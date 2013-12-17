@@ -1,10 +1,13 @@
 #include <iostream>
-#include <owl_om/Dummy.hpp>
+#include <owl_om/Class.hpp>
+#include <owl_om/Vocabulary.hpp>
 
 int main(int argc, char** argv)
 {
-	owl_om::DummyClass dummyClass;
-	dummyClass.welcome();
+    using namespace owl_om;
 
-	return 0;
+    std::cout << vocabulary::OWL::BaseUri() << std::endl;
+    std::cout << vocabulary::OWL::Class() << std::endl;
+
+    Class a("TEST");
 }

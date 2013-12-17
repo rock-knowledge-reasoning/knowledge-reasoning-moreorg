@@ -1,3 +1,4 @@
 rock_testsuite(test suite.cpp
-   test_Dummy.cpp
-   DEPS owl_om)
+    test_Model.cpp
+    DEPS owl_om)
+
