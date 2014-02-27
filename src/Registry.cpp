@@ -9,25 +9,25 @@ Registry::Registry()
 {
     // The class that all others will subclass
     Class::Ptr thing( new Class( vocabulary::OWL::Thing() ) );
-    registerClass(vocabulary::OWL::Thing(), thing);
+    registerClass(thing);
 
     // owl:Nothing subclasses all other classes
     Class::Ptr nothing(new Class( vocabulary::OWL::Nothing() ) );
     //// add explitely since it will not have been added (due to reverse dependency)
     nothing->addSuperClass(thing);
-    registerClass(vocabulary::OWL::Nothing(), nothing );
+    registerClass(nothing);
 
-    Property::Ptr property(new Property());
-    registerProperty(vocabulary::RDF::Property(), property);
+    Property::Ptr property(new Property( vocabulary::RDF::Property()));
+    registerProperty(property);
 
-    Property::Ptr datatypeProperty(new DatatypeProperty());
-    registerProperty(vocabulary::OWL::DatatypeProperty(), datatypeProperty);
+    Property::Ptr datatypeProperty(new DatatypeProperty( vocabulary::OWL::DatatypeProperty()));
+    registerProperty(datatypeProperty);
 
-    Property::Ptr objectProperty(new ObjectProperty());
-    registerProperty(vocabulary::OWL::ObjectProperty(), objectProperty);
+    Property::Ptr objectProperty(new ObjectProperty( vocabulary::OWL::ObjectProperty()));
+    registerProperty(objectProperty);
 
-    Property::Ptr annotationProperty(new AnnotationProperty());
-    registerProperty(vocabulary::OWL::AnnotationProperty(), annotationProperty);
+    Property::Ptr annotationProperty(new AnnotationProperty(vocabulary::OWL::AnnotationProperty()));
+    registerProperty(annotationProperty);
 }
 
 Class::Ptr Registry::getClass(const Name& name) const
@@ -42,9 +42,9 @@ Class::Ptr Registry::getClass(const Name& name) const
     throw std::runtime_error(msg);
 }
 
-void Registry::registerClass(const Name& name, Class::Ptr klass)
+void Registry::registerClass(Class::Ptr klass)
 {
-    LOG_DEBUG_S << name;
+    std::string name = klass->getName();
 
     if(mClasses.find(name) != mClasses.end())
     {
@@ -84,8 +84,9 @@ Property::Ptr Registry::getProperty(const Name& name) const
     throw std::runtime_error(msg);
 }
 
-void Registry::registerProperty(const Name& name, Property::Ptr klass)
+void Registry::registerProperty(Property::Ptr klass)
 {
+    std::string name = klass->getName();
     if(mProperties.find(name) != mProperties.end())
     {
         std::string msg = "owl_om::Registry: property for '" + name + "' already registered";

@@ -1,6 +1,7 @@
 #include "Class.hpp"
 #include "Registry.hpp"
 
+#include <stdexcept>
 #include <owl_om/Property.hpp>
 
 namespace owl_om {
@@ -36,17 +37,22 @@ bool Class::subclassOf(const Class& klass) const
 
 bool Class::subclassOf(const Name& klassName) const
 {
-    Map::const_iterator cit = mSuperClasses.find(klassName);
-    if(cit != mSuperClasses.end())
+    Map::const_iterator cit = mSuperClasses.begin();
+    for(; cit != mSuperClasses.end(); ++cit)
     {
-        return true;
+        if(cit->first == klassName)
+        {
+            return true;
+        }
+
+        // Transitive property, i.e. if superklass is subclass of A
+        // so is this class
+        if(cit->second->subclassOf(klassName))
+        {
+            return true;
+        }
     }
     return false;
-}
-
-bool Class::hasProperty(const Property& property) const
-{
-    return hasProperty(property.getName());
 }
 
 bool Class::hasProperty(const Name& propertyName) const
@@ -57,6 +63,17 @@ bool Class::hasProperty(const Name& propertyName) const
         return true;
     }
     return false;
+}
+
+Property::Ptr Class::getProperty(const Name& propertyName) const
+{
+    Property::Map::const_iterator cit = mProperties.find( propertyName );
+    if(cit != mProperties.end())
+    {
+        return cit->second;
+    }
+    std::string msg = "owl_om::Property: property '" + propertyName + "' does not exist for class '" + getName() + "'";
+    throw std::runtime_error(msg);
 }
 
 std::string Class::toString() const

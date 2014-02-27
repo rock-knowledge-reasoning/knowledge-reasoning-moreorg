@@ -7,6 +7,11 @@
 
 namespace owl_om {
 
+/**
+ * Custom TBox representation to allow for an
+ * intuitive 'object oriented' handling of OWL based
+ * axioms
+ */
 class Registry
 {
 public:
@@ -22,7 +27,7 @@ public:
      * \param name
      * \param klass
      */
-    void registerClass(const Name& name, Class::Ptr klass);
+    void registerClass(Class::Ptr klass);
 
     /**
      * Get map of all classes
@@ -38,7 +43,7 @@ public:
     /**
      * Add property
      */
-    void registerProperty(const Name& name, Property::Ptr klass);
+    void registerProperty(Property::Ptr klass);
 
     /**
      * Get all properties

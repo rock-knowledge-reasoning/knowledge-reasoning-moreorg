@@ -30,6 +30,8 @@ class Utils
 {
 public:
     static SplitUri extractBaseUri(const Uri& uri);
+
+    static Uri adaptPlaceholder(std::string& uri);
 };
 
 } // end namespace vocabulary
