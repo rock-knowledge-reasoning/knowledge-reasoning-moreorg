@@ -1,4 +1,5 @@
-rock_testsuite(test suite.cpp
+rock_testsuite(${PROJECT_NAME}-test suite.cpp
     test_Model.cpp
+    test_ModelGeneration.cpp
     DEPS owl_om)
 

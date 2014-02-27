@@ -1,0 +1,783 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY om-schema "http://www.rock-robotics.org/2013/09/om-schema#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.rock-robotics.org/2013/09/om-schema#"
+     xml:base="http://www.rock-robotics.org/2013/09/om-schema"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:om-schema="http://www.rock-robotics.org/2013/09/om-schema#">
+    <owl:Ontology rdf:about="http://www.rock-robotics.org/2013/09/om-schema"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#has -->
+
+    <owl:ObjectProperty rdf:about="&om-schema;has">
+        <rdfs:range rdf:resource="&om-schema;OrganizationElement"/>
+        <rdfs:domain rdf:resource="&om-schema;OrganizationElement"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#hasCapability -->
+
+    <owl:ObjectProperty rdf:about="&om-schema;hasCapability">
+        <rdfs:domain rdf:resource="&om-schema;Actor"/>
+        <rdfs:range rdf:resource="&om-schema;Service"/>
+        <rdfs:subPropertyOf rdf:resource="&om-schema;has"/>
+        <owl:equivalentProperty rdf:resource="&om-schema;providesService"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#hasInterface -->
+
+    <owl:ObjectProperty rdf:about="&om-schema;hasInterface">
+        <rdfs:range rdf:resource="&om-schema;Interface"/>
+        <rdfs:domain rdf:resource="&om-schema;RobotModel"/>
+        <rdfs:subPropertyOf rdf:resource="&om-schema;has"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#hasResourceCosts -->
+
+    <owl:ObjectProperty rdf:about="&om-schema;hasResourceCosts">
+        <rdfs:domain rdf:resource="&om-schema;Capability"/>
+        <rdfs:range rdf:resource="&om-schema;Resource"/>
+        <rdfs:subPropertyOf rdf:resource="&om-schema;has"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#provides -->
+
+    <owl:ObjectProperty rdf:about="&om-schema;provides">
+        <rdfs:domain rdf:resource="&om-schema;OrganizationElement"/>
+        <rdfs:range rdf:resource="&om-schema;Service"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#providesService -->
+
+    <owl:ObjectProperty rdf:about="&om-schema;providesService">
+        <rdfs:domain rdf:resource="&om-schema;Actor"/>
+        <rdfs:range rdf:resource="&om-schema;Service"/>
+        <rdfs:subPropertyOf rdf:resource="&om-schema;provides"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#requires -->
+
+    <owl:ObjectProperty rdf:about="&om-schema;requires">
+        <rdfs:range rdf:resource="&om-schema;OrganizationElement"/>
+        <rdfs:domain rdf:resource="&om-schema;OrganizationElement"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#requiresCapability -->
+
+    <owl:ObjectProperty rdf:about="&om-schema;requiresCapability">
+        <rdfs:domain rdf:resource="&om-schema;Role"/>
+        <rdfs:range rdf:resource="&om-schema;Service"/>
+        <rdfs:subPropertyOf rdf:resource="&om-schema;requires"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#requiresResource -->
+
+    <owl:ObjectProperty rdf:about="&om-schema;requiresResource">
+        <rdfs:domain rdf:resource="&om-schema;OrganizationElement"/>
+        <rdfs:range rdf:resource="&om-schema;OrganizationElement"/>
+        <rdfs:subPropertyOf rdf:resource="&om-schema;requires"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#activityProperty -->
+
+    <owl:DatatypeProperty rdf:about="&om-schema;activityProperty">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&om-schema;Activity"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#hasBreakCondition -->
+
+    <owl:DatatypeProperty rdf:about="&om-schema;hasBreakCondition">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:domain rdf:resource="&om-schema;Task"/>
+        <rdfs:subPropertyOf rdf:resource="&om-schema;activityProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#isLooping -->
+
+    <owl:DatatypeProperty rdf:about="&om-schema;isLooping">
+        <rdfs:comment>Looping activities reoccur until a break condition is met</rdfs:comment>
+        <rdfs:domain rdf:resource="&om-schema;Task"/>
+        <rdfs:subPropertyOf rdf:resource="&om-schema;activityProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#isSequential -->
+
+    <owl:DatatypeProperty rdf:about="&om-schema;isSequential">
+        <rdfs:domain rdf:resource="&om-schema;ComplexActivity"/>
+        <rdfs:subPropertyOf rdf:resource="&om-schema;activityProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#AILA -->
+
+    <owl:Class rdf:about="&om-schema;AILA">
+        <rdfs:subClassOf rdf:resource="&om-schema;RobotModel"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Action -->
+
+    <owl:Class rdf:about="&om-schema;Action">
+        <rdfs:subClassOf rdf:resource="&om-schema;PrimitiveActivity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Activity -->
+
+    <owl:Class rdf:about="&om-schema;Activity">
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+        <rdfs:comment>Activity describes the performance of a single actor into order to fulfill a goal</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Actor -->
+
+    <owl:Class rdf:about="&om-schema;Actor">
+        <rdfs:subClassOf rdf:resource="&om-schema;NonConsumable"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Asguard -->
+
+    <owl:Class rdf:about="&om-schema;Asguard">
+        <rdfs:subClassOf rdf:resource="&om-schema;RobotModel"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Bandwidth -->
+
+    <owl:Class rdf:about="&om-schema;Bandwidth">
+        <rdfs:subClassOf rdf:resource="&om-schema;NonConsumable"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#BatteryPayloadItem -->
+
+    <owl:Class rdf:about="&om-schema;BatteryPayloadItem">
+        <rdfs:subClassOf rdf:resource="&om-schema;PayloadItem"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#CREX -->
+
+    <owl:Class rdf:about="&om-schema;CREX">
+        <rdfs:subClassOf rdf:resource="&om-schema;RobotModel"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#CameraPayloadItem -->
+
+    <owl:Class rdf:about="&om-schema;CameraPayloadItem">
+        <rdfs:subClassOf rdf:resource="&om-schema;PayloadItem"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Capability -->
+
+    <owl:Class rdf:about="&om-schema;Capability">
+        <owl:equivalentClass rdf:resource="&om-schema;Service"/>
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#CapabilityRequirement -->
+
+    <owl:Class rdf:about="&om-schema;CapabilityRequirement">
+        <owl:equivalentClass rdf:resource="&om-schema;ServiceRequirement"/>
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#ComplexActivity -->
+
+    <owl:Class rdf:about="&om-schema;ComplexActivity">
+        <rdfs:subClassOf rdf:resource="&om-schema;Activity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#ConsumableResource -->
+
+    <owl:Class rdf:about="&om-schema;ConsumableResource">
+        <rdfs:subClassOf rdf:resource="&om-schema;Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#EMI -->
+
+    <owl:Class rdf:about="&om-schema;EMI">
+        <rdfs:subClassOf rdf:resource="&om-schema;HardwareInterface"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Energy -->
+
+    <owl:Class rdf:about="&om-schema;Energy">
+        <rdfs:subClassOf rdf:resource="&om-schema;ConsumableResource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#EnergyGeneration -->
+
+    <owl:Class rdf:about="&om-schema;EnergyGeneration">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#EnergyProvider -->
+
+    <owl:Class rdf:about="&om-schema;EnergyProvider">
+        <rdfs:subClassOf rdf:resource="&om-schema;Role"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Exploration -->
+
+    <owl:Class rdf:about="&om-schema;Exploration">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Explorer -->
+
+    <owl:Class rdf:about="&om-schema;Explorer">
+        <rdfs:subClassOf rdf:resource="&om-schema;Role"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Goal -->
+
+    <owl:Class rdf:about="&om-schema;Goal">
+        <owl:equivalentClass rdf:resource="&om-schema;PartialWorldState"/>
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#HardwareInterface -->
+
+    <owl:Class rdf:about="&om-schema;HardwareInterface">
+        <rdfs:subClassOf rdf:resource="&om-schema;Interface"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#ImageAnalysis -->
+
+    <owl:Class rdf:about="&om-schema;ImageAnalysis">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Imaging -->
+
+    <owl:Class rdf:about="&om-schema;Imaging">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Interface -->
+
+    <owl:Class rdf:about="&om-schema;Interface">
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Localization -->
+
+    <owl:Class rdf:about="&om-schema;Localization">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Location -->
+
+    <owl:Class rdf:about="&om-schema;Location">
+        <rdfs:subClassOf rdf:resource="&om-schema;PartialWorldState"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Locomotion -->
+
+    <owl:Class rdf:about="&om-schema;Locomotion">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Manipulation -->
+
+    <owl:Class rdf:about="&om-schema;Manipulation">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Manipulator -->
+
+    <owl:Class rdf:about="&om-schema;Manipulator">
+        <rdfs:subClassOf rdf:resource="&om-schema;Role"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Mapping -->
+
+    <owl:Class rdf:about="&om-schema;Mapping">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Memory -->
+
+    <owl:Class rdf:about="&om-schema;Memory">
+        <rdfs:subClassOf rdf:resource="&om-schema;NonConsumable"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Mission -->
+
+    <owl:Class rdf:about="&om-schema;Mission">
+        <rdfs:subClassOf rdf:resource="&om-schema;Scene"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Navigation -->
+
+    <owl:Class rdf:about="&om-schema;Navigation">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#NonConsumable -->
+
+    <owl:Class rdf:about="&om-schema;NonConsumable">
+        <rdfs:subClassOf rdf:resource="&om-schema;Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#ObjectDetection -->
+
+    <owl:Class rdf:about="&om-schema;ObjectDetection">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Operator -->
+
+    <owl:Class rdf:about="&om-schema;Operator">
+        <rdfs:subClassOf rdf:resource="&om-schema;Actor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#OrganizationElement -->
+
+    <owl:Class rdf:about="&om-schema;OrganizationElement"/>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#PartialWorldState -->
+
+    <owl:Class rdf:about="&om-schema;PartialWorldState">
+        <rdfs:subClassOf rdf:resource="&om-schema;WorldState"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#PayloadItem -->
+
+    <owl:Class rdf:about="&om-schema;PayloadItem">
+        <rdfs:subClassOf rdf:resource="&om-schema;RobotModel"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Position -->
+
+    <owl:Class rdf:about="&om-schema;Position">
+        <rdfs:subClassOf rdf:resource="&om-schema;PartialWorldState"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#PrimitiveActivity -->
+
+    <owl:Class rdf:about="&om-schema;PrimitiveActivity">
+        <rdfs:subClassOf rdf:resource="&om-schema;Activity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#ProcessingPower -->
+
+    <owl:Class rdf:about="&om-schema;ProcessingPower">
+        <rdfs:subClassOf rdf:resource="&om-schema;NonConsumable"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#RendevouzPoint -->
+
+    <owl:Class rdf:about="&om-schema;RendevouzPoint">
+        <rdfs:subClassOf rdf:resource="&om-schema;PartialWorldState"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Resource -->
+
+    <owl:Class rdf:about="&om-schema;Resource">
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Robot -->
+
+    <owl:Class rdf:about="&om-schema;Robot">
+        <rdfs:subClassOf rdf:resource="&om-schema;Actor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#RobotModel -->
+
+    <owl:Class rdf:about="&om-schema;RobotModel">
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Role -->
+
+    <owl:Class rdf:about="&om-schema;Role">
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+        <rdfs:comment>Role requires a set of capabilities and a goal</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Sampling -->
+
+    <owl:Class rdf:about="&om-schema;Sampling">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Scene -->
+
+    <owl:Class rdf:about="&om-schema;Scene">
+        <rdfs:subClassOf rdf:resource="&om-schema;ComplexActivity"/>
+        <rdfs:comment>Scene describes a complex activity with multiple actors</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Service -->
+
+    <owl:Class rdf:about="&om-schema;Service">
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+        <rdfs:comment>A capability describes the power of a system to perform an intended modification of the world state</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#ServiceRequirement -->
+
+    <owl:Class rdf:about="&om-schema;ServiceRequirement">
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Sherpa -->
+
+    <owl:Class rdf:about="&om-schema;Sherpa">
+        <rdfs:subClassOf rdf:resource="&om-schema;RobotModel"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Shuttle -->
+
+    <owl:Class rdf:about="&om-schema;Shuttle">
+        <rdfs:subClassOf rdf:resource="&om-schema;Role"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#SoftwareInterface -->
+
+    <owl:Class rdf:about="&om-schema;SoftwareInterface">
+        <rdfs:subClassOf rdf:resource="&om-schema;Interface"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Space -->
+
+    <owl:Class rdf:about="&om-schema;Space">
+        <owl:equivalentClass rdf:resource="&om-schema;Storage"/>
+        <rdfs:subClassOf rdf:resource="&om-schema;NonConsumable"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#SpaceClimber -->
+
+    <owl:Class rdf:about="&om-schema;SpaceClimber">
+        <rdfs:subClassOf rdf:resource="&om-schema;RobotModel"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Storage -->
+
+    <owl:Class rdf:about="&om-schema;Storage">
+        <rdfs:subClassOf rdf:resource="&om-schema;NonConsumable"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Task -->
+
+    <owl:Class rdf:about="&om-schema;Task">
+        <rdfs:subClassOf rdf:resource="&om-schema;ComplexActivity"/>
+        <rdfs:comment>Task can involve single or multiple robots, but requires sequential execution of each activity (at system level)</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Team -->
+
+    <owl:Class rdf:about="&om-schema;Team">
+        <rdfs:subClassOf rdf:resource="&om-schema;Actor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Time -->
+
+    <owl:Class rdf:about="&om-schema;Time">
+        <rdfs:subClassOf rdf:resource="&om-schema;ConsumableResource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#Transport -->
+
+    <owl:Class rdf:about="&om-schema;Transport">
+        <rdfs:subClassOf rdf:resource="&om-schema;Service"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#WorldState -->
+
+    <owl:Class rdf:about="&om-schema;WorldState">
+        <rdfs:subClassOf rdf:resource="&om-schema;OrganizationElement"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#GPS -->
+
+    <owl:NamedIndividual rdf:about="&om-schema;GPS">
+        <rdf:type rdf:resource="&om-schema;Localization"/>
+        <provides rdf:resource="&om-schema;PayloadItemTransport"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#PayloadBay -->
+
+    <owl:NamedIndividual rdf:about="&om-schema;PayloadBay">
+        <rdf:type rdf:resource="&om-schema;Storage"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#PayloadItemTransport -->
+
+    <owl:NamedIndividual rdf:about="&om-schema;PayloadItemTransport">
+        <rdf:type rdf:resource="&om-schema;Transport"/>
+        <requiresResource rdf:resource="&om-schema;PayloadBay"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2013/09/om-schema#sherpa_0 -->
+
+    <owl:NamedIndividual rdf:about="&om-schema;sherpa_0">
+        <rdf:type rdf:resource="&om-schema;Robot"/>
+        <providesService rdf:resource="&om-schema;PayloadItemTransport"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="&om-schema;EnergyGeneration"/>
+            <rdf:Description rdf:about="&om-schema;Exploration"/>
+            <rdf:Description rdf:about="&om-schema;ImageAnalysis"/>
+            <rdf:Description rdf:about="&om-schema;Imaging"/>
+            <rdf:Description rdf:about="&om-schema;Localization"/>
+            <rdf:Description rdf:about="&om-schema;Locomotion"/>
+            <rdf:Description rdf:about="&om-schema;Manipulation"/>
+            <rdf:Description rdf:about="&om-schema;Mapping"/>
+            <rdf:Description rdf:about="&om-schema;Navigation"/>
+            <rdf:Description rdf:about="&om-schema;ObjectDetection"/>
+            <rdf:Description rdf:about="&om-schema;Sampling"/>
+            <rdf:Description rdf:about="&om-schema;Transport"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="&om-schema;EnergyProvider"/>
+            <rdf:Description rdf:about="&om-schema;Explorer"/>
+            <rdf:Description rdf:about="&om-schema;Manipulator"/>
+            <rdf:Description rdf:about="&om-schema;Shuttle"/>
+        </owl:members>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="&om-schema;Action"/>
+            <rdf:Description rdf:about="&om-schema;Goal"/>
+            <rdf:Description rdf:about="&om-schema;Resource"/>
+            <rdf:Description rdf:about="&om-schema;Role"/>
+            <rdf:Description rdf:about="&om-schema;Service"/>
+            <rdf:Description rdf:about="&om-schema;ServiceRequirement"/>
+        </owl:members>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+
