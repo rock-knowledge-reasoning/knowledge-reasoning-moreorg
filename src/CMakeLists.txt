@@ -1,6 +1,7 @@
 find_package(Boost REQUIRED regex)
 rock_library(owl_om
     SOURCES Class.cpp
+        Instance.cpp
         Registry.cpp
         Vocabulary.cpp
         db/KnowledgeBase.cpp
@@ -10,6 +11,7 @@ rock_library(owl_om
         gen/ModelGenerator.cpp
         gen/NamingConversion.cpp
     HEADERS Class.hpp
+        Instance.hpp
         Property.hpp
         Registry.hpp
         Vocabulary.hpp
