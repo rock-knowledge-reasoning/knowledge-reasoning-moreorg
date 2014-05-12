@@ -3,6 +3,7 @@ rock_library(owl_om
     SOURCES Class.cpp
         Instance.cpp
         KnowledgeBase.cpp
+        OrganizationModel.cpp
         Registry.cpp
         Vocabulary.cpp
         db/KnowledgeBase.cpp
@@ -14,6 +15,7 @@ rock_library(owl_om
     HEADERS Class.hpp
         Instance.hpp
         KnowledgeBase.hpp
+        OrganizationModel.hpp
         Property.hpp
         Registry.hpp
         Vocabulary.hpp
