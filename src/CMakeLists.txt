@@ -2,6 +2,7 @@ find_package(Boost REQUIRED regex)
 rock_library(owl_om
     SOURCES Class.cpp
         Instance.cpp
+        KnowledgeBase.cpp
         Registry.cpp
         Vocabulary.cpp
         db/KnowledgeBase.cpp
@@ -12,6 +13,7 @@ rock_library(owl_om
         gen/NamingConversion.cpp
     HEADERS Class.hpp
         Instance.hpp
+        KnowledgeBase.hpp
         Property.hpp
         Registry.hpp
         Vocabulary.hpp
@@ -24,7 +26,7 @@ rock_library(owl_om
         db/rdf/SparqlInterface.hpp
         gen/ModelGenerator.hpp
         gen/NamingConversion.hpp
-    DEPS_PKGCONFIG base-lib redland soprano
+    DEPS_PKGCONFIG base-lib redland soprano factpp
 )
 target_link_libraries(owl_om ctemplate ${Boost_LIBRARIES})
 
