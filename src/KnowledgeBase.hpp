@@ -208,6 +208,14 @@ public:
      */
     Axiom inverseOf(const IRI& baseProperty, const IRI& inverseProperty);
 
+    /**
+     * Adds an object property restriction
+     * \param type Type, e.g., depending of existential or universal quantifier is required
+     * \param relationProperty the property to which the restriction will refer
+     * \param klassOrInstance property value
+     * \param cardinality if cardinality type is selected this defines the min,max or exact cardinality to use
+     * \return corresponding class expression
+     */
     ClassExpression objectPropertyRestriction(restriction::Type type, const IRI& relationProperty, const IRI& klassOrInstance, int cardinality = -1);
 
     /**
