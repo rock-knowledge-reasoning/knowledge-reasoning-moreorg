@@ -133,7 +133,8 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
 
     {
         kb.refresh();
-        std::string instance = kb.resolveAlias("move_to");
+        IRIList instanceList = kb.getSameAs("move_to");
+        IRI instance = instanceList[0];
         assert(instance == "MoveTo/requirement#0");
         assert ( kb.allRelatedInstances(instance,"dependsOn").size() == 4 );
     }

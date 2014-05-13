@@ -285,9 +285,10 @@ public:
 
     /**
      * Resolve an alias / instance name
-     * \return Resolved alias or the actual instance name if there is no alias
+     * \param inverse in order to find an alias for a given instance set to true
+     * \return Resolved aliases or a list containing only the instance name if there is no alias
      */
-    IRI resolveAlias(const IRI& aliasOrInstance);
+    IRIList getSameAs(const IRI& instanceOrAlias);
 
     /**
      * Make the list of instances unique, i.e., remove redundant information (aliases)

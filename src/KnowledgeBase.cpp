@@ -452,7 +452,7 @@ IRI KnowledgeBase::typeOf(const IRI& instance)
     return types[0];
 }
 
-IRI KnowledgeBase::resolveAlias(const IRI& aliasOrInstance)
+IRIList KnowledgeBase::getSameAs(const IRI& aliasOrInstance)
 {
     TDLIndividualExpression* f_instance = getExpressionManager()->Individual(aliasOrInstance);
 
@@ -470,9 +470,11 @@ IRI KnowledgeBase::resolveAlias(const IRI& aliasOrInstance)
     delete[] result;
     if(alias.empty())
     {
-        return aliasOrInstance;
+        IRIList list;
+        list.push_back(aliasOrInstance);
+        return list;
     } else {
-       return alias[0];
+        return alias;
     }
 }
 
