@@ -130,11 +130,17 @@ bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherR
             IRI otherInterface = *oit;
             IRI otherInterfaceType = mKnowledgeBase.typeOf(otherInterface);
 
-            if( mKnowledgeBase.isSubclassOf( mKnowledgeBase.intersectionOf(interfaceType, otherInterfaceType), EntitiesIRIs[COMPATIBILITY]) )
+            if( mKnowledgeBase.assertAndAddRelation(interface, "compatibleWith", otherInterface) )
             {
                 LOG_INFO_S << resource << " compatibleWith " << otherResource << " via " << interface << " and " << otherInterface;
                 return true;
             }
+
+            //if( mKnowledgeBase.isSubclassOf( mKnowledgeBase.intersectionOf(interfaceType, otherInterfaceType), EntitiesIRIs[COMPATIBILITY]) )
+            //{
+            //    LOG_INFO_S << resource << " compatibleWith " << otherResource << " via " << interface << " and " << otherInterface;
+            //    return true;
+            //}
         }
     }
 

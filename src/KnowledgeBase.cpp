@@ -55,16 +55,9 @@ void KnowledgeBase::setVerbose()
     mKernel->setVerboseOutput(true);
 }
 
-bool KnowledgeBase::refresh()
+void KnowledgeBase::refresh()
 {
-    mKernel->preprocessKB();
-    if( !mKernel->isKBConsistent() )
-    {
-        return false;
-    } else {
-        mKernel->realiseKB();
-    }
-    return true;
+    mKernel->realiseKB();
 }
 
 Axiom KnowledgeBase::transitiveProperty(const IRI& property)
@@ -136,6 +129,27 @@ ClassExpression KnowledgeBase::intersectionOf(const IRIList& klasses)
     return ClassExpression( f_and );
 }
 
+ClassExpression KnowledgeBase::disjunctionOf(const IRI& klass, const IRI& otherKlass)
+{
+    IRIList klasses;
+    klasses.push_back(klass);
+    klasses.push_back(otherKlass);
+    return disjunctionOf(klasses);
+}
+
+ClassExpression KnowledgeBase::disjunctionOf(const IRIList& klasses)
+{
+    IRIList::const_iterator cit = klasses.begin();
+    getExpressionManager()->newArgList();
+    for(; cit != klasses.end(); ++cit)
+    {
+        TDLConceptExpression* f_concept = getExpressionManager()->Concept(*cit);
+        getExpressionManager()->addArg(f_concept);
+    }
+    TDLConceptExpression* f_or = getExpressionManager()->Or();
+    return ClassExpression( f_or );
+}
+
 Axiom KnowledgeBase::alias(const IRI& alias, const ClassExpression& expression)
 {
     TDLConceptExpression* f_concept = getExpressionManager()->Concept(alias);
@@ -173,25 +187,44 @@ Axiom KnowledgeBase::alias(const IRI& aliasName, const IRI& iri, EntityType type
 }
 
 
-Axiom KnowledgeBase::disjointClasses(const IRI& klass, const IRI& otherKlass)
+Axiom KnowledgeBase::disjoint(const IRI& klassOrInstance, const IRI& otherKlassOrInstance, KnowledgeBase::EntityType type)
 {
-    IRIList klasses;
-    klasses.push_back(klass);
-    klasses.push_back(otherKlass);
-    return disjointClasses(klasses);
+    IRIList klassesOrInstances;
+    klassesOrInstances.push_back(klassOrInstance);
+    klassesOrInstances.push_back(otherKlassOrInstance);
+    return disjoint(klassesOrInstances, type);
 }
 
-Axiom KnowledgeBase::disjointClasses(const IRIList& klasses)
+Axiom KnowledgeBase::disjoint(const IRIList& klassesOrInstances, KnowledgeBase::EntityType type)
 {
-    IRIList::const_iterator cit = klasses.begin();
+    IRIList::const_iterator cit = klassesOrInstances.begin();
     getExpressionManager()->newArgList();
-    for(; cit != klasses.end(); ++cit)
+    for(; cit != klassesOrInstances.end(); ++cit)
     {
-        TDLConceptExpression* f_concept = getExpressionManager()->Concept(*cit);
-        getExpressionManager()->addArg(f_concept);
+        if(type == CLASS)
+        {
+            TDLConceptExpression* f_concept = getExpressionManager()->Concept(*cit);
+            getExpressionManager()->addArg(f_concept);
+        } else if(type == INSTANCE)
+        {
+            TDLIndividualExpression* f_individual = getExpressionManager()->Individual(*cit);
+            getExpressionManager()->addArg(f_individual);
+        }
     }
-    TDLAxiom* axiom = mKernel->disjointConcepts();
-    return Axiom(axiom);
+
+    if(type == CLASS)
+    {
+        TDLAxiom* axiom = mKernel->disjointConcepts();
+        return Axiom(axiom);
+    } else if(type == INSTANCE)
+    {
+        LOG_WARN("PROCESS DIFFERENT");
+        TDLAxiom* axiom = mKernel->processDifferent();
+        return Axiom(axiom);
+    }
+
+    throw std::runtime_error("owl_om::KnowledgeBase::disjoint requires either list of classes or instances");
+
 }
 
 Axiom KnowledgeBase::instanceOf(const IRI& individual, const IRI& klass)
@@ -201,13 +234,18 @@ Axiom KnowledgeBase::instanceOf(const IRI& individual, const IRI& klass)
     return Axiom( mKernel->instanceOf(f_individual, f_class) );
 }
 
-Axiom KnowledgeBase::relatedTo(const IRI& instance, const IRI& relationProperty, const IRI& otherInstance)
+Axiom KnowledgeBase::relatedTo(const IRI& instance, const IRI& relationProperty, const IRI& otherInstance, bool isTrue)
 {
     TDLObjectRoleExpression* f_relation = getExpressionManager()->ObjectRole(relationProperty);
     TDLIndividualExpression* f_individual = getExpressionManager()->Individual(instance);
     TDLIndividualExpression* f_otherIndividual = getExpressionManager()->Individual(otherInstance);
 
-    return Axiom( mKernel->relatedTo(f_individual, f_relation, f_otherIndividual) );
+    if(isTrue)
+    {
+        return Axiom( mKernel->relatedTo(f_individual, f_relation, f_otherIndividual) );
+    } else {
+        return Axiom( mKernel->relatedToNot(f_individual, f_relation, f_otherIndividual) );
+    }
 }
 
 Axiom KnowledgeBase::domainOf(const IRI& property, const IRI& domain, PropertyType propertyType)
@@ -243,15 +281,15 @@ Axiom KnowledgeBase::inverseOf(const IRI& base, const IRI& inverse)
     return Axiom( mKernel->setInverseRoles(f_role, f_inverse) );
 }
 
-ClassExpression KnowledgeBase::oneOf(const IRIList& klassList)
+ClassExpression KnowledgeBase::oneOf(const IRIList& instanceList)
 {
-    IRIList::const_iterator cit = klassList.begin();
-    for(; cit != klassList.end(); ++cit)
+    IRIList::const_iterator cit = instanceList.begin();
+    for(; cit != instanceList.end(); ++cit)
     {
-        IRI klass = *cit;
-        TDLConceptExpression* f_concept = getExpressionManager()->Concept(klass);
+        IRI instance = *cit;
+        TDLIndividualExpression* f_instance = getExpressionManager()->Individual(instance);
         getExpressionManager()->newArgList();
-        getExpressionManager()->addArg(f_concept);
+        getExpressionManager()->addArg(f_instance);
     }
     return ClassExpression( getExpressionManager()->OneOf() );
 }
@@ -296,6 +334,8 @@ ClassExpression KnowledgeBase::objectPropertyRestriction(restriction::Type type,
             return ClassExpression( getExpressionManager()->Cardinality(cardinality, f_relation, f_concept) );
         }
     }
+
+    throw std::runtime_error("owl_om::KnowledgeBase::objectPropertyRestriction: Unknown restriction type");
 }
 
 bool KnowledgeBase::isSubclassOf(const IRI& subclass, const IRI& parentClass)
@@ -511,6 +551,33 @@ IRIList KnowledgeBase::uniqueList(const IRIList& individuals)
     }
 
     return unique;
+}
+
+void KnowledgeBase::retract(Axiom& a)
+{
+    mKernel->retract(a.get());
+}
+
+bool KnowledgeBase::assertAndAddRelation(const IRI& instance, const IRI& relation, const IRI& otherInstance)
+{
+    if( isRelatedTo(instance, relation, otherInstance) )
+    {
+        return true;
+    } else {
+        // seems to be unknown, or false so try add
+        Axiom a = relatedTo(instance, relation, otherInstance);
+        try {
+            refresh();
+            LOG_DEBUG_S << "'" << instance << "' '" << relation << "' '" << otherInstance << " is true -- added to db";
+            return true;
+        } catch(const std::exception& e)
+        {
+            // ok, that relation has already be added to the knowledge database
+            retract(a);
+            LOG_DEBUG_S << "'" << instance << "' '" << relation << "' '" << otherInstance << " is false";
+            return false;
+        }
+    }
 }
 
 } // namespace owl_om

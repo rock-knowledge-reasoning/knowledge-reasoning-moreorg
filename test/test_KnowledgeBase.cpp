@@ -9,6 +9,7 @@ using namespace owl_om;
 BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
 {
     KnowledgeBase kb;
+    kb.setVerbose();
     kb.subclassOf("Derived", "Base");
     kb.subclassOf("DerivedDerived", "Derived");
     BOOST_REQUIRE_MESSAGE( kb.isSubclassOf("Derived", "Base"), "Derived is subclass of base");
@@ -16,6 +17,21 @@ BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
     kb.instanceOf("Instance", "DerivedDerived");
     BOOST_REQUIRE_MESSAGE( kb.isInstanceOf("Instance", "DerivedDerived"), "instance of DerivedDerived");
     BOOST_REQUIRE_MESSAGE( kb.isInstanceOf("Instance", "Base"), "instance of Base");
+
+    kb.instanceOf("A","Base");
+    kb.instanceOf("B","Base");
+
+    kb.disjoint("A","B", KnowledgeBase::INSTANCE );
+    kb.relatedTo("A","sibling","B");
+    Axiom a = kb.relatedTo("A","sibling","B", false);
+
+    BOOST_REQUIRE_THROW(kb.refresh(), std::exception);
+    kb.retract(a);
+    BOOST_REQUIRE_NO_THROW(kb.refresh()) //, "Kb inconsistent if inverses relation both apply" );
+
+    BOOST_REQUIRE_MESSAGE( kb.isRelatedTo("A", "sibling", "B"), "A and B are related");
+    BOOST_REQUIRE_THROW( !kb.isRelatedTo("A", "unknown", "B"), std::exception);
+
 }
 
 BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
@@ -23,6 +39,7 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     OrganizationModel om;
 
     KnowledgeBase& kb = om.knowledgeBase();
+    kb.setVerbose();
     // General concepts:
     kb.subclassOf("Mission","Thing");
     assert( kb.isSubclassOf("Mission", "Thing") );
@@ -48,14 +65,15 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
 
     kb.subclassOf("EmiActive", "ElectroMechanicalInterface");
     kb.subclassOf("EmiPassive", "ElectroMechanicalInterface");
+    kb.subclassOf("EmiNeutral", "ElectroMechanicalInterface");
 
-    // Define compatible interfaces by using unions that subclass compatiblity
-    kb.subclassOf("Compatibility", "Interface");
-    ClassExpression e = kb.intersectionOf("EmiActive", "EmiPassive");
-    kb.alias("MatchingDevices#0", e);
-    kb.subclassOf("MatchingDevices#0", "Compatibility");
+    // // Define compatible interfaces by using unions that subclass compatiblity
+    // kb.subclassOf("Compatibility", "Interface");
+    // ClassExpression e = kb.intersectionOf("EmiActive", "EmiPassive");
+    // kb.alias("MatchingDevices#0", e);
+    // kb.subclassOf("MatchingDevices#0", "Compatibility");
 
-    BOOST_REQUIRE_MESSAGE( kb.isSubclassOf( kb.intersectionOf("EmiActive", "EmiPassive") , "Compatibility"), "subclass of intersection");
+    // BOOST_REQUIRE_MESSAGE( kb.isSubclassOf( kb.intersectionOf("EmiActive", "EmiPassive") , "Compatibility"), "subclass of intersection");
 
     kb.subclassOf("Camera", "Resource");
     kb.subclassOf("Power", "Resource");
@@ -216,6 +234,44 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     kb.allInverseRelatedInstances("Camera/instance#1","has");
 
 
+    {
+        ClassExpression emiActiveCompatible = kb.disjunctionOf("EmiPassive","EmiNeutral");
+        kb.alias("CompatibleInterfacesEmiActive", emiActiveCompatible);
+        // Creates a restriction that all systems that own an EMI are ReconfigurableActors
+        ClassExpression forallRestriction = kb.objectPropertyRestriction(restriction::FORALL, "compatibleWith", "CompatibleInterfacesEmiActive");
+        kb.alias("EmiActive", forallRestriction);
+        kb.refresh();
+    }
+
+    {
+        ClassExpression emiPassiveCompatible = kb.disjunctionOf("EmiActive","EmiNeutral");
+        kb.alias("CompatibleInterfacesEmiPassive", emiPassiveCompatible);
+        // Creates a restriction that all systems that own an EMI are ReconfigurableActors
+        ClassExpression forallRestriction = kb.objectPropertyRestriction(restriction::FORALL, "compatibleWith", "CompatibleInterfacesEmiPassive");
+        kb.alias("EmiPassive", forallRestriction);
+        kb.refresh();
+    }
+
+    kb.disjoint("CompatibleInterfacesEmiActive", "EmiActive", KnowledgeBase::CLASS);
+    BOOST_REQUIRE_NO_THROW( kb.refresh() );
+    kb.disjoint("CompatibleInterfacesEmiPassive", "EmiPassive", KnowledgeBase::CLASS);
+
+        BOOST_REQUIRE_NO_THROW( kb.refresh() );
+    {
+        Axiom a = kb.relatedTo("EmiActive/instance#0", "compatibleWith", "EmiActive/instance#11");
+        BOOST_REQUIRE_THROW( kb.refresh(), std::exception);
+        kb.retract(a);
+        BOOST_REQUIRE_NO_THROW( kb.refresh() );
+    }
+
+    {
+        Axiom a = kb.relatedTo("EmiPassive/instance#0", "compatibleWith", "EmiPassive/instance#11");
+        BOOST_REQUIRE_THROW( kb.refresh(), std::exception);
+        kb.retract(a);
+        BOOST_REQUIRE_NO_THROW( kb.refresh() );
+        BOOST_REQUIRE_MESSAGE(!kb.isRelatedTo("EmiPassive/instance#0", "compatibleWith", "EmiPassive/instance#11"), "Interface is not compatible");
+    }
+
     BOOST_REQUIRE_MESSAGE( om.checkIfCompatible("Sherpa/instance#0","CREX/instance#0"), "Sherpa compatible to CREX");
     BOOST_REQUIRE_MESSAGE( om.checkIfCompatible("Sherpa/instance#0","PayloadCamera/instance#0"), " Sherpa compatible to PayloadCamera" );
     BOOST_REQUIRE_MESSAGE( !om.checkIfCompatible("CREX/instance#0","CREX/instance#0"), "CREX incompatible to CREX");
@@ -245,7 +301,7 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     // Each property that hasInterface with an concept of EmiActive
     // has to be a ReconfigurableActor
     kb.subclassOf("ReconfigurableActor","Actor");
-    kb.disjointClasses("Interface","ReconfigurableActor");
+    kb.disjoint("Interface","ReconfigurableActor", KnowledgeBase::CLASS);
     kb.inverseOf("has","availableFor");
 
     // Creates a restriction that all systems that own an EMI are ReconfigurableActors

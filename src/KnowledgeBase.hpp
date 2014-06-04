@@ -29,6 +29,7 @@ public:
     Axiom(TDLAxiom* axiom);
 
     const TDLAxiom* get() const { return mAxiom; } 
+    TDLAxiom* get() { return mAxiom; }
 };
 
 class ClassExpression
@@ -64,8 +65,9 @@ public:
 
     /**
      * Refresh status after adding new updates
+     * \throw std::exception if the data base is inconsistent
      */
-    bool refresh();
+    void refresh();
 
     // ROLES (PROPERTIES)
     /**
@@ -132,6 +134,25 @@ public:
      */
     ClassExpression intersectionOf(const IRIList& klasses);
 
+
+    /**
+     * Define disjunction of classes under a given alias
+     * \param alias Equivalent concept the disjunction of classes
+     * \param klass A concept identifier
+     * \param otherKlass Another's concept identifier
+     * \return corresponding anonymous class expression
+     */
+    ClassExpression disjunctionOf(const IRI& klass, const IRI& otherKlass);
+
+    /**
+     * Define disjunction of classes under a given alias
+     * \param alias Equivalent concept the disjunction of classes
+     * \param klass A concept identifier
+     * \param otherKlass Another's concept identifier
+     * \return corresponding anonymous class expression
+     */
+    ClassExpression disjunctionOf(const IRIList& klasses);
+
     /**
      * Define intersection of classes under a given alias
      * \param alias Equivalent concept the intersection of classes
@@ -159,18 +180,18 @@ public:
 
     /**
      * Define classes to be disjoint
-     * \param klass One concept identifier
-     * \param another concept identifier
+     * \param klassOrInstance One concept or instance identifier
+     * \param another concept or instance identifier
      * \return corresponding axiom
      */
-    Axiom disjointClasses(const IRI& klass, const IRI& otherKlass);
+    Axiom disjoint(const IRI& klassOrInstance, const IRI& otherKlassOrInstance, EntityType type);
 
     /**
-     * Define classes to be disjoint
-     * \param List of concepts that will be declared disjoint
+     * Define classes to be disjoint / or instance
+     * \param klassesOrInstances List of concepts or instances that will be declared disjoint
      * \return corresponding axiom
      */
-    Axiom disjointClasses(const IRIList& klasses);
+    Axiom disjoint(const IRIList& klassesOrInstances, EntityType type);
 
     /**
      * Define an instance of a concept / class
@@ -185,9 +206,20 @@ public:
      * \param instance
      * \param relationProperty the property that related both instances
      * \param otherInstance
+     * \param isTrue Set to true if relationship is true, false if is is false
      * \return corresponding axiom
      */
-    Axiom relatedTo(const IRI& instance, const IRI& relationProperty, const IRI& otherInstance);
+    Axiom relatedTo(const IRI& instance, const IRI& relationProperty, const IRI& otherInstance, bool isTrue = true);
+
+    /**
+     * Define negated an object relation between two instances / individuals
+     * \param instance
+     * \param relationProperty the property that related both instances
+     * \param otherInstance
+     * \return corresponding axiom
+     */
+    Axiom notRelatedTo(const IRI& instance, const IRI& relationProperty, const IRI& otherInstance);
+
 
     /**
      * Define an object relation / role and its domain
@@ -198,10 +230,13 @@ public:
 
     /**
      * Define one of a class relationship
-     * \param klassList list of classes
+     * (enumerated classes): Classes can be described by enumeration of the individuals that make up the class. The members of the class are exactly the set of enumerated individuals; no more, no less. For example, the class of daysOfTheWeek can be described by simply enumerating the individuals Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday. From this a reasoner can deduce the maximum cardinality (7) of any property that has daysOfTheWeek as its allValuesFrom
+     * restriction. 
+     *
+     * \param instanceList list of classes
      * \return corresponding class expression
      */
-    ClassExpression oneOf(const IRIList& klassList);
+    ClassExpression oneOf(const IRIList& instanceList);
 
     /**
      * Define inverse of a given object property
@@ -233,10 +268,16 @@ public:
 
     /**
      * Test if instance is type of a class
+     * \param instance Instance identifier
+     * \param klass Class indentifier
+     * \return true if instance is of given klass type, false otherwise
      */
     bool isInstanceOf(const IRI& instance, const IRI& klass);
+
     /**
      * Test if instances are related via given a given property
+     * \param instance Instance identifier
+     * \param relationProperty relation identifier:
      */
     bool isRelatedTo(const IRI& instance, const IRI& relationProperty, const IRI& otherInstance);
 
@@ -302,6 +343,16 @@ public:
      * Make the list of instances unique, i.e., remove redundant information (aliases)
      */
     IRIList uniqueList(const IRIList& instances);
+
+    /**
+     * Remove axiom from the knowledge base
+     */
+    void retract(Axiom& a);
+
+    /**
+     * Test relation and add result if successfully asserted
+     */
+    bool assertAndAddRelation(const IRI& instance, const IRI& relation, const IRI& otherInstance);
 };
 
 } // namespace owl_om
