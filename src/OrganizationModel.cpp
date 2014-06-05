@@ -7,14 +7,14 @@ namespace owl_om {
 std::map<OrganizationModel::Entities, IRI> OrganizationModel::EntitiesIRIs = boost::assign::map_list_of
     (OrganizationModel::ACTOR, "Actor")
     (OrganizationModel::INTERFACE, "Interface")
-    (OrganizationModel::COMPATIBILITY, "Compatibility")
     (OrganizationModel::SERVICE, "Service");
 
 std::map<OrganizationModel::Properties, IRI> OrganizationModel::PropertiesIRIs = boost::assign::map_list_of
     (OrganizationModel::DEPENDS_ON, "dependsOn")
     (OrganizationModel::HAS, "has")
     (OrganizationModel::PROVIDES, "provides")
-    (OrganizationModel::USES, "uses");
+    (OrganizationModel::USES, "uses")
+    (OrganizationModel::COMPATIBLE_WITH, "compatibleWith");
 
 void OrganizationModel::runInferenceEngine()
 {
@@ -37,7 +37,7 @@ void OrganizationModel::runInferenceEngine()
                 if( checkIfFulfills(*actorIt, *serviceIt) )
                 {
                     LOG_INFO("inference: '%s' provides '%s'", actorIt->c_str(), serviceIt->c_str());
-                    mKnowledgeBase.relatedTo(*actorIt, "provides", *serviceIt);
+                    mKnowledgeBase.relatedTo(*actorIt, PropertiesIRIs[PROVIDES], *serviceIt);
                     updated = true;
                 } else {
                     LOG_INFO("inference: '%s' does not provide '%s'", actorIt->c_str(), serviceIt->c_str());
@@ -130,17 +130,11 @@ bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherR
             IRI otherInterface = *oit;
             IRI otherInterfaceType = mKnowledgeBase.typeOf(otherInterface);
 
-            if( mKnowledgeBase.assertAndAddRelation(interface, "compatibleWith", otherInterface) )
+            if( mKnowledgeBase.assertAndAddRelation(interface, PropertiesIRIs[COMPATIBLE_WITH], otherInterface) )
             {
                 LOG_INFO_S << resource << " compatibleWith " << otherResource << " via " << interface << " and " << otherInterface;
                 return true;
             }
-
-            //if( mKnowledgeBase.isSubclassOf( mKnowledgeBase.intersectionOf(interfaceType, otherInterfaceType), EntitiesIRIs[COMPATIBILITY]) )
-            //{
-            //    LOG_INFO_S << resource << " compatibleWith " << otherResource << " via " << interface << " and " << otherInterface;
-            //    return true;
-            //}
         }
     }
 
@@ -206,7 +200,7 @@ IRIList OrganizationModel::checkIfCompatibleNow(const std::string& instance, con
             IRI otherInterface = *oit;
             IRI otherInterfaceType = mKnowledgeBase.typeOf(otherInterface);
 
-            if( mKnowledgeBase.isSubclassOf( mKnowledgeBase.intersectionOf(interfaceType, otherInterfaceType), EntitiesIRIs[COMPATIBILITY]) )
+            if( mKnowledgeBase.assertAndAddRelation(interface, PropertiesIRIs[COMPATIBLE_WITH], otherInterface) )
             {
                 LOG_INFO_S << instance << " compatibleWith " << otherInstance << " via " << interface << " and " << otherInterface;
                 usedInterfaces.push_back(interface);

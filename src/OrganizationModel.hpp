@@ -14,10 +14,12 @@ public:
     enum Entities { ACTOR, SERVICE, INTERFACE, COMPATIBILITY, END_OF_ENTITIES };
     static std::map<Entities, IRI> EntitiesIRIs;
 
-    enum Properties { HAS, PROVIDES, DEPENDS_ON, USES, END_OF_PROPERTIES };
+    enum Properties { HAS, PROVIDES, DEPENDS_ON, USES, COMPATIBLE_WITH, END_OF_PROPERTIES };
     static std::map<Properties, IRI> PropertiesIRIs;
 
     KnowledgeBase& knowledgeBase() { return mKnowledgeBase; }
+
+    const KnowledgeBase& knowledgeBase() const { return mKnowledgeBase; }
 
     // PREDICATES
     /**
@@ -45,8 +47,6 @@ public:
      * Run inference to identify service that are 'provided'
      */
     void runInferenceEngine();
-
-    void save(const std::string& filename);
 
     /** Provide a list of available actors, so that we can bound the actual generation of theoretically
      * possible combinations
