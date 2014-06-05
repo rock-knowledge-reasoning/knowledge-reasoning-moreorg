@@ -4,6 +4,8 @@
 #include <owl_om/KnowledgeBase.hpp>
 #include <owl_om/OrganizationModel.hpp>
 
+#include <owl_om/exporter/PDDLExporter.hpp>
+
 using namespace owl_om;
 
 BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
@@ -332,5 +334,10 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     // - count service required
     // - permutations should consider the associated interface (future version)
 
+    // Export PDDL
+    PDDLExporter exporter;
+    pddl_planner::representation::Domain domain = exporter.toDomain(om);
+
+    BOOST_REQUIRE_MESSAGE(true, "Domain:" << domain.toLISP());
 }
 

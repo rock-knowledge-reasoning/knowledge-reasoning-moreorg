@@ -10,6 +10,7 @@ rock_library(owl_om
         db/FileBackend.cpp
         db/rdf/SopranoDB.cpp
         db/rdf/SparqlInterface.cpp
+        exporter/PDDLExporter.cpp
         gen/ModelGenerator.cpp
         gen/NamingConversion.cpp
     HEADERS Class.hpp
@@ -26,9 +27,10 @@ rock_library(owl_om
         db/FileBackend.hpp
         db/rdf/SopranoDB.hpp
         db/rdf/SparqlInterface.hpp
+        exporter/PDDLExporter.hpp
         gen/ModelGenerator.hpp
         gen/NamingConversion.hpp
-    DEPS_PKGCONFIG base-lib redland soprano factpp
+    DEPS_PKGCONFIG base-lib redland soprano factpp pddl_planner
 )
 target_link_libraries(owl_om ctemplate ${Boost_LIBRARIES})
 
