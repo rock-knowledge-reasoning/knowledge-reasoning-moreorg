@@ -34,6 +34,9 @@ BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
     BOOST_REQUIRE_MESSAGE( kb.isRelatedTo("A", "sibling", "B"), "A and B are related");
     BOOST_REQUIRE_THROW( !kb.isRelatedTo("A", "unknown", "B"), std::exception);
 
+    IRIList klasses = kb.allClasses();
+    BOOST_REQUIRE_MESSAGE( klasses.size() == 3, "Number of classes is '" << klasses.size() << "' expected 3");
+
 }
 
 BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
