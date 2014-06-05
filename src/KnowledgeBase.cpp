@@ -29,9 +29,66 @@ ClassExpression::ClassExpression(TDLConceptExpression* expression)
     : mExpression(expression)
 {}
 
+InstanceExpression::InstanceExpression(TDLIndividualExpression* expression)
+    : mExpression(expression)
+{}
+
 TExpressionManager* KnowledgeBase::getExpressionManager()
 {
     return mKernel->getExpressionManager();
+}
+
+const TExpressionManager* KnowledgeBase::getExpressionManager() const
+{
+    return mKernel->getExpressionManager();
+}
+
+ClassExpression KnowledgeBase::getClass(const IRI& klass) const
+{
+    IRIClassExpressionMap::const_iterator cit = mClasses.find(klass);
+    if(cit == mClasses.end())
+    {
+        throw std::invalid_argument("Class '" + klass + "' does not exist");
+    }
+
+    return cit->second;
+}
+
+ClassExpression KnowledgeBase::getClassLazy(const IRI& klass)
+{
+    try {
+        return getClass(klass);
+    } catch(const std::invalid_argument& e)
+    {
+        TDLConceptExpression* f_class = getExpressionManager()->Concept(klass);
+        ClassExpression expression(f_class);
+        mClasses[klass] = expression;
+        return expression;
+    }
+}
+
+InstanceExpression KnowledgeBase::getInstance(const IRI& instance) const
+{
+    IRIInstanceExpressionMap::const_iterator cit = mInstances.find(instance);
+    if(cit == mInstances.end())
+    {
+        throw std::invalid_argument("Instance '" + instance + "' does not exist");
+    }
+
+    return cit->second;
+}
+
+InstanceExpression KnowledgeBase::getInstanceLazy(const IRI& instance)
+{
+    try {
+        return getInstance(instance);
+    } catch(const std::invalid_argument& e)
+    {
+        TDLIndividualExpression* f_individual = getExpressionManager()->Individual(instance);
+        InstanceExpression expression(f_individual);
+        mInstances[instance] = expression;
+        return expression;
+    }
 }
 
 KnowledgeBase::KnowledgeBase()
@@ -92,20 +149,20 @@ Axiom KnowledgeBase::asymmetricProperty(const IRI& property)
 
 Axiom KnowledgeBase::subclassOf(const IRI& subclass, const IRI& parentClass)
 {
-    TDLConceptExpression* f_subclass = getExpressionManager()->Concept(subclass);
-    return subclassOf( ClassExpression(f_subclass), parentClass );
+    ClassExpression ce = getClassLazy(subclass);
+    return subclassOf( ce, parentClass );
 }
 
 Axiom KnowledgeBase::subclassOf(const ClassExpression& subclass, const IRI& parentClass)
 {
-    TDLConceptExpression* f_parentClass = getExpressionManager()->Concept(parentClass);
-    return Axiom( mKernel->impliesConcepts(subclass.get(), f_parentClass) );
+    ClassExpression e_parentClass = getClassLazy(parentClass);
+    return Axiom( mKernel->impliesConcepts(subclass.get(), e_parentClass.get()) );
 }
 
 Axiom KnowledgeBase::subclassOf(const IRI& subclass, const ClassExpression& parentClass)
 {
-    TDLConceptExpression* f_subclass = getExpressionManager()->Concept(subclass);
-    return Axiom( mKernel->impliesConcepts(f_subclass, parentClass.get()) );
+    ClassExpression e_subclass = getClassLazy(subclass);
+    return Axiom( mKernel->impliesConcepts(e_subclass.get(), parentClass.get()) );
 }
 
 ClassExpression KnowledgeBase::intersectionOf(const IRI& klass, const IRI& otherKlass)
@@ -122,8 +179,8 @@ ClassExpression KnowledgeBase::intersectionOf(const IRIList& klasses)
     getExpressionManager()->newArgList();
     for(; cit != klasses.end(); ++cit)
     {
-        TDLConceptExpression* f_concept = getExpressionManager()->Concept(*cit);
-        getExpressionManager()->addArg(f_concept);
+        ClassExpression e_class = getClassLazy(*cit);
+        getExpressionManager()->addArg(e_class.get());
     }
     TDLConceptExpression* f_and = getExpressionManager()->And();
     return ClassExpression( f_and );
@@ -143,8 +200,8 @@ ClassExpression KnowledgeBase::disjunctionOf(const IRIList& klasses)
     getExpressionManager()->newArgList();
     for(; cit != klasses.end(); ++cit)
     {
-        TDLConceptExpression* f_concept = getExpressionManager()->Concept(*cit);
-        getExpressionManager()->addArg(f_concept);
+        ClassExpression e_class = getClassLazy(*cit);
+        getExpressionManager()->addArg(e_class.get());
     }
     TDLConceptExpression* f_or = getExpressionManager()->Or();
     return ClassExpression( f_or );
@@ -152,10 +209,10 @@ ClassExpression KnowledgeBase::disjunctionOf(const IRIList& klasses)
 
 Axiom KnowledgeBase::alias(const IRI& alias, const ClassExpression& expression)
 {
-    TDLConceptExpression* f_concept = getExpressionManager()->Concept(alias);
+    ClassExpression e_aliasClass = getClassLazy(alias);
 
     getExpressionManager()->newArgList();
-    getExpressionManager()->addArg(f_concept);
+    getExpressionManager()->addArg(e_aliasClass.get());
     getExpressionManager()->addArg(expression.get());
     return Axiom( mKernel->equalConcepts() );
 }
@@ -168,18 +225,18 @@ Axiom KnowledgeBase::alias(const IRI& aliasName, const IRI& iri, EntityType type
         {
             instanceOf(aliasName, typeOf(iri));
 
-            TDLIndividualExpression* f_aliasIndividual = getExpressionManager()->Individual(aliasName);
-            TDLIndividualExpression* f_individual = getExpressionManager()->Individual(iri);
+            InstanceExpression e_aliasInstance = getInstanceLazy(aliasName);
+            InstanceExpression e_instance = getInstance(iri);
 
             getExpressionManager()->newArgList();
-            getExpressionManager()->addArg(f_aliasIndividual);
-            getExpressionManager()->addArg(f_individual);
+            getExpressionManager()->addArg(e_aliasInstance.get());
+            getExpressionManager()->addArg(e_instance.get());
             return Axiom( mKernel->processSame() );
         }
         case CLASS:
         {
-            TDLConceptExpression* f_concept = getExpressionManager()->Concept(iri);
-            return alias(aliasName, ClassExpression(f_concept) );
+            ClassExpression e_class = getClass(iri);
+            return alias(aliasName, e_class);
         }
         default:
             throw std::invalid_argument("Alias for entity type '" + EntityTypeTxt[type] + "' not supported");
@@ -203,12 +260,12 @@ Axiom KnowledgeBase::disjoint(const IRIList& klassesOrInstances, KnowledgeBase::
     {
         if(type == CLASS)
         {
-            TDLConceptExpression* f_concept = getExpressionManager()->Concept(*cit);
-            getExpressionManager()->addArg(f_concept);
+            ClassExpression e_class = getClass(*cit);
+            getExpressionManager()->addArg(e_class.get());
         } else if(type == INSTANCE)
         {
-            TDLIndividualExpression* f_individual = getExpressionManager()->Individual(*cit);
-            getExpressionManager()->addArg(f_individual);
+            InstanceExpression e_instance = getInstance(*cit);
+            getExpressionManager()->addArg(e_instance.get());
         }
     }
 
@@ -229,22 +286,23 @@ Axiom KnowledgeBase::disjoint(const IRIList& klassesOrInstances, KnowledgeBase::
 
 Axiom KnowledgeBase::instanceOf(const IRI& individual, const IRI& klass)
 {
-    TDLConceptExpression* f_class = getExpressionManager()->Concept(klass);
-    TDLIndividualExpression* f_individual = getExpressionManager()->Individual(individual);
-    return Axiom( mKernel->instanceOf(f_individual, f_class) );
+    ClassExpression e_class = getClass(klass);
+    InstanceExpression e_instance = getInstanceLazy(individual);
+    return Axiom( mKernel->instanceOf(e_instance.get(), e_class.get()) );
 }
 
 Axiom KnowledgeBase::relatedTo(const IRI& instance, const IRI& relationProperty, const IRI& otherInstance, bool isTrue)
 {
     TDLObjectRoleExpression* f_relation = getExpressionManager()->ObjectRole(relationProperty);
-    TDLIndividualExpression* f_individual = getExpressionManager()->Individual(instance);
-    TDLIndividualExpression* f_otherIndividual = getExpressionManager()->Individual(otherInstance);
+
+    InstanceExpression e_instance = getInstanceLazy(instance);
+    InstanceExpression e_otherInstance = getInstanceLazy(otherInstance);
 
     if(isTrue)
     {
-        return Axiom( mKernel->relatedTo(f_individual, f_relation, f_otherIndividual) );
+        return Axiom( mKernel->relatedTo(e_instance.get(), f_relation, e_otherInstance.get()) );
     } else {
-        return Axiom( mKernel->relatedToNot(f_individual, f_relation, f_otherIndividual) );
+        return Axiom( mKernel->relatedToNot(e_instance.get(), f_relation, e_otherInstance.get()) );
     }
 }
 
@@ -255,16 +313,16 @@ Axiom KnowledgeBase::domainOf(const IRI& property, const IRI& domain, PropertyTy
         case OBJECT:
         {
             TDLObjectRoleExpression* f_role = getExpressionManager()->ObjectRole(property);
-            TDLConceptExpression* f_domain = getExpressionManager()->Concept(domain);
+            ClassExpression e_domain = getClassLazy(domain);
 
-            return Axiom( mKernel->setODomain(f_role, f_domain) );
+            return Axiom( mKernel->setODomain(f_role, e_domain.get()) );
         }
         case DATA:
         {
             TDLDataRoleExpression* f_role = getExpressionManager()->DataRole(property);
-            TDLConceptExpression* f_domain = getExpressionManager()->Concept(domain);
+            ClassExpression e_domain = getClassLazy(domain);
 
-            return Axiom( mKernel->setDDomain(f_role, f_domain) );
+            return Axiom( mKernel->setDDomain(f_role, e_domain.get()) );
         }
         default:
         {
@@ -287,9 +345,9 @@ ClassExpression KnowledgeBase::oneOf(const IRIList& instanceList)
     for(; cit != instanceList.end(); ++cit)
     {
         IRI instance = *cit;
-        TDLIndividualExpression* f_instance = getExpressionManager()->Individual(instance);
+        InstanceExpression e_instance = getInstanceLazy(instance);
         getExpressionManager()->newArgList();
-        getExpressionManager()->addArg(f_instance);
+        getExpressionManager()->addArg(e_instance.get());
     }
     return ClassExpression( getExpressionManager()->OneOf() );
 }
@@ -305,33 +363,33 @@ ClassExpression KnowledgeBase::objectPropertyRestriction(restriction::Type type,
         }
         case restriction::VALUE:
         {
-            TDLIndividualExpression* f_individual = getExpressionManager()->Individual(klassOrInstance);
-            return ClassExpression( getExpressionManager()->Value(f_relation, f_individual) );
+            InstanceExpression e_instance = getInstanceLazy(klassOrInstance);
+            return ClassExpression( getExpressionManager()->Value(f_relation, e_instance.get()) );
         }
         case restriction::EXISTS:
         {
-            TDLConceptExpression* f_concept = getExpressionManager()->Concept(klassOrInstance);
-            return ClassExpression( getExpressionManager()->Exists(f_relation, f_concept) );
+            ClassExpression e_class = getClassLazy(klassOrInstance);
+            return ClassExpression( getExpressionManager()->Exists(f_relation, e_class.get()) );
         }
         case restriction::FORALL:
         {
-            TDLConceptExpression* f_concept = getExpressionManager()->Concept(klassOrInstance);
-            return ClassExpression( getExpressionManager()->Forall(f_relation, f_concept) );
+            ClassExpression e_class = getClassLazy(klassOrInstance);
+            return ClassExpression( getExpressionManager()->Forall(f_relation, e_class.get()) );
         }
         case restriction::MIN_CARDINALITY:
         {
-            TDLConceptExpression* f_concept = getExpressionManager()->Concept(klassOrInstance);
-            return ClassExpression( getExpressionManager()->MinCardinality(cardinality, f_relation, f_concept) );
+            ClassExpression e_class = getClassLazy(klassOrInstance);
+            return ClassExpression( getExpressionManager()->MinCardinality(cardinality, f_relation, e_class.get()) );
         }
         case restriction::MAX_CARDINALITY:
         {
-            TDLConceptExpression* f_concept = getExpressionManager()->Concept(klassOrInstance);
-            return ClassExpression( getExpressionManager()->MaxCardinality(cardinality, f_relation, f_concept) );
+            ClassExpression e_class = getClassLazy(klassOrInstance);
+            return ClassExpression( getExpressionManager()->MaxCardinality(cardinality, f_relation, e_class.get()) );
         }
         case restriction::EXACT_CARDINALITY:
         {
-            TDLConceptExpression* f_concept = getExpressionManager()->Concept(klassOrInstance);
-            return ClassExpression( getExpressionManager()->Cardinality(cardinality, f_relation, f_concept) );
+            ClassExpression e_class = getClassLazy(klassOrInstance);
+            return ClassExpression( getExpressionManager()->Cardinality(cardinality, f_relation, e_class.get()) );
         }
     }
 
@@ -340,47 +398,58 @@ ClassExpression KnowledgeBase::objectPropertyRestriction(restriction::Type type,
 
 bool KnowledgeBase::isSubclassOf(const IRI& subclass, const IRI& parentClass)
 {
-    TDLConceptExpression* f_subclass = getExpressionManager()->Concept(subclass);
-    return isSubclassOf( ClassExpression(f_subclass), parentClass );
+    ClassExpression e_class = getClass(subclass);
+    return isSubclassOf( e_class, parentClass );
 }
 
 bool KnowledgeBase::isSubclassOf(const ClassExpression& subclass, const IRI& parentClass)
 {
-    TDLConceptExpression* f_parentClass = getExpressionManager()->Concept(parentClass);
-    return mKernel->isSubsumedBy(subclass.get(), f_parentClass);
+    ClassExpression e_class = getClass(parentClass);
+    return mKernel->isSubsumedBy(subclass.get(), e_class.get());
 }
 
 bool KnowledgeBase::isInstanceOf(const IRI& instance, const IRI& klass)
 {
-    TDLIndividualExpression* f_instance = getExpressionManager()->Individual(instance);
-    TDLConceptExpression* f_klass = getExpressionManager()->Concept(klass);
-    return mKernel->isInstance(f_instance, f_klass);
+    InstanceExpression e_instance = getInstance(instance);
+    ClassExpression e_class = getClass(klass);
+    return mKernel->isInstance(e_instance.get(), e_class.get());
 }
 
 bool KnowledgeBase::isRelatedTo(const IRI& instance, const IRI& relationProperty, const IRI& otherInstance)
 {
-    TDLIndividualExpression* f_instance = getExpressionManager()->Individual(instance);
-    TDLIndividualExpression* f_otherInstance = getExpressionManager()->Individual(otherInstance);
+    InstanceExpression e_instance = getInstance(instance);
+    InstanceExpression e_otherInstance = getInstance(otherInstance);
 
     TDLObjectRoleExpression* f_relation = getExpressionManager()->ObjectRole(relationProperty);
-    return mKernel->isRelated(f_instance, f_relation, f_otherInstance);
+    return mKernel->isRelated(e_instance.get(), f_relation, e_otherInstance.get());
 }
 
-bool KnowledgeBase::isSame(const IRI& instance, const IRI& otherInstance)
+bool KnowledgeBase::isSameInstance(const IRI& instance, const IRI& otherInstance)
 {
-    TDLIndividualExpression* f_instance = getExpressionManager()->Individual(instance);
-    TDLIndividualExpression* f_otherInstance = getExpressionManager()->Individual(otherInstance);
-    return mKernel->isSameIndividuals(f_instance, f_otherInstance);
+    InstanceExpression e_instance = getInstance(instance);
+    InstanceExpression e_otherInstance = getInstance(otherInstance);
+    return mKernel->isSameIndividuals(e_instance.get(), e_otherInstance.get());
+}
+
+IRIList KnowledgeBase::allClasses(bool excludeBottomClass) const
+{
+    IRIList klasses;
+    IRIClassExpressionMap::const_iterator cit = mClasses.begin();
+    for(; cit != mClasses.end(); ++cit)
+    {
+        klasses.push_back(cit->first);
+    }
+    return klasses;
 }
 
 IRIList KnowledgeBase::allSubclassesOf(const IRI& klass, bool direct)
 {
-    TDLConceptExpression* f_class = getExpressionManager()->Concept(klass);
+    ClassExpression e_class = getClass(klass);
     std::vector<std::string> subclasses;
 
     Actor actor;
     actor.needConcepts();
-    mKernel->getSubConcepts(f_class, direct, actor);
+    mKernel->getSubConcepts(e_class.get(), direct, actor);
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
@@ -393,12 +462,12 @@ IRIList KnowledgeBase::allSubclassesOf(const IRI& klass, bool direct)
 
 IRIList KnowledgeBase::allAncestorsOf(const IRI& klass, bool direct)
 {
-    TDLConceptExpression* f_class = getExpressionManager()->Concept(klass);
+    ClassExpression e_class = getClass(klass);
     std::vector<std::string> superclasses;
 
     Actor actor;
     actor.needConcepts();
-    mKernel->getSupConcepts(f_class, direct, actor);
+    mKernel->getSupConcepts(e_class.get(), direct, actor);
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
@@ -409,14 +478,25 @@ IRIList KnowledgeBase::allAncestorsOf(const IRI& klass, bool direct)
     return superclasses;
 }
 
+IRIList KnowledgeBase::allInstances() const
+{
+    IRIList instances;
+    IRIInstanceExpressionMap::const_iterator cit = mInstances.begin();
+    for(; cit != mInstances.end(); ++cit)
+    {
+        instances.push_back(cit->first);
+    }
+    return instances;
+}
+
 IRIList KnowledgeBase::allInstancesOf(const IRI& klass)
 {
-    TDLConceptExpression* f_class = getExpressionManager()->Concept(klass);
+    ClassExpression e_class = getClass(klass);
     std::vector<std::string> instances;
 
     Actor actor;
     actor.needIndividuals();
-    mKernel->getInstances(f_class, actor);
+    mKernel->getInstances(e_class.get(), actor);
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
@@ -429,11 +509,11 @@ IRIList KnowledgeBase::allInstancesOf(const IRI& klass)
 
 IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& relationProperty)
 {
-    TDLIndividualExpression* f_individual = getExpressionManager()->Individual(individual);
+    InstanceExpression e_instance = getInstance(individual);
     TDLObjectRoleExpression* f_relation = getExpressionManager()->ObjectRole(relationProperty);
 
     ReasoningKernel::IndividualSet relatedIndividuals;
-    mKernel->getRoleFillers(f_individual, f_relation, relatedIndividuals);
+    mKernel->getRoleFillers(e_instance.get(), f_relation, relatedIndividuals);
 
     IRIList individuals;
     ReasoningKernel::IndividualSet::const_iterator cit = relatedIndividuals.begin();
@@ -448,12 +528,12 @@ IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& rel
 
 IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const IRI& relationProperty)
 {
-    TDLIndividualExpression* f_individual = getExpressionManager()->Individual(individual);
+    InstanceExpression e_instance = getInstance(individual);
     TDLObjectRoleExpression* f_relation = getExpressionManager()->ObjectRole(relationProperty);
     TDLObjectRoleExpression* f_inverseRelation = getExpressionManager()->Inverse(f_relation);
 
     ReasoningKernel::IndividualSet relatedIndividuals;
-    mKernel->getRoleFillers(f_individual, f_inverseRelation, relatedIndividuals);
+    mKernel->getRoleFillers(e_instance.get(), f_inverseRelation, relatedIndividuals);
 
     std::vector<std::string> individuals;
     ReasoningKernel::IndividualSet::const_iterator cit = relatedIndividuals.begin();
@@ -466,15 +546,15 @@ IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const I
     return individuals;
 }
 
-IRIList KnowledgeBase::typesOf(const IRI& instance, bool direct)
+IRIList KnowledgeBase::typesOf(const IRI& instance, bool direct) const
 {
-    TDLIndividualExpression* f_instance = getExpressionManager()->Individual(instance);
+    InstanceExpression e_instance = getInstance(instance);
 
     IRIList klasses;
 
     Actor actor;
     actor.needConcepts();
-    mKernel->getTypes(f_instance, direct, actor);
+    mKernel->getTypes(e_instance.get(), direct, actor);
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
@@ -485,7 +565,7 @@ IRIList KnowledgeBase::typesOf(const IRI& instance, bool direct)
     return klasses;
 }
 
-IRI KnowledgeBase::typeOf(const IRI& instance)
+IRI KnowledgeBase::typeOf(const IRI& instance) const
 {
     IRIList types = typesOf(instance, true);
     assert(!types.empty());
@@ -494,13 +574,13 @@ IRI KnowledgeBase::typeOf(const IRI& instance)
 
 IRIList KnowledgeBase::getSameAs(const IRI& aliasOrInstance)
 {
-    TDLIndividualExpression* f_instance = getExpressionManager()->Individual(aliasOrInstance);
+    InstanceExpression e_instance = getInstance(aliasOrInstance);
 
     IRIList alias;
 
     Actor actor;
     actor.needIndividuals();
-    mKernel->getSameAs(f_instance, actor);
+    mKernel->getSameAs(e_instance.get(), actor);
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
@@ -539,7 +619,7 @@ IRIList KnowledgeBase::uniqueList(const IRIList& individuals)
         for(; uit != unique.end();)
         {
             IRI otherIndividual = *uit;
-            if(individual != otherIndividual && isSame(individual, otherIndividual) )
+            if(individual != otherIndividual && isSameInstance(individual, otherIndividual) )
             {
                 LOG_DEBUG_S << "Remove " << *uit << " since its an alias";
                 unique.erase(uit);

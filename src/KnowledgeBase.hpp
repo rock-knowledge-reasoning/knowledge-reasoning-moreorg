@@ -10,6 +10,7 @@
 class TExpressionManager;
 class TDLAxiom;
 class TDLConceptExpression;
+class TDLIndividualExpression;
 class ReasoningKernel;
 
 namespace owl_om {
@@ -37,16 +38,38 @@ class ClassExpression
     TDLConceptExpression* mExpression;
 
 public:
-    ClassExpression(TDLConceptExpression* expression);
+    ClassExpression(TDLConceptExpression* expression = NULL);
 
-    const TDLConceptExpression* get() const { return mExpression; } 
+    const TDLConceptExpression* get() const { return mExpression; }
 };
+
+class InstanceExpression
+{
+    TDLIndividualExpression* mExpression;
+
+public:
+    InstanceExpression(TDLIndividualExpression* expression = NULL);
+
+    const TDLIndividualExpression* get() const { return mExpression; }
+};
+
+typedef std::map<IRI, ClassExpression > IRIClassExpressionMap;
+typedef std::map<IRI, InstanceExpression > IRIInstanceExpressionMap;
 
 class KnowledgeBase
 {
     ReasoningKernel* mKernel;
 
     TExpressionManager* getExpressionManager();
+
+    const TExpressionManager* getExpressionManager() const;
+
+    IRIInstanceExpressionMap mInstances;
+    IRIClassExpressionMap mClasses;
+
+    bool hasClass(const std::string& klass) const { return mClasses.count(klass); }
+
+    bool hasInstance(const std::string& instance) const { return mInstances.count(instance); }
 
 public:
     enum PropertyType { UNKNOWN_PROPERTY_TYPE, OBJECT, DATA, END_PROPERTY_TYPE };
@@ -287,7 +310,26 @@ public:
      * \param otherInstance
      * \return true upon success, false otherwise
      */
-    bool isSame(const IRI& instance, const IRI& otherInstance);
+    bool isSameInstance(const IRI& instance, const IRI& otherInstance);
+
+    /**
+     * Get ClassExpression for given IRI if it exists
+     * \param klass
+     * \throw std::invalid_argument if class does not exist
+     */
+    ClassExpression getClass(const IRI& klass) const;
+
+    /**
+     * Get existing ClassExpression for given IRI or initialize if it does not exist yet
+     * \param klass
+     */
+    ClassExpression getClassLazy(const IRI& klass);
+
+    /**
+     * Retrieve all known classes
+     * \return list of all classes
+     */
+    IRIList allClasses(bool excludeBottomClass = true) const;
    
     /**
      * Retrieve all subclasses of a given klass
@@ -300,6 +342,28 @@ public:
      * \return list of all ancestors
      */
     IRIList allAncestorsOf(const IRI& klass, bool direct = false);
+
+    /**
+     * Retrieve instance  and perform lazy initialization if requested
+     * \param instance
+     * \param lazyInitialization If set to true will initialized the instance
+     * \throw if the instance cannot be found and will not be lazily initalized
+     * \return InstanceExpression for that instance
+     */
+    InstanceExpression getInstance(const IRI& instance) const;
+
+    /**
+     * Get existing InstanceExpression for a given IRI or initializ if it does not exist yet
+     * \param instance Identifer of instance
+     * \return InstanceExpression for that instance
+     */
+    InstanceExpression getInstanceLazy(const IRI& instance);
+
+    /**
+     * Retrieve all known instances
+     * \return list of all instances
+     */
+    IRIList allInstances() const;
 
     /**
      * Retrieve all known instance of a given klass type
@@ -324,13 +388,13 @@ public:
      * Get all types of a given instance
      * \return list of types of a given instance
      */
-    IRIList typesOf(const IRI& instance, bool direct = false);
+    IRIList typesOf(const IRI& instance, bool direct = false) const;
 
     /**
      * Get the direct type of a given instance
      * \return klassname for the type of this instance if known
      */
-    IRI typeOf(const IRI& instance);
+    IRI typeOf(const IRI& instance) const;
 
     /**
      * Resolve an alias / instance name
