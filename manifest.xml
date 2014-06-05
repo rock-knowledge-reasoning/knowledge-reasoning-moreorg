@@ -8,5 +8,8 @@
   <logo>http://</logo>
   <depend package="base/cmake" />
   <depend package="boost" />
-  <depend pacakge="ctemplate" />
+  <depend package="base/types" />
+  <depend package="external/factpp" />
+  <depend package="planning/pddl_planner" />
+  <!-- <depend package="ctemplate" /> -->
 </package>
