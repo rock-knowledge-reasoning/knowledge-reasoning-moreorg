@@ -5,21 +5,28 @@
 
 namespace owl_om {
 
+typedef std::vector<IRIList> CandidatesList;
+
 class OrganizationModel
 {
     KnowledgeBase mKnowledgeBase;
 
 public:
 
-    enum Entities { ACTOR, SERVICE, INTERFACE, COMPATIBILITY, END_OF_ENTITIES };
+    enum Entities { ACTOR, ACTOR_MODEL, COMPOSITE_ACTOR, SERVICE, SERVICE_MODEL, INTERFACE, COMPATIBILITY, END_OF_ENTITIES };
     static std::map<Entities, IRI> EntitiesIRIs;
 
-    enum Properties { HAS, PROVIDES, DEPENDS_ON, USES, COMPATIBLE_WITH, END_OF_PROPERTIES };
+    enum Properties { HAS, PROVIDES, DEPENDS_ON, USES, COMPATIBLE_WITH, MODELED_BY, END_OF_PROPERTIES };
     static std::map<Properties, IRI> PropertiesIRIs;
 
     KnowledgeBase& knowledgeBase() { return mKnowledgeBase; }
 
     const KnowledgeBase& knowledgeBase() const { return mKnowledgeBase; }
+
+    /**
+     * Creation of an instance of a given elementary klass, which is modeled by a given model klass
+     */
+    void createInstance(const IRI& instanceName, const IRI& klass, const IRI& model);
 
     // PREDICATES
     /**
@@ -41,7 +48,7 @@ public:
      * Account of interface that are in use, i.e.
      * relation: <Actor> 'uses' <Interface>
      */
-    IRIList checkIfCompatibleNow(const IRI& instance, const IRI& otherInstance);
+    CandidatesList checkIfCompatibleNow(const IRI& instance, const IRI& otherInstance);
 
     /**
      * Run inference to identify service that are 'provided'
@@ -69,6 +76,9 @@ public:
      */
     IRIList compactActorList();
 
+    IRI getResourceModel(const IRI& instance);
+    
+    bool isSameResourceModel(const IRI& instance, const IRI& otherInstance);
 };
 
 } // end namespace owl_om

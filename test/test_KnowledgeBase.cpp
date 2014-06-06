@@ -23,6 +23,9 @@ BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
     kb.instanceOf("A","Base");
     kb.instanceOf("B","Base");
 
+    IRIList directInstances = kb.allInstancesOf("Base", true);
+    BOOST_REQUIRE_MESSAGE(directInstances.size() == 2, "All direct instances of BASE: '" << directInstances.size() << "' expected 2");
+
     kb.disjoint("A","B", KnowledgeBase::INSTANCE );
     kb.relatedTo("A","sibling","B");
     Axiom a = kb.relatedTo("A","sibling","B", false);
@@ -44,6 +47,14 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     OrganizationModel om;
 
     KnowledgeBase& kb = om.knowledgeBase();
+
+    // Resource definitions
+    kb.transitiveProperty("dependsOn");
+    kb.transitiveProperty("provides");
+    kb.transitiveProperty("uses");
+    kb.transitiveProperty("modeledBy");
+    kb.symmetricProperty("compatibleWith");
+
     kb.setVerbose();
     // General concepts:
     kb.subclassOf("Mission","Thing");
@@ -53,180 +64,178 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     assert( kb.allSubclassesOf("Thing").size() == 2);
 
     kb.subclassOf("Resource", "Thing");
+    kb.subclassOf("ResourceModel", "Thing");
+    kb.subclassOf("ResourceRequirement", "Thing");
     kb.subclassOf("Interface", "Resource");
-    kb.subclassOf("Service", "Thing");
-    kb.subclassOf("Actor", "Thing");
+    kb.subclassOf("InterfaceModel", "ResourceModel");
+    kb.subclassOf("Service", "Resource");
+    kb.subclassOf("ServiceModel", "ResourceModel");
+    kb.subclassOf("Actor", "Resource");
+    kb.subclassOf("ActorModel", "ResourceModel");
 
-    kb.subclassOf("Mapping", "Resource");
-    kb.subclassOf("Localization", "Resource");
-    kb.subclassOf("Locomotion", "Resource");
-    kb.subclassOf("MechanicalInterface", "Interface");
+    kb.instanceOf("Mapping", "ResourceModel");
+    kb.instanceOf("Localization", "ResourceModel");
+    kb.instanceOf("Locomotion", "ResourceModel");
 
-    // Define ElectroMechanicalInterface as union of ElectricalInterface and MechanicalInterface
-    kb.subclassOf("ElectricalInterface", "Interface");
-    ClassExpression emi = kb.intersectionOf("MechanicalInterface", "ElectricalInterface");
-    kb.alias("ElectroMechanicalInterface", emi);
-    kb.subclassOf("ElectroMechanicalInterface", "Interface");
+    kb.instanceOf("Camera", "ResourceModel");
+    kb.instanceOf("Power", "ResourceModel");
 
-    kb.subclassOf("EmiActive", "ElectroMechanicalInterface");
-    kb.subclassOf("EmiPassive", "ElectroMechanicalInterface");
-    kb.subclassOf("EmiNeutral", "ElectroMechanicalInterface");
+    kb.instanceOf("MechanicalInterface", "InterfaceModel");
+    kb.instanceOf("ElectricalInterface", "InterfaceModel");
+    kb.instanceOf("ElectroMechanicalInterface", "InterfaceModel");
 
-    // // Define compatible interfaces by using unions that subclass compatiblity
-    // kb.subclassOf("Compatibility", "Interface");
-    // ClassExpression e = kb.intersectionOf("EmiActive", "EmiPassive");
-    // kb.alias("MatchingDevices#0", e);
-    // kb.subclassOf("MatchingDevices#0", "Compatibility");
+    kb.instanceOf("EmiActive", "InterfaceModel");
+    kb.instanceOf("EmiPassive", "InterfaceModel");
+    kb.instanceOf("EmiNeutral", "InterfaceModel");
 
-    // BOOST_REQUIRE_MESSAGE( kb.isSubclassOf( kb.intersectionOf("EmiActive", "EmiPassive") , "Compatibility"), "subclass of intersection");
+    kb.relatedTo("EmiActive", "compatibleWith", "EmiPassive");
 
-    kb.subclassOf("Camera", "Resource");
-    kb.subclassOf("Power", "Resource");
+    om.createInstance("Mapping/instance#0", "Resource", "Mapping");
+    om.createInstance("Mapping/instance#1", "Resource", "Mapping");
+    om.createInstance("Mapping/instance#2", "Resource", "Mapping");
+    om.createInstance("Mapping/instance#10", "Resource", "Mapping");
+    om.createInstance("Mapping/instance#20", "Resource", "Mapping");
 
-    kb.instanceOf("Mapping/instance#0", "Mapping");
-    kb.instanceOf("Mapping/instance#1", "Mapping");
-    kb.instanceOf("Mapping/instance#2", "Mapping");
+    BOOST_REQUIRE_MESSAGE(kb.isInstanceOf("Mapping/instance#0", "Resource"), "Instance of Mapping");
+    BOOST_REQUIRE_MESSAGE(kb.isRelatedTo("Mapping/instance#0", "modeledBy", "Mapping"), "Resource Mapping/instance#0 typeOf Mapping");
 
-    BOOST_REQUIRE_MESSAGE(kb.isInstanceOf("Mapping/instance#0", "Mapping"), "Instance of Mapping");
+    om.createInstance("Localization/instance#0", "Resource", "Localization");
+    om.createInstance("Localization/instance#1", "Resource", "Localization");
+    om.createInstance("Localization/instance#10", "Resource", "Localization");
+    om.createInstance("Localization/instance#20", "Resource", "Localization");
 
+    om.createInstance("Locomotion/instance#0", "Resource", "Locomotion");
+    om.createInstance("Locomotion/instance#1", "Resource", "Locomotion");
+    om.createInstance("Locomotion/instance#2", "Resource", "Locomotion");
+    om.createInstance("Locomotion/instance#10", "Resource", "Locomotion");
+    om.createInstance("Locomotion/instance#20", "Resource", "Locomotion");
 
-    kb.instanceOf("Localization/instance#0", "Localization");
-    kb.instanceOf("Localization/instance#1", "Localization");
-    kb.instanceOf("Localization/instance#2", "Localization");
+    om.createInstance("EmiActive/requirement#0", "ResourceRequirement", "EmiActive");
+    om.createInstance("EmiActive/instance#0" , "Interface", "EmiActive");
+    om.createInstance("EmiActive/instance#1" , "Interface", "EmiActive");
+    om.createInstance("EmiActive/instance#2" , "Interface", "EmiActive");
+    om.createInstance("EmiActive/instance#3" , "Interface", "EmiActive");
+    om.createInstance("EmiActive/instance#10", "Interface", "EmiActive");
+    om.createInstance("EmiActive/instance#11", "Interface", "EmiActive");
+    om.createInstance("EmiActive/instance#30", "Interface", "EmiActive");
 
-    kb.instanceOf("Locomotion/instance#0", "Locomotion");
-    kb.instanceOf("Locomotion/instance#1", "Locomotion");
-    kb.instanceOf("Locomotion/instance#2", "Locomotion");
+    om.createInstance("EmiPassive/requirement#0", "ResourceRequirement", "EmiPassive");
+    om.createInstance("EmiPassive/instance#0" , "Interface", "EmiPassive");
+    om.createInstance("EmiPassive/instance#1" , "Interface", "EmiPassive");
+    om.createInstance("EmiPassive/instance#2" , "Interface", "EmiPassive");
+    om.createInstance("EmiPassive/instance#3" , "Interface", "EmiPassive");
+    om.createInstance("EmiPassive/instance#11", "Interface", "EmiPassive");
+    om.createInstance("EmiPassive/instance#12", "Interface", "EmiPassive");
+    om.createInstance("EmiPassive/instance#13", "Interface", "EmiPassive");
+    om.createInstance("EmiPassive/instance#10", "Interface", "EmiPassive");
+    om.createInstance("EmiPassive/instance#20", "Interface", "EmiPassive");
+    om.createInstance("EmiPassive/instance#30", "Interface", "EmiPassive");
 
-    kb.instanceOf("EmiActive/instance#0", "EmiActive");
-    kb.instanceOf("EmiActive/instance#1", "EmiActive");
-    kb.instanceOf("EmiActive/instance#2", "EmiActive");
-    kb.instanceOf("EmiActive/instance#3", "EmiActive");
-    kb.instanceOf("EmiActive/instance#11", "EmiActive");
+    om.createInstance("Camera/requirement#0" , "ResourceRequirement", "Camera");
+    om.createInstance("Camera/requirement#1" , "ResourceRequirement", "Camera");
+    om.createInstance("Camera/instance#0" , "Resource", "Camera");
+    om.createInstance("Camera/instance#10" , "Resource", "Camera");
+    om.createInstance("Camera/instance#20" , "Resource", "Camera");
+    om.createInstance("Camera/instance#30" , "Resource", "Camera");
 
-    kb.instanceOf("EmiPassive/instance#0", "EmiPassive");
-    kb.instanceOf("EmiPassive/instance#1", "EmiPassive");
-    kb.instanceOf("EmiPassive/instance#2", "EmiPassive");
-    kb.instanceOf("EmiPassive/instance#3", "EmiPassive");
-    kb.instanceOf("EmiPassive/instance#11", "EmiPassive");
-    kb.instanceOf("EmiPassive/instance#12", "EmiPassive");
-    kb.instanceOf("EmiPassive/instance#13", "EmiPassive");
+    om.createInstance("Power/requirement#0", "ResourceRequirement", "Power");
+    om.createInstance("Power/instance#0", "Resource", "Power");
 
-    kb.instanceOf("Camera/requirement#0", "Camera");
-    kb.instanceOf("Camera/requirement#1", "Camera");
-
-    kb.instanceOf("Camera/instance#0", "Camera");
-    kb.instanceOf("Camera/instance#1", "Camera");
-    kb.instanceOf("Camera/instance#2", "Camera");
-    kb.instanceOf("Camera/instance#3", "Camera");
-
-    kb.instanceOf("Power/requirement#0", "Power");
-
-    kb.instanceOf("Power/instance#0", "Power");
-    kb.instanceOf("Power/instance#1", "Power");
-    kb.instanceOf("Power/instance#2", "Power");
-    kb.instanceOf("Power/instance#3", "Power");
-
-    kb.subclassOf("ImageProvider", "Service");
+    kb.instanceOf("ImageProvider", "ServiceModel");
     // to allow a higher arity, e.g., for a stereo camera that requires distinct services
-    kb.instanceOf("ImageProvider/requirement#0", "ImageProvider");
-    kb.instanceOf("ImageProvider/requirement#1", "ImageProvider");
+    om.createInstance("ImageProvider/requirement#0", "ResourceRequirement", "ImageProvider");
+    om.createInstance("ImageProvider/requirement#1", "ResourceRequirement", "ImageProvider");
 
-    kb.subclassOf("StereoImageProvider", "Service");
-    kb.subclassOf("StereoImageProvider/requirement#0", "StereoImageProvider");
+    kb.instanceOf("StereoImageProvider", "ServiceModel");
+    om.createInstance("StereoImageProvider/requirement#0", "Service", "StereoImageProvider");
 
     kb.refresh();
     BOOST_REQUIRE_MESSAGE( kb.allInstancesOf("Thing").size() != 0, "# of instances of Thing > 0, i.e. " << kb.allInstancesOf("Thing").size());
 
-    // Resource definitions
-    kb.transitiveProperty("dependsOn");
-    kb.transitiveProperty("provides");
-    kb.transitiveProperty("uses");
-
     //// Service definitions
-    kb.subclassOf("MoveTo", "Service");
-    kb.instanceOf("MoveTo/requirement#0", "MoveTo");
-    kb.relatedTo("MoveTo/requirement#0", "dependsOn", "Mapping/instance#0");
-    kb.relatedTo("MoveTo/requirement#0", "dependsOn", "Localization/instance#0");
-    kb.relatedTo("MoveTo/requirement#0", "dependsOn", "Locomotion/instance#0");
-    kb.relatedTo("MoveTo/requirement#0", "dependsOn", "Power/instance#0");
-    kb.alias("move_to", "MoveTo/requirement#0", KnowledgeBase::INSTANCE);
+    kb.instanceOf("MoveTo", "ServiceModel");
+    om.createInstance("Mapping/requirement#0", "ResourceRequirement", "Mapping");
+    om.createInstance("Localization/requirement#0", "ResourceRequirement", "Mapping");
+    om.createInstance("Locomotion/requirement#0", "ResourceRequirement", "Mapping");
+    // The following requirement is already defined
+    // om.createInstance("Power/requirement#0", "ResourceRequirement", "Power");
+
+    kb.relatedTo("MoveTo", "dependsOn", "Mapping/requirement#0");
+    kb.relatedTo("MoveTo", "dependsOn", "Localization/requirement#0");
+    kb.relatedTo("MoveTo", "dependsOn", "Locomotion/requirement#0");
+    kb.relatedTo("MoveTo", "dependsOn", "Power/requirement#0");
     
-    BOOST_REQUIRE_MESSAGE( kb.isRelatedTo("move_to", "dependsOn", "Mapping/instance#0"), "Alias depends on mapping");
+    BOOST_REQUIRE_MESSAGE( kb.isRelatedTo("MoveTo", "dependsOn", "Mapping/requirement#0"), "Check dependency");
 
-    {
-        kb.refresh();
-        IRIList instanceList = kb.getSameAs("move_to");
-        IRI instance = instanceList[0];
-        assert(instance == "MoveTo/requirement#0");
-        assert ( kb.allRelatedInstances(instance,"dependsOn").size() == 4 );
-    }
+    om.createInstance("Camera/requirement#0", "ResourceRequirement", "Camera");
+    om.createInstance("Power/requirement#0", "ResourceRequirement", "Power");
+    kb.relatedTo("ImageProvider", "dependsOn", "Camera/requirement#0");
+    kb.relatedTo("ImageProvider", "dependsOn", "Power/requirement#0");
 
-    kb.relatedTo("ImageProvider/requirement#0", "dependsOn", "Camera/requirement#0");
-    kb.relatedTo("ImageProvider/requirement#0", "dependsOn", "Power/requirement#0");
 
-    kb.relatedTo("ImageProvider/requirement#1", "dependsOn", "Camera/requirement#1");
-    kb.relatedTo("ImageProvider/requirement#1", "dependsOn", "Power/requirement#1");
+    kb.instanceOf("StereoImageProvider", "ServiceModel");
+    kb.relatedTo("StereoImageProvider", "dependsOn", "ImageProvider/requirement#0");
+    kb.relatedTo("StereoImageProvider", "dependsOn", "ImageProvider/requirement#1");
 
-    kb.subclassOf("StereoImageProvider", "Service");
-    kb.instanceOf("StereoImageProvider/requirement#0", "StereoImageProvider");
-    kb.relatedTo("StereoImageProvider/requirement#0", "dependsOn", "ImageProvider/requirement#0");
-    kb.relatedTo("StereoImageProvider/requirement#0", "dependsOn", "ImageProvider/requirement#1");
+    om.createInstance("MoveTo/requirement#0", "ResourceRequirement", "MoveTo");
+    kb.instanceOf("LocationImageProvider", "ServiceModel");
+    kb.relatedTo("LocationImageProvider", "dependsOn", "ImageProvider/requirement#0");
+    kb.relatedTo("LocationImageProvider", "dependsOn", "MoveTo/requirement#0");
 
-    kb.subclassOf("LocationImageProvider", "Service");
-    kb.instanceOf("LocationImageProvider/requirement#0", "LocationImageProvider");
-    kb.relatedTo("LocationImageProvider/requirement#0", "dependsOn", "ImageProvider/requirement#0");
-    kb.relatedTo("LocationImageProvider/requirement#0", "dependsOn", "MoveTo/requirement#0");
-
+    om.createInstance("LocationImageProvider/requirement#0", "ResourceRequirement", "LocationImageProvider");
     kb.alias("location_image_provider", "LocationImageProvider/requirement#0", KnowledgeBase::INSTANCE);
     {
         kb.refresh();
-        BOOST_REQUIRE ( kb.allRelatedInstances("location_image_provider","dependsOn").size() > 2 );
+        int allInstances = kb.allRelatedInstances("location_image_provider","modeledBy").size();
+        BOOST_REQUIRE_MESSAGE ( kb.allRelatedInstances("location_image_provider","modeledBy").size() == 1, "All related instances " << allInstances << " expected > 2" );
+
+        allInstances = kb.allRelatedInstances("LocationImageProvider","dependsOn").size();
+        BOOST_REQUIRE_MESSAGE ( kb.allRelatedInstances("LocationImageProvider","dependsOn").size() == 2, "All related instances " << allInstances << " expected > 2" );
     }
 
-    kb.subclassOf("Power", "Service");
-    kb.subclassOf("EmiPowerProvider", "Power");
-    kb.instanceOf("EmiPowerPower/requirement#0", "EmiPowerProvider");
-    kb.relatedTo("EmiPowerProvider/requirement#0", "dependsOn", "EmiActive/requirement#0");
-    kb.relatedTo("EmiPowerProvider/requirement#0", "dependsOn", "EmiPassive/requirement#0");
-    kb.relatedTo("EmiPowerProvider/requirement#0", "dependsOn", "Power/requirement#0");
+    kb.instanceOf("PowerProvider", "ServiceModel");
+    om.createInstance("EmiPowerProvider", "Service", "PowerProvider");
+    kb.relatedTo("EmiPowerProvider", "dependsOn", "EmiActive/requirement#0");
+    kb.relatedTo("EmiPowerProvider", "dependsOn", "EmiPassive/requirement#0");
+    kb.relatedTo("EmiPowerProvider", "dependsOn", "Power/requirement#0");
+    om.createInstance("EmiPowerPower/requirement#0", "ResourceRequirement", "EmiPowerProvider");
 
     //// Actor definition
-    kb.subclassOf("Sherpa","Actor");
-    kb.instanceOf("Sherpa/instance#0","Sherpa");
+    kb.instanceOf("Sherpa","ActorModel");
+    om.createInstance("Sherpa/instance#0","Actor", "Sherpa");
     kb.alias("sherpa", "Sherpa/instance#0", KnowledgeBase::INSTANCE);
 
-    kb.subclassOf("CREX","Actor");
-    kb.instanceOf("CREX/instance#0","CREX");
+    kb.instanceOf("CREX","ActorModel");
+    om.createInstance("CREX/instance#0","Actor", "CREX");
     kb.alias("crex", "CREX/instance#0", KnowledgeBase::INSTANCE);
 
-    kb.subclassOf("PayloadCamera","Actor");
-    kb.instanceOf("PayloadCamera/instance#0","PayloadCamera");
+    kb.instanceOf("PayloadCamera","ActorModel");
+    om.createInstance("PayloadCamera/instance#0","Actor", "PayloadCamera");
     kb.alias("payload_camera", "PayloadCamera/instance#0", KnowledgeBase::INSTANCE);
 
     kb.transitiveProperty("has");
-    kb.relatedTo("Sherpa/instance#0", "has", "Mapping/instance#1");
-    kb.relatedTo("Sherpa/instance#0", "has", "Localization/instance#1");
-    kb.relatedTo("Sherpa/instance#0", "has", "Locomotion/instance#1");
-    kb.relatedTo("Sherpa/instance#0", "has", "Camera/instance#1");
-    kb.relatedTo("Sherpa/instance#0", "has", "EmiActive/instance#1");
-    kb.relatedTo("Sherpa/instance#0", "has", "EmiActive/instance#11");
-    kb.relatedTo("Sherpa/instance#0", "has", "EmiPassive/instance#1");
-    kb.relatedTo("Sherpa/instance#0", "has", "EmiPassive/instance#11");
-    kb.relatedTo("Sherpa/instance#0", "has", "EmiPassive/instance#12");
-    kb.relatedTo("Sherpa/instance#0", "has", "EmiPassive/instance#13");
-    kb.relatedTo("Sherpa/instance#0", "has", "Power/instance#1");
+    kb.relatedTo("Sherpa", "has", "Mapping/instance#10");
+    kb.relatedTo("Sherpa", "has", "Localization/instance#10");
+    kb.relatedTo("Sherpa", "has", "Locomotion/instance#10");
+    kb.relatedTo("Sherpa", "has", "Camera/instance#10");
+    kb.relatedTo("Sherpa", "has", "EmiActive/instance#10");
+    kb.relatedTo("Sherpa", "has", "EmiActive/instance#11");
+    kb.relatedTo("Sherpa", "has", "EmiPassive/instance#10");
+    kb.relatedTo("Sherpa", "has", "EmiPassive/instance#11");
+    kb.relatedTo("Sherpa", "has", "EmiPassive/instance#12");
+    kb.relatedTo("Sherpa", "has", "EmiPassive/instance#13");
+    kb.relatedTo("Sherpa", "has", "Power/instance#0");
 
-    kb.relatedTo("CREX/instance#0", "has", "Mapping/instance#2");
-    kb.relatedTo("CREX/instance#0", "has", "Localization/instance#2");
-    kb.relatedTo("CREX/instance#0", "has", "Locomotion/instance#2");
-    kb.relatedTo("CREX/instance#0", "has", "Camera/instance#2");
-    kb.relatedTo("CREX/instance#0", "has", "EmiPassive/instance#2");
-    kb.relatedTo("CREX/instance#0", "has", "Power/instance#2");
+    kb.relatedTo("CREX", "has", "Mapping/instance#20");
+    kb.relatedTo("CREX", "has", "Localization/instance#20");
+    kb.relatedTo("CREX", "has", "Locomotion/instance#20");
+    kb.relatedTo("CREX", "has", "Camera/instance#20");
+    kb.relatedTo("CREX", "has", "EmiPassive/instance#20");
+    kb.relatedTo("CREX", "has", "Power/instance#0");
 
-    kb.relatedTo("PayloadCamera/instance#0", "has", "Camera/instance#3");
-    kb.relatedTo("PayloadCamera/instance#0", "has", "EmiPassive/instance#3");
-    kb.relatedTo("PayloadCamera/instance#0", "has", "EmiActive/instance#3");
+    kb.relatedTo("PayloadCamera", "has", "Camera/instance#30");
+    kb.relatedTo("PayloadCamera", "has", "EmiPassive/instance#30");
+    kb.relatedTo("PayloadCamera", "has", "EmiActive/instance#30");
 
     //// Mission requirements
     kb.instanceOf("simple_mission", "Mission");
@@ -236,46 +245,7 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     assert ( kb.allRelatedInstances("simple_mission", "dependsOn").size() != 0 );
 
     kb.allInverseRelatedInstances("Camera/instance#0","dependsOn");
-    kb.allInverseRelatedInstances("Camera/instance#1","has");
-
-
-    {
-        ClassExpression emiActiveCompatible = kb.disjunctionOf("EmiPassive","EmiNeutral");
-        kb.alias("CompatibleInterfacesEmiActive", emiActiveCompatible);
-        // Creates a restriction that all systems that own an EMI are ReconfigurableActors
-        ClassExpression forallRestriction = kb.objectPropertyRestriction(restriction::FORALL, "compatibleWith", "CompatibleInterfacesEmiActive");
-        kb.alias("EmiActive", forallRestriction);
-        kb.refresh();
-    }
-
-    {
-        ClassExpression emiPassiveCompatible = kb.disjunctionOf("EmiActive","EmiNeutral");
-        kb.alias("CompatibleInterfacesEmiPassive", emiPassiveCompatible);
-        // Creates a restriction that all systems that own an EMI are ReconfigurableActors
-        ClassExpression forallRestriction = kb.objectPropertyRestriction(restriction::FORALL, "compatibleWith", "CompatibleInterfacesEmiPassive");
-        kb.alias("EmiPassive", forallRestriction);
-        kb.refresh();
-    }
-
-    kb.disjoint("CompatibleInterfacesEmiActive", "EmiActive", KnowledgeBase::CLASS);
-    BOOST_REQUIRE_NO_THROW( kb.refresh() );
-    kb.disjoint("CompatibleInterfacesEmiPassive", "EmiPassive", KnowledgeBase::CLASS);
-
-        BOOST_REQUIRE_NO_THROW( kb.refresh() );
-    {
-        Axiom a = kb.relatedTo("EmiActive/instance#0", "compatibleWith", "EmiActive/instance#11");
-        BOOST_REQUIRE_THROW( kb.refresh(), std::exception);
-        kb.retract(a);
-        BOOST_REQUIRE_NO_THROW( kb.refresh() );
-    }
-
-    {
-        Axiom a = kb.relatedTo("EmiPassive/instance#0", "compatibleWith", "EmiPassive/instance#11");
-        BOOST_REQUIRE_THROW( kb.refresh(), std::exception);
-        kb.retract(a);
-        BOOST_REQUIRE_NO_THROW( kb.refresh() );
-        BOOST_REQUIRE_MESSAGE(!kb.isRelatedTo("EmiPassive/instance#0", "compatibleWith", "EmiPassive/instance#11"), "Interface is not compatible");
-    }
+    kb.allInverseRelatedInstances("Camera/instance#0","has");
 
     BOOST_REQUIRE_MESSAGE( om.checkIfCompatible("Sherpa/instance#0","CREX/instance#0"), "Sherpa compatible to CREX");
     BOOST_REQUIRE_MESSAGE( om.checkIfCompatible("Sherpa/instance#0","PayloadCamera/instance#0"), " Sherpa compatible to PayloadCamera" );
@@ -283,8 +253,8 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
 
     om.runInferenceEngine();
 
-    assert( om.checkIfFulfills("Sherpa/instance#0", "LocationImageProvider/requirement#0") );
-    assert( kb.isRelatedTo("Sherpa/instance#0", "provides", "LocationImageProvider/requirement#0") );
+    BOOST_REQUIRE( om.checkIfFulfills("Sherpa/instance#0", "LocationImageProvider/requirement#0") );
+    BOOST_REQUIRE( kb.isRelatedTo("Sherpa", "provides", "LocationImageProvider") );
     {
         std::vector<std::string> newActors = om.computeActorsFromRecombination();
         std::vector<std::string>::iterator ait = newActors.begin();
@@ -303,40 +273,41 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
         }
     }
 
-    // Each property that hasInterface with an concept of EmiActive
-    // has to be a ReconfigurableActor
-    kb.subclassOf("ReconfigurableActor","Actor");
-    kb.disjoint("Interface","ReconfigurableActor", KnowledgeBase::CLASS);
-    kb.inverseOf("has","availableFor");
-
-    // Creates a restriction that all systems that own an EMI are ReconfigurableActors
-    ClassExpression forallRestriction = kb.objectPropertyRestriction(restriction::FORALL, "availableFor", "ReconfigurableActor");
-    kb.subclassOf("ElectroMechanicalInterface", forallRestriction);
-    kb.refresh();
-
-    //std::vector<std::string> types = kb.typesOf("PayloadCamera/instance#0");
-    //for(int i =0; i < types.size(); ++i)
-    //{
-    //    LOG_WARN_S << types[i];
-    //}
-
-    BOOST_REQUIRE_MESSAGE( kb.isInstanceOf("PayloadCamera/instance#0", "ReconfigurableActor"), "PayloadCamera instance of ReconfigurableActor" );
-    BOOST_REQUIRE_MESSAGE( kb.isInstanceOf("Sherpa/instance#0", "ReconfigurableActor"), "Sherpa instance of ReconfigurableActor" );
-    BOOST_REQUIRE_MESSAGE( kb.isInstanceOf("CREX/instance#0", "ReconfigurableActor"), "CREX instance of ReconfigurableActor");
-
-
-    //// A version of Sherpa without interface defined
-    kb.instanceOf("Sherpa/instance#1", "Sherpa");
-    BOOST_REQUIRE_MESSAGE( !kb.isInstanceOf("Sherpa/instance#1", "ReconfigurableActor"), "Sherpa#1 not instance of ReconfigurableActor");
-
-
-    // --
-    // how to
-    // - identify the number of dependencies for a certain instance, i.e.
-    // - differentiate between consumables and non-consumables, e.g. such as the interface
-    // - count service required
-    // - permutations should consider the associated interface (future version)
-
+//    // Each property that hasInterface with an concept of EmiActive
+//    // has to be a ReconfigurableActor
+//    kb.subclassOf("ReconfigurableActor","Actor");
+//    kb.disjoint("Interface","ReconfigurableActor", KnowledgeBase::CLASS);
+//    kb.inverseOf("has","availableFor");
+//
+//    // Creates a restriction that all systems that own an EMI are ReconfigurableActors
+//    ClassExpression forallRestriction = kb.objectPropertyRestriction(restriction::FORALL, "availableFor", "ReconfigurableActor");
+//    kb.subclassOf("ElectroMechanicalInterface", forallRestriction);
+//    kb.refresh();
+//
+//    //std::vector<std::string> types = kb.typesOf("PayloadCamera/instance#0");
+//    //for(int i =0; i < types.size(); ++i)
+//    //{
+//    //    LOG_WARN_S << types[i];
+//    //}
+//
+//    BOOST_REQUIRE_MESSAGE( kb.isInstanceOf("PayloadCamera/instance#0", "ReconfigurableActor"), "PayloadCamera instance of ReconfigurableActor" );
+//    BOOST_REQUIRE_MESSAGE( kb.isInstanceOf("Sherpa/instance#0", "ReconfigurableActor"), "Sherpa instance of ReconfigurableActor" );
+//    BOOST_REQUIRE_MESSAGE( kb.isInstanceOf("CREX/instance#0", "ReconfigurableActor"), "CREX instance of ReconfigurableActor");
+//
+//
+//    //// A version of Sherpa without interface defined
+//    kb.instanceOf("Sherpa/instance#1", "Sherpa");
+//    BOOST_REQUIRE_MESSAGE( !kb.isInstanceOf("Sherpa/instance#1", "ReconfigurableActor"), "Sherpa#1 not instance of ReconfigurableActor");
+//
+//
+//    // --
+//    // how to
+//    // - identify the number of dependencies for a certain instance, i.e.
+//    // - differentiate between consumables and non-consumables, e.g. such as the interface
+//    // - count service required
+//    // - permutations should consider the associated interface (future version)
+//    //
+//
     // Export PDDL
     PDDLExporter exporter;
     pddl_planner::representation::Domain domain = exporter.toDomain(om);

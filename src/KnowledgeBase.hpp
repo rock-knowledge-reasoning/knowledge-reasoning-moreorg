@@ -367,15 +367,23 @@ public:
 
     /**
      * Retrieve all known instance of a given klass type
+     * \param klass Name of klass
+     * \param direct Set to true if only direct instances of the given class shall be retrieved
      * \return list of all known instances
      */
-    IRIList allInstancesOf(const IRI& klass);
+    IRIList allInstancesOf(const IRI& klass, bool direct = false);
 
     /**
      * Retrieve all related instances regarding a single instance and a selected property
      * \return list of instances that are related to instance via the relationProperty
      */
     IRIList allRelatedInstances(const IRI& instance, const IRI& relationProperty);
+
+    /**
+     * Retrieve all related instances regarding a single instance and a selected property
+     * \return list of instances that are related to instance via the relationProperty
+     */
+    IRI relatedInstance(const IRI& instance, const IRI& relationProperty);
 
     /**
      * Retrieve all instances regarding a single instance and a selected property

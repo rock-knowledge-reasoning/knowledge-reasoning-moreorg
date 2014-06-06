@@ -489,19 +489,28 @@ IRIList KnowledgeBase::allInstances() const
     return instances;
 }
 
-IRIList KnowledgeBase::allInstancesOf(const IRI& klass)
+IRIList KnowledgeBase::allInstancesOf(const IRI& klass, bool direct)
 {
     ClassExpression e_class = getClass(klass);
-    std::vector<std::string> instances;
+    IRIList instances;
 
     Actor actor;
     actor.needIndividuals();
     mKernel->getInstances(e_class.get(), actor);
+
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
-        LOG_DEBUG_S << "instance of '" << klass << "': " << result[i];
-        instances.push_back( std::string(result[i]) );
+        // Fact does seem to fail at extracting direct instances
+        std::string instanceName(result[i]);
+        if(direct && ! (typeOf(instanceName) == klass) )
+        {
+            LOG_DEBUG_S << "instance '" << instanceName << "' not a direct instance of '" << klass << "'";
+            continue;
+        }
+        LOG_DEBUG_S << "instance of '" << klass << "': " << instanceName;
+        instances.push_back(instanceName);
+
     }
     delete[] result;
     return instances;
@@ -524,6 +533,16 @@ IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& rel
         individuals.push_back( std::string( entry->getName() ) );
     }
     return individuals;
+}
+
+IRI KnowledgeBase::relatedInstance(const IRI& individual, const IRI& relationProperty)
+{
+    IRIList instances = allRelatedInstances(individual, relationProperty);
+    if(instances.empty())
+    {
+        throw std::invalid_argument("KnowledgeBase::relatedInstance: no instance related to '" + individual + "' via property '" + relationProperty + "'");
+    }
+    return instances.front();
 }
 
 IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const IRI& relationProperty)
