@@ -34,6 +34,7 @@ BOOST_AUTO_TEST_CASE(it_should_query_db_abstract)
 
     db::query::Results results = kb->findAll("?s","?p","?o");
     BOOST_REQUIRE_MESSAGE(results.rows.size() != 0, "Results retrieved");
+    BOOST_TEST_MESSAGE(results.toString());
 
     results = kb->findAll("?s", vocabulary::RDFS::subClassOf(),"?o");
     BOOST_TEST_MESSAGE(results.toString());

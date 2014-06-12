@@ -17,7 +17,7 @@ private:
 
     void updateRegistry(Registry* registry) const;
 
-    void updateInstances(Instance::List* instances) const;
+    void updateInstances(Instance::List* instances);
 
 public:
     /**

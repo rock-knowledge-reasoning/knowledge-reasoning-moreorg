@@ -58,8 +58,8 @@ void KnowledgeBase::updateRegistry(Registry* registry) const
             std::string subject = it["s"];
             std::string object = it["o"];
 
-            Class::Ptr subjectKlass = registry->getClass(subject);
-            Class::Ptr objectKlass = registry->getClass(object);
+            Class::Ptr subjectKlass = registry->getClass(subject, true /* lazy */);
+            Class::Ptr objectKlass = registry->getClass(object, true /* lazy */);
             subjectKlass->addSuperClass(objectKlass);
         }
     }
@@ -112,7 +112,7 @@ void KnowledgeBase::updateRegistry(Registry* registry) const
 
 }
 
-void KnowledgeBase::updateInstances(Instance::List* instances) const
+void KnowledgeBase::updateInstances(Instance::List* instances)
 {
     using namespace query;
     // Get NamedIndividuals

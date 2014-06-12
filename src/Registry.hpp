@@ -20,7 +20,7 @@ public:
     /**
      * Get instance of a certain class model
      */
-    Class::Ptr getClass(const Name& name) const;
+    Class::Ptr getClass(const Name& name, bool lazy = false);
 
     /**
      * Register a certain class type for a given uri

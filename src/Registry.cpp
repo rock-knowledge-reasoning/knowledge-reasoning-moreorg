@@ -30,7 +30,7 @@ Registry::Registry()
     registerProperty(annotationProperty);
 }
 
-Class::Ptr Registry::getClass(const Name& name) const
+Class::Ptr Registry::getClass(const Name& name, bool lazy)
 {
     Class::Map::const_iterator cit = mClasses.find(name);
     for(; cit != mClasses.end(); ++cit)
@@ -38,13 +38,21 @@ Class::Ptr Registry::getClass(const Name& name) const
         return cit->second;
     }
 
-    std::string msg = "owl_om::Registry: cannot retrieve class. No class '" + name + "' known";
-    throw std::runtime_error(msg);
+    if(!lazy)
+    {
+        std::string msg = "owl_om::Registry: cannot retrieve class. No class '" + name + "' known";
+        throw std::runtime_error(msg);
+    } else {
+        Class::Ptr klass(new Class(name));
+        registerClass(klass);
+        return klass;
+    }
 }
 
 void Registry::registerClass(Class::Ptr klass)
 {
     std::string name = klass->getName();
+    LOG_DEBUG_S << "Registering class '" << name << "'";
 
     if(mClasses.find(name) != mClasses.end())
     {
