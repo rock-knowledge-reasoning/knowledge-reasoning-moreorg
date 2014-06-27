@@ -19,7 +19,7 @@ std::string Results::toString() const
         txt << "--- #" << count++ << " ---" << std::endl;
         for(; cit != rit->end(); ++cit)
         {
-            txt << "    " << cit->second << std::endl;
+            txt << "    " << cit->first << ": " << cit->second << std::endl;
         }
     }
 
