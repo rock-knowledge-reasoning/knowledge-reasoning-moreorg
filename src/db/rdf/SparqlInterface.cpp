@@ -33,7 +33,7 @@ Results SparqlInterface::select_where(const Uri& subject, const Uri& predicate, 
     std::string where;
 
     std::map<std::string,std::string> prefixOpenlist;
-    // using mini prefix to preseve order for where clause
+    // using mini prefix to preserve order for where clause
     prefixOpenlist["a_pre_subject"] = subject;
     prefixOpenlist["b_pre_predicate"] = predicate;
     prefixOpenlist["c_pre_object"] = object;
