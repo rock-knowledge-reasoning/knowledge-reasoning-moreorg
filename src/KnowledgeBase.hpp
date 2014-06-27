@@ -11,9 +11,12 @@ class TExpressionManager;
 class TDLAxiom;
 class TDLConceptExpression;
 class TDLIndividualExpression;
+class TDLObjectRoleExpression;
+class TDLDataRoleExpression;
 class ReasoningKernel;
 
 namespace owl_om {
+//! Restriction types
 namespace restriction {
     enum Type { SELF, VALUE, EXISTS, FORALL, MIN_CARDINALITY, MAX_CARDINALITY, EXACT_CARDINALITY };
 }
@@ -53,8 +56,30 @@ public:
     const TDLIndividualExpression* get() const { return mExpression; }
 };
 
+class ObjectPropertyExpression
+{
+    TDLObjectRoleExpression* mExpression;
+
+public:
+    ObjectPropertyExpression(TDLObjectRoleExpression* expression = NULL);
+
+    const TDLObjectRoleExpression* get() const { return mExpression; }
+};
+
+class DataPropertyExpression
+{
+    TDLDataRoleExpression* mExpression;
+
+public:
+    DataPropertyExpression(TDLDataRoleExpression* expression = NULL);
+
+    const TDLDataRoleExpression* get() const { return mExpression; }
+};
+
 typedef std::map<IRI, ClassExpression > IRIClassExpressionMap;
 typedef std::map<IRI, InstanceExpression > IRIInstanceExpressionMap;
+typedef std::map<IRI, ObjectPropertyExpression > IRIObjectPropertyExpressionMap;
+typedef std::map<IRI, DataPropertyExpression > IRIDataPropertyExpressionMap;
 
 class KnowledgeBase
 {
@@ -66,6 +91,8 @@ class KnowledgeBase
 
     IRIInstanceExpressionMap mInstances;
     IRIClassExpressionMap mClasses;
+    IRIObjectPropertyExpressionMap mObjectProperties;
+    IRIDataPropertyExpressionMap mDataProperties;
 
     bool hasClass(const std::string& klass) const { return mClasses.count(klass); }
 
@@ -94,9 +121,25 @@ public:
 
     // ROLES (PROPERTIES)
     /**
+     * Make an object property known
+     */
+    ObjectPropertyExpression objectProperty(const IRI& property);
+    /**
+     * Make a data property known
+     */
+    DataPropertyExpression dataProperty(const IRI& property);
+    /**
      * Define a transitive object property
      */
     Axiom transitiveProperty(const IRI& property);
+    /**
+     * Define a functional object/data property
+     */
+    Axiom functionalProperty(const IRI& property, PropertyType type = OBJECT);
+    /**
+     * Define an inverse functional object/data property
+     */
+    Axiom inverseFunctionalProperty(const IRI& property);
     /**
      * Define a reflexive object property
      */
@@ -359,6 +402,11 @@ public:
      */
     InstanceExpression getInstanceLazy(const IRI& instance);
 
+    ObjectPropertyExpression getObjectProperty(const IRI& property) const;
+    ObjectPropertyExpression getObjectPropertyLazy(const IRI& property);
+    DataPropertyExpression getDataProperty(const IRI& property) const;
+    DataPropertyExpression getDataPropertyLazy(const IRI& property);
+
     /**
      * Retrieve all known instances
      * \return list of all instances
@@ -391,6 +439,16 @@ public:
      * relationProperty
      */
     IRIList allInverseRelatedInstances(const IRI& instance, const IRI& relationProperty);
+
+    /**
+     * Retrieve all object properties
+     */
+    IRIList allObjectProperties() const;
+
+    /**
+     * Retrieve all data properties
+     */
+    IRIList allDataProperties() const;
 
     /**
      * Get all types of a given instance

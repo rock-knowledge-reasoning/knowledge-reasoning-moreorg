@@ -12,6 +12,20 @@ namespace owl_om {
     typedef std::string Uri;
 
 namespace vocabulary {
+/** 
+ * \class Custom vocabulary
+ */
+class Custom
+{
+    Uri mBaseUri;
+public:
+    Custom(const std::string& baseUri)
+        : mBaseUri(baseUri)
+    {}
+
+    Uri operator[](const std::string& name) const { return mBaseUri + name; }
+};
+
 
 struct SplitUri
 {

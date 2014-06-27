@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdio.h>
-#include <owl_om/db/KnowledgeBase.hpp>
+#include <owl_om/db/Ontology.hpp>
 
 int main(int argc, char** argv)
 {
@@ -15,10 +15,12 @@ int main(int argc, char** argv)
 
     if(!o_filename.empty())
     {
-        db::KnowledgeBase::Ptr kb = db::KnowledgeBase::fromFile( o_filename );
-        db::query::Results results = kb->findAll("?s","?p","?o");
-        printf("Results: %s", results.toString().c_str());
+        db::Ontology::Ptr ontology = db::Ontology::fromFile( o_filename );
+        db::query::Results results = ontology->findAll("?s","?p","?o");
+        printf("Results:\n%s", results.toString().c_str());
+        printf("\n-----------------------------------\n");
+        printf("Resulting Ontology:\n%s", ontology->toString().c_str());
     } else {
-        fprintf(stderr, "Please provide a filename");
+        fprintf(stderr, "usage: %s <filename>\n", argv[0]);
     }
 }

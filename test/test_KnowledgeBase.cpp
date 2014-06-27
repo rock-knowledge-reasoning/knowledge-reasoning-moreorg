@@ -6,6 +6,7 @@
 
 #include <owl_om/exporter/PDDLExporter.hpp>
 
+#include <owl_om/db/Ontology.hpp>
 using namespace owl_om;
 
 BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
@@ -315,3 +316,13 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     BOOST_REQUIRE_MESSAGE(true, "Domain:" << domain.toLISP());
 }
 
+BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_from_owl)
+{
+    db::Ontology::Ptr ontology = db::Ontology::fromFile( getRootDir() + "/test/data/om-schema-v0.2.owl" );
+    ontology->refresh();
+    owl_om::vocabulary::Custom rock("http://www.rock-robotics.org/2014/01/om-schema#");
+
+    BOOST_REQUIRE_MESSAGE("http://www.rock-robotics.org/2014/01/om-schema#compatibleWith" == rock["compatibleWith"], "ObjectProperty: compatible with is valid");
+    BOOST_REQUIRE_NO_THROW(ontology->getObjectProperty( rock["compatibleWith"] ) );
+    BOOST_REQUIRE_MESSAGE(ontology->isRelatedTo( rock["EmiActive"], rock["compatibleWith"], rock["EmiPassive"]), "Ontology: EmiActive compatibleWith EmiPassive");
+}

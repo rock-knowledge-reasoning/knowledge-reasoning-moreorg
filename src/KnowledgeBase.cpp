@@ -33,6 +33,14 @@ InstanceExpression::InstanceExpression(TDLIndividualExpression* expression)
     : mExpression(expression)
 {}
 
+ObjectPropertyExpression::ObjectPropertyExpression(TDLObjectRoleExpression* expression)
+    : mExpression(expression)
+{}
+
+DataPropertyExpression::DataPropertyExpression(TDLDataRoleExpression* expression)
+    : mExpression(expression)
+{}
+
 TExpressionManager* KnowledgeBase::getExpressionManager()
 {
     return mKernel->getExpressionManager();
@@ -91,6 +99,52 @@ InstanceExpression KnowledgeBase::getInstanceLazy(const IRI& instance)
     }
 }
 
+ObjectPropertyExpression KnowledgeBase::getObjectProperty(const IRI& property) const
+{
+    IRIObjectPropertyExpressionMap::const_iterator cit = mObjectProperties.find(property);
+    if(cit == mObjectProperties.end())
+    {
+        throw std::invalid_argument("ObjectProperty '" + property + "' does not exist");
+    }
+    return cit->second;
+}
+
+ObjectPropertyExpression KnowledgeBase::getObjectPropertyLazy(const IRI& property)
+{
+    try {
+        return getObjectProperty(property);
+    } catch(const std::invalid_argument& e)
+    {
+        TDLObjectRoleExpression* f_property = getExpressionManager()->ObjectRole(property);
+        ObjectPropertyExpression expression(f_property);
+        mObjectProperties[property] = expression;
+        return expression;
+    }
+}
+
+DataPropertyExpression KnowledgeBase::getDataProperty(const IRI& property) const
+{
+    IRIDataPropertyExpressionMap::const_iterator cit = mDataProperties.find(property);
+    if(cit == mDataProperties.end())
+    {
+        throw std::invalid_argument("DataProperty '" + property + "' does not exist");
+    }
+    return cit->second;
+}
+
+DataPropertyExpression KnowledgeBase::getDataPropertyLazy(const IRI& property)
+{
+    try {
+        return getDataProperty(property);
+    } catch(const std::invalid_argument& e)
+    {
+        TDLDataRoleExpression* f_property = getExpressionManager()->DataRole(property);
+        DataPropertyExpression expression(f_property);
+        mDataProperties[property] = expression;
+        return expression;
+    }
+}
+
 KnowledgeBase::KnowledgeBase()
     : mKernel(new ReasoningKernel())
 {
@@ -117,34 +171,69 @@ void KnowledgeBase::refresh()
     mKernel->realiseKB();
 }
 
+ObjectPropertyExpression KnowledgeBase::objectProperty(const IRI& property)
+{
+    return getObjectPropertyLazy(property);
+}
+
+DataPropertyExpression KnowledgeBase::dataProperty(const IRI& property)
+{
+    return getDataPropertyLazy(property);
+}
+
 Axiom KnowledgeBase::transitiveProperty(const IRI& property)
 {
-    TDLObjectRoleExpression* f_property = getExpressionManager()->ObjectRole(property);
-    return Axiom( mKernel->setTransitive(f_property) );
+    ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
+    return Axiom( mKernel->setTransitive(e_property.get()) );
+}
+
+Axiom KnowledgeBase::functionalProperty(const IRI& property, PropertyType type)
+{
+    switch(type)
+    {
+        case OBJECT:
+        {
+            ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
+            return Axiom( mKernel->setOFunctional(e_property.get()) );
+        }
+        case DATA:
+        {
+            DataPropertyExpression e_property = getDataPropertyLazy(property);
+            return Axiom( mKernel->setDFunctional(e_property.get()) );
+        }
+        default:
+            throw std::invalid_argument("Functional property can only be created for object or data property");
+    }
+}
+
+Axiom KnowledgeBase::inverseFunctionalProperty(const IRI& property)
+{
+    ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
+    return Axiom( mKernel->setInverseFunctional(e_property.get()) );
 }
 
 Axiom KnowledgeBase::reflexiveProperty(const IRI& property)
 {
-    TDLObjectRoleExpression* f_property = getExpressionManager()->ObjectRole(property);
-    return Axiom( mKernel->setReflexive(f_property) );
+    ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
+    return Axiom( mKernel->setReflexive(e_property.get()) );
 }
 
 Axiom KnowledgeBase::irreflexiveProperty(const IRI& property)
 {
-    TDLObjectRoleExpression* f_property = getExpressionManager()->ObjectRole(property);
-    return Axiom( mKernel->setIrreflexive(f_property) );
+    ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
+    return Axiom( mKernel->setIrreflexive(e_property.get()) );
 }
 
 Axiom KnowledgeBase::symmetricProperty(const IRI& property)
 {
-    TDLObjectRoleExpression* f_property = getExpressionManager()->ObjectRole(property);
-    return Axiom( mKernel->setSymmetric(f_property) );
+    ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
+    return Axiom( mKernel->setSymmetric(e_property.get()) );
 }
 
 Axiom KnowledgeBase::asymmetricProperty(const IRI& property)
 {
-    TDLObjectRoleExpression* f_property = getExpressionManager()->ObjectRole(property);
-    return Axiom( mKernel->setAsymmetric(f_property) );
+    ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
+    return Axiom( mKernel->setAsymmetric(e_property.get()) );
 }
 
 Axiom KnowledgeBase::subclassOf(const IRI& subclass, const IRI& parentClass)
@@ -293,16 +382,16 @@ Axiom KnowledgeBase::instanceOf(const IRI& individual, const IRI& klass)
 
 Axiom KnowledgeBase::relatedTo(const IRI& instance, const IRI& relationProperty, const IRI& otherInstance, bool isTrue)
 {
-    TDLObjectRoleExpression* f_relation = getExpressionManager()->ObjectRole(relationProperty);
+    ObjectPropertyExpression e_relation = getObjectPropertyLazy(relationProperty);
 
     InstanceExpression e_instance = getInstanceLazy(instance);
     InstanceExpression e_otherInstance = getInstanceLazy(otherInstance);
 
     if(isTrue)
     {
-        return Axiom( mKernel->relatedTo(e_instance.get(), f_relation, e_otherInstance.get()) );
+        return Axiom( mKernel->relatedTo(e_instance.get(), e_relation.get(), e_otherInstance.get()) );
     } else {
-        return Axiom( mKernel->relatedToNot(e_instance.get(), f_relation, e_otherInstance.get()) );
+        return Axiom( mKernel->relatedToNot(e_instance.get(), e_relation.get(), e_otherInstance.get()) );
     }
 }
 
@@ -312,17 +401,17 @@ Axiom KnowledgeBase::domainOf(const IRI& property, const IRI& domain, PropertyTy
     {
         case OBJECT:
         {
-            TDLObjectRoleExpression* f_role = getExpressionManager()->ObjectRole(property);
+            ObjectPropertyExpression e_role = getObjectPropertyLazy(property);
             ClassExpression e_domain = getClassLazy(domain);
 
-            return Axiom( mKernel->setODomain(f_role, e_domain.get()) );
+            return Axiom( mKernel->setODomain(e_role.get(), e_domain.get()) );
         }
         case DATA:
         {
-            TDLDataRoleExpression* f_role = getExpressionManager()->DataRole(property);
+            DataPropertyExpression e_role = getDataPropertyLazy(property);
             ClassExpression e_domain = getClassLazy(domain);
 
-            return Axiom( mKernel->setDDomain(f_role, e_domain.get()) );
+            return Axiom( mKernel->setDDomain(e_role.get(), e_domain.get()) );
         }
         default:
         {
@@ -333,10 +422,10 @@ Axiom KnowledgeBase::domainOf(const IRI& property, const IRI& domain, PropertyTy
 
 Axiom KnowledgeBase::inverseOf(const IRI& base, const IRI& inverse)
 {
-    TDLObjectRoleExpression* f_role = getExpressionManager()->ObjectRole(base);
-    TDLObjectRoleExpression* f_inverse = getExpressionManager()->ObjectRole(inverse);
+    ObjectPropertyExpression e_role = getObjectPropertyLazy(base);
+    ObjectPropertyExpression e_inverse = getObjectPropertyLazy(inverse);
 
-    return Axiom( mKernel->setInverseRoles(f_role, f_inverse) );
+    return Axiom( mKernel->setInverseRoles(e_role.get(), e_inverse.get()) );
 }
 
 ClassExpression KnowledgeBase::oneOf(const IRIList& instanceList)
@@ -354,42 +443,42 @@ ClassExpression KnowledgeBase::oneOf(const IRIList& instanceList)
 
 ClassExpression KnowledgeBase::objectPropertyRestriction(restriction::Type type, const IRI& relationProperty, const IRI& klassOrInstance, int cardinality)
 {
-    TDLObjectRoleExpression* f_relation = getExpressionManager()->ObjectRole(relationProperty);
+    ObjectPropertyExpression e_relation = getObjectPropertyLazy(relationProperty);
     switch(type)
     {
         case restriction::SELF:
         {
-            return ClassExpression( getExpressionManager()->SelfReference(f_relation) );
+            return ClassExpression( getExpressionManager()->SelfReference(e_relation.get()) );
         }
         case restriction::VALUE:
         {
             InstanceExpression e_instance = getInstanceLazy(klassOrInstance);
-            return ClassExpression( getExpressionManager()->Value(f_relation, e_instance.get()) );
+            return ClassExpression( getExpressionManager()->Value(e_relation.get(), e_instance.get()) );
         }
         case restriction::EXISTS:
         {
             ClassExpression e_class = getClassLazy(klassOrInstance);
-            return ClassExpression( getExpressionManager()->Exists(f_relation, e_class.get()) );
+            return ClassExpression( getExpressionManager()->Exists(e_relation.get(), e_class.get()) );
         }
         case restriction::FORALL:
         {
             ClassExpression e_class = getClassLazy(klassOrInstance);
-            return ClassExpression( getExpressionManager()->Forall(f_relation, e_class.get()) );
+            return ClassExpression( getExpressionManager()->Forall(e_relation.get(), e_class.get()) );
         }
         case restriction::MIN_CARDINALITY:
         {
             ClassExpression e_class = getClassLazy(klassOrInstance);
-            return ClassExpression( getExpressionManager()->MinCardinality(cardinality, f_relation, e_class.get()) );
+            return ClassExpression( getExpressionManager()->MinCardinality(cardinality, e_relation.get(), e_class.get()) );
         }
         case restriction::MAX_CARDINALITY:
         {
             ClassExpression e_class = getClassLazy(klassOrInstance);
-            return ClassExpression( getExpressionManager()->MaxCardinality(cardinality, f_relation, e_class.get()) );
+            return ClassExpression( getExpressionManager()->MaxCardinality(cardinality, e_relation.get(), e_class.get()) );
         }
         case restriction::EXACT_CARDINALITY:
         {
             ClassExpression e_class = getClassLazy(klassOrInstance);
-            return ClassExpression( getExpressionManager()->Cardinality(cardinality, f_relation, e_class.get()) );
+            return ClassExpression( getExpressionManager()->Cardinality(cardinality, e_relation.get(), e_class.get()) );
         }
     }
 
@@ -420,8 +509,8 @@ bool KnowledgeBase::isRelatedTo(const IRI& instance, const IRI& relationProperty
     InstanceExpression e_instance = getInstance(instance);
     InstanceExpression e_otherInstance = getInstance(otherInstance);
 
-    TDLObjectRoleExpression* f_relation = getExpressionManager()->ObjectRole(relationProperty);
-    return mKernel->isRelated(e_instance.get(), f_relation, e_otherInstance.get());
+    ObjectPropertyExpression e_relation = getObjectProperty(relationProperty);
+    return mKernel->isRelated(e_instance.get(), e_relation.get(), e_otherInstance.get());
 }
 
 bool KnowledgeBase::isSameInstance(const IRI& instance, const IRI& otherInstance)
@@ -519,10 +608,10 @@ IRIList KnowledgeBase::allInstancesOf(const IRI& klass, bool direct)
 IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& relationProperty)
 {
     InstanceExpression e_instance = getInstance(individual);
-    TDLObjectRoleExpression* f_relation = getExpressionManager()->ObjectRole(relationProperty);
+    ObjectPropertyExpression e_relation = getObjectProperty(relationProperty);
 
     ReasoningKernel::IndividualSet relatedIndividuals;
-    mKernel->getRoleFillers(e_instance.get(), f_relation, relatedIndividuals);
+    mKernel->getRoleFillers(e_instance.get(), e_relation.get(), relatedIndividuals);
 
     IRIList individuals;
     ReasoningKernel::IndividualSet::const_iterator cit = relatedIndividuals.begin();
@@ -548,11 +637,11 @@ IRI KnowledgeBase::relatedInstance(const IRI& individual, const IRI& relationPro
 IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const IRI& relationProperty)
 {
     InstanceExpression e_instance = getInstance(individual);
-    TDLObjectRoleExpression* f_relation = getExpressionManager()->ObjectRole(relationProperty);
-    TDLObjectRoleExpression* f_inverseRelation = getExpressionManager()->Inverse(f_relation);
+    ObjectPropertyExpression e_relation = getObjectProperty(relationProperty);
+    TDLObjectRoleExpression* f_inverse = mKernel->getExpressionManager()->Inverse(e_relation.get());
 
     ReasoningKernel::IndividualSet relatedIndividuals;
-    mKernel->getRoleFillers(e_instance.get(), f_inverseRelation, relatedIndividuals);
+    mKernel->getRoleFillers(e_instance.get(), f_inverse, relatedIndividuals);
 
     std::vector<std::string> individuals;
     ReasoningKernel::IndividualSet::const_iterator cit = relatedIndividuals.begin();
@@ -563,6 +652,28 @@ IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const I
         individuals.push_back( std::string( entry->getName() ) );
     }
     return individuals;
+}
+
+IRIList KnowledgeBase::allObjectProperties() const
+{
+    IRIList properties;
+    IRIObjectPropertyExpressionMap::const_iterator cit = mObjectProperties.begin();
+    for(; cit != mObjectProperties.end(); ++cit)
+    {
+        properties.push_back(cit->first);
+    }
+    return properties;
+}
+
+IRIList KnowledgeBase::allDataProperties() const
+{
+    IRIList properties;
+    IRIDataPropertyExpressionMap::const_iterator cit = mDataProperties.begin();
+    for(; cit != mDataProperties.end(); ++cit)
+    {
+        properties.push_back(cit->first);
+    }
+    return properties;
 }
 
 IRIList KnowledgeBase::typesOf(const IRI& instance, bool direct) const
