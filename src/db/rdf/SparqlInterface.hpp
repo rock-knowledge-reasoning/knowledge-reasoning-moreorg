@@ -56,6 +56,8 @@ private:
 class SparqlInterface
 {
 public:
+    virtual ~SparqlInterface() {}
+
     Results select_where(const Uri& subject, const Uri& predicate, const Uri& object, const Bindings& binding);
 
 protected:
