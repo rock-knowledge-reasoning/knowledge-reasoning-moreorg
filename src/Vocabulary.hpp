@@ -2,6 +2,7 @@
 #define OWL_OM_VOCABULARY_HPP
 
 #include <string>
+#include <owl_om/Uri.hpp>
 
 #define VOCABULARY_BASE_URI(URI) \
     static Uri BaseUri() { return URI; }
@@ -9,8 +10,6 @@
     static Uri NAME() { return BaseUri() + #NAME; }
 
 namespace owl_om {
-    typedef std::string Uri;
-
 namespace vocabulary {
 /** 
  * \class Custom vocabulary
@@ -25,7 +24,6 @@ public:
 
     Uri operator[](const std::string& name) const { return mBaseUri + name; }
 };
-
 
 struct SplitUri
 {

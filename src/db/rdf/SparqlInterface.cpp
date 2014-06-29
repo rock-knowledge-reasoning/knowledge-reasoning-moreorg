@@ -1,7 +1,9 @@
 #include "SparqlInterface.hpp"
-#include <boost/regex.hpp>
 #include <sstream>
+#include <boost/regex.hpp>
 #include <base/Logging.hpp>
+
+#include "Sparql.hpp"
 
 namespace owl_om {
 namespace db {
@@ -26,79 +28,84 @@ std::string Results::toString() const
     return txt.str();
 }
 
-Results SparqlInterface::select_where(const Uri& subject, const Uri& predicate, const Uri& object, const Bindings& bindings)
+ResultsIterator::ResultsIterator(const Results& results)
+    : mResults(results)
+    , mInitialized(false)
 {
-    std::string select = "select ";
-    std::string prefix;
-    std::string where;
-
-    std::map<std::string,std::string> prefixOpenlist;
-    // using mini prefix to preserve order for where clause
-    prefixOpenlist["a_pre_subject"] = subject;
-    prefixOpenlist["b_pre_predicate"] = predicate;
-    prefixOpenlist["c_pre_object"] = object;
-
-    Bindings::const_iterator cit = bindings.begin();
-    for(; cit != bindings.end(); ++cit)
-    {
-        std::string binding = *cit;
-        select += " ?" + binding + " ";
-    }
-
-    where += " {";
-    std::map<std::string,std::string> prefixClosedlist;
-    std::map<std::string, std::string>::const_iterator pit = prefixOpenlist.begin();
-    for(; pit != prefixOpenlist.end(); ++pit)
-    {
-        try {
-            vocabulary::SplitUri splitUri = vocabulary::Utils::extractBaseUri(pit->second);
-
-            // is a full uri
-            prefixClosedlist[pit->first] = splitUri.baseUri;
-            where += " " + pit->first + ":" + splitUri.name;
-        } catch(...)
-        {
-            // is a placeholder
-            where += " " + pit->second;
-        }
-    }
-    where += " . }";
-
-
-    std::string prefixes;
-    std::map<std::string,std::string>::const_iterator pcit = prefixClosedlist.begin();
-    for(; pcit != prefixClosedlist.end(); ++pcit)
-    {
-        prefixes += "PREFIX " + pcit->first + ":<" + pcit->second + ">\n";
-    }
-    prefixes += " ";
-
-    std::string fullQuery = prefixes + select + where;
-
-    LOG_WARN("query: %s", fullQuery.c_str());
-
-    return query(fullQuery, bindings);
+    mRowIterator = mResults.rows.begin();
 }
 
-Uri Utils::identifyPlaceholder(const Uri& uri, Bindings* bindings)
+bool ResultsIterator::next()
 {
-    boost::regex singleVal("[a-z]$");
-    boost::regex placeholderVal("\\?[a-z]$");
-
-    if(boost::regex_match(uri,singleVal))
+    if(mInitialized)
     {
-        bindings->push_back(uri);
-        return uri;
-    } else if(boost::regex_match(uri, placeholderVal) )
-    {
-        bindings->push_back(uri.substr(1,1));
-        return uri;
+        ++mRowIterator;
+    } else {
+        mInitialized = true;
     }
 
-    // returning unchanges since it is no placeholder
-    return uri;
+    return mRowIterator != mResults.rows.end();
 }
 
+Uri ResultsIterator::operator[](const std::string& name) const
+{
+    std::string variable = SparqlInterface::unboundVariable(name);
+
+    Row::iterator cit =  mRowIterator->find(variable);
+    if( mRowIterator->end() != cit)
+    {
+        return cit->second;
+    }
+
+    std::string bindings;
+    cit = mRowIterator->begin();
+    for(; cit != mRowIterator->end(); ++cit)
+    {
+        bindings += cit->first + ",";
+    }
+    std::string msg = "owl_om::db::query::ResultsIterator: unknown binding for '" + name + "' known are: " + bindings;
+    throw std::runtime_error(msg);
+}
+
+Results SparqlInterface::findAll(const Uri& subject, const Uri& predicate, const Uri& object) const
+{
+    LOG_DEBUG_S << "Find all for: subject '" << subject << "', predicate: '" << predicate << "', object '" << object << "'";
+    using namespace owl_om::db::rdf::sparql;
+    Query query;
+    bool doThrow = false;
+    query.select(subject, doThrow) \
+        .select(predicate, doThrow) \
+        .select(object, doThrow) \
+        .beginWhere() \
+            .triple(subject,predicate,object) \
+        .endWhere();
+
+    std::string queryTxt = query.toString();
+    LOG_DEBUG_S << "Sending query: " << queryTxt;
+    return this->query(queryTxt, query.getBindings());
+}
+
+UnboundVariable SparqlInterface::unboundVariable(const std::string& name)
+{
+    if(name.empty())
+    {
+        throw std::invalid_argument("owl_om::Query::unboundVariable: given name is empty");
+    }
+
+    if(name.find("http://") != std::string::npos)
+    {
+        throw std::invalid_argument("owl_om::Query::unboundVariable: given URI: '" + name + "'");
+    }
+
+    std::string variable;
+    if(name.data()[0] != '?')
+    {
+        variable = "?" + name;
+    } else {
+        variable = name;
+    }
+    return variable;
+}
 
 } // end namespace query
 } // end namespace db

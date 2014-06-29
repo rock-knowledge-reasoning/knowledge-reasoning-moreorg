@@ -23,7 +23,7 @@ public:
     /**
      * Query the database
      */
-    query::Results query(const std::string& query, const query::Bindings& bindings);
+    query::Results query(const std::string& query, const query::Bindings& bindings) const;
 
 private:
     Soprano::Model* mRDFModel;

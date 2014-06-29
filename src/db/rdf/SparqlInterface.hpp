@@ -12,62 +12,57 @@ namespace db {
 namespace query {
 
 typedef std::vector<std::string> Bindings;
+typedef std::string UnboundVariable;
+typedef std::vector<UnboundVariable> UnboundVariableList;
 
 typedef std::map<std::string, std::string> Row;
 struct Results
 {
     std::vector<Row> rows;
-
     std::string toString() const;
 };
 
 class ResultsIterator
 {
-public:
-    ResultsIterator(const Results& results)
-        : mResults(results)
-    {
-        mRowIterator = mResults.rows.begin();
-    }
-
-    bool next() 
-    {
-        mCurrentRowPtr = const_cast<Row*>( &(*mRowIterator));
-        return mRowIterator++ != mResults.rows.end();
-    }
-
-    Uri operator[](const std::string& name) const
-    {
-        Row::const_iterator cit =  mCurrentRowPtr->find(name);
-        if( mCurrentRowPtr->end() != cit)
-        {
-            return cit->second;
-        }
-        std::string msg = "owl_om::db::query::ResultsIterator: unknown binding '" + name + "'";
-        throw std::runtime_error(msg);
-    }
-
-private:
     Results mResults;
-    Row* mCurrentRowPtr;
-    std::vector<Row>::const_iterator mRowIterator;
+    std::vector<Row>::iterator mRowIterator;
+
+    bool mInitialized;
+
+public:
+    ResultsIterator(const Results& results);
+
+    bool next();
+
+    Uri operator[](const std::string& name) const;
 };
 
+/**
+ * \class SparqlInterface
+ * \brief Class for implementation for all database that allow sparql querying
+ */
 class SparqlInterface
 {
 public:
     virtual ~SparqlInterface() {}
 
-    Results select_where(const Uri& subject, const Uri& predicate, const Uri& object, const Bindings& binding);
+    /**
+     * Send a sparql query to the underlying database using the given bindings
+     * \param query The SPARQL conform query
+     * \param bindings The set of bindings used
+     */
+    virtual Results query(const std::string& query, const Bindings& bindings) const { throw std::runtime_error("owl_om::db::query::SparqlInterface not implemented"); }
 
-protected:
-    virtual Results query(const std::string& query, const Bindings& bindings) { throw std::runtime_error("owl_om::db::query::SparqlInterface not implemented"); }
-};
+    /**
+     * Retrieve results when matching the given triple definition
+     * \return Results List of Rows
+     */
+    Results findAll(const Uri& subject, const Uri& predicate, const Uri& object) const;
 
-class Utils
-{
-public:
-    static Uri identifyPlaceholder(const std::string& uri, Bindings* bindings);
+    /**
+     * Create an unbound variable, i.e. with preceding '?'
+     */
+    static UnboundVariable unboundVariable(const std::string& name);
 };
 
 } // end namespace query

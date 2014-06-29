@@ -8,8 +8,6 @@
 
 //! Main enclosing namespace for OWL Organization Modelling
 namespace owl_om {
-//! Interfacing databases and such
-namespace db {
 
 /**
  * @class KnowledgeBase
@@ -41,7 +39,7 @@ public:
     /**
      * Find all items that match the query
      */
-    query::Results findAll(const Uri& subject, const Uri& predicate, const Uri& object) const;
+    db::query::Results findAll(const Uri& subject, const Uri& predicate, const Uri& object) const;
 
     /**
      * Convert ontology to string representation
@@ -49,10 +47,9 @@ public:
     std::string toString() const;
 
 private:
-    query::SparqlInterface* mSparqlInterface;
+    db::query::SparqlInterface* mSparqlInterface;
 };
 
-} // end namespace db
 } // end namespace owl_om
 
 #endif // OWL_OM_DB_ONTOLOGY_HPP

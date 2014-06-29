@@ -40,7 +40,7 @@ Soprano::Model* SopranoDB::fromFile(const std::string& filename, const std::stri
     return sopranoModel;
 }
 
-query::Results SopranoDB::query(const std::string& query, const query::Bindings& bindings)
+query::Results SopranoDB::query(const std::string& query, const query::Bindings& bindings) const
 {
     query::Results queryResults;
 
@@ -52,12 +52,18 @@ query::Results SopranoDB::query(const std::string& query, const query::Bindings&
         query::Row row;
         for(; bit != bindings.end(); ++bit)
         {
-            std::string boundValue = qit.binding(QString(bit->c_str())).toString().toStdString();
-            row[*bit] = boundValue;
+            std::string binding = *bit;
+            // TODO: Not very efficient, check better handling of binding / mapping
+            std::string bindingName = bit->substr(1);
+            std::string boundValue = qit.binding(QString(bindingName.c_str())).toString().toStdString();
+            LOG_DEBUG_S << "Found result for '" << binding << "' -> " << boundValue;
+            row[binding] = boundValue;
         }
 
         queryResults.rows.push_back(row);
     }
+
+    LOG_DEBUG_S << "Results: " << queryResults.toString();
 
     return queryResults;
 }
