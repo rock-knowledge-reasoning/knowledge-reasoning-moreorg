@@ -20,6 +20,7 @@ rock_library(owl_om
         db/rdf/SopranoDB.hpp
         db/rdf/SparqlInterface.hpp
         exporter/PDDLExporter.hpp
+        reasoner/factpp/Types.hpp
     DEPS_PKGCONFIG base-lib redland soprano factpp pddl_planner
 )
 target_link_libraries(owl_om ${Boost_LIBRARIES})

@@ -6,14 +6,7 @@
 #include <vector>
 #include <owl_om/Exceptions.hpp>
 #include <base/Logging.hpp>
-
-class TExpressionManager;
-class TDLAxiom;
-class TDLConceptExpression;
-class TDLIndividualExpression;
-class TDLObjectRoleExpression;
-class TDLDataRoleExpression;
-class ReasoningKernel;
+#include <owl_om/reasoner/factpp/Types.hpp>
 
 namespace owl_om {
 
@@ -26,60 +19,9 @@ namespace restriction {
     enum Type { SELF, VALUE, EXISTS, FORALL, MIN_CARDINALITY, MAX_CARDINALITY, EXACT_CARDINALITY };
 }
 
-// Internationalized Resource Identifier
+// Internationalized Resource Identifier -- simply using a string here for simplicity
 typedef std::string IRI;
 typedef std::vector<IRI> IRIList;
-
-class Axiom
-{
-    TDLAxiom* mAxiom;
-
-public:
-    Axiom(TDLAxiom* axiom);
-
-    const TDLAxiom* get() const { return mAxiom; } 
-    TDLAxiom* get() { return mAxiom; }
-};
-
-class ClassExpression
-{
-    TDLConceptExpression* mExpression;
-
-public:
-    ClassExpression(TDLConceptExpression* expression = NULL);
-
-    const TDLConceptExpression* get() const { return mExpression; }
-};
-
-class InstanceExpression
-{
-    TDLIndividualExpression* mExpression;
-
-public:
-    InstanceExpression(TDLIndividualExpression* expression = NULL);
-
-    const TDLIndividualExpression* get() const { return mExpression; }
-};
-
-class ObjectPropertyExpression
-{
-    TDLObjectRoleExpression* mExpression;
-
-public:
-    ObjectPropertyExpression(TDLObjectRoleExpression* expression = NULL);
-
-    const TDLObjectRoleExpression* get() const { return mExpression; }
-};
-
-class DataPropertyExpression
-{
-    TDLDataRoleExpression* mExpression;
-
-public:
-    DataPropertyExpression(TDLDataRoleExpression* expression = NULL);
-
-    const TDLDataRoleExpression* get() const { return mExpression; }
-};
 
 typedef std::map<IRI, ClassExpression > IRIClassExpressionMap;
 typedef std::map<IRI, InstanceExpression > IRIInstanceExpressionMap;
