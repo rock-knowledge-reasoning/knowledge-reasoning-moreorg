@@ -1,14 +1,14 @@
 #include <boost/test/unit_test.hpp>
 #include <owl_om/Vocabulary.hpp>
 #include <owl_om/Registry.hpp>
-#include <owl_om/db/Ontology.hpp>
+#include <owl_om/Ontology.hpp>
 #include <owl_om/db/rdf/SopranoDB.hpp>
 #include <owl_om/OWLApi.hpp>
 #include "test_utils.hpp"
 
 using namespace owl_om;
 
-std::string rdfTestFiles[] = { "test/data/om-schema-v0.1.owl" };
+std::string rdfTestFiles[] = { "test/data/om-schema-v0.1.owl", "test/data/om-schema-v0.2.owl" };
 
 BOOST_AUTO_TEST_CASE(it_should_query_db)
 {
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(it_should_query_db)
 
 BOOST_AUTO_TEST_CASE(it_should_query_db_abstract)
 {
-    db::Ontology::Ptr ontology = db::Ontology::fromFile( getRootDir() + rdfTestFiles[0]);
+    Ontology::Ptr ontology = Ontology::fromFile( getRootDir() + rdfTestFiles[0]);
 
     db::query::Results results = ontology->findAll("?s","?p","?o");
     BOOST_REQUIRE_MESSAGE(results.rows.size() != 0, "Results retrieved");
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(it_should_query_db_abstract)
 
 BOOST_AUTO_TEST_CASE(it_should_create_ontology)
 {
-    using namespace owl_om::db;
+    using namespace owl_om;
     Ontology::Ptr ontology = Ontology::fromFile( getRootDir() + rdfTestFiles[0]);
     BOOST_TEST_MESSAGE("Ontology: " << ontology->toString());
 }

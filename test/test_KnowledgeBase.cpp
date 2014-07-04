@@ -6,7 +6,7 @@
 
 #include <owl_om/exporter/PDDLExporter.hpp>
 
-#include <owl_om/db/Ontology.hpp>
+#include <owl_om/Ontology.hpp>
 using namespace owl_om;
 
 BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
 
 BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_from_owl)
 {
-    db::Ontology::Ptr ontology = db::Ontology::fromFile( getRootDir() + "/test/data/om-schema-v0.2.owl" );
+    Ontology::Ptr ontology = Ontology::fromFile( getRootDir() + "/test/data/om-schema-v0.2.owl" );
     ontology->refresh();
     owl_om::vocabulary::Custom rock("http://www.rock-robotics.org/2014/01/om-schema#");
 
