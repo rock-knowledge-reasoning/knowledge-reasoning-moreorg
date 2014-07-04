@@ -420,6 +420,7 @@ public:
 
     /**
      * Make the list of instances unique, i.e., remove redundant information (aliases)
+     * \return list of unique IRI
      */
     IRIList uniqueList(const IRIList& instances);
 
@@ -429,7 +430,8 @@ public:
     void retract(Axiom& a);
 
     /**
-     * Test relation and add result if successfully asserted
+     * Test relation i.e. check if knowledge base remains consistent and add result if successfully asserted
+     * \return true if relation has been successfully been added
      */
     bool assertAndAddRelation(const IRI& instance, const IRI& relation, const IRI& otherInstance);
 
