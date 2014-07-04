@@ -3,6 +3,7 @@
 #include <owl_om/Registry.hpp>
 #include <owl_om/db/Ontology.hpp>
 #include <owl_om/db/rdf/SopranoDB.hpp>
+#include <owl_om/OWLApi.hpp>
 #include "test_utils.hpp"
 
 using namespace owl_om;
@@ -48,4 +49,8 @@ BOOST_AUTO_TEST_CASE(it_should_create_ontology)
     using namespace owl_om::db;
     Ontology::Ptr ontology = Ontology::fromFile( getRootDir() + rdfTestFiles[0]);
     BOOST_TEST_MESSAGE("Ontology: " << ontology->toString());
+}
+
+BOOST_AUTO_TEST_CASE(it_should_handle_owlapi)
+{
 }

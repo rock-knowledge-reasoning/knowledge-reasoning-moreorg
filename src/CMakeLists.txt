@@ -10,6 +10,7 @@ rock_library(owl_om
         exporter/PDDLExporter.cpp
     HEADERS KnowledgeBase.hpp
         OrganizationModel.hpp
+        OWLApi.hpp
         Property.hpp
         Vocabulary.hpp
         vocabularies/OWL.hpp
@@ -20,6 +21,11 @@ rock_library(owl_om
         db/rdf/SopranoDB.hpp
         db/rdf/SparqlInterface.hpp
         exporter/PDDLExporter.hpp
+        owlapi/model/HasIRI.hpp
+        owlapi/model/OWLAxiom.hpp
+        owlapi/model/OWLEntity.hpp
+        owlapi/model/OWLNamedObject.hpp
+        owlapi/model/OWLObject.hpp
         reasoner/factpp/Types.hpp
     DEPS_PKGCONFIG base-lib redland soprano factpp pddl_planner
 )
