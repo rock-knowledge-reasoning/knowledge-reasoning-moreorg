@@ -196,6 +196,11 @@ std::string Ontology::toString() const
             txt += *cit + "\n";
         }
     }
+
+    txt += "- - - - - - - - - - - - - - - -\n";
+    txt += "LISP Based Representation: \n";
+    txt += KnowledgeBase::toString();
+
     return txt;
 }
 

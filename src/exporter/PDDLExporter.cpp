@@ -8,7 +8,7 @@ namespace owl_om {
 pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationModel& model)
 {
     using namespace pddl_planner;
-    representation::Domain domain("om");
+    pddl_planner::representation::Domain domain("om");
     domain.addRequirement("strips");
     domain.addRequirement("equality");
     domain.addRequirement("typing");
@@ -29,7 +29,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
         IRI klassType = model.knowledgeBase().typeOf( instance );
         LOG_DEBUG_S << "Domain: adding typed constant: '" << instance << "' of type '" << klassType << "'";
         try {
-            domain.addConstant( representation::Constant(instance, klassType) );
+            domain.addConstant( pddl_planner::representation::Constant(instance, klassType) );
         } catch(const std::invalid_argument& e)
         {
             LOG_WARN_S << e.what();

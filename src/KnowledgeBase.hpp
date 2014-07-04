@@ -4,7 +4,7 @@
 #include <string.h>
 #include <map>
 #include <vector>
-#include <stdexcept>
+#include <owl_om/Exceptions.hpp>
 #include <base/Logging.hpp>
 
 class TExpressionManager;
@@ -16,6 +16,11 @@ class TDLDataRoleExpression;
 class ReasoningKernel;
 
 namespace owl_om {
+
+namespace representation {
+    enum Type { UNKNOWN, LISP };
+}
+
 //! Restriction types
 namespace restriction {
     enum Type { SELF, VALUE, EXISTS, FORALL, MIN_CARDINALITY, MAX_CARDINALITY, EXACT_CARDINALITY };
@@ -80,6 +85,8 @@ typedef std::map<IRI, ClassExpression > IRIClassExpressionMap;
 typedef std::map<IRI, InstanceExpression > IRIInstanceExpressionMap;
 typedef std::map<IRI, ObjectPropertyExpression > IRIObjectPropertyExpressionMap;
 typedef std::map<IRI, DataPropertyExpression > IRIDataPropertyExpressionMap;
+
+enum Representation { UNKNOWN = 0, LISP = 1 };
 
 class KnowledgeBase
 {
@@ -483,6 +490,12 @@ public:
      * Test relation and add result if successfully asserted
      */
     bool assertAndAddRelation(const IRI& instance, const IRI& relation, const IRI& otherInstance);
+
+    /**
+     * Print the ontology
+     * \return 
+     */
+    std::string toString(representation::Type representation = representation::LISP) const;
 };
 
 } // namespace owl_om

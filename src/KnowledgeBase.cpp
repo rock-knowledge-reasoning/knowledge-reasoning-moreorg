@@ -4,6 +4,7 @@
 #include <factpp/Actor.h>
 #include <boost/assign/list_of.hpp>
 #include <base/Logging.hpp>
+#include <factpp/tOntologyPrinterLISP.h>
 
 namespace owl_om {
 
@@ -788,6 +789,31 @@ bool KnowledgeBase::assertAndAddRelation(const IRI& instance, const IRI& relatio
             return false;
         }
     }
+}
+
+std::string KnowledgeBase::toString(representation::Type representation) const
+{
+    switch(representation)
+    {
+        case representation::LISP:
+        {
+            std::stringstream ss;
+            TLISPOntologyPrinter printer(ss);
+
+            TOntology& ontology = mKernel->getOntology();
+            printer.visitOntology(ontology);
+
+            return ss.str();
+        }
+        default:
+            throw NotSupported("Representation is not supported");
+    }
+
+    //TOntology::iterator axiom = getOntology().begin();
+    //for(; axiom != ontology.end(); ++axiom)
+    //{
+    //    axiom->accept(
+    //}
 }
 
 } // namespace owl_om
