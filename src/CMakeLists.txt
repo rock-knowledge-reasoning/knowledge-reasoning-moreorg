@@ -1,4 +1,14 @@
 find_package(Boost REQUIRED regex)
+set(ICU_LIBS icutu
+    icutest
+    icudata
+    icule
+    icuio
+    icui18n
+    iculx
+    icuuc
+)
+
 rock_library(owl_om
     SOURCES KnowledgeBase.cpp
         OrganizationModel.cpp
@@ -8,6 +18,8 @@ rock_library(owl_om
         db/rdf/SopranoDB.cpp
         db/rdf/Sparql.cpp
         db/rdf/SparqlInterface.cpp
+        owlapi/io/XMLUtils.cpp
+        owlapi/model/IRI.cpp
         exporter/PDDLExporter.cpp
     HEADERS KnowledgeBase.hpp
         OrganizationModel.hpp
@@ -22,15 +34,18 @@ rock_library(owl_om
         db/rdf/Sparql.hpp
         db/rdf/SparqlInterface.hpp
         exporter/PDDLExporter.hpp
+        owlapi/io/XMLUtils.hpp
         owlapi/model/HasIRI.hpp
+        owlapi/model/IRI.hpp
         owlapi/model/OWLAxiom.hpp
         owlapi/model/OWLEntity.hpp
         owlapi/model/OWLNamedObject.hpp
         owlapi/model/OWLObject.hpp
+        owlapi/model/URI.hpp
         reasoner/factpp/Types.hpp
     DEPS_PKGCONFIG base-lib redland soprano factpp pddl_planner
 )
-target_link_libraries(owl_om ${Boost_LIBRARIES})
+target_link_libraries(owl_om ${Boost_LIBRARIES} ${ICU_LIBS})
 
 rock_executable(owl_om_bin Main.cpp
     DEPS owl_om)
