@@ -92,7 +92,8 @@ IRI IRI::create(const std::string& s)
 {
     if(s.empty())
     {
-        throw std::invalid_argument("IRI::create iri cannot created from empty string");
+        LOG_DEBUG_S << "IRI::create iri created from empty string";
+        return IRI();
     }
 
     size_t splitPos = owlapi::io::XMLUtils::getNCNameSuffixIndex(s);
