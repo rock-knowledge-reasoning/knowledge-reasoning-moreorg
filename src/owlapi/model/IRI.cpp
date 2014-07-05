@@ -24,6 +24,11 @@ void IRI::setFromString(const std::string& s)
     }
 }
 
+IRI::IRI(const char* s)
+{
+    setFromString( std::string(s) );
+}
+
 IRI::IRI(const std::string& s)
 {
     setFromString(s);

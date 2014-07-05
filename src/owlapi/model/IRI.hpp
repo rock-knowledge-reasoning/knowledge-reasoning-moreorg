@@ -17,6 +17,7 @@ protected:
 
 public:
     IRI() {}
+    IRI(const char* s);
     IRI(const std::string& s);
     IRI(const std::string& prefix, const std::string& remainder);
 
