@@ -11,7 +11,7 @@ namespace vocabulary {
 class RDF
 {
 public:
-    VOCABULARY_BASE_URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+    VOCABULARY_BASE_IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
     VOCABULARY_ADD_WORD(Alt);
     VOCABULARY_ADD_WORD(Bag);
     VOCABULARY_ADD_WORD(List);

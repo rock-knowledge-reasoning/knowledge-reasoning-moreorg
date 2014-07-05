@@ -9,14 +9,21 @@ namespace model {
 
 class IRI
 {
+protected:
     std::string mPrefix;
     std::string mRemainder;
 
-public:
-    IRI();
+    void setFromString(const std::string& s);
 
+public:
+    IRI() {}
+    IRI(const std::string& s);
     IRI(const std::string& prefix, const std::string& remainder);
 
+    /**
+     * Convert IRI to URI
+     * \return URI
+     */
     URI toURI() const;
 
     /**
@@ -27,7 +34,7 @@ public:
 
     /**
      * \return IRI scheme, i.e http, urn
-     * \throws if IRI does not have a scheme
+     * \throws std::invalid_argument if IRI does not have a scheme
      */
     std::string getScheme() const;
 
@@ -49,17 +56,50 @@ public:
     /**
      * Resolve the IRI
      */
-    IRI resolve(const std::string& iri_string) const;
+    IRI resolve(const std::string& relative_path) const;
 
     /**
      * To quoted string
      */
-    std::string toQuotedString() const;
+    std::string toQuotedString() const { return '<' + toString() + '>'; }
 
+    /**
+     * To string
+     */
+    std::string toString() const { return mPrefix + mRemainder; }
+
+    /**
+     * Create IRI from single string
+     * \return IRI
+     */
     static IRI create(const std::string& iri_string);
 
-    static IRI create(const URI& iri_string) { throw std::runtime_error("IRI not implemented");}
+    /**
+     * Create IRI from prefix and suffix
+     * \return IRI
+     */
+    static IRI create(const std::string& prefix, const std::string& suffix);
+
+    /**
+     * Create IRI from URI
+     * \return IRI
+     */
+    static IRI create(const URI& uri) { return IRI::create(uri.toString()); }
+
+    bool empty() const { return toString().empty(); }
+   
+    /**
+     * Equals operator
+     */
+    bool operator==(const IRI& other) const;
+
+    bool operator!=(const IRI& other) const { return !(*this == other); }
+ 
+    bool operator<(const IRI& other) const { return toString() < other.toString(); }
 };
+
+
+std::ostream& operator<<(std::ostream& os, const owlapi::model::IRI& iri);
 
 } // end namespace model
 } // end namespace owlapi

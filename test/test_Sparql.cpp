@@ -1,6 +1,5 @@
 #include <boost/test/unit_test.hpp>
 #include <owl_om/Vocabulary.hpp>
-#include <owl_om/Registry.hpp>
 #include <owl_om/Ontology.hpp>
 #include <owl_om/db/rdf/SopranoDB.hpp>
 #include <owl_om/db/rdf/Sparql.hpp>
@@ -64,9 +63,9 @@ BOOST_AUTO_TEST_CASE(it_should_query_db_with_sparql)
 
     {
         db::rdf::sparql::Query query;
-        query.select("?s").select("?type") \
+        query.select(db::query::Subject()).select(db::query::Any("type")) \
             .beginWhere() \
-                .triple("?s",vocabulary::RDF::type(), "?type") \
+                .triple(db::query::Subject(),vocabulary::RDF::type(), db::query::Any("type")) \
                 // unsupported with rasqual
                 //.minus("?s", vocabulary::RDF::type(), vocabulary::OWL::Class())
             .endWhere();
@@ -78,9 +77,9 @@ BOOST_AUTO_TEST_CASE(it_should_query_db_with_sparql)
 
     {
         db::rdf::sparql::Query query;
-        query.select("?s")
+        query.select(db::query::Subject())
             .beginWhere() \
-                .triple("?s",vocabulary::RDF::type(), vocabulary::OWL::NamedIndividual()) \
+                .triple(db::query::Subject(),vocabulary::RDF::type(), vocabulary::OWL::NamedIndividual()) \
             .endWhere();
 
         BOOST_TEST_MESSAGE("Display query: " << query.toString() );
@@ -90,7 +89,7 @@ BOOST_AUTO_TEST_CASE(it_should_query_db_with_sparql)
         db::query::ResultsIterator it(results);
         while(it.next())
         {
-            BOOST_REQUIRE_MESSAGE(!it["?s"].empty(), "Result expected to be not empty: '" << it["s"]);
+            BOOST_REQUIRE_MESSAGE(!it[db::query::Subject()].empty(), "Result expected to be not empty: '" << it[db::query::Subject()]);
         }
     }
 }

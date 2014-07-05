@@ -2,9 +2,32 @@
 
 #include <ctype.h>
 #include <owl_om/owlapi/io/XMLUtils.hpp>
+#include <base/Logging.hpp>
 
 namespace owlapi {
 namespace model {
+
+void IRI::setFromString(const std::string& s)
+{
+    if(s.empty())
+    {
+        throw std::invalid_argument("IRI::setFromString iri cannot created from empty string");
+    }
+
+    size_t splitPos = owlapi::io::XMLUtils::getNCNameSuffixIndex(s);
+    if(splitPos == std::string::npos)
+    {
+        mPrefix = s;
+    } else {
+        mPrefix = s.substr(0,splitPos);
+        mRemainder = s.substr(splitPos);
+    }
+}
+
+IRI::IRI(const std::string& s)
+{
+    setFromString(s);
+}
 
 IRI::IRI(const std::string& prefix, const std::string& remainder)
     : mPrefix(prefix)
@@ -13,22 +36,24 @@ IRI::IRI(const std::string& prefix, const std::string& remainder)
 
 URI IRI::toURI() const
 {
-    return URI::create(mPrefix + mRemainder);
+    return URI(mPrefix + mRemainder);
 }
 
 bool IRI::isAbsolute() const
 {
-    if( std::string::npos == mPrefix.find(":"))
+    size_t colonPos = mPrefix.find(":");
+    if( std::string::npos == colonPos )
     {
         return false;
     }
 
-    for(size_t i = 0; i < mPrefix.size(); ++i)
+    for(size_t i = 0; i < colonPos; ++i)
     {
         char ch = mPrefix.at(i);
-        if( !(isalpha(ch) || !isdigit(ch) || ch == '.' ||
+        if( !(isalpha(ch) || isdigit(ch) || ch == '.' ||
                     ch == '+' || ch == '-'))
         {
+            LOG_DEBUG_S << "owlapi::model::IRI::isAbsolute: Invalid character in prefix '" << ch << "'";
             return false;
         }
     }
@@ -47,40 +72,71 @@ std::string IRI::getScheme() const
     return mPrefix.substr(0, pos);
 }
 
-IRI IRI::resolve(const std::string& iri_string) const
+IRI IRI::resolve(const std::string& s) const
 {
-    URI uri = URI::create(iri_string);
+    URI uri(s);
     if(uri.isAbsolute() || uri.isOpaque())
     {
         return create(uri);
     }
 
-//    return create(toURI().resolve(uri));
-    throw std::runtime_error("Not implemented: IRI::resolve");
+    return IRI::create( toURI().resolve(uri) );
 }
 
-std::string IRI::toQuotedString() const
+IRI IRI::create(const std::string& s)
 {
-    return '<' + mPrefix + mRemainder + '>';
-}
-
-IRI IRI::create(const std::string& iri_string)
-{
-    if(iri_string.empty())
+    if(s.empty())
     {
         throw std::invalid_argument("IRI::create iri cannot created from empty string");
     }
 
-    size_t splitPos = owlapi::io::XMLUtils::getNCNameSuffixIndex(iri_string);
+    size_t splitPos = owlapi::io::XMLUtils::getNCNameSuffixIndex(s);
     if(splitPos == std::string::npos)
     {
-        return IRI(iri_string, "");
+        return IRI(s, "");
     }
 
-    return IRI(iri_string.substr(0,splitPos), iri_string.substr(splitPos));
+    return IRI(s.substr(0,splitPos), s.substr(splitPos));
+}
+
+IRI IRI::create(const std::string& prefix, const std::string& suffix)
+{
+    if(prefix.empty())
+    {
+        return create(suffix);
+    } else if( suffix.empty() )
+    {
+        return create(suffix);
+    } else {
+        size_t prefixIndex = owlapi::io::XMLUtils::getNCNameSuffixIndex(prefix);
+        size_t suffixIndex = owlapi::io::XMLUtils::getNCNameSuffixIndex(suffix);
+
+        if(prefixIndex == std::string::npos && suffixIndex == 0)
+        {
+              // the prefix does not contain an ncname character and there is
+              // no illegal character in the suffix
+              // the split is therefore correct
+              return IRI(prefix, suffix);
+        }
+
+        // otherwise the split is wrong; we could obtain the right split by
+        // using index and test, but it's just as easy to use the other
+        // constructor
+        return create(prefix + suffix);
+    }
 }
 
 
+bool IRI::operator==(const IRI& other) const
+{
+    return mPrefix == other.mPrefix && mRemainder == other.mRemainder; 
+}
+
+std::ostream& operator<<(std::ostream& os, const owlapi::model::IRI& iri)
+{ 
+    os << iri.toString();
+    return os;
+}
 
 } // end namespace model
 } // end namespace owlapi

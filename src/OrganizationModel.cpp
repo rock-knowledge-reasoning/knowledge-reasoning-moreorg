@@ -5,20 +5,20 @@
 namespace owl_om {
 
 std::map<OrganizationModel::Entities, IRI> OrganizationModel::EntitiesIRIs = boost::assign::map_list_of
-    (OrganizationModel::ACTOR, "Actor")
-    (OrganizationModel::ACTOR_MODEL, "ActorModel")
-    (OrganizationModel::COMPOSITE_ACTOR, "CompositeActor")
-    (OrganizationModel::INTERFACE, "Interface")
-    (OrganizationModel::SERVICE, "Service")
-    (OrganizationModel::SERVICE_MODEL, "ServiceModel");
+    (OrganizationModel::ACTOR,          IRI::create("Actor"))
+    (OrganizationModel::ACTOR_MODEL,    IRI::create("ActorModel"))
+    (OrganizationModel::COMPOSITE_ACTOR,IRI::create("CompositeActor"))
+    (OrganizationModel::INTERFACE,      IRI::create("Interface"))
+    (OrganizationModel::SERVICE,        IRI::create("Service"))
+    (OrganizationModel::SERVICE_MODEL,  IRI::create("ServiceModel"));
 
 std::map<OrganizationModel::Properties, IRI> OrganizationModel::PropertiesIRIs = boost::assign::map_list_of
-    (OrganizationModel::DEPENDS_ON, "dependsOn")
-    (OrganizationModel::HAS, "has")
-    (OrganizationModel::PROVIDES, "provides")
-    (OrganizationModel::USES, "uses")
-    (OrganizationModel::COMPATIBLE_WITH, "compatibleWith")
-    (OrganizationModel::MODELED_BY, "modeledBy");
+    (OrganizationModel::DEPENDS_ON,      IRI::create("dependsOn"))
+    (OrganizationModel::HAS,             IRI::create("has"))
+    (OrganizationModel::PROVIDES,        IRI::create("provides"))
+    (OrganizationModel::USES,            IRI::create("uses"))
+    (OrganizationModel::COMPATIBLE_WITH, IRI::create("compatibleWith"))
+    (OrganizationModel::MODELED_BY,      IRI::create("modeledBy"));
 
 
 void OrganizationModel::createInstance(const IRI& instanceName, const IRI& klass, const IRI& model)
@@ -29,9 +29,9 @@ void OrganizationModel::createInstance(const IRI& instanceName, const IRI& klass
 
 void OrganizationModel::runInferenceEngine()
 {
-    std::vector<std::string> actors = mKnowledgeBase.allInstancesOf( EntitiesIRIs[ACTOR_MODEL] );
-    std::vector<std::string> services = mKnowledgeBase.allInstancesOf( EntitiesIRIs[SERVICE_MODEL] );
-    std::vector<std::string>::const_iterator actorIt = actors.begin();
+    IRIList actors = mKnowledgeBase.allInstancesOf( EntitiesIRIs[ACTOR_MODEL] );
+    IRIList services = mKnowledgeBase.allInstancesOf( EntitiesIRIs[SERVICE_MODEL] );
+    IRIList::const_iterator actorIt = actors.begin();
 
     LOG_INFO_S << "Run inference engine: # of actors: '" << actors.size();
 
@@ -41,17 +41,17 @@ void OrganizationModel::runInferenceEngine()
         updated = false;
         for(; actorIt != actors.end(); ++actorIt)
         {
-            std::vector<std::string>::const_iterator serviceIt = services.begin();
+            IRIList::const_iterator serviceIt = services.begin();
             for(; serviceIt != services.end(); ++serviceIt)
             {
-                LOG_INFO("inference: '%s' checkIfFulfills? '%s'", actorIt->c_str(), serviceIt->c_str());
+                LOG_INFO_S << "inference: '" << *actorIt << "' checkIfFulfills? '" << *serviceIt << "'";
                 if( checkIfFulfills(*actorIt, *serviceIt) )
                 {
-                    LOG_INFO("inference: '%s' provides '%s'", actorIt->c_str(), serviceIt->c_str());
+                    LOG_INFO_S << "inference: '" << *actorIt << "' provides '" << *serviceIt << "'";
                     mKnowledgeBase.relatedTo(*actorIt, PropertiesIRIs[PROVIDES], *serviceIt);
                     updated = true;
                 } else {
-                    LOG_INFO("inference: '%s' does not provide '%s'", actorIt->c_str(), serviceIt->c_str());
+                    LOG_INFO_S << "inference: '" << *actorIt << "' does not provide '" << *serviceIt << "'";
                 }
             }
         }
@@ -65,11 +65,11 @@ bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& 
     IRIList availableResources = mKnowledgeBase.allRelatedInstances(resourceProviderModel, PropertiesIRIs[HAS]);
     IRIList availableServices = mKnowledgeBase.allRelatedInstances(resourceProviderModel, PropertiesIRIs[PROVIDES]);
 
-    LOG_DEBUG("Get requirements for '%s'", resourceRequirements.c_str());
+    LOG_DEBUG_S << "Get requirements for '" << resourceRequirements << "'";
     IRI requirementModel = getResourceModel(resourceRequirements);
     IRIList requirements = mKnowledgeBase.allRelatedInstances( requirementModel, PropertiesIRIs[DEPENDS_ON]);
 
-    LOG_DEBUG("check if resourceProvider [%s] '%s' fulfills some of the '%d' requirements", resourceProviderModel.c_str(), resourceProvider.c_str(), requirements.size());
+    LOG_DEBUG_S << "check if resourceProvider [" << resourceProviderModel << "] '" << resourceProvider << "' fulfills some of the '" << requirements.size() << "' requirements";
 
     IRIList::const_iterator cit = requirements.begin();
     for(; cit != requirements.end(); ++cit)
@@ -172,7 +172,7 @@ bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherR
     return false;
 }
 
-CandidatesList OrganizationModel::checkIfCompatibleNow(const std::string& instance, const std::string& otherInstance)
+CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, const IRI& otherInstance)
 {
     IRIList usedInterfaces;
 
@@ -317,10 +317,10 @@ IRIList OrganizationModel::recombine(const IRI& actor, const IRIList& otherActor
         CandidatesList interfaceMatchings = checkIfCompatibleNow(actor, *cit);
         if(interfaceMatchings.empty())
         {
-            LOG_INFO("Cannot join: '%s' and '%s' -- no interfaces available", actor.c_str(), cit->c_str());
+            LOG_INFO_S << "Cannot join: '" << actor <<"' and '" << *cit << "' -- no interfaces available";
             continue;
         } else {
-            LOG_INFO("Can join: '%s' and '%s' in %d different ways", actor.c_str(), cit->c_str(), interfaceMatchings.size());
+            LOG_INFO("Can join: '%s' and '%s' in %d different ways", actor.toString().c_str(), cit->toString().c_str(), interfaceMatchings.size());
         }
 
         CandidatesList::iterator mit = interfaceMatchings.begin();
@@ -335,10 +335,11 @@ IRIList OrganizationModel::recombine(const IRI& actor, const IRIList& otherActor
     
             // reconfiguration with of the same model is generally possible
             // so leave it here for the moment
-            IRI actorFromRecombination = actor + "+" + *cit;
+            // TODO: FIX IRI recombination handling
+            IRI actorFromRecombination = IRI::create( actor.getPrefix(), actor.getNamespace() + "+" + cit->getNamespace() );
             std::stringstream ss;
             ss << getResourceModel(actor) << "+" << getResourceModel(*cit) << "[" << candidateId++ << "]";
-            IRI actorClassFromRecombination = ss.str();
+            IRI actorClassFromRecombination = IRI::create(ss.str());
     
             mKnowledgeBase.subclassOf(EntitiesIRIs[COMPOSITE_ACTOR], EntitiesIRIs[ACTOR]);
             mKnowledgeBase.instanceOf(actorClassFromRecombination, EntitiesIRIs[COMPOSITE_ACTOR]);
@@ -350,14 +351,14 @@ IRIList OrganizationModel::recombine(const IRI& actor, const IRIList& otherActor
             mKnowledgeBase.relatedTo(actorClassFromRecombination, PropertiesIRIs[DEPENDS_ON], getResourceModel(actor));
             mKnowledgeBase.relatedTo(actorClassFromRecombination, PropertiesIRIs[DEPENDS_ON], getResourceModel(*cit));
     
-            std::vector<std::string>::iterator iit = usedInterfaces.begin();
+            IRIList::iterator iit = usedInterfaces.begin();
             for(; iit != usedInterfaces.end(); ++iit)
             {
-                LOG_INFO("add new actor class: '%s' uses '%s'", actorClassFromRecombination.c_str(), iit->c_str());
-                mKnowledgeBase.relatedTo(actorClassFromRecombination, "uses", *iit);
+                LOG_INFO_S << "add new actor class: '" << actorClassFromRecombination << "' uses '" << *iit << "'";
+                mKnowledgeBase.relatedTo(actorClassFromRecombination, IRI::create("uses"), *iit);
             }
     
-            LOG_INFO("new actor: '%s' of class '%s' --> '%s' combined with '%s'", actorFromRecombination.c_str(), actorClassFromRecombination.c_str(), actor.c_str(), cit->c_str());
+            LOG_INFO_S << "new actor: '" << actorFromRecombination << "' of class '" << actorClassFromRecombination << "' --> '" << actor << "' combined with '" << *cit << "'";
     
             // Update return list and use the current instance of the newly inferred actor type
             recombinations.push_back(actorFromRecombination);

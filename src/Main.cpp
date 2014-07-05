@@ -16,7 +16,7 @@ int main(int argc, char** argv)
     if(!o_filename.empty())
     {
         Ontology::Ptr ontology = Ontology::fromFile( o_filename );
-        db::query::Results results = ontology->findAll("?s","?p","?o");
+        db::query::Results results = ontology->findAll(db::query::Subject(), db::query::Predicate(), db::query::Object());
         printf("Results:\n%s", results.toString().c_str());
         printf("\n-----------------------------------\n");
         printf("Resulting Ontology:\n%s", ontology->toString().c_str());

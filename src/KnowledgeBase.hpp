@@ -7,6 +7,7 @@
 #include <owl_om/Exceptions.hpp>
 #include <base/Logging.hpp>
 #include <owl_om/reasoner/factpp/Types.hpp>
+#include <owl_om/OWLApi.hpp>
 
 namespace owl_om {
 
@@ -20,7 +21,7 @@ namespace restriction {
 }
 
 // Internationalized Resource Identifier -- simply using a string here for simplicity
-typedef std::string IRI;
+typedef owlapi::model::IRI IRI;
 typedef std::vector<IRI> IRIList;
 
 typedef std::map<IRI, ClassExpression > IRIClassExpressionMap;
@@ -43,9 +44,9 @@ class KnowledgeBase
     IRIObjectPropertyExpressionMap mObjectProperties;
     IRIDataPropertyExpressionMap mDataProperties;
 
-    bool hasClass(const std::string& klass) const { return mClasses.count(klass); }
+    bool hasClass(const IRI& klass) const { return mClasses.count(klass); }
 
-    bool hasInstance(const std::string& instance) const { return mInstances.count(instance); }
+    bool hasInstance(const IRI& instance) const { return mInstances.count(instance); }
 
 public:
     enum PropertyType { UNKNOWN_PROPERTY_TYPE, OBJECT, DATA, END_PROPERTY_TYPE };

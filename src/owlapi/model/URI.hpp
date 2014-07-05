@@ -2,25 +2,50 @@
 #define OWL_OM_OWL_API_MODEL_URI_HPP
 
 #include <string>
+#include <map>
+#include <stdexcept>
+
+struct UriUriStructA;
 
 namespace owlapi {
 namespace model {
 
 class URI
 {
-    std::string mUri;
+    UriUriStructA* mUri;
 
-    URI(const std::string& s)
-        : mUri(s)
-    {}
+    static std::map<int, std::string> ErrorCodeTxt;
 
 public:
-    static URI create(const std::string& s) { return URI(s); }
+    URI();
 
-    bool isAbsolute() const { return !mUri.empty() && mUri.at(0) != '/'; }
+    ~URI();
 
-    bool isOpaque() const { return false; }
+    URI(const std::string& s);
 
+    /**
+     * Test if URI is absolute
+     */
+    bool isAbsolute() const;
+
+    /**
+     * Test if URI is opaque
+     */
+    bool isOpaque() const;
+
+    /**
+     * Resolve the provided uri
+     * \return resolve uri
+     */
+    URI resolve(const URI& relativeUri) const;
+
+    void normalize();
+
+    /**
+     * Get string representation of URI
+     * \return URI as string
+     */
+    std::string toString() const;
 };
 
 } // end namespace model

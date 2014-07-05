@@ -11,5 +11,6 @@
   <depend package="base/types" />
   <depend package="external/factpp" />
   <depend package="planning/pddl_planner" />
+  <depend package="uriparser" />
   <!-- <depend package="ctemplate" /> -->
 </package>

@@ -19,7 +19,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
     IRIList klasses = model.knowledgeBase().allClasses();
     BOOST_FOREACH(IRI klass, klasses)
     {
-        domain.addType(klass);
+        domain.addType(klass.toString());
         LOG_DEBUG_S << "Domain: adding klass: '" << klass << "'";
     }
 
@@ -29,7 +29,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
         IRI klassType = model.knowledgeBase().typeOf( instance );
         LOG_DEBUG_S << "Domain: adding typed constant: '" << instance << "' of type '" << klassType << "'";
         try {
-            domain.addConstant( pddl_planner::representation::Constant(instance, klassType) );
+            domain.addConstant( pddl_planner::representation::Constant(instance.toString(), klassType.toString()) );
         } catch(const std::invalid_argument& e)
         {
             LOG_WARN_S << e.what();

@@ -39,7 +39,7 @@ public:
     /**
      * Find all items that match the query
      */
-    db::query::Results findAll(const Uri& subject, const Uri& predicate, const Uri& object) const;
+    db::query::Results findAll(const db::query::Variable& subject, const db::query::Variable& predicate, const db::query::Variable& object) const;
 
     /**
      * Convert ontology to string representation

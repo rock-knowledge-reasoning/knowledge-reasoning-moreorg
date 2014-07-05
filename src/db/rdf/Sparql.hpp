@@ -4,7 +4,6 @@
 #include <vector>
 #include <map>
 #include <stdexcept>
-#include <owl_om/Uri.hpp>
 #include <owl_om/db/rdf/SparqlInterface.hpp>
 
 namespace owl_om {
@@ -29,10 +28,10 @@ public:
     /**
      * Add a triple statement
      */
-    WhereClause& triple(const std::string& subject, const std::string& predicate, const std::string& object);
-    WhereClause& filter_regex(const db::query::UnboundVariable& variable, const std::string& matchExpression, filter::Option option = filter::UNKNOWN_OPTION);
-    WhereClause& filter_expression(const db::query::UnboundVariable& variable, const std::string& op, const std::string& expression);
-    WhereClause& minus(const std::string& subject, const std::string& predicate, const std::string& object);
+    WhereClause& triple(const db::query::Variable& subject, const db::query::Variable& predicate, const db::query::Variable& object);
+    WhereClause& filter_regex(const db::query::Variable& variable, const std::string& matchExpression, filter::Option option = filter::UNKNOWN_OPTION);
+    WhereClause& filter_expression(const db::query::Variable& variable, const std::string& op, const std::string& expression);
+    WhereClause& minus(const db::query::Variable& subject, const db::query::Variable& predicate, const db::query::Variable& object);
 
     /**
      * Return the associated mQuery
@@ -46,12 +45,10 @@ class Query
 {
     friend class WhereClause;
 
-    typedef std::map<std::string, Uri> PrefixMap;
-
-    db::query::UnboundVariableList mUnboundVariables;
+    typedef std::map<std::string, owlapi::model::IRI> PrefixMap;
 
     PrefixMap mPrefixes;
-    db::query::UnboundVariableList mSelect;
+    db::query::VariableList mSelect;
     WhereClause mWhere;
 
     std::string prefixTxt() const;
@@ -61,16 +58,16 @@ class Query
     /**
      * Add an unbound variable that will be used in this query
      */
-    void addUnboundVariable(const db::query::UnboundVariable& variable);
+    //void addUnboundVariable(const db::query::Variable& variable);
 
-    std::string getOrCreatePrefix(const Uri& uri);
+    std::string getOrCreatePrefix(const owlapi::model::IRI& iri);
 
 protected:
     /**
      * Prepare an given uri, by extracting the prefix or check
      * if the given variable is valid
      */
-    std::string prepare(const std::string& uriOrVariable);
+    //std::string prepare(const std::string& uriOrVariable);
 
 public:
 
@@ -87,8 +84,8 @@ public:
      * \param prefix
      * \param uri Uri this prefix maps to
      */
-    Query& prefix(const std::string& prefix, const Uri& uri);
-    Query& select(const db::query::UnboundVariable& variable, bool do_throw = true);
+    Query& prefix(const std::string& prefix, const owlapi::model::IRI& iri);
+    Query& select(const db::query::Variable& variable, bool do_throw = true);
     WhereClause& beginWhere() { return mWhere; }
 
     db::query::Bindings getBindings() const;

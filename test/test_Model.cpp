@@ -8,8 +8,6 @@
 
 using namespace owl_om;
 
-std::string rdfTestFiles[] = { "test/data/om-schema-v0.1.owl", "test/data/om-schema-v0.2.owl" };
-
 BOOST_AUTO_TEST_CASE(it_should_query_db)
 {
     std::string baseUri = "http://www.rock-robotics.org/2013/09/om-schema#";

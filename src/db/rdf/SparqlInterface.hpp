@@ -5,17 +5,22 @@
 #include <map>
 #include <string>
 #include <stdexcept>
+#include <owl_om/db/rdf/Variable.hpp>
 #include <owl_om/Vocabulary.hpp>
 
 namespace owl_om {
 namespace db {
 namespace query {
 
-typedef std::vector<std::string> Bindings;
-typedef std::string UnboundVariable;
-typedef std::vector<UnboundVariable> UnboundVariableList;
+/**
+ * Query variables
+ */
+extern Variable Subject();
+extern Variable Object();
+extern Variable Predicate();
+extern Variable Any(const std::string& label);
 
-typedef std::map<std::string, std::string> Row;
+typedef std::map<Variable, owlapi::model::IRI> Row;
 struct Results
 {
     std::vector<Row> rows;
@@ -34,7 +39,7 @@ public:
 
     bool next();
 
-    Uri operator[](const std::string& name) const;
+    owlapi::model::IRI operator[](const Variable& name) const;
 };
 
 /**
@@ -57,12 +62,7 @@ public:
      * Retrieve results when matching the given triple definition
      * \return Results List of Rows
      */
-    Results findAll(const Uri& subject, const Uri& predicate, const Uri& object) const;
-
-    /**
-     * Create an unbound variable, i.e. with preceding '?'
-     */
-    static UnboundVariable unboundVariable(const std::string& name);
+    Results findAll(const Variable& subject, const Variable& predicate, const Variable& object) const;
 };
 
 } // end namespace query

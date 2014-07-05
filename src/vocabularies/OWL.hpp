@@ -10,7 +10,7 @@ namespace vocabulary {
 class OWL
 {
 public:
-    VOCABULARY_BASE_URI("http://www.w3.org/2002/07/owl#");
+    VOCABULARY_BASE_IRI("http://www.w3.org/2002/07/owl#");
     VOCABULARY_ADD_WORD(AllDifferent);
     VOCABULARY_ADD_WORD(AnnotationProperty);
     VOCABULARY_ADD_WORD(Class);

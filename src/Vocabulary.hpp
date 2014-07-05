@@ -2,12 +2,12 @@
 #define OWL_OM_VOCABULARY_HPP
 
 #include <string>
-#include <owl_om/Uri.hpp>
+#include <owl_om/OWLApi.hpp>
 
-#define VOCABULARY_BASE_URI(URI) \
-    static Uri BaseUri() { return URI; }
+#define VOCABULARY_BASE_IRI(X) \
+    static owlapi::model::IRI IRIPrefix() { return owlapi::model::IRI::create(X); }
 #define VOCABULARY_ADD_WORD(NAME) \
-    static Uri NAME() { return BaseUri() + #NAME; }
+    static owlapi::model::IRI NAME() { return IRIPrefix().resolve(#NAME); }
 
 namespace owl_om {
 namespace vocabulary {
@@ -16,34 +16,14 @@ namespace vocabulary {
  */
 class Custom
 {
-    Uri mBaseUri;
+    owlapi::model::IRI mBase;
 public:
-    Custom(const std::string& baseUri)
-        : mBaseUri(baseUri)
-    {}
+    Custom(const std::string& prefix)
+        : mBase(prefix,"")
+    {
+    }
 
-    Uri operator[](const std::string& name) const { return mBaseUri + name; }
-};
-
-struct SplitUri
-{
-    SplitUri(const std::string& _baseUri, const std::string& _name)
-        : baseUri(_baseUri)
-        , name(_name)
-    {}
-
-    std::string fullName() { return baseUri + name; }
-
-    std::string baseUri;
-    std::string name;
-};
-
-class Utils
-{
-public:
-    static SplitUri extractBaseUri(const Uri& uri);
-
-    static Uri adaptPlaceholder(std::string& uri);
+    owlapi::model::IRI operator[](const std::string& name) const { return mBase.resolve(name); }
 };
 
 } // end namespace vocabulary

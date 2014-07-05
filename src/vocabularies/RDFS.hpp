@@ -10,7 +10,7 @@ namespace vocabulary {
 class RDFS
 {
 public:
-    VOCABULARY_BASE_URI("http://www.w3.org/2000/01/rdf-schema#");
+    VOCABULARY_BASE_IRI("http://www.w3.org/2000/01/rdf-schema#");
     VOCABULARY_ADD_WORD(Class);
     VOCABULARY_ADD_WORD(Container);
     VOCABULARY_ADD_WORD(ContainerMembershipProperty);

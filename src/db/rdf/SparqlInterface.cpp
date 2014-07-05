@@ -9,6 +9,15 @@ namespace owl_om {
 namespace db {
 namespace query {
 
+Variable Any(const std::string& label)
+{
+    return Variable(label, false);
+}
+
+Variable Subject() { return Any("s"); }
+Variable Object() { return Any("o"); }
+Variable Predicate() { return Any("p"); }
+
 std::string Results::toString() const
 {
     std::stringstream txt;
@@ -47,27 +56,28 @@ bool ResultsIterator::next()
     return mRowIterator != mResults.rows.end();
 }
 
-Uri ResultsIterator::operator[](const std::string& name) const
+owlapi::model::IRI ResultsIterator::operator[](const Variable& variable) const
 {
-    std::string variable = SparqlInterface::unboundVariable(name);
-
+    // Retrieve row that matches the requested variable
     Row::iterator cit =  mRowIterator->find(variable);
     if( mRowIterator->end() != cit)
     {
         return cit->second;
     }
 
+    // For error handling
     std::string bindings;
     cit = mRowIterator->begin();
     for(; cit != mRowIterator->end(); ++cit)
     {
-        bindings += cit->first + ",";
+        Variable variable = cit->first;
+        bindings += variable.getQueryName() + ",";
     }
-    std::string msg = "owl_om::db::query::ResultsIterator: unknown binding for '" + name + "' known are: " + bindings;
+    std::string msg = "owl_om::db::query::ResultsIterator: unknown binding for '" + variable.getQueryName() + "' known are: " + bindings;
     throw std::runtime_error(msg);
 }
 
-Results SparqlInterface::findAll(const Uri& subject, const Uri& predicate, const Uri& object) const
+Results SparqlInterface::findAll(const Variable& subject, const Variable& predicate, const Variable& object) const
 {
     LOG_DEBUG_S << "Find all for: subject '" << subject << "', predicate: '" << predicate << "', object '" << object << "'";
     using namespace owl_om::db::rdf::sparql;
@@ -83,28 +93,6 @@ Results SparqlInterface::findAll(const Uri& subject, const Uri& predicate, const
     std::string queryTxt = query.toString();
     LOG_DEBUG_S << "Sending query: " << queryTxt;
     return this->query(queryTxt, query.getBindings());
-}
-
-UnboundVariable SparqlInterface::unboundVariable(const std::string& name)
-{
-    if(name.empty())
-    {
-        throw std::invalid_argument("owl_om::Query::unboundVariable: given name is empty");
-    }
-
-    if(name.find("http://") != std::string::npos)
-    {
-        throw std::invalid_argument("owl_om::Query::unboundVariable: given URI: '" + name + "'");
-    }
-
-    std::string variable;
-    if(name.data()[0] != '?')
-    {
-        variable = "?" + name;
-    } else {
-        variable = name;
-    }
-    return variable;
 }
 
 } // end namespace query

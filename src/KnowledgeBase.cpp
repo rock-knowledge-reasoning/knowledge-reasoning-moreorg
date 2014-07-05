@@ -57,7 +57,7 @@ ClassExpression KnowledgeBase::getClass(const IRI& klass) const
     IRIClassExpressionMap::const_iterator cit = mClasses.find(klass);
     if(cit == mClasses.end())
     {
-        throw std::invalid_argument("Class '" + klass + "' does not exist");
+        throw std::invalid_argument("Class '" + klass.toString() + "' does not exist");
     }
 
     return cit->second;
@@ -69,7 +69,7 @@ ClassExpression KnowledgeBase::getClassLazy(const IRI& klass)
         return getClass(klass);
     } catch(const std::invalid_argument& e)
     {
-        TDLConceptExpression* f_class = getExpressionManager()->Concept(klass);
+        TDLConceptExpression* f_class = getExpressionManager()->Concept(klass.toString());
         ClassExpression expression(f_class);
         mClasses[klass] = expression;
         return expression;
@@ -81,7 +81,7 @@ InstanceExpression KnowledgeBase::getInstance(const IRI& instance) const
     IRIInstanceExpressionMap::const_iterator cit = mInstances.find(instance);
     if(cit == mInstances.end())
     {
-        throw std::invalid_argument("Instance '" + instance + "' does not exist");
+        throw std::invalid_argument("Instance '" + instance.toString() + "' does not exist");
     }
 
     return cit->second;
@@ -93,7 +93,7 @@ InstanceExpression KnowledgeBase::getInstanceLazy(const IRI& instance)
         return getInstance(instance);
     } catch(const std::invalid_argument& e)
     {
-        TDLIndividualExpression* f_individual = getExpressionManager()->Individual(instance);
+        TDLIndividualExpression* f_individual = getExpressionManager()->Individual(instance.toString());
         InstanceExpression expression(f_individual);
         mInstances[instance] = expression;
         return expression;
@@ -105,7 +105,7 @@ ObjectPropertyExpression KnowledgeBase::getObjectProperty(const IRI& property) c
     IRIObjectPropertyExpressionMap::const_iterator cit = mObjectProperties.find(property);
     if(cit == mObjectProperties.end())
     {
-        throw std::invalid_argument("ObjectProperty '" + property + "' does not exist");
+        throw std::invalid_argument("ObjectProperty '" + property.toString() + "' does not exist");
     }
     return cit->second;
 }
@@ -116,7 +116,7 @@ ObjectPropertyExpression KnowledgeBase::getObjectPropertyLazy(const IRI& propert
         return getObjectProperty(property);
     } catch(const std::invalid_argument& e)
     {
-        TDLObjectRoleExpression* f_property = getExpressionManager()->ObjectRole(property);
+        TDLObjectRoleExpression* f_property = getExpressionManager()->ObjectRole(property.toString());
         ObjectPropertyExpression expression(f_property);
         mObjectProperties[property] = expression;
         return expression;
@@ -128,7 +128,7 @@ DataPropertyExpression KnowledgeBase::getDataProperty(const IRI& property) const
     IRIDataPropertyExpressionMap::const_iterator cit = mDataProperties.find(property);
     if(cit == mDataProperties.end())
     {
-        throw std::invalid_argument("DataProperty '" + property + "' does not exist");
+        throw std::invalid_argument("DataProperty '" + property.toString() + "' does not exist");
     }
     return cit->second;
 }
@@ -139,7 +139,7 @@ DataPropertyExpression KnowledgeBase::getDataPropertyLazy(const IRI& property)
         return getDataProperty(property);
     } catch(const std::invalid_argument& e)
     {
-        TDLDataRoleExpression* f_property = getExpressionManager()->DataRole(property);
+        TDLDataRoleExpression* f_property = getExpressionManager()->DataRole(property.toString());
         DataPropertyExpression expression(f_property);
         mDataProperties[property] = expression;
         return expression;
@@ -535,7 +535,7 @@ IRIList KnowledgeBase::allClasses(bool excludeBottomClass) const
 IRIList KnowledgeBase::allSubclassesOf(const IRI& klass, bool direct)
 {
     ClassExpression e_class = getClass(klass);
-    std::vector<std::string> subclasses;
+    IRIList subclasses;
 
     Actor actor;
     actor.needConcepts();
@@ -544,7 +544,7 @@ IRIList KnowledgeBase::allSubclassesOf(const IRI& klass, bool direct)
     for(size_t i = 0; result[i] != NULL; ++i)
     {
         LOG_DEBUG_S << "subconcept of '" << klass << "': " << result[i];
-        subclasses.push_back( std::string(result[i]) );
+        subclasses.push_back( IRI::create(result[i]) );
     }
     delete[] result;
     return subclasses;
@@ -553,7 +553,7 @@ IRIList KnowledgeBase::allSubclassesOf(const IRI& klass, bool direct)
 IRIList KnowledgeBase::allAncestorsOf(const IRI& klass, bool direct)
 {
     ClassExpression e_class = getClass(klass);
-    std::vector<std::string> superclasses;
+    IRIList superclasses;
 
     Actor actor;
     actor.needConcepts();
@@ -562,7 +562,7 @@ IRIList KnowledgeBase::allAncestorsOf(const IRI& klass, bool direct)
     for(size_t i = 0; result[i] != NULL; ++i)
     {
         LOG_DEBUG_S << "super concept of '" << klass << "': " << result[i];
-        superclasses.push_back( std::string(result[i]) );
+        superclasses.push_back( IRI::create(result[i]) );
     }
     delete[] result;
     return superclasses;
@@ -592,7 +592,7 @@ IRIList KnowledgeBase::allInstancesOf(const IRI& klass, bool direct)
     for(size_t i = 0; result[i] != NULL; ++i)
     {
         // Fact does seem to fail at extracting direct instances
-        std::string instanceName(result[i]);
+        IRI instanceName = IRI::create(result[i]);
         if(direct && ! (typeOf(instanceName) == klass) )
         {
             LOG_DEBUG_S << "instance '" << instanceName << "' not a direct instance of '" << klass << "'";
@@ -620,7 +620,7 @@ IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& rel
     {
         const TNamedEntry* entry = *cit;
         LOG_INFO_S << "'" << individual << "' " << relationProperty << " '" << entry->getName() << "'";
-        individuals.push_back( std::string( entry->getName() ) );
+        individuals.push_back( IRI::create( entry->getName() ) );
     }
     return individuals;
 }
@@ -630,7 +630,7 @@ IRI KnowledgeBase::relatedInstance(const IRI& individual, const IRI& relationPro
     IRIList instances = allRelatedInstances(individual, relationProperty);
     if(instances.empty())
     {
-        throw std::invalid_argument("KnowledgeBase::relatedInstance: no instance related to '" + individual + "' via property '" + relationProperty + "'");
+        throw std::invalid_argument("KnowledgeBase::relatedInstance: no instance related to '" + individual.toString() + "' via property '" + relationProperty.toString() + "'");
     }
     return instances.front();
 }
@@ -644,13 +644,13 @@ IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const I
     ReasoningKernel::IndividualSet relatedIndividuals;
     mKernel->getRoleFillers(e_instance.get(), f_inverse, relatedIndividuals);
 
-    std::vector<std::string> individuals;
+    IRIList individuals;
     ReasoningKernel::IndividualSet::const_iterator cit = relatedIndividuals.begin();
     for(; cit != relatedIndividuals.end(); ++cit)
     {
         const TNamedEntry* entry = *cit;
         LOG_INFO_S << "'" << individual << "' -" << relationProperty << " '" << entry->getName() << "'";
-        individuals.push_back( std::string( entry->getName() ) );
+        individuals.push_back( IRI::create( entry->getName() ) );
     }
     return individuals;
 }
@@ -690,7 +690,7 @@ IRIList KnowledgeBase::typesOf(const IRI& instance, bool direct) const
     for(size_t i = 0; result[i] != NULL; ++i)
     {
         LOG_INFO_S << "instance " << instance << " of type '" << result[i] << "'";
-        klasses.push_back( std::string(result[i]) );
+        klasses.push_back( IRI::create(result[i]) );
     }
     delete[] result;
     return klasses;
@@ -716,7 +716,7 @@ IRIList KnowledgeBase::getSameAs(const IRI& aliasOrInstance)
     for(size_t i = 0; result[i] != NULL; ++i)
     {
         LOG_INFO_S << "instance or alias of " << aliasOrInstance << " -> '" << result[i] << "'";
-        alias.push_back( IRI(result[i]) );
+        alias.push_back( IRI::create(result[i]) );
     }
     delete[] result;
     if(alias.empty())
