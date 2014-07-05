@@ -11,6 +11,7 @@ using namespace owl_om;
 
 BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
 {
+    using namespace owlapi::model;
     KnowledgeBase kb;
     kb.setVerbose();
     kb.subclassOf("Derived", "Base");
@@ -257,8 +258,8 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     BOOST_REQUIRE( om.checkIfFulfills("Sherpa/instance#0", "LocationImageProvider/requirement#0") );
     BOOST_REQUIRE( kb.isRelatedTo("Sherpa", "provides", "LocationImageProvider") );
     {
-        std::vector<std::string> newActors = om.computeActorsFromRecombination();
-        std::vector<std::string>::iterator ait = newActors.begin();
+        IRIList newActors = om.computeActorsFromRecombination();
+        IRIList::iterator ait = newActors.begin();
         for(; ait != newActors.end(); ++ait)
         {
             LOG_INFO_S << "New actor: '" << *ait;
@@ -266,8 +267,8 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
         om.runInferenceEngine();
     }
     {
-        std::vector<std::string> newActors = om.computeActorsFromRecombination();
-        std::vector<std::string>::iterator ait = newActors.begin();
+        IRIList newActors = om.computeActorsFromRecombination();
+        IRIList::iterator ait = newActors.begin();
         for(; ait != newActors.end(); ++ait)
         {
             LOG_INFO_S << "New actor after inference: '" << *ait;
@@ -322,7 +323,7 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_from_owl)
     ontology->refresh();
     owl_om::vocabulary::Custom rock("http://www.rock-robotics.org/2014/01/om-schema#");
 
-    BOOST_REQUIRE_MESSAGE("http://www.rock-robotics.org/2014/01/om-schema#compatibleWith" == rock["compatibleWith"], "ObjectProperty: compatible with is valid");
+    BOOST_REQUIRE_MESSAGE(IRI("http://www.rock-robotics.org/2014/01/om-schema#compatibleWith") == rock["compatibleWith"], "ObjectProperty: compatible with is valid");
     BOOST_REQUIRE_NO_THROW(ontology->getObjectProperty( rock["compatibleWith"] ) );
     BOOST_REQUIRE_MESSAGE(ontology->isRelatedTo( rock["EmiActive"], rock["compatibleWith"], rock["EmiPassive"]), "Ontology: EmiActive compatibleWith EmiPassive");
 }
