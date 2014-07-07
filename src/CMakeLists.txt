@@ -37,13 +37,24 @@ rock_library(owl_om
         db/rdf/Variable.hpp
         exporter/PDDLExporter.hpp
         owlapi/io/XMLUtils.hpp
+        owlapi/model/AnonymousIndividual.hpp
         owlapi/model/HasIRI.hpp
+        owlapi/model/HasAnnotations.hpp
         owlapi/model/IRI.hpp
+        owlapi/model/OWLAnnotation.hpp
         owlapi/model/OWLAxiom.hpp
+        owlapi/model/OWLClassExpression.hpp
         owlapi/model/OWLEntity.hpp
         owlapi/model/OWLNamedObject.hpp
         owlapi/model/OWLObject.hpp
         owlapi/model/URI.hpp
+        owlapi/model/entities/OWLAnnotationProperty.hpp
+        owlapi/model/entities/OWLClass.hpp
+        owlapi/model/entities/OWLDataProperty.hpp
+        owlapi/model/entities/OWLDatatype.hpp
+        owlapi/model/entities/OWLLogicalEntity.hpp
+        owlapi/model/entities/OWLNamedIndividual.hpp
+        owlapi/model/entities/OWLObjectProperty.hpp
         reasoner/factpp/Types.hpp
     DEPS_PKGCONFIG base-lib redland soprano factpp pddl_planner liburiparser
 )

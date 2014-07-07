@@ -2,6 +2,7 @@
 #define OWL_API_MODEL_AXIOM_HPP
 
 #include <owl_om/owlapi/model/OWLObject.hpp>
+#include <owl_om/owlapi/model/HasAnnotations.hpp>
 
 namespace owlapi {
 namespace model {
@@ -10,22 +11,22 @@ namespace model {
  *
  * \see http://www.w3.org/TR/owl2-syntax/#Axioms
  */
-class OWLAxiom : public OWLObject //, HasAnnotations
+class OWLAxiom : public OWLObject, HasAnnotations
 {
     enum Type { 
-                Declaration = 0, // TDLAxiomDeclaration
-                ClassAxiom, // TDLConceptName
-                ObjectPropertyAxiom, // TDLObjectRoleName
-                DataPropertyAxiom, // TDLDataRoleName
-                DatatypeDefinition, 
-                Assertion, 
+                Declaration = 0,            // TDLAxiomDeclaration
+                ClassAxiom,                 // TDLConceptName
+                ObjectPropertyAxiom,        // TDLObjectRoleName
+                DataPropertyAxiom,          // TDLDataRoleName
+                DatatypeDefinition,         // n/a
+                Assertion,                  // n/a
                 HasKey, 
-                AnnotationAxiom,   // not part of the reasoner
+                AnnotationAxiom,            // not part of the reasoner
                 // ClassAxiom:
-                SubClassOf,        // TDLAxiomConceptInclusion
-                EquivalentClasses, // TDLAxiomEquivalentConcepts
-                DisjointClasses,   // TDLAxiomDisjointConcepts
-                DisjointUnion,     // TDLAxiomDisjointUnion
+                SubClassOf,                 // TDLAxiomConceptInclusion
+                EquivalentClasses,          // TDLAxiomEquivalentConcepts
+                DisjointClasses,            // TDLAxiomDisjointConcepts
+                DisjointUnion,              // TDLAxiomDisjointUnion
                 // ObjectPropertyAxiom
                 EquivalentObjectProperties, // TDLAxiomEquivalentORoles
                 DisjointObjectProperties,   // TDLAxiomDisjointORoles
@@ -56,10 +57,10 @@ class OWLAxiom : public OWLObject //, HasAnnotations
                 DataPropertyAssertion,      // TDLAxiomValueOf
                 NegativeDataPropertyAssertion,    // TDLAxiomValueOfNot
                 // AnnotationAxiom
-                SubAnnotationPropertyOf,
-                AnnotationPropertyDomain,
-                AnnotationPropertyRange,
-                AnnotationAssertion,
+                SubAnnotationPropertyOf,    // n/a
+                AnnotationPropertyDomain,   // n/a
+                AnnotationPropertyRange,    // n/a
+                AnnotationAssertion,        // n/a
                 // Not explicitly stated in OWL 2 but for convenience
                 SubPropertyChainOf
     };
@@ -70,24 +71,17 @@ public:
 //     *        visitor to accept
 //     */
 //    void accept(OWLAxiomVisitor visitor);
-//
-//    /**
-//     * Gets the annotations that are annotate this axiom.
-//     * @return A set of annotations that annotate this axiom.
-//     */
-//    virtual OWLAnnotation::Set getAnnotations() const;
-//
-//    /**
-//     * Gets the annotations that annotate this axiom and whose annotation
-//     * property is equal to {@code annotationProperty}.
-//     * 
-//     * @param annotationProperty
-//     *        The annotation property that will be equal to the annotation
-//     *        property of each returned annotation.
-//     * @return A set of annotations that annotate this axiom, each of whose
-//     *         annotation properties is equals to {@code annotationProperty}.
-//     */
-//    OWLAnnotation::Set getAnnotations(const OWLAnnotationProperty& annotationProperty) const;
+
+    /**
+     * Gets the annotations that annotate this axiom and whose annotation
+     * property is equal to {@code annotationProperty}.
+     * 
+     * @param annotationProperty
+     *        The annotation property that will be equal to the annotation
+     *        property of each returned annotation.
+     * @return A set of annotations that annotate this axiom, each of whose
+     *         annotation properties is equals to {@code annotationProperty//     */
+    //OWLAnnotationPtrList getAnnotations(const OWLAnnotationProperty& annotationProperty) const;
 //
 //    /**
 //     * Gets an axiom that is structurally equivalent to this axiom without
