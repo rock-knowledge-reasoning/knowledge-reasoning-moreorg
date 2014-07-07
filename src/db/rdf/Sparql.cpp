@@ -43,7 +43,7 @@ std::string Query::selectTxt() const
     {
         if(cit->isGrounded())
         {
-            LOG_WARN_S << "Skipping ground variable for SELECT";
+            LOG_WARN_S << "Skipping ground variable '" << cit->getQueryName() + "' for SELECT";
             continue;
         }
         select += " " + cit->toString();
