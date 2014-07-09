@@ -44,9 +44,11 @@ rock_library(owl_om
         owlapi/model/OWLAnnotation.hpp
         owlapi/model/OWLAxiom.hpp
         owlapi/model/OWLClassExpression.hpp
+        owlapi/model/OWLDataRange.hpp
         owlapi/model/OWLEntity.hpp
         owlapi/model/OWLNamedObject.hpp
         owlapi/model/OWLObject.hpp
+        owlapi/model/OWLPropertyRange.hpp
         owlapi/model/URI.hpp
         owlapi/model/entities/OWLAnnotationProperty.hpp
         owlapi/model/entities/OWLClass.hpp
