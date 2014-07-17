@@ -608,19 +608,26 @@ IRIList KnowledgeBase::allInstancesOf(const IRI& klass, bool direct)
 
 IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& relationProperty)
 {
-    InstanceExpression e_instance = getInstance(individual);
-    ObjectPropertyExpression e_relation = getObjectProperty(relationProperty);
-
-    ReasoningKernel::IndividualSet relatedIndividuals;
-    mKernel->getRoleFillers(e_instance.get(), e_relation.get(), relatedIndividuals);
-
     IRIList individuals;
-    ReasoningKernel::IndividualSet::const_iterator cit = relatedIndividuals.begin();
-    for(; cit != relatedIndividuals.end(); ++cit)
+    try {
+        InstanceExpression e_instance = getInstance(individual);
+        ObjectPropertyExpression e_relation = getObjectProperty(relationProperty);
+
+        ReasoningKernel::IndividualSet relatedIndividuals;
+        mKernel->getRoleFillers(e_instance.get(), e_relation.get(), relatedIndividuals);
+
+        ReasoningKernel::IndividualSet::const_iterator cit = relatedIndividuals.begin();
+        for(; cit != relatedIndividuals.end(); ++cit)
+        {
+            const TNamedEntry* entry = *cit;
+            individuals.push_back( IRI::create( entry->getName() ) );
+        }
+
+        LOG_DEBUG_S << "'" << individual << "' related via '" << relationProperty << "' to " << individuals;
+    } catch(const std::exception& e)
     {
-        const TNamedEntry* entry = *cit;
-        LOG_INFO_S << "'" << individual << "' " << relationProperty << " '" << entry->getName() << "'";
-        individuals.push_back( IRI::create( entry->getName() ) );
+        LOG_WARN_S << e.what();
+        // There is no such relation defined, thus return an empty list
     }
     return individuals;
 }
@@ -637,20 +644,26 @@ IRI KnowledgeBase::relatedInstance(const IRI& individual, const IRI& relationPro
 
 IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const IRI& relationProperty)
 {
-    InstanceExpression e_instance = getInstance(individual);
-    ObjectPropertyExpression e_relation = getObjectProperty(relationProperty);
-    TDLObjectRoleExpression* f_inverse = mKernel->getExpressionManager()->Inverse(e_relation.get());
-
-    ReasoningKernel::IndividualSet relatedIndividuals;
-    mKernel->getRoleFillers(e_instance.get(), f_inverse, relatedIndividuals);
-
     IRIList individuals;
-    ReasoningKernel::IndividualSet::const_iterator cit = relatedIndividuals.begin();
-    for(; cit != relatedIndividuals.end(); ++cit)
+    try {
+        InstanceExpression e_instance = getInstance(individual);
+        ObjectPropertyExpression e_relation = getObjectProperty(relationProperty);
+        TDLObjectRoleExpression* f_inverse = mKernel->getExpressionManager()->Inverse(e_relation.get());
+
+        ReasoningKernel::IndividualSet relatedIndividuals;
+        mKernel->getRoleFillers(e_instance.get(), f_inverse, relatedIndividuals);
+
+        ReasoningKernel::IndividualSet::const_iterator cit = relatedIndividuals.begin();
+        for(; cit != relatedIndividuals.end(); ++cit)
+        {
+            const TNamedEntry* entry = *cit;
+            LOG_INFO_S << "'" << individual << "' -" << relationProperty << " '" << entry->getName() << "'";
+            individuals.push_back( IRI::create( entry->getName() ) );
+        }
+    } catch(const std::exception& e)
     {
-        const TNamedEntry* entry = *cit;
-        LOG_INFO_S << "'" << individual << "' -" << relationProperty << " '" << entry->getName() << "'";
-        individuals.push_back( IRI::create( entry->getName() ) );
+        LOG_WARN_S << e.what();
+        // There is no such relation defined, thus return an empty list
     }
     return individuals;
 }
