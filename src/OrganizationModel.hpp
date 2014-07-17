@@ -1,7 +1,7 @@
 #ifndef OWL_OM_ORGANIZATION_MODEL_HPP
 #define OWL_OM_ORGANIZATION_MODEL_HPP
 
-#include <owl_om/KnowledgeBase.hpp>
+#include <owl_om/Ontology.hpp>
 
 namespace owl_om {
 
@@ -9,19 +9,25 @@ typedef std::vector<IRIList> CandidatesList;
 
 class OrganizationModel
 {
-    KnowledgeBase mKnowledgeBase;
+    Ontology::Ptr mpOntology;
 
 public:
 
-    enum Entities { ACTOR, ACTOR_MODEL, COMPOSITE_ACTOR, SERVICE, SERVICE_MODEL, INTERFACE, COMPATIBILITY, END_OF_ENTITIES };
-    static std::map<Entities, IRI> EntitiesIRIs;
+    /**
+     * Constructor for an empty OrganizationModel
+     */
+    OrganizationModel();
 
-    enum Properties { HAS, PROVIDES, DEPENDS_ON, USES, COMPATIBLE_WITH, MODELED_BY, END_OF_PROPERTIES };
-    static std::map<Properties, IRI> PropertiesIRIs;
+    /**
+     * Constructor to create an OrganizationModel from an existing description file
+     * \param filename File name to an rdf/xml formatted ontology description file
+     * \param runInference Set to true to run inference for recombinations after loading the description file, False to suppress the inference at construction time
+     */
+    OrganizationModel(const std::string& filename, bool runInference = true);
 
-    KnowledgeBase& knowledgeBase() { return mKnowledgeBase; }
+    Ontology::Ptr ontology() { return mpOntology; }
 
-    const KnowledgeBase& knowledgeBase() const { return mKnowledgeBase; }
+    const Ontology::Ptr ontology() const { return mpOntology; }
 
     /**
      * Creation of an instance of a given elementary klass, which is modeled by a given model klass
@@ -80,6 +86,25 @@ public:
     
     bool isSameResourceModel(const IRI& instance, const IRI& otherInstance);
 };
+
+//
+///**
+// *
+// */
+//class SequenceHandler
+//{
+//    operator()
+//};
+//
+//class CombinatoricEngine
+//{
+//    IRIList resources;
+//
+//    void permutations(SequenceHandler handler, SequenceFilter filter);
+//
+//    void combinations(
+//
+//};
 
 } // end namespace owl_om
 #endif // OWL_OM_ORGANIZATION_MODEL_HPP

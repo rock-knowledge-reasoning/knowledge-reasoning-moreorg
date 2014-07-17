@@ -9,12 +9,16 @@
 //! Main enclosing namespace for OWL Organization Modelling
 namespace owl_om {
 
+class OrganizationModel;
+
 /**
  * @class KnowledgeBase
  * @brief KnowledgeBase serves as main layer of abstraction for the underlying database
  */
 class Ontology : public owl_om::KnowledgeBase
 {
+    friend class OrganizationModel;
+
 private:
     Ontology();
 
