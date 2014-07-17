@@ -2,6 +2,7 @@
 #define OWL_OM_OWL_API_MODEL_IRI_HPP
 
 #include <stdexcept>
+#include <vector>
 #include <owl_om/owlapi/model/URI.hpp>
 
 namespace owlapi {
@@ -106,6 +107,11 @@ public:
 
 
 std::ostream& operator<<(std::ostream& os, const owlapi::model::IRI& iri);
+
+/**
+ * Stream list or iris
+ */
+std::ostream& operator<<(std::ostream& os, const std::vector<owlapi::model::IRI>& iris);
 
 } // end namespace model
 } // end namespace owlapi
