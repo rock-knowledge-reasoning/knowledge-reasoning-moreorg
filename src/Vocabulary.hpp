@@ -32,5 +32,6 @@ public:
 #include <owl_om/vocabularies/OWL.hpp>
 #include <owl_om/vocabularies/RDF.hpp>
 #include <owl_om/vocabularies/RDFS.hpp>
+#include <owl_om/vocabularies/OM.hpp>
 
 #endif // OWL_OM_VOCABULARY_HPP

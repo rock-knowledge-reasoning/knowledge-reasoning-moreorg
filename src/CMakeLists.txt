@@ -27,6 +27,7 @@ rock_library(owl_om
         OWLApi.hpp
         Ontology.hpp
         Vocabulary.hpp
+        vocabularies/OM.hpp
         vocabularies/OWL.hpp
         vocabularies/RDF.hpp
         vocabularies/RDFS.hpp
