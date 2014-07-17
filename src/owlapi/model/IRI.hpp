@@ -70,6 +70,11 @@ public:
     std::string toString() const { return mPrefix + mRemainder; }
 
     /**
+     * Get Fragement of IRI, i.e. everything past #
+     */
+    std::string getFragment() const;
+
+    /**
      * Create IRI from single string
      * \return IRI
      */

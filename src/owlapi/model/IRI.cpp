@@ -88,6 +88,17 @@ IRI IRI::resolve(const std::string& s) const
     return IRI::create( toURI().resolve(uri) );
 }
 
+std::string IRI::getFragment() const
+{
+    size_t npos = mRemainder.find_last_of("#");
+    if(npos == std::string::npos)
+    {
+        throw std::invalid_argument("owlapi::model::IRI::getFragment IRI does not have a fragment");
+    }
+
+    return mRemainder.substr(npos+1);
+}
+
 IRI IRI::create(const std::string& s)
 {
     if(s.empty())
