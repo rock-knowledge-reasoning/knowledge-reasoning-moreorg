@@ -105,13 +105,22 @@ public:
     bool operator<(const IRI& other) const { return toString() < other.toString(); }
 };
 
+typedef std::vector<IRI> IRIList;
 
+/**
+ * Stream an IRI
+ */
 std::ostream& operator<<(std::ostream& os, const owlapi::model::IRI& iri);
 
 /**
- * Stream list or iris
+ * Stream list of IRIs
  */
 std::ostream& operator<<(std::ostream& os, const std::vector<owlapi::model::IRI>& iris);
+
+/**
+ * Stream list of list of IRIs
+ */
+std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<owlapi::model::IRI> >& iris);
 
 } // end namespace model
 } // end namespace owlapi

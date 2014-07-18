@@ -171,5 +171,15 @@ std::ostream& operator<<(std::ostream& os, const std::vector<owlapi::model::IRI>
     return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<owlapi::model::IRI> >& iris)
+{
+    std::vector< std::vector<owlapi::model::IRI> >::const_iterator cit = iris.begin();
+    for(; cit != iris.end(); ++cit)
+    {
+        os << *cit << std::endl;
+    }
+    return os;
+}
+
 } // end namespace model
 } // end namespace owlapi
