@@ -626,7 +626,7 @@ IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& rel
         LOG_DEBUG_S << "'" << individual << "' related via '" << relationProperty << "' to " << individuals;
     } catch(const std::exception& e)
     {
-        LOG_WARN_S << e.what();
+        LOG_WARN_S << "'" << individual << "' not related to any via '" << relationProperty << "': " << e.what();
         // There is no such relation defined, thus return an empty list
     }
     return individuals;
@@ -662,7 +662,7 @@ IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const I
         }
     } catch(const std::exception& e)
     {
-        LOG_WARN_S << e.what();
+        LOG_WARN_S << "'" << individual << "' not related to any via '" << relationProperty << "': " << e.what();
         // There is no such relation defined, thus return an empty list
     }
     return individuals;

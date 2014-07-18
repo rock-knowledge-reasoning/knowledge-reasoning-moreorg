@@ -71,10 +71,10 @@ void Ontology::refresh()
                         owlapi::model::IRI classType = objectsIt[Object()];
                         if(classType != vocabulary::OWL::NamedIndividual())
                         {
-                            LOG_INFO_S << "Registering:" << classType;
+                            LOG_DEBUG_S << "Registering:" << classType;
                             instanceOf(subject, classType);
                         } else {
-                            LOG_INFO_S << "Skipping NamedIndividual " << classType;
+                            LOG_DEBUG_S << "Skipping NamedIndividual " << classType;
                         }
                     }
                 } else if (object == vocabulary::RDF::Property())
@@ -97,10 +97,10 @@ void Ontology::refresh()
                 //    transitiveProperty(object);
                 } else if ( object == vocabulary::OWL::AnnotationProperty())
                 {
-                    LOG_INFO_S << "Annotation property '" << subject << "' ignored for reasoning"; 
+                    LOG_DEBUG_S << "Annotation property '" << subject << "' ignored for reasoning";
                 } else if ( object == vocabulary::OWL::Restriction() )
                 {
-                    LOG_INFO_S << "Found restriction";
+                    LOG_DEBUG_S << "Found restriction";
                 }
             } else if(predicate == vocabulary::RDFS::subClassOf())
             {
@@ -136,8 +136,8 @@ void Ontology::refresh()
     {
         IRI relation = *cit;
         Results results = findAll(Subject(), relation, Object());
-        LOG_DEBUG_S << "PROPERTY QUERY RESULTS";
-        LOG_DEBUG_S << "RESULTS: " << results.toString();
+        LOG_DEBUG_S << "PROPERTY QUERY RESULTS:" << std::endl
+            << results.toString() << std::endl;
         ResultsIterator it(results);
         while(it.next())
         {

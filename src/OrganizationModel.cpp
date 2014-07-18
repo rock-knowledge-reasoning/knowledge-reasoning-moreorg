@@ -181,6 +181,11 @@ bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherR
         }
     }
 
+
+    LOG_DEBUG_S << "Check compatibility of '" << resource << " with '" << otherResource << "'" << std::endl
+        << "    interfaces of first: " << resourceInterfaces << std::endl
+        << "    interfaces of second: " << otherResourceInterfaces << std::endl;
+
     // For each interface check if the models are compatible to each other
     IRIList::const_iterator rit = resourceInterfaces.begin();
     for(; rit != resourceInterfaces.end(); ++rit)
@@ -198,8 +203,6 @@ bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherR
             {
                 LOG_INFO_S << resource << " compatibleWith " << otherResource << " via " << interface << "[" << interfaceModel << "] and " << otherInterface << "[" << otherInterfaceModel << "]";
                 return true;
-            } else {
-                LOG_INFO_S << resource << " not compatibleWith " << otherResource << " via " << interface << "[" << interfaceModel << "] and " << otherInterface << "[" << otherInterfaceModel << "]";
             }
         }
     }
@@ -295,8 +298,6 @@ CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, cons
 
                 // One candidate for the matching
                 candidates.push_back(usedInterfaces);
-            } else {
-                LOG_INFO_S << instance << " not compatibleWith " << otherInstance << " via " << interface << " and " << otherInterface;
             }
         }
     }
@@ -305,7 +306,7 @@ CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, cons
     {
         LOG_INFO_S << instance << " is not compatibleWith " << otherInstance << " via any interface";
     } else {
-        LOG_INFO_S << "Found number of candidates: " << candidates.size();
+        LOG_INFO_S << "Candidates: " << candidates;
     }
     return candidates;
 }
@@ -340,6 +341,7 @@ IRIList OrganizationModel::computeActorsFromRecombination()
             rest.erase(self);
         }
 
+        LOG_INFO_S << "Recombine '" << *ait << " with " << rest;
         IRIList recombinations = recombine(*ait, rest);
         newActors.insert(newActors.begin(), recombinations.begin(), recombinations.end());
     }
@@ -350,7 +352,6 @@ IRIList OrganizationModel::computeActorsFromRecombination()
 
 IRIList OrganizationModel::recombine(const IRI& actor, const IRIList& otherActors)
 {
-    LOG_INFO_S << "Recombine actor '" << actor << " with #" << otherActors.size() << " other actors";
     IRIList::const_iterator cit = otherActors.begin();
     IRIList recombinations;
     for(; cit != otherActors.end(); ++cit)
@@ -359,10 +360,10 @@ IRIList OrganizationModel::recombine(const IRI& actor, const IRIList& otherActor
         CandidatesList interfaceMatchings = checkIfCompatibleNow(actor, *cit);
         if(interfaceMatchings.empty())
         {
-            LOG_INFO_S << "Cannot join: '" << actor <<"' and '" << *cit << "' -- no interfaces available";
+            LOG_DEBUG_S << "Cannot join: '" << actor <<"' and '" << *cit << "' -- no interfaces available";
             continue;
         } else {
-            LOG_INFO("Can join: '%s' and '%s' in %d different ways", actor.toString().c_str(), cit->toString().c_str(), interfaceMatchings.size());
+            LOG_DEBUG("Can join: '%s' and '%s' in %d different ways", actor.toString().c_str(), cit->toString().c_str(), interfaceMatchings.size());
         }
 
         CandidatesList::iterator mit = interfaceMatchings.begin();
@@ -379,7 +380,6 @@ IRIList OrganizationModel::recombine(const IRI& actor, const IRIList& otherActor
             // so leave it here for the moment
             // TODO: FIX IRI recombination handling
             IRI actorFromRecombination = IRI::create( actor.toString() + "+" + cit->getFragment() );
-            LOG_INFO_S << "Actor from recombination: " << actorFromRecombination << " remainder: " << actor.getRemainder();
             std::stringstream ss;
             ss << getResourceModel(actor) << "+" << getResourceModel(*cit).getFragment() << "[" << candidateId++ << "]";
             IRI actorClassFromRecombination = IRI::create(ss.str());
@@ -397,11 +397,13 @@ IRIList OrganizationModel::recombine(const IRI& actor, const IRIList& otherActor
             IRIList::iterator iit = usedInterfaces.begin();
             for(; iit != usedInterfaces.end(); ++iit)
             {
-                LOG_INFO_S << "add new actor class: '" << actorClassFromRecombination << "' uses '" << *iit << "'";
                 mpOntology->relatedTo(actorClassFromRecombination, IRI::create("uses"), *iit);
             }
     
-            LOG_INFO_S << "new actor: '" << actorFromRecombination << "' of class '" << actorClassFromRecombination << "' --> '" << actor << "' combined with '" << *cit << "'";
+            LOG_INFO_S << "New actor: '" << actorFromRecombination << std::endl
+                << "     new actor model:    " << actorClassFromRecombination << std::endl
+                << "     involved actors:    " << actor << " and " << *cit << std::endl
+                << "     recombination uses: " << usedInterfaces;
     
             // Update return list and use the current instance of the newly inferred actor type
             recombinations.push_back(actorFromRecombination);
