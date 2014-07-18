@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdexcept>
 #include <stdint.h>
+#include <math.h>
 #include <base/Logging.hpp>
 
 namespace base {
@@ -61,6 +62,7 @@ private:
     // Binary code to define the current combination
     // 1 stands for present items, 0 for not present items
     uint64_t mCurrentCombination;
+    uint64_t mMaxCombination;
 
     typedef std::vector<size_t> Draw;
     Draw mDraw;
@@ -106,6 +108,7 @@ public:
         : mItems(uniqueItems)
         , mSizeOfDraw(sizeOfDraw)
         , mCurrentCombination(0)
+        , mMaxCombination(pow(2,mItems.size()))
         , mType(type)
         , mNumberOfCombinations(0)
         , mFoundCombinations(0)
@@ -120,20 +123,36 @@ public:
 
     bool next()
     {
-        if(mFoundCombinations >= mNumberOfCombinations)
-        {
-            return false;
-        }
-
-        ++mCurrentCombination;
-        mDraw = getDraw();
         while(true)
         {
+            if(mFoundCombinations >= mNumberOfCombinations)
+            {
+                return false;
+            }
+
+            if(mMaxCombination <= mNumberOfCombinations)
+            {
+                LOG_ERROR_S << "base::combinatorics::Combination: maximum required representation reached: internal error: '" << mNumberOfCombinations << "' vs. '" << mMaxCombination << "'" << std::endl
+                    << "    items size: " << mItems.size() << std::endl
+                    << "    draw size: " << mSizeOfDraw;
+
+                throw std::runtime_error("base::combinatorics::Combination: maximum required representation reached: internal error");
+            }
+
+            mDraw = getDraw();
+            ++mCurrentCombination;
+
+            size_t currentDrawSize = mDraw.size();
+            if(currentDrawSize == 0)
+            {
+                continue;
+            }
+
             switch(mType)
             {
                 case EXACT:
                 {
-                    if(mDraw.size() == mSizeOfDraw)
+                    if(currentDrawSize == mSizeOfDraw)
                     {
                         ++mFoundCombinations;
                         return true;
@@ -142,7 +161,7 @@ public:
                 }
                 case MIN:
                 {
-                    if(mDraw.size() >= mSizeOfDraw)
+                    if(currentDrawSize >= mSizeOfDraw)
                     {
                         ++mFoundCombinations;
                         return true;
@@ -151,7 +170,7 @@ public:
                 }
                 case MAX:
                 {
-                    if(mDraw.size() <= mSizeOfDraw)
+                    if(currentDrawSize <= mSizeOfDraw)
                     {
                         ++mFoundCombinations;
                         return true;
@@ -209,9 +228,7 @@ public:
     uint32_t numberOfCombinations(uint32_t drawSize) const
     {
         uint32_t nominator = factorial(mItems.size());
-        LOG_DEBUG_S << "Items: " << mItems.size();
         uint32_t denominator = factorial(mItems.size() - drawSize)*factorial(drawSize);
-        LOG_DEBUG_S << "denominator: " << denominator;
         return nominator / denominator;
     }
 };

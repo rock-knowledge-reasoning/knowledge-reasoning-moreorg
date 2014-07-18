@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include <owl_om/Combinatorics.hpp>
+#include <owl_om/owlapi/model/IRI.hpp>
 #include <sstream>
 
 using namespace base::combinatorics;
@@ -24,29 +25,98 @@ BOOST_AUTO_TEST_CASE(it_should_generate_permutations)
     } while(permutation.next());
 }
 
-BOOST_AUTO_TEST_CASE(it_should_generate_combinations)
+BOOST_AUTO_TEST_CASE(it_should_generate_combinations_int)
 {
-    std::vector<int> items;
-    items.push_back(1);
-    items.push_back(2);
-    items.push_back(0);
-    items.push_back(4);
-
-    Combination<int> combination(items,items.size(), Combination<int>::MAX);
-    //BOOST_REQUIRE_MESSAGE( combination.numberOfCombinations(4) == 1, "Expect 1 got " << combination.numberOfCombinations(4));
-    BOOST_TEST_MESSAGE( "Number of expected combinations: " << combination.numberOfCombinations() );
-
-    do
     {
-        std::vector<int> combinatedItems = combination.current();
-        std::vector<int>::const_iterator cit = combinatedItems.begin();
-        std::stringstream ss;
-        for(; cit != combinatedItems.end(); ++cit)
+        std::vector<int> items;
+        for(size_t i = 0; i < 9; ++i)
         {
-            ss << *cit;
+            items.push_back(i);
         }
-        BOOST_TEST_MESSAGE("Combination: " << ss.str());
-    } while(combination.next());
+
+        std::vector< Combination<int>::Type> types;
+        types.push_back(Combination<int>::MAX);
+        types.push_back(Combination<int>::MIN);
+        types.push_back(Combination<int>::EXACT);
+
+        for(size_t t = 0; t < types.size(); ++t)
+        {
+            size_t count = 0;
+            Combination<int> combination(items,items.size() - 1, types[t]);
+            while(combination.next())
+            {
+                std::vector<int> combinatedItems = combination.current();
+                std::vector<int>::const_iterator cit = combinatedItems.begin();
+                std::stringstream ss;
+                for(; cit != combinatedItems.end(); ++cit)
+                {
+                    ss << *cit;
+                }
+                ++count;
+                BOOST_TEST_MESSAGE("Combination: " << ss.str());
+            }
+            BOOST_REQUIRE_MESSAGE( count == combination.numberOfCombinations(), "Number of expected combinations: " << combination.numberOfCombinations() << " vs. actual " << count );
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(it_should_generate_combinations_iri)
+{
+    {
+        using namespace owlapi::model;
+
+        IRIList items;
+        for(size_t i = 0; i <= 15; ++i)
+        {
+            std::stringstream ss;
+            ss << "http://test#" << i;
+            items.push_back( IRI(ss.str()));
+        }
+
+        size_t count = 0;
+        Combination<IRI> combination(items,items.size(), Combination<IRI>::MAX);
+        while(combination.next());
+        {
+            IRIList combinatedItems = combination.current();
+            IRIList::const_iterator cit = combinatedItems.begin();
+            std::stringstream ss;
+            for(; cit != combinatedItems.end(); ++cit)
+            {
+                ss << *cit << " ";
+            }
+            ++count;
+            BOOST_TEST_MESSAGE("Combination: " << ss.str());
+        }
+        BOOST_REQUIRE_MESSAGE( count == combination.numberOfCombinations(), "Number of expected combinations: " << combination.numberOfCombinations() << " vs. actual " << count );
+    }
+    //{
+    //    using namespace owlapi::model;
+
+    //    IRIList items;
+    //    for(size_t i = 0; i <= 15; ++i)
+    //    {
+    //        std::stringstream ss;
+    //        ss << "http://test#" << i;
+    //        items.push_back( IRI(ss.str()));
+    //    }
+
+
+    //    size_t count = 0;
+    //    Combination<IRI> combination(items,2, Combination<IRI>::MAX);
+    //    while(combination.next());
+    //    {
+    //        IRIList combinatedItems = combination.current();
+    //        IRIList::const_iterator cit = combinatedItems.begin();
+    //        std::stringstream ss;
+    //        for(; cit != combinatedItems.end(); ++cit)
+    //        {
+    //            ss << *cit << " ";
+    //        }
+    //        ++count;
+    //        BOOST_TEST_MESSAGE("Combination: " << ss.str());
+    //    }
+    //    BOOST_REQUIRE_MESSAGE( count == combination.numberOfCombinations(), "Number of expected combinations: " << combination.numberOfCombinations() << " vs. actual " << count );
+    //}
 
     
 

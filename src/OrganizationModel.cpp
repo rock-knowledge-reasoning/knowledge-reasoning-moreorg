@@ -1,11 +1,19 @@
 #include "OrganizationModel.hpp"
 #include <algorithm>
 #include <boost/assign/list_of.hpp>
+#include <boost/lambda/lambda.hpp>
 #include <owl_om/Vocabulary.hpp>
+#include <owl_om/Combinatorics.hpp>
 
 using namespace owl_om::vocabulary;
 
 namespace owl_om {
+
+bool InterfaceConnection::operator<(const InterfaceConnection& other) const
+{
+    return begin < other.begin && end < other.end;
+
+}
 
 OrganizationModel::OrganizationModel()
     : mpOntology( new Ontology())
@@ -16,10 +24,12 @@ OrganizationModel::OrganizationModel(const std::string& filename, bool runInfere
     mpOntology = Ontology::fromFile(filename);
     mpOntology->refresh();
 
-    if(runInference)
-    {
-        runInferenceEngine();
-    }
+    generateInterfaceCombinations();
+
+//    if(runInference)
+//    {
+//        runInferenceEngine();
+//    }
 }
 
 void OrganizationModel::createInstance(const IRI& instanceName, const IRI& klass, const IRI& model)
@@ -70,7 +80,8 @@ void OrganizationModel::runInferenceEngine()
 bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& resourceRequirements)
 {
     IRI resourceProviderModel = getResourceModel(resourceProvider);
-    IRIList availableResources = mpOntology->allRelatedInstances(resourceProviderModel, OM::has());
+
+    IRIList availableResources = mpOntology->allRelatedInstances(resourceProvider, OM::has());
     IRIList availableServices = mpOntology->allRelatedInstances(resourceProviderModel, OM::provides());
 
     IRI requirementModel = getResourceModel(resourceRequirements);
@@ -155,8 +166,7 @@ bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherR
 
     // First extract available interfaces from the associated models
     {
-        IRI resourceModel = getResourceModel(resource);
-        IRIList interfaces = mpOntology->allRelatedInstances(resourceModel, OM::has());
+        IRIList interfaces = mpOntology->allRelatedInstances(resource, OM::has());
         IRIList::const_iterator cit = interfaces.begin();
         for(; cit != interfaces.end(); ++cit)
         {
@@ -168,8 +178,7 @@ bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherR
         }
     }
     {
-        IRI resourceModel = getResourceModel(otherResource);
-        IRIList interfaces = mpOntology->allRelatedInstances(resourceModel, OM::has());
+        IRIList interfaces = mpOntology->allRelatedInstances(otherResource, OM::has());
         IRIList::const_iterator cit = interfaces.begin();
         for(; cit != interfaces.end(); ++cit)
         {
@@ -223,7 +232,7 @@ CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, cons
 
     {
         // Identify the list of unused interfaces for 'instance'
-        IRIList interfaces = mpOntology->allRelatedInstances( getResourceModel(instance), OM::has());
+        IRIList interfaces = mpOntology->allRelatedInstances( instance, OM::has());
         IRIList::const_iterator cit = interfaces.begin();
         for(; cit != interfaces.end(); ++cit)
         {
@@ -242,7 +251,7 @@ CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, cons
     }
     {
         // Identify the list of unused interfaces for 'otherInstance'
-        IRIList interfaces = mpOntology->allRelatedInstances( getResourceModel(otherInstance), OM::has());
+        IRIList interfaces = mpOntology->allRelatedInstances( otherInstance, OM::has());
         IRIList::const_iterator cit = interfaces.begin();
         for(; cit != interfaces.end(); ++cit)
         {
@@ -439,6 +448,94 @@ IRI OrganizationModel::getResourceModel(const IRI& instance)
 bool OrganizationModel::isSameResourceModel(const IRI& instance, const IRI& otherInstance)
 {
     return getResourceModel(instance) == getResourceModel(otherInstance);
+}
+
+InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
+{
+    using namespace base::combinatorics;
+
+    // 1. permute through all interfaces and create 'links'/connections
+    //    - make sure constraints hold:
+    //        - no self-connection (starting at pointing at same actor)
+    //        - compatible interface models 
+    // 2. use connections to compute combinations of order 1 to N-1, where N is the number of actors
+    //    - N-1 since two actors can have only 1 connection
+    //    
+
+    IRIList interfaces = mpOntology->allInstancesOf( OM::Interface() );
+    InterfaceConnectionList validConnections;
+
+    if(interfaces.size() < 2)
+    {
+        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough interfaces available, i.e. no more than 1");
+    }
+
+    // Get all basic actors to get number of actors and maximum number of connections
+    // we have to account for
+    IRIList actors = mpOntology->allInstancesOf( OM::ActorModel() );
+    if(actors.size() < 2)
+    {
+        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors available, i.e. no more than 1");
+    }
+
+    Combination<IRI> interfaceCombinations(interfaces, 2, Combination<IRI>::EXACT);
+    do {
+
+        IRIList match = interfaceCombinations.current();
+        LOG_WARN_S << "MATCH size: " << match.size() << " from " << interfaces.size();
+        if(match.size() != 2)
+        {
+            throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: no two interfaces available to create connection");
+        }
+        IRIList parents0 = mpOntology->allInverseRelatedInstances(match[0], OM::has());
+        IRIList parents1 = mpOntology->allInverseRelatedInstances(match[1], OM::has());
+
+        if(parents0 == parents1)
+        {
+            // Reject: self connection since start/end belong to the same actor
+            continue;
+        }
+
+        if( ! mpOntology->isRelatedTo( getResourceModel( match[0] ), OM::compatibleWith(), getResourceModel( match[1] )) )
+        {
+            // Reject: interfaces are not compatible with each other
+            continue;
+        }
+
+        validConnections.push_back( InterfaceConnection(match[0], match[1]) );
+    } while( interfaceCombinations.next() );
+
+
+    size_t maximumNumberOfConnections =  actors.size() - 1;
+
+    // Compute valid combinations, i.e.
+    //    - each interface is only used once in a combination
+    InterfaceCombinationList validCombinations; 
+    Combination<InterfaceConnection> connections( validConnections, maximumNumberOfConnections, Combination<InterfaceConnection>::MAX);
+    do {
+        IRIList usedInterfaces;
+        InterfaceConnectionList connectionList = connections.current();
+        InterfaceConnectionList::const_iterator cit = connectionList.begin();
+        bool valid = true;
+        for(; cit != connectionList.end(); ++cit)
+        {
+            InterfaceConnection connection = *cit;
+
+            IRIList::const_iterator uit = std::find_if(usedInterfaces.begin(), usedInterfaces.end(), boost::lambda::_1 == connection.begin || boost::lambda::_1 == connection.end );
+            if(uit != usedInterfaces.end())
+            {
+                valid = false;
+                break;
+            }
+        }
+        if(valid)
+        {
+            validCombinations.push_back(connectionList);
+        }
+    } while( connections.next() );
+
+    LOG_DEBUG_S << "Found '" << validCombinations.size() << "' valid combinations";
+    return validCombinations;
 }
 
 }

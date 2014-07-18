@@ -7,6 +7,24 @@ namespace owl_om {
 
 typedef std::vector<IRIList> CandidatesList;
 
+struct InterfaceConnection
+{
+    InterfaceConnection() {}
+
+    InterfaceConnection(const IRI& interface0, const IRI& interface1)
+        : begin(interface0)
+        , end(interface1)
+    {}
+
+    IRI begin;
+    IRI end;
+
+    bool operator<(const InterfaceConnection& other) const;
+};
+
+typedef std::vector< InterfaceConnection > InterfaceConnectionList;
+typedef std::vector< InterfaceConnectionList > InterfaceCombinationList;
+
 class OrganizationModel
 {
     Ontology::Ptr mpOntology;
@@ -85,6 +103,11 @@ public:
     IRI getResourceModel(const IRI& instance);
     
     bool isSameResourceModel(const IRI& instance, const IRI& otherInstance);
+
+    /**
+     * Generate a combination list based on actor interface
+     */
+    InterfaceCombinationList generateInterfaceCombinations();
 };
 
 //
