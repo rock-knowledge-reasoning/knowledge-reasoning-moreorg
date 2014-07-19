@@ -5,6 +5,13 @@
 
 using namespace base::combinatorics;
 
+BOOST_AUTO_TEST_CASE(it_should_compute_binomial_coefficient)
+{
+    BOOST_REQUIRE_MESSAGE( 0 == binomialCoefficient(0,1), "1 out of 0 should be 0");
+    BOOST_REQUIRE_MESSAGE( 1 == binomialCoefficient(10,10), "n out of n should be 1");
+    BOOST_REQUIRE_MESSAGE( 10 == binomialCoefficient(10,1), "1 out of n should be n");
+    BOOST_REQUIRE_MESSAGE( 220 == binomialCoefficient(12,3), "3 out of 12 should be 220: was " << binomialCoefficient(12,3));
+}
 
 BOOST_AUTO_TEST_CASE(it_should_generate_permutations)
 {

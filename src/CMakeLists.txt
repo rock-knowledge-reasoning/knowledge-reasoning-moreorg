@@ -10,7 +10,8 @@ set(ICU_LIBS icutu
 )
 
 rock_library(owl_om
-    SOURCES KnowledgeBase.cpp
+    SOURCES Combinatorics.cpp
+        KnowledgeBase.cpp
         OrganizationModel.cpp
         Ontology.cpp
         db/FileBackend.cpp

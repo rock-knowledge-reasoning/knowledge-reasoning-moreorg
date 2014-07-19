@@ -11,10 +11,14 @@
 namespace base {
 namespace combinatorics {
 
-inline size_t factorial(size_t n) 
+inline uint64_t factorial(uint32_t n)
 {
     return (n == 1 || n == 0) ? 1 : factorial(n-1) * n;
 }
+
+// Compute the binomial coefficient
+// see http://de.wikipedia.org/wiki/Binomialkoeffizient for details
+uint64_t binomialCoefficient(uint32_t n, uint32_t k);
 
 template <class T>
 class Permutation
@@ -196,18 +200,19 @@ public:
 
     uint32_t numberOfCombinations() const
     {
+        uint32_t numberOfItems = mItems.size();
         switch(mType)
         {
             case EXACT:
             {
-                return numberOfCombinations(mSizeOfDraw);
+                return binomialCoefficient(numberOfItems, mSizeOfDraw);
             }
             case MIN:
             {
                 uint32_t sum = 0;
                 for(uint32_t i = mSizeOfDraw; i <= mItems.size(); ++i)
                 {
-                    sum += numberOfCombinations(i);
+                    sum += binomialCoefficient(numberOfItems, i);
                 }
                 return sum;
             }
@@ -216,20 +221,13 @@ public:
                 uint32_t sum = 0;
                 for(uint32_t i = 1; i <= mSizeOfDraw; ++i)
                 {
-                    sum += numberOfCombinations(i);
+                    sum += binomialCoefficient(numberOfItems, i);
                 }
                 return sum;
             }
             default:
                 throw std::runtime_error("Invalid type given to switch");
         } // end switch
-    }
-
-    uint32_t numberOfCombinations(uint32_t drawSize) const
-    {
-        uint32_t nominator = factorial(mItems.size());
-        uint32_t denominator = factorial(mItems.size() - drawSize)*factorial(drawSize);
-        return nominator / denominator;
     }
 };
 
