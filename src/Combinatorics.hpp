@@ -52,148 +52,145 @@ public:
     size_t numberOfPermutations() const { return factorial(mItems.size()); }
 };
 
+/**
+ * \brief Combination of a unique item map Binomialcoefficient (n k)
+ * \tparam Type of items that should be combined
+ * \details A code example
+ * \verbatim 
+   #include <vector>
+   #include <string>
+
+   std::vector<std::string> items;
+   items.push_back("A");
+   items.push_back("B");
+   items.push_back("C");
+
+   Combination<std::string> combinations(items, Combination<std::string>::EXACT);
+   do {
+       std::vector<std::string> combination = combinations.current();
+       ...
+   } while(combinations.next());
+ \endverbatim
+ */
 template <class T>
 class Combination
 {
 public:
     typedef typename std::vector<T> ItemList;
-    enum Type { EXACT = 0, MAX, MIN };
+    enum Mode { EXACT = 0, MAX, MIN };
 
 private:
     std::vector<T> mItems;
+    uint32_t mSizeOfDraw;
 
-    size_t mSizeOfDraw;
-    // Binary code to define the current combination
-    // 1 stands for present items, 0 for not present items
-    uint64_t mCurrentCombination;
-    uint64_t mMaxCombination;
+    typedef std::vector<bool> Draw;
+    typedef std::vector< Draw > DrawList;
 
-    typedef std::vector<size_t> Draw;
-    Draw mDraw;
-
-
-    Type mType;
-    size_t mNumberOfCombinations;
-    uint64_t mFoundCombinations;
-
-    std::vector<size_t> getDraw()
-    {
-        uint64_t binaryCode = mCurrentCombination;
-        std::vector<size_t> drawPositions;
-
-        size_t position = 0;
-        std::stringstream ss;
-        while(true)
-        {
-            if( 0x01 & binaryCode)
-            {
-                ss << 1;
-                drawPositions.push_back(position);
-            } else {
-                ss << 0;
-            }
-
-            binaryCode = binaryCode >> 1;
-            if(binaryCode == 0)
-            {
-                return drawPositions;
-            }
-            ++position;
-        }
-        return drawPositions;
-    }
+    Mode mMode;
+    DrawList mDrawList;
+    DrawList::iterator mDrawListIterator;
 
 public:
     /**
-     * \class Combination of a unique item map
-     * \param itemMap map of unique item types
+     * \brief Combination of a unique item map Binomialcoefficient (n k)
+     * \param uniqueItems Map of unique items
+     * \param sizeOfDraw Size of the draw (k)
+     * \param mode One of Mode to get the exact type of combination all up to (MAX) or from to maximum use (MIN)
      */
-    Combination(const std::vector<T>& uniqueItems, size_t sizeOfDraw, Type type = EXACT)
+    Combination(const std::vector<T>& uniqueItems, size_t sizeOfDraw, Mode mode = EXACT)
         : mItems(uniqueItems)
         , mSizeOfDraw(sizeOfDraw)
-        , mCurrentCombination(0)
-        , mMaxCombination(pow(2,mItems.size()))
-        , mType(type)
-        , mNumberOfCombinations(0)
-        , mFoundCombinations(0)
+        , mMode(mode)
     {
         std::sort(mItems.begin(), mItems.end());
-        mNumberOfCombinations = numberOfCombinations();
         if(sizeOfDraw > uniqueItems.size())
         {
             throw std::invalid_argument("base::combinatorics::Combination: size of draw is greater than number of available items");
         }
+
+        uint32_t numberOfItems = mItems.size();
+        switch(mMode)
+        {
+            case EXACT:
+            {
+                mDrawList.push_back( createStartDraw(numberOfItems, mSizeOfDraw) );
+                break;
+            }
+            case MIN:
+            {
+                for(uint32_t i = mSizeOfDraw; i <= numberOfItems; ++i)
+                {
+                    mDrawList.push_back( createStartDraw(numberOfItems, i) );
+                }
+                break;
+            }
+            case MAX:
+            {
+                for(uint32_t i = 1; i <= mSizeOfDraw; ++i)
+                {
+                    mDrawList.push_back( createStartDraw(numberOfItems, i) );
+                }
+                break;
+            }
+            default:
+                throw std::runtime_error("Invalid type given to switch");
+
+        }
+        LOG_DEBUG_S << "Creating Combination: n = " << numberOfItems << ", k = " << sizeOfDraw << std::endl
+            << "    expected number of combinations for (mode: " << mode << "): " << numberOfCombinations() << std::endl;
+
+        mDrawListIterator = mDrawList.begin();
+    }
+
+    Draw createStartDraw(uint32_t n, uint32_t k)
+    {
+        Draw draw;
+        for(uint32_t i = 0; i < k; ++i)
+        {
+            draw.push_back(true);
+        }
+        for(uint32_t i = k; i < n; ++i)
+        {
+            draw.push_back(false);
+        }
+        std::sort(draw.begin(), draw.end());
+        return draw;
     }
 
     bool next()
     {
-        while(true)
+        if(mDrawListIterator == mDrawList.end())
         {
-            if(mFoundCombinations >= mNumberOfCombinations)
-            {
-                return false;
-            }
-
-            if(mMaxCombination <= mNumberOfCombinations)
-            {
-                LOG_ERROR_S << "base::combinatorics::Combination: maximum required representation reached: internal error: '" << mNumberOfCombinations << "' vs. '" << mMaxCombination << "'" << std::endl
-                    << "    items size: " << mItems.size() << std::endl
-                    << "    draw size: " << mSizeOfDraw;
-
-                throw std::runtime_error("base::combinatorics::Combination: maximum required representation reached: internal error");
-            }
-
-            mDraw = getDraw();
-            ++mCurrentCombination;
-
-            size_t currentDrawSize = mDraw.size();
-            if(currentDrawSize == 0)
-            {
-                continue;
-            }
-
-            switch(mType)
-            {
-                case EXACT:
-                {
-                    if(currentDrawSize == mSizeOfDraw)
-                    {
-                        ++mFoundCombinations;
-                        return true;
-                    }
-                    break;
-                }
-                case MIN:
-                {
-                    if(currentDrawSize >= mSizeOfDraw)
-                    {
-                        ++mFoundCombinations;
-                        return true;
-                    }
-                    break;
-                }
-                case MAX:
-                {
-                    if(currentDrawSize <= mSizeOfDraw)
-                    {
-                        ++mFoundCombinations;
-                        return true;
-                    }
-                    break;
-                }
-                default:
-                    throw std::runtime_error("Invalid type given to switch");
-            } // end switch
+            return false;
         }
+
+        Draw& currentDraw = *mDrawListIterator;
+        if(! std::next_permutation(currentDraw.begin(), currentDraw.end()) )
+        {
+            return ++mDrawListIterator != mDrawList.end();
+        }
+        return true;
     }
 
     ItemList current() const
     {
         ItemList draw;
-        Draw::const_iterator cit = mDraw.begin();
-        for(; cit != mDraw.end(); ++cit)
+        if(mDrawListIterator == mDrawList.end())
         {
-            draw.push_back( mItems[*cit] );
+            return draw;
+        }
+
+        const Draw& currentDraw = *mDrawListIterator;
+        Draw::const_iterator cit = currentDraw.begin();
+
+        uint32_t position = 0;
+        for(; cit != currentDraw.end(); ++cit)
+        {
+            if( *cit )
+            {
+                draw.push_back( mItems[position] );
+            }
+            ++position;
         }
         return draw;
     }
@@ -201,7 +198,7 @@ public:
     uint32_t numberOfCombinations() const
     {
         uint32_t numberOfItems = mItems.size();
-        switch(mType)
+        switch(mMode)
         {
             case EXACT:
             {

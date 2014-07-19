@@ -41,16 +41,16 @@ BOOST_AUTO_TEST_CASE(it_should_generate_combinations_int)
             items.push_back(i);
         }
 
-        std::vector< Combination<int>::Type> types;
-        types.push_back(Combination<int>::MAX);
-        types.push_back(Combination<int>::MIN);
-        types.push_back(Combination<int>::EXACT);
+        std::vector< Combination<int>::Mode> modes;
+        modes.push_back(Combination<int>::MAX);
+        modes.push_back(Combination<int>::MIN);
+        modes.push_back(Combination<int>::EXACT);
 
-        for(size_t t = 0; t < types.size(); ++t)
+        for(size_t t = 0; t < modes.size(); ++t)
         {
             size_t count = 0;
-            Combination<int> combination(items,items.size() - 1, types[t]);
-            while(combination.next())
+            Combination<int> combination(items,items.size() - 1, modes[t]);
+            do
             {
                 std::vector<int> combinatedItems = combination.current();
                 std::vector<int>::const_iterator cit = combinatedItems.begin();
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(it_should_generate_combinations_int)
                 }
                 ++count;
                 BOOST_TEST_MESSAGE("Combination: " << ss.str());
-            }
+            } while(combination.next());
             BOOST_REQUIRE_MESSAGE( count == combination.numberOfCombinations(), "Number of expected combinations: " << combination.numberOfCombinations() << " vs. actual " << count );
         }
     }
@@ -80,50 +80,65 @@ BOOST_AUTO_TEST_CASE(it_should_generate_combinations_iri)
             items.push_back( IRI(ss.str()));
         }
 
-        size_t count = 0;
-        Combination<IRI> combination(items,items.size(), Combination<IRI>::MAX);
-        while(combination.next());
+        std::vector< Combination<IRI>::Mode> modes;
+        modes.push_back(Combination<IRI>::MAX);
+        modes.push_back(Combination<IRI>::MIN);
+        modes.push_back(Combination<IRI>::EXACT);
+
+        for(size_t t = 0; t < modes.size(); ++t)
         {
-            IRIList combinatedItems = combination.current();
-            IRIList::const_iterator cit = combinatedItems.begin();
-            std::stringstream ss;
-            for(; cit != combinatedItems.end(); ++cit)
+            size_t count = 0;
+            Combination<IRI> combination(items,items.size(), modes[t]);
+            do
             {
-                ss << *cit << " ";
-            }
-            ++count;
-            BOOST_TEST_MESSAGE("Combination: " << ss.str());
+                IRIList combinatedItems = combination.current();
+                IRIList::const_iterator cit = combinatedItems.begin();
+                std::stringstream ss;
+                for(; cit != combinatedItems.end(); ++cit)
+                {
+                    ss << *cit << " ";
+                }
+                ++count;
+                BOOST_TEST_MESSAGE("Combination: " << ss.str());
+            } while(combination.next());
+            BOOST_REQUIRE_MESSAGE( count == combination.numberOfCombinations(), "Number of expected combinations: " << combination.numberOfCombinations() << " vs. actual " << count );
         }
-        BOOST_REQUIRE_MESSAGE( count == combination.numberOfCombinations(), "Number of expected combinations: " << combination.numberOfCombinations() << " vs. actual " << count );
     }
-    //{
-    //    using namespace owlapi::model;
+    {
+        using namespace owlapi::model;
 
-    //    IRIList items;
-    //    for(size_t i = 0; i <= 15; ++i)
-    //    {
-    //        std::stringstream ss;
-    //        ss << "http://test#" << i;
-    //        items.push_back( IRI(ss.str()));
-    //    }
+        IRIList items;
+        for(size_t i = 0; i <= 15; ++i)
+        {
+            std::stringstream ss;
+            ss << "http://test#" << i;
+            items.push_back( IRI(ss.str()));
+        }
 
+        std::vector< Combination<IRI>::Mode> modes;
+        modes.push_back(Combination<IRI>::MAX);
+        modes.push_back(Combination<IRI>::MIN);
+        modes.push_back(Combination<IRI>::EXACT);
 
-    //    size_t count = 0;
-    //    Combination<IRI> combination(items,2, Combination<IRI>::MAX);
-    //    while(combination.next());
-    //    {
-    //        IRIList combinatedItems = combination.current();
-    //        IRIList::const_iterator cit = combinatedItems.begin();
-    //        std::stringstream ss;
-    //        for(; cit != combinatedItems.end(); ++cit)
-    //        {
-    //            ss << *cit << " ";
-    //        }
-    //        ++count;
-    //        BOOST_TEST_MESSAGE("Combination: " << ss.str());
-    //    }
-    //    BOOST_REQUIRE_MESSAGE( count == combination.numberOfCombinations(), "Number of expected combinations: " << combination.numberOfCombinations() << " vs. actual " << count );
-    //}
+        for(size_t t = 0; t < modes.size(); ++t)
+        {
+            size_t count = 0;
+            Combination<IRI> combination(items,2, modes[t]);
+            do
+            {
+                IRIList combinatedItems = combination.current();
+                IRIList::const_iterator cit = combinatedItems.begin();
+                std::stringstream ss;
+                for(; cit != combinatedItems.end(); ++cit)
+                {
+                    ss << *cit << " ";
+                }
+                ++count;
+                BOOST_TEST_MESSAGE("Combination: " << ss.str());
+            } while(combination.next());
+            BOOST_REQUIRE_MESSAGE( count == combination.numberOfCombinations(), "Number of expected combinations: " << combination.numberOfCombinations() << " vs. actual " << count );
+        }
+    }
 
     
 
