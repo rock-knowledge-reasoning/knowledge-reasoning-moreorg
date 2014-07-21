@@ -93,7 +93,7 @@ std::string IRI::getFragment() const
     size_t npos = mRemainder.find_last_of("#");
     if(npos == std::string::npos)
     {
-        throw std::invalid_argument("owlapi::model::IRI::getFragment IRI does not have a fragment");
+        throw std::invalid_argument("owlapi::model::IRI::getFragment IRI " + toQuotedString() + " does not have a fragment");
     }
 
     return mRemainder.substr(npos+1);
