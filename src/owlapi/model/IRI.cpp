@@ -155,9 +155,9 @@ std::ostream& operator<<(std::ostream& os, const owlapi::model::IRI& iri)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<owlapi::model::IRI>& iris)
+std::ostream& operator<<(std::ostream& os, const IRIList& iris)
 {
-    std::vector<owlapi::model::IRI>::const_iterator cit = iris.begin();
+    IRIList::const_iterator cit = iris.begin();
     os << "[";
     for(; cit != iris.end(); ++cit)
     {
@@ -171,9 +171,22 @@ std::ostream& operator<<(std::ostream& os, const std::vector<owlapi::model::IRI>
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<owlapi::model::IRI> >& iris)
+std::ostream& operator<<(std::ostream& os, const IRISet& iris)
 {
-    std::vector< std::vector<owlapi::model::IRI> >::const_iterator cit = iris.begin();
+    IRISet::const_iterator cit = iris.begin();
+    os << "[";
+    for(; cit != iris.end(); ++cit)
+    {
+        os << cit->toString();
+        os << ", ";
+    }
+    os << "]";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector< IRIList >& iris)
+{
+    std::vector< IRIList >::const_iterator cit = iris.begin();
     for(; cit != iris.end(); ++cit)
     {
         os << *cit << std::endl;

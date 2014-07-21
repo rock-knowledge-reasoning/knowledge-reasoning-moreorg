@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <set>
 #include <owl_om/owlapi/model/URI.hpp>
 
 namespace owlapi {
@@ -106,6 +107,7 @@ public:
 };
 
 typedef std::vector<IRI> IRIList;
+typedef std::set<IRI> IRISet;
 
 /**
  * Stream an IRI
@@ -115,12 +117,17 @@ std::ostream& operator<<(std::ostream& os, const owlapi::model::IRI& iri);
 /**
  * Stream list of IRIs
  */
-std::ostream& operator<<(std::ostream& os, const std::vector<owlapi::model::IRI>& iris);
+std::ostream& operator<<(std::ostream& os, const IRIList& iris);
+
+/**
+ * Stream set of IRIs
+ */
+std::ostream& operator<<(std::ostream& os, const IRISet& iris);
 
 /**
  * Stream list of list of IRIs
  */
-std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<owlapi::model::IRI> >& iris);
+std::ostream& operator<<(std::ostream& os, const std::vector< IRIList >& iris);
 
 } // end namespace model
 } // end namespace owlapi
