@@ -14,6 +14,7 @@ Ontology::Ptr Ontology::fromFile(const std::string& filename)
 {
     Ontology::Ptr ontology(new Ontology());
     ontology->mSparqlInterface = new db::SopranoDB(filename);
+    ontology->reload();
     ontology->refresh();
 
     return ontology;
@@ -32,7 +33,7 @@ db::query::Results Ontology::findAll(const db::query::Variable& subject, const d
     return results;
 }
 
-void Ontology::refresh()
+void Ontology::reload()
 {
     using namespace owl_om::db::query;
 

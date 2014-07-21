@@ -38,7 +38,7 @@ public:
     /**
      * Update the ontology
      */
-    void refresh();
+    void reload();
 
     /**
      * Find all items that match the query
