@@ -110,10 +110,6 @@ OrganizationModel::OrganizationModel(const std::string& filename, bool runInfere
     {
         runInferenceEngine();
     }
-//    if(runInference)
-//    {
-//        runInferenceEngine();
-//    }
 }
 
 IRI OrganizationModel::createNewActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id)
