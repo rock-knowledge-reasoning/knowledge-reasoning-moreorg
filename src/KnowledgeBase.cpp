@@ -622,7 +622,7 @@ IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& rel
             const TNamedEntry* entry = *cit;
             IRI iri( entry->getName() );
 
-            if( klass == "TOP" || isInstanceOf(iri, klass) )
+            if( klass.empty() || isInstanceOf(iri, klass) )
             {
                 individuals.push_back(iri);
             }

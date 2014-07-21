@@ -380,7 +380,7 @@ public:
      * \param klass Klass type the relation should map to
      * \return list of instances that are related to instance via the relationProperty
      */
-    IRIList allRelatedInstances(const IRI& instance, const IRI& relationProperty, const IRI& klass = "TOP");
+    IRIList allRelatedInstances(const IRI& instance, const IRI& relationProperty, const IRI& klass = IRI());
 
     /**
      * Retrieve all related instances regarding a single instance and a selected property
