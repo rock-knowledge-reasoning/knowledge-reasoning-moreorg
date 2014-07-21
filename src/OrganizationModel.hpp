@@ -1,6 +1,7 @@
 #ifndef OWL_OM_ORGANIZATION_MODEL_HPP
 #define OWL_OM_ORGANIZATION_MODEL_HPP
 
+#include <stdint.h>
 #include <owl_om/Ontology.hpp>
 
 namespace owl_om {
@@ -19,15 +20,33 @@ struct InterfaceConnection
     IRI begin;
     IRI end;
 
+    IRIList parents;
+
+    void addParent(const IRI& parent);
+    bool sameParents(const InterfaceConnection& other) const;
+
+    /**
+     * Test if the two interface connections use the same interface
+     */
+    bool useSameInterface(const InterfaceConnection& other) const;
+
     bool operator<(const InterfaceConnection& other) const;
+
+    std::string toString() const;
 };
 
 typedef std::vector< InterfaceConnection > InterfaceConnectionList;
 typedef std::vector< InterfaceConnectionList > InterfaceCombinationList;
 
+std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection);
+std::ostream& operator<<(std::ostream& os, const InterfaceConnectionList& list);
+std::ostream& operator<<(std::ostream& os, const InterfaceCombinationList& list);
+
 class OrganizationModel
 {
     Ontology::Ptr mpOntology;
+
+    IRI createNewActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id);
 
 public:
 
@@ -78,21 +97,6 @@ public:
      * Run inference to identify service that are 'provided'
      */
     void runInferenceEngine();
-
-    /** Provide a list of available actors, so that we can bound the actual generation of theoretically
-     * possible combinations
-     *
-     * \return list of available actors
-     */
-    IRIList computeActorsFromRecombination();
-
-    /**
-     * \param actor Base actor which should be recombined with another set of actors
-     * \param otherActors Set of actors using for recombination
-     * \param interfaceBlackList Set of interfaces that are already in use
-     * \return List of new actors that arose from recombination
-     */
-    IRIList recombine(const IRI& actor, const IRIList& otherActors);
 
     /**
      * Reduce list of actor to unique individuals, i.e. removing
