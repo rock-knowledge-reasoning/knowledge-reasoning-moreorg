@@ -117,6 +117,12 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#Location -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Location"/>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Mission -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Mission"/>

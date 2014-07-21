@@ -14,6 +14,7 @@ public:
     VOCABULARY_ADD_WORD(Interface);
     VOCABULARY_ADD_WORD(Service);
     VOCABULARY_ADD_WORD(ServiceModel);
+    VOCABULARY_ADD_WORD(Location);
 
     // Properties
     VOCABULARY_ADD_WORD(dependsOn);
