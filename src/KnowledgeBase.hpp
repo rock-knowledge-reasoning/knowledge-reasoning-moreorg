@@ -23,6 +23,7 @@ namespace restriction {
 // Internationalized Resource Identifier -- simply using a string here for simplicity
 typedef owlapi::model::IRI IRI;
 typedef owlapi::model::IRIList IRIList;
+typedef owlapi::model::IRISet IRISet;
 
 typedef std::map<IRI, ClassExpression > IRIClassExpressionMap;
 typedef std::map<IRI, InstanceExpression > IRIInstanceExpressionMap;
