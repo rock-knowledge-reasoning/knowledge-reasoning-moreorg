@@ -286,7 +286,7 @@ public:
     /**
      * Test if instance is type of a class
      * \param instance Instance identifier
-     * \param klass Class indentifier
+     * \param klass Class identifier
      * \return true if instance is of given klass type, false otherwise
      */
     bool isInstanceOf(const IRI& instance, const IRI& klass);
