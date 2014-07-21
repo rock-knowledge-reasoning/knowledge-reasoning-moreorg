@@ -3,6 +3,7 @@
 
 #include <owl_om/OrganizationModel.hpp>
 #include <pddl_planner/representation/Domain.hpp>
+#include <pddl_planner/representation/Problem.hpp>
 
 namespace owl_om {
 
@@ -16,6 +17,12 @@ public:
      * \return Domain description
      */
     pddl_planner::representation::Domain toDomain(const OrganizationModel& model);
+
+    /**
+     * Convert the existing model to a partial PDDL problem description
+     * \return Problem description
+     */
+    pddl_planner::representation::Problem toProblem(const OrganizationModel& model);
 
     /**
      * Save the organization models domain description to a file

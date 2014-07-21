@@ -3,33 +3,46 @@
 #include <iostream>
 #include <fstream>
 #include <boost/foreach.hpp>
+#include <owl_om/Vocabulary.hpp>
 
 namespace owl_om {
 
 pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationModel& model)
 {
+    using namespace owl_om::vocabulary;
     using namespace pddl_planner;
+
     pddl_planner::representation::Domain domain("om");
     domain.addRequirement("strips");
     domain.addRequirement("equality");
     domain.addRequirement("typing");
     domain.addRequirement("conditional-effects");
 
+    std::string actorType = OM::Actor().getFragment();
+    std::string locationType = OM::Location().getFragment();
     // Adding types to the domain -> concepts
     IRIList klasses = model.ontology()->allClasses();
     BOOST_FOREACH(IRI klass, klasses)
     {
-        domain.addType(klass.toString());
         LOG_DEBUG_S << "Domain: adding klass: '" << klass << "'";
+        try {
+            domain.addType(klass.getFragment());
+            LOG_DEBUG_S << "Domain: adding klass: '" << klass << "' as '" << klass.getFragment() << "'";
+        } catch(const std::invalid_argument& e)
+        {
+            LOG_WARN_S << "Domain: not adding klass: " << e.what();
+        }
     }
 
-    IRIList instances = model.ontology()->allInstances();
+    LOG_DEBUG_S << "All instance of actor";
+    IRIList instances = model.ontology()->allInstancesOf( OM::Actor(), false);
     BOOST_FOREACH(IRI instance, instances)
     {
-        IRI klassType = model.ontology()->typeOf( instance );
         LOG_DEBUG_S << "Domain: adding typed constant: '" << instance << "' of type '" << klassType << "'";
         try {
-            domain.addConstant( pddl_planner::representation::Constant(instance.toString(), klassType.toString()) );
+            LOG_DEBUG_S << "Domain: adding typed constant: '" << instance << "' of type '" << OM::Actor() << "'";
+            std::string instanceName = instance.getFragment();
+            domain.addConstant( pddl_planner::representation::Constant(instanceName, actorType) );
         } catch(const std::invalid_argument& e)
         {
             LOG_WARN_S << e.what();
@@ -38,15 +51,15 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
 
     // Add predicates
     using namespace pddl_planner::representation;
-    domain.addPredicate( Predicate("at", TypedItem("?x","Actor"), TypedItem("?l","Location")) );
-    domain.addPredicate( Predicate("operative", TypedItem("?x","Actor")) );
-    domain.addPredicate( Predicate("embodies", TypedItem("?x","Actor"), TypedItem("?y", "Actor")) );
-    domain.addPredicate( Predicate("mobile", TypedItem("?x","Actor"), TypedItem("?y", "Actor")) );
-    domain.addPredicate( Predicate("provides", TypedItem("?x", "Actor"), TypedItem("?s", "Service")) );
+    domain.addPredicate( Predicate("at", TypedItem("?x", actorType), TypedItem("?l", locationType)) );
+    domain.addPredicate( Predicate("operative", TypedItem("?x",actorType)) );
+    domain.addPredicate( Predicate("embodies", TypedItem("?x",actorType), TypedItem("?y", actorType)) );
+    domain.addPredicate( Predicate("mobile", TypedItem("?x",actorType), TypedItem("?y", actorType)) );
+    domain.addPredicate( Predicate("provides", TypedItem("?x", actorType), TypedItem("?s", actorType)) );
 
     // Add actions
     {
-        pddl_planner::representation::Action move("move", TypedItem("?obj","Actor"), TypedItem("?m", "Location"), TypedItem("?l","Location"));
+        pddl_planner::representation::Action move("move", TypedItem("?obj", actorType), TypedItem("?m", locationType), TypedItem("?l", locationType));
         Expression precondition("and",
             Expression("at","?obj","?m"),
             Expression("not",
@@ -65,7 +78,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
         domain.addAction(move);
     }
     {
-        pddl_planner::representation::Action reconfigure_join("physical_merge", TypedItem("?x", "Actor"), TypedItem("?y", "Actor"), TypedItem("?z", "Actor"));
+        pddl_planner::representation::Action reconfigure_join("physical_merge", TypedItem("?x", actorType), TypedItem("?y", actorType), TypedItem("?z", actorType));
         Expression precondition("and",
                 Expression("not",
                     Expression("=","?x","?y")),
@@ -74,7 +87,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
                 Expression("not",
                     Expression("=","?y","?z")),
                 Expression(EXISTS,
-                    TypedItem("?l","Location"),
+                    TypedItem("?l", locationType),
                     Expression("and",
                         Expression("at","?x","?l"),
                         Expression("at","?y","?l"))
@@ -94,7 +107,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
                     Expression("operative","?x")),
                 Expression("operative","?z"),
                 Expression(FORALL,
-                    TypedItem("?l","Location"),
+                    TypedItem("?l", locationType),
                     Expression("when",
                         Expression("at","?x","?l"),
                         Expression("and",
@@ -113,7 +126,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
     }
     {
 
-        pddl_planner::representation::Action reconfigure_split("physical_split", TypedItem("?x", "Actor"), TypedItem("?y", "Actor"), TypedItem("?z", "Actor"));
+        pddl_planner::representation::Action reconfigure_split("physical_split", TypedItem("?x", actorType), TypedItem("?y", actorType), TypedItem("?z", actorType));
         Expression precondition("and",
                 Expression("not",
                     Expression("=","?x","?y")),
@@ -158,6 +171,39 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
     }
 
     return domain;
+}
+
+pddl_planner::representation::Problem PDDLExporter::toProblem(const OrganizationModel& model)
+{
+    using namespace owl_om::vocabulary;
+
+    using namespace pddl_planner;
+    using namespace pddl_planner::representation;
+
+    pddl_planner::representation::Problem problem("om-partial", toDomain(model));
+
+    IRIList instances = model.ontology()->allInstancesOf( OM::Actor(), false);
+    BOOST_FOREACH(IRI instance, instances)
+    {
+        try {
+            std::string instanceName = instance.getFragment();
+            IRIList relatedActors = model.ontology()->allRelatedInstances(instance, OM::has(), OM::Actor());
+            BOOST_FOREACH(IRI relatedActor, relatedActors)
+            {
+                // embodies: CombinedActor embodies Actor
+                problem.addInitialStatus( Expression("embodies", instanceName, relatedActor.getFragment()) );
+            }
+
+            // mobile: general characteristics
+
+            // provides: Actor provides Capability / Service
+
+        } catch(const std::invalid_argument& e)
+        {
+            LOG_WARN_S << e.what();
+        }
+    }
+    return problem;
 }
 
 
