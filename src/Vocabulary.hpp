@@ -5,9 +5,9 @@
 #include <owl_om/OWLApi.hpp>
 
 #define VOCABULARY_BASE_IRI(X) \
-    static owlapi::model::IRI IRIPrefix() { return owlapi::model::IRI::create(X); }
+    static owlapi::model::IRI IRIPrefix() { static owlapi::model::IRI iri(X); return iri;}
 #define VOCABULARY_ADD_WORD(NAME) \
-    static owlapi::model::IRI NAME() { return IRIPrefix().resolve(#NAME); }
+    static owlapi::model::IRI NAME() { static owlapi::model::IRI name = IRIPrefix().resolve(#NAME); return name; }
 
 namespace owl_om {
 namespace vocabulary {
