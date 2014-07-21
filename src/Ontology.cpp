@@ -95,7 +95,7 @@ void Ontology::reload()
                     inverseFunctionalProperty(subject);
                 } else if (object == vocabulary::OWL::TransitiveProperty())
                 {
-                //    transitiveProperty(object);
+                    transitiveProperty(subject);
                 } else if ( object == vocabulary::OWL::AnnotationProperty())
                 {
                     LOG_DEBUG_S << "Annotation property '" << subject << "' ignored for reasoning";
