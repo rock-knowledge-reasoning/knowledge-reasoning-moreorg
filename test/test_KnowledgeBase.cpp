@@ -321,6 +321,8 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_from_owl)
     // Export PDDL
     PDDLExporter exporter;
     pddl_planner::representation::Domain domain = exporter.toDomain(om);
+    pddl_planner::representation::Problem problem = exporter.toProblem(om);
 
     BOOST_REQUIRE_MESSAGE(true, "Domain:" << domain.toLISP());
+    BOOST_REQUIRE_MESSAGE(true, "Problem:" << problem.toLISP());
 }
