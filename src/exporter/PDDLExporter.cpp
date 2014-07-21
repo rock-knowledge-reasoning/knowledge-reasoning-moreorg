@@ -195,6 +195,12 @@ pddl_planner::representation::Problem PDDLExporter::toProblem(const Organization
             // mobile: general characteristics
 
             // provides: Actor provides Capability / Service
+            IRIList relatedServices = model.ontology()->allRelatedInstances(instance, OM::provides());
+            BOOST_FOREACH(IRI relatedService, relatedServices)
+            {
+                // embodies: CombinedActor embodies Actor
+                problem.addInitialStatus( Expression("provides", instanceName, relatedService.getFragment()) );
+            }
 
         } catch(const std::invalid_argument& e)
         {
