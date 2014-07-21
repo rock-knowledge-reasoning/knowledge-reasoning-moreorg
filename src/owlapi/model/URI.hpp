@@ -12,26 +12,26 @@ namespace model {
 
 class URI
 {
-    UriUriStructA* mUri;
+    std::string mUri;
+    bool mIsAbsolute;
+    bool mIsOpaque;
 
     static std::map<int, std::string> ErrorCodeTxt;
 
+    std::string update(UriUriStructA* uri);
+
 public:
-    URI();
-
-    ~URI();
-
-    URI(const std::string& s);
+    URI(const std::string& s = "");
 
     /**
      * Test if URI is absolute
      */
-    bool isAbsolute() const;
+    bool isAbsolute() const { return mIsAbsolute; }
 
     /**
      * Test if URI is opaque
      */
-    bool isOpaque() const;
+    bool isOpaque() const { return mIsOpaque; }
 
     /**
      * Resolve the provided uri
@@ -39,13 +39,11 @@ public:
      */
     URI resolve(const URI& relativeUri) const;
 
-    void normalize();
-
     /**
      * Get string representation of URI
      * \return URI as string
      */
-    std::string toString() const;
+    std::string toString() const { return mUri; }
 };
 
 } // end namespace model

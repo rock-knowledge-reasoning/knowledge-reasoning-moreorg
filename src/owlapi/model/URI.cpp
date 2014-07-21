@@ -1,7 +1,8 @@
 #include "URI.hpp"
 // http://uriparser.sourceforge.net/doc/html/structUriParserStateStructA.html
-#include <uriparser/Uri.h>
 #include <boost/assign/list_of.hpp>
+#include <base/Logging.hpp>
+#include <uriparser/Uri.h>
 
 namespace owlapi {
 namespace model {
@@ -19,87 +20,60 @@ std::map<int, std::string> URI::ErrorCodeTxt = boost::assign::map_list_of
     (URI_ERROR_REMOVEBASE_REL_BASE, "Remove base relative base: given base is not absolute")
     (URI_ERROR_REMOVEBASE_REL_SOURCE, "Remove base relative source: given base is not absolute");
 
-URI::URI()
-    : mUri(0)
-{}
-
 URI::URI(const std::string& s)
-    : mUri(new UriUriA())
+    : mIsAbsolute(false)
+    , mIsOpaque(false)
 {
-    UriParserStateA state;
-    state.uri = mUri;
-    if (uriParseUriA(&state, s.c_str()) != URI_SUCCESS) 
+    if(!s.empty())
     {
-       uriFreeUriMembersA(mUri);
-       throw std::invalid_argument("owlapi::model::URI: uri" + s + " is invalid: " + ErrorCodeTxt[state.errorCode]);
+        UriUriA uri;
+        UriParserStateA state;
+        state.uri = &uri;
+        if (uriParseUriA(&state, s.c_str()) != URI_SUCCESS)
+        {
+           uriFreeUriMembersA(&uri);
+           throw std::invalid_argument("owlapi::model::URI: uri" + s + " is invalid: " + ErrorCodeTxt[state.errorCode]);
+        } else {
+            mUri = update(&uri);
+            uriFreeUriMembersA(&uri);
+        }
     }
 }
 
-URI::~URI()
+std::string URI::update(UriUriA* uri)
 {
-    uriFreeUriMembersA(mUri);
-    delete mUri;
-}
+    mIsAbsolute = uri->absolutePath;
 
-bool URI::isAbsolute() const 
-{
-    return mUri->absolutePath;
-}
-
-bool URI::isOpaque() const
-{
-    return false;
-}
-
-URI URI::resolve(const URI& relativeUri) const
-{
-    URI absoluteDestination(toString() + relativeUri.toString());
-
-    // uriparser seems to be broken in this context, this using simple append and normalize
-    // as reduction of the uri
-    //
-    //if (uriAddBaseUriA(absoluteDestination.mUri, relativeUri.mUri, mUri) != URI_SUCCESS) 
-    //{
-    //        /* Failure */
-    //    uriFreeUriMembersA(absoluteDestination.mUri);
-    //    throw std::runtime_error("owlapi::model::URI::resolve uri " + relativeUri.toString() + "' could not be resolved ");
-    //}
-
-    absoluteDestination.normalize();
-    return absoluteDestination;
-}
-
-void URI::normalize()
-{
-    if (uriNormalizeSyntaxA(mUri) != URI_SUCCESS) 
+    // normalize
+    if (uriNormalizeSyntaxA(uri) != URI_SUCCESS)
     {
-        throw std::runtime_error("owlapi::model::URI::normalize failed for uri '" + toString() + "'");
+        throw std::runtime_error("owlapi::model::URI::normalize failed");
     }
-}
 
-
-std::string URI::toString() const
-{
-    int charsRequired;
-    if (uriToStringCharsRequiredA(mUri, &charsRequired) != URI_SUCCESS)
+    int charsRequired = 0;
+    if (uriToStringCharsRequiredA(uri, &charsRequired) != URI_SUCCESS)
     {
         throw std::runtime_error("owlapi::model::URI::toString() failed since length of uri could not be evaluated");
     }
     charsRequired++;
 
-    char* uriCString = (char*) malloc(charsRequired * sizeof(char));
+    char* uriCString = (char*) calloc(charsRequired, sizeof(char));
     if (uriCString == NULL)
     {
         throw std::runtime_error("owlapi::model::URI::toString() failed since not memory could be allocated for string");
     }
 
-    if (uriToStringA(uriCString, mUri, charsRequired, NULL) != URI_SUCCESS)
+    if (uriToStringA(uriCString, uri, charsRequired, NULL) != URI_SUCCESS)
     {
         throw std::runtime_error("owlapi::model::URI::toString() failed since not memory could be allocated for string");
     }
-    std::string uri(uriCString);
-    delete uriCString;
-    return uri;
+
+    return std::string(uriCString);
+}
+
+URI URI::resolve(const URI& relativeUri) const
+{
+    return URI( mUri + relativeUri.mUri );
 }
 
 } // end namespace model

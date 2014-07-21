@@ -51,5 +51,35 @@ BOOST_AUTO_TEST_CASE(it_should_handle_iris)
         BOOST_REQUIRE_MESSAGE(iri.getRemainder() == suffix, "Remainder expected '" << suffix << "' got '" << iri.getRemainder() << "'");
     }
 
+    {
+        IRI iri("http://www.w3.org/2002/07/owl#TransitiveProperty");
+        URI uri = iri.toURI();
+        BOOST_TEST_MESSAGE("URI should be same after toString 1: " << uri.toString());
+        BOOST_TEST_MESSAGE("URI should be same after toString 2: " << uri.toString());
+        BOOST_TEST_MESSAGE("URI should be same after toString 3: " << uri.toString());
+
+        BOOST_REQUIRE_MESSAGE(iri.toString() == uri.toString(), "IRI should be same after uri conversion: " << iri.toString() << " vs. iri->uri->iri " << uri.toString() );
+    }
+    {
+        URI relativeUri("Transitive");
+        BOOST_REQUIRE_MESSAGE(relativeUri.toString() == "Transitive", "Relative uri remains the same " << relativeUri.toString());
+        URI uri("http://www.w3.org/2002/07/owl#");
+        BOOST_TEST_MESSAGE("Test base uri: " << uri.toString());
+
+        URI resolvedUri = uri.resolve(relativeUri);
+
+        BOOST_REQUIRE_MESSAGE(resolvedUri.toString() == "http://www.w3.org/2002/07/owl#Transitive", "Resolved uri via relative: '" << resolvedUri.toString() << "'");
+    }
+
+    {
+        IRI iri("http://www.w3.org/2002/07/owl#");
+
+        IRI resolvedIri = iri.resolve("TransitiveProperty");
+        IRI expected("http://www.w3.org/2002/07/owl#TransitiveProperty");
+ 
+        BOOST_REQUIRE_MESSAGE(resolvedIri == expected, "Resolved iri: " << resolvedIri << " vs. expected " << expected);
+
+    }
+
 
 }
