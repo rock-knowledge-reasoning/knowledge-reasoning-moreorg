@@ -24,7 +24,6 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
     IRIList klasses = model.ontology()->allClasses();
     BOOST_FOREACH(IRI klass, klasses)
     {
-        LOG_DEBUG_S << "Domain: adding klass: '" << klass << "'";
         try {
             domain.addType(klass.getFragment());
             LOG_DEBUG_S << "Domain: adding klass: '" << klass << "' as '" << klass.getFragment() << "'";
@@ -38,7 +37,6 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
     IRIList instances = model.ontology()->allInstancesOf( OM::Actor(), false);
     BOOST_FOREACH(IRI instance, instances)
     {
-        LOG_DEBUG_S << "Domain: adding typed constant: '" << instance << "' of type '" << klassType << "'";
         try {
             LOG_DEBUG_S << "Domain: adding typed constant: '" << instance << "' of type '" << OM::Actor() << "'";
             std::string instanceName = instance.getFragment();
