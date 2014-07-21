@@ -104,7 +104,7 @@ public:
      */
     IRIList compactActorList();
 
-    IRI getResourceModel(const IRI& instance);
+    IRI getResourceModel(const IRI& instance) const;
     
     bool isSameResourceModel(const IRI& instance, const IRI& otherInstance);
 

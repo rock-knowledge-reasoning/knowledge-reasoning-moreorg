@@ -106,6 +106,10 @@ OrganizationModel::OrganizationModel(const std::string& filename, bool runInfere
     mpOntology->refresh();
     LOG_DEBUG_S << "OrganizationModel: with inferred actors: " << newActors;
 
+    if(runInference)
+    {
+        runInferenceEngine();
+    }
 //    if(runInference)
 //    {
 //        runInferenceEngine();
@@ -189,7 +193,7 @@ void OrganizationModel::createInstance(const IRI& instanceName, const IRI& klass
 
 void OrganizationModel::runInferenceEngine()
 {
-    IRIList actors = mpOntology->allInstancesOf( OM::ActorModel() );
+    IRIList actors = mpOntology->allInstancesOf( OM::Actor() );
     IRIList services = mpOntology->allInstancesOf( OM::ServiceModel() );
     IRIList::const_iterator actorIt = actors.begin();
 
@@ -461,7 +465,7 @@ CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, cons
     return candidates;
 }
 
-IRI OrganizationModel::getResourceModel(const IRI& instance)
+IRI OrganizationModel::getResourceModel(const IRI& instance) const
 {
     try {
         return mpOntology->relatedInstance(instance, OM::modelledBy());
