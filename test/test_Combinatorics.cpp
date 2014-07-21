@@ -41,10 +41,10 @@ BOOST_AUTO_TEST_CASE(it_should_generate_combinations_int)
             items.push_back(i);
         }
 
-        std::vector< Combination<int>::Mode> modes;
-        modes.push_back(Combination<int>::MAX);
-        modes.push_back(Combination<int>::MIN);
-        modes.push_back(Combination<int>::EXACT);
+        std::vector<Mode> modes;
+        modes.push_back(MAX);
+        modes.push_back(MIN);
+        modes.push_back(EXACT);
 
         for(size_t t = 0; t < modes.size(); ++t)
         {
@@ -80,10 +80,10 @@ BOOST_AUTO_TEST_CASE(it_should_generate_combinations_iri)
             items.push_back( IRI(ss.str()));
         }
 
-        std::vector< Combination<IRI>::Mode> modes;
-        modes.push_back(Combination<IRI>::MAX);
-        modes.push_back(Combination<IRI>::MIN);
-        modes.push_back(Combination<IRI>::EXACT);
+        std::vector<Mode> modes;
+        modes.push_back(MAX);
+        modes.push_back(MIN);
+        modes.push_back(EXACT);
 
         for(size_t t = 0; t < modes.size(); ++t)
         {
@@ -115,10 +115,10 @@ BOOST_AUTO_TEST_CASE(it_should_generate_combinations_iri)
             items.push_back( IRI(ss.str()));
         }
 
-        std::vector< Combination<IRI>::Mode> modes;
-        modes.push_back(Combination<IRI>::MAX);
-        modes.push_back(Combination<IRI>::MIN);
-        modes.push_back(Combination<IRI>::EXACT);
+        std::vector<Mode> modes;
+        modes.push_back(MAX);
+        modes.push_back(MIN);
+        modes.push_back(EXACT);
 
         for(size_t t = 0; t < modes.size(); ++t)
         {

@@ -1,7 +1,14 @@
 #include "Combinatorics.hpp"
+#include <boost/assign/list_of.hpp>
 
 namespace base {
 namespace combinatorics {
+
+std::map<Mode, std::string> ModeTxt = boost::assign::map_list_of
+    (EXACT, "EXACT")
+    (MIN, "MIN")
+    (MAX, "MAX");
+
 
 uint64_t binomialCoefficient(uint32_t n, uint32_t k)
 {

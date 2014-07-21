@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <vector>
+#include <map>
+#include <string>
 #include <stdexcept>
 #include <stdint.h>
 #include <math.h>
@@ -52,6 +54,9 @@ public:
     size_t numberOfPermutations() const { return factorial(mItems.size()); }
 };
 
+enum Mode { EXACT = 0, MAX, MIN };
+extern std::map<Mode, std::string> ModeTxt;
+
 /**
  * \brief Combination of a unique item map Binomialcoefficient (n k)
  * \tparam Type of items that should be combined
@@ -60,12 +65,16 @@ public:
    #include <vector>
    #include <string>
 
+   using namespace base::combinatorics;
+
+   ...
+
    std::vector<std::string> items;
    items.push_back("A");
    items.push_back("B");
    items.push_back("C");
 
-   Combination<std::string> combinations(items, Combination<std::string>::EXACT);
+   Combination<std::string> combinations(items, EXACT);
    do {
        std::vector<std::string> combination = combinations.current();
        ...
@@ -77,7 +86,6 @@ class Combination
 {
 public:
     typedef typename std::vector<T> ItemList;
-    enum Mode { EXACT = 0, MAX, MIN };
 
 private:
     std::vector<T> mItems;
@@ -137,7 +145,7 @@ public:
 
         }
         LOG_DEBUG_S << "Creating Combination: n = " << numberOfItems << ", k = " << sizeOfDraw << std::endl
-            << "    expected number of combinations for (mode: " << mode << "): " << numberOfCombinations() << std::endl;
+            << "    expected number of combinations for (mode: " << ModeTxt[mode] << "): " << numberOfCombinations() << std::endl;
 
         mDrawListIterator = mDrawList.begin();
     }
