@@ -606,7 +606,7 @@ IRIList KnowledgeBase::allInstancesOf(const IRI& klass, bool direct)
     return instances;
 }
 
-IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& relationProperty)
+IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& relationProperty, const IRI& klass)
 {
     IRIList individuals;
     try {
@@ -620,7 +620,12 @@ IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& rel
         for(; cit != relatedIndividuals.end(); ++cit)
         {
             const TNamedEntry* entry = *cit;
-            individuals.push_back( IRI::create( entry->getName() ) );
+            IRI iri( entry->getName() );
+
+            if( klass == "TOP" || isInstanceOf(iri, klass) )
+            {
+                individuals.push_back(iri);
+            }
         }
 
         LOG_DEBUG_S << "'" << individual << "' related via '" << relationProperty << "' to " << individuals;
