@@ -20,6 +20,8 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
 
     std::string actorType = OM::Actor().getFragment();
     std::string locationType = OM::Location().getFragment();
+    std::string serviceType = OM::Service().getFragment();
+
     // Adding types to the domain -> concepts
     IRIList klasses = model.ontology()->allClasses();
     BOOST_FOREACH(IRI klass, klasses)
@@ -46,14 +48,27 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
             LOG_WARN_S << e.what();
         }
     }
+    LOG_DEBUG_S << "All services";
+    IRIList services = model.ontology()->allInstancesOf( OM::ServiceModel(), false);
+    BOOST_FOREACH(IRI service, services)
+    {
+        try {
+            LOG_DEBUG_S << "Domain: adding typed constant: '" << service << "' of type '" << OM::ServiceModel() << "'";
+            std::string instanceName = service.getFragment();
+            domain.addConstant( pddl_planner::representation::Constant(instanceName, serviceType) );
+        } catch(const std::invalid_argument& e)
+        {
+            LOG_WARN_S << e.what();
+        }
+    }
 
     // Add predicates
     using namespace pddl_planner::representation;
     domain.addPredicate( Predicate("at", TypedItem("?x", actorType), TypedItem("?l", locationType)) );
     domain.addPredicate( Predicate("operative", TypedItem("?x",actorType)) );
     domain.addPredicate( Predicate("embodies", TypedItem("?x",actorType), TypedItem("?y", actorType)) );
-    domain.addPredicate( Predicate("mobile", TypedItem("?x",actorType), TypedItem("?y", actorType)) );
-    domain.addPredicate( Predicate("provides", TypedItem("?x", actorType), TypedItem("?s", actorType)) );
+    domain.addPredicate( Predicate("mobile", TypedItem("?x",actorType)) );
+    domain.addPredicate( Predicate("provides", TypedItem("?x", actorType), TypedItem("?s", serviceType)) );
 
     // Add actions
     {
@@ -76,47 +91,42 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
         domain.addAction(move);
     }
     {
-        pddl_planner::representation::Action reconfigure_join("physical_merge", TypedItem("?x", actorType), TypedItem("?y", actorType), TypedItem("?z", actorType));
+        pddl_planner::representation::Action reconfigure_join("physical_merge", TypedItem("?z", actorType), TypedItem("?l", locationType));
         Expression precondition("and",
-                Expression("not",
-                    Expression("=","?x","?y")),
-                Expression("not",
-                    Expression("=","?x","?z")),
-                Expression("not",
-                    Expression("=","?y","?z")),
-                Expression(EXISTS,
-                    TypedItem("?l", locationType),
-                    Expression("and",
-                        Expression("at","?x","?l"),
-                        Expression("at","?y","?l"))
+                Expression(FORALL,
+                    TypedItem("?a",actorType),
+                    Expression("or",
+                        Expression("and",
+                            Expression("embodies", "?z", "?a"),
+                            Expression("operative", "?a"),
+                            Expression("at", "?a", "?l")
+                        ),
+                        Expression("not",
+                            Expression("embodies", "?z", "?a"))
+                    )
                 ),
                 Expression("not",
-                    Expression("operative","?z")),
-                Expression("operative","?x"),
-                Expression("operative","?y"),
-                Expression("embodies","?z","?x"),
-                Expression("embodies","?z","?y")
+                    Expression("atomic","?z")),
+                Expression("not",
+                    Expression("operative","?z"))
         );
 
         Expression effect("and",
-                Expression("not",
-                    Expression("operative","?y")),
-                Expression("not",
-                    Expression("operative","?x")),
-                Expression("operative","?z"),
                 Expression(FORALL,
-                    TypedItem("?l", locationType),
+                    TypedItem("?a", actorType),
                     Expression("when",
-                        Expression("at","?x","?l"),
+                        Expression("embodies","?z","?a"),
                         Expression("and",
                             Expression("not",
-                                Expression("at","?x","?l")),
+                                Expression("at","?a","?l")),
                             Expression("not",
-                                Expression("at","?y","?l")),
-                            Expression("at","?z","?l"))
-                    ) // end Expression 'when'
-                ) // end Expression 'forall'
-        );
+                                Expression("operative","?a"))
+                            )
+                    ) // end when
+                ), // end forall
+                Expression("operative","?z"),
+                Expression("at","?z","?l")
+        ); // end Expression 'forall'
 
         reconfigure_join.addPrecondition(precondition);
         reconfigure_join.addEffect(effect);
@@ -124,40 +134,26 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
     }
     {
 
-        pddl_planner::representation::Action reconfigure_split("physical_split", TypedItem("?x", actorType), TypedItem("?y", actorType), TypedItem("?z", actorType));
+        pddl_planner::representation::Action reconfigure_split("physical_split", TypedItem("?z", actorType), TypedItem("?l", locationType));
         Expression precondition("and",
-                Expression("not",
-                    Expression("=","?x","?y")),
-                Expression("not",
-                    Expression("=","?x","?z")),
-                Expression("not",
-                    Expression("=","?y","?z")),
-                Expression("not",
-                    Expression("operative","?x")),
-                Expression("not",
-                    Expression("operative","?y")),
                 Expression("operative","?z"),
-                Expression("embodies","?z","?x"),
-                Expression("embodies","?z","?y")
+                Expression("at","?z","?l")
         );
 
         Expression effect("and",
                 // Make sure status of operation changes
                 Expression("not",
                     Expression("operative","?z")),
-                Expression("operative","?x"),
-                Expression("operative","?y"),
+                Expression("not",
+                    Expression("at","?z","?l")),
                 // Make sure location is properly set for released
                 Expression(FORALL,
-                    TypedItem("?l", "Location"),
+                    TypedItem("?a", actorType),
                     Expression("when", // first param condition, second effect
-                        Expression("at","?z","?l"),
+                        Expression("embodies","?z","?a"),
                         Expression("and",
-                            Expression("at","?x","?l"),
-                            Expression("at","?y","?l"),
-                            Expression("not",
-                                Expression("at","?z","?l")
-                            )
+                            Expression("operative","?a"),
+                            Expression("at","?a","?l")
                         )
                     ) // end Expression 'when'
                 ) // end Expression 'forall'
@@ -200,6 +196,18 @@ pddl_planner::representation::Problem PDDLExporter::toProblem(const Organization
             {
                 // embodies: CombinedActor embodies Actor
                 problem.addInitialStatus( Expression("provides", instanceName, relatedService.getFragment()) );
+                if(relatedService.getFragment() == "MoveTo")
+                {
+                    problem.addInitialStatus( Expression("mobile", instanceName) );
+                }
+            }
+
+            // All atomic actors
+            IRIList actors = model.ontology()->allInstancesOf( OM::Actor(), true);
+            BOOST_FOREACH(IRI atomicActor, actors)
+            {
+                std::string instanceName = instance.getFragment();
+                problem.addInitialStatus( Expression("atomic", instanceName) );
             }
 
         } catch(const std::invalid_argument& e)
