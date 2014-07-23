@@ -1,8 +1,11 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
+#include <boost/foreach.hpp>
 #include <owl_om/OrganizationModel.hpp>
 #include <owl_om/exporter/PDDLExporter.hpp>
+#include <owl_om/Combinatorics.hpp>
+
 using namespace owl_om;
 
 BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
@@ -162,7 +165,7 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     ontology->relatedTo("MoveTo", "dependsOn", "Localization/requirement#0");
     ontology->relatedTo("MoveTo", "dependsOn", "Locomotion/requirement#0");
     ontology->relatedTo("MoveTo", "dependsOn", "Power/requirement#0");
-    
+
     BOOST_REQUIRE_MESSAGE( ontology->isRelatedTo("MoveTo", "dependsOn", "Mapping/requirement#0"), "Check dependency");
 
     om.createInstance("Camera/requirement#0", "ResourceRequirement", "Camera");
@@ -314,6 +317,81 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     BOOST_REQUIRE_MESSAGE(true, "Domain:" << domain.toLISP());
 }
 
+
+BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
+{
+    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.3.owl" );
+
+    using namespace owl_om;
+    using namespace owl_om::vocabulary;
+    {
+        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("Sherpa"));
+
+        BOOST_TEST_MESSAGE("Created new from model" << instance);
+        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
+    }
+
+    {
+        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("CREX"));
+
+        BOOST_TEST_MESSAGE("Created new from model" << instance);
+        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
+    }
+    {
+        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("PayloadCamera"));
+
+        BOOST_TEST_MESSAGE("Created new from model" << instance);
+        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
+    }
+
+    om.refresh();
+
+    // Export PDDL
+    PDDLExporter exporter;
+    pddl_planner::representation::Domain domain = exporter.toDomain(om);
+    pddl_planner::representation::Problem problem = exporter.toProblem(om);
+
+    std::vector<std::string> distances;
+    distances.push_back("location_p0");
+    distances.push_back("location_c0");
+    distances.push_back("location_p0");
+
+    using namespace owl_om;
+    using namespace owl_om::vocabulary;
+    using namespace pddl_planner::representation;
+
+    std::string locationType = OM::Location().getFragment();
+
+    problem.addObject(TypedItem("location_p0", locationType));
+    problem.addObject(TypedItem("location_c0", locationType));
+    problem.addObject(TypedItem("location_s0", locationType));
+
+    IRIList atomicActors = om.ontology()->allInstancesOf( OM::Actor(), true);
+    BOOST_FOREACH(IRI atomicActor, atomicActors)
+    {
+        std::string instanceName = atomicActor.getFragment();
+        problem.addInitialStatus(Expression("operative",instanceName));
+        problem.addInitialStatus(Expression("at",instanceName, "location_s0"));
+    }
+
+    std::string distance = "10";
+    using namespace base::combinatorics;
+    Combination< std::string > combination(distances, 2, EXACT);
+    do
+    {
+        std::vector<std::string> current = combination.current();
+        problem.addInitialStatus( Expression("=", Expression("distance", current[0], current[1]), Expression(distance) ));
+        problem.addInitialStatus( Expression("=", Expression("distance", current[1], current[0]), Expression(distance) ));
+
+    } while(combination.next());
+
+    problem.addInitialStatus( Expression("=", Expression("distance", "location_c0", "location_p0"), Expression("10")));
+
+    BOOST_REQUIRE_MESSAGE(true, "Domain:" << domain.toLISP());
+    BOOST_REQUIRE_MESSAGE(true, "Problem:" << problem.toLISP());
+}
+
+
 BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_from_owl)
 {
     OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.2.owl" );
@@ -322,6 +400,42 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_from_owl)
     PDDLExporter exporter;
     pddl_planner::representation::Domain domain = exporter.toDomain(om);
     pddl_planner::representation::Problem problem = exporter.toProblem(om);
+
+    std::vector<std::string> distances;
+    distances.push_back("location_p0");
+    distances.push_back("location_c0");
+    distances.push_back("location_p0");
+
+    using namespace owl_om;
+    using namespace owl_om::vocabulary;
+    using namespace pddl_planner::representation;
+
+    std::string locationType = OM::Location().getFragment();
+
+    problem.addObject(TypedItem("location_p0", locationType));
+    problem.addObject(TypedItem("location_c0", locationType));
+    problem.addObject(TypedItem("location_s0", locationType));
+
+    IRIList atomicActors = om.ontology()->allInstancesOf( OM::Actor(), true);
+    BOOST_FOREACH(IRI atomicActor, atomicActors)
+    {
+        std::string instanceName = atomicActor.getFragment();
+        problem.addInitialStatus(Expression("operative",instanceName));
+        problem.addInitialStatus(Expression("at",instanceName, "location_s0"));
+    }
+
+    std::string distance = "10";
+    using namespace base::combinatorics;
+    Combination< std::string > combination(distances, 2, EXACT);
+    do
+    {
+        std::vector<std::string> current = combination.current();
+        problem.addInitialStatus( Expression("=", Expression("distance", current[0], current[1]), Expression(distance) ));
+        problem.addInitialStatus( Expression("=", Expression("distance", current[1], current[0]), Expression(distance) ));
+
+    } while(combination.next());
+
+    problem.addInitialStatus( Expression("=", Expression("distance", "location_c0", "location_p0"), Expression("10")));
 
     BOOST_REQUIRE_MESSAGE(true, "Domain:" << domain.toLISP());
     BOOST_REQUIRE_MESSAGE(true, "Problem:" << problem.toLISP());
