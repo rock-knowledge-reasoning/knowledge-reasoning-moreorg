@@ -58,9 +58,13 @@ public:
     /**
      * Constructor to create an OrganizationModel from an existing description file
      * \param filename File name to an rdf/xml formatted ontology description file
-     * \param runInference Set to true to run inference for recombinations after loading the description file, False to suppress the inference at construction time
      */
-    OrganizationModel(const std::string& filename, bool runInference = true);
+    OrganizationModel(const std::string& filename);
+
+    /**
+     * Update the organization model
+     */
+    void refresh();
 
     Ontology::Ptr ontology() { return mpOntology; }
 
@@ -107,6 +111,16 @@ public:
     IRI getResourceModel(const IRI& instance) const;
     
     bool isSameResourceModel(const IRI& instance, const IRI& otherInstance);
+
+    /**
+     * Create new instance (ABox from existing model (also ABox)
+     * Model will be associated via modelledBy relation and subclassed from
+     * classType
+     * \param classType New instance will be subclass of this type
+     * \param model New instance will be modelledBy this model
+     * \return IRI to new model
+     */
+    IRI createNewFromModel(const IRI& classType, const IRI& model) const;
 
     /**
      * Generate a combination list based on actor interface

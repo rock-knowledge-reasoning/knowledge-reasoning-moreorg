@@ -81,35 +81,51 @@ OrganizationModel::OrganizationModel()
     : mpOntology( new Ontology())
 {}
 
-OrganizationModel::OrganizationModel(const std::string& filename, bool runInference)
+OrganizationModel::OrganizationModel(const std::string& filename)
 {
     mpOntology = Ontology::fromFile(filename);
+    refresh();
+}
+
+void OrganizationModel::refresh()
+{
     mpOntology->refresh();
 
-    InterfaceCombinationList interfaceCombinations = generateInterfaceCombinations();
-    InterfaceCombinationList::const_iterator cit = interfaceCombinations.begin();
-    std::map<IRISet, uint32_t> actorTypes;
-    IRIList newActors;
-    for(; cit != interfaceCombinations.end(); ++cit)
+    InterfaceCombinationList interfaceCombinations;
+    try {
+        interfaceCombinations = generateInterfaceCombinations();
+    } catch(const std::invalid_argument& e)
     {
-        IRISet actorCombination;
-        InterfaceConnectionList::const_iterator iit = cit->begin();
-        for(; iit != cit->end(); ++iit)
+        LOG_WARN_S << e.what();
+    }
+
+    if(!interfaceCombinations.empty())
+    {
+        InterfaceCombinationList::const_iterator cit = interfaceCombinations.begin();
+        std::map<IRISet, uint32_t> actorTypes;
+        IRIList newActors;
+        for(; cit != interfaceCombinations.end(); ++cit)
         {
-            actorCombination.insert(iit->parents.begin(), iit->parents.end());
+            IRISet actorCombination;
+            InterfaceConnectionList::const_iterator iit = cit->begin();
+            for(; iit != cit->end(); ++iit)
+            {
+                actorCombination.insert(iit->parents.begin(), iit->parents.end());
+            }
+            uint32_t count = actorTypes[actorCombination] + 1;
+            actorTypes[actorCombination] = count;
+            IRI newActor = createNewActor(actorCombination, *cit, count);
+            newActors.push_back(newActor);
         }
-        uint32_t count = actorTypes[actorCombination] + 1;
-        actorTypes[actorCombination] = count;
-        IRI newActor = createNewActor(actorCombination, *cit, count);
-        newActors.push_back(newActor);
-    }
-    mpOntology->refresh();
-    LOG_DEBUG_S << "OrganizationModel: with inferred actors: " << newActors;
 
-    if(runInference)
-    {
-        runInferenceEngine();
+        mpOntology->refresh();
+        LOG_DEBUG_S << "OrganizationModel: with inferred actors: " << newActors;
+
+    } else {
+        LOG_INFO_S << "OrganizationModel: no interface combinations available, so no actors inferred";
     }
+
+    runInferenceEngine();
 }
 
 IRI OrganizationModel::createNewActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id)
@@ -207,8 +223,13 @@ void OrganizationModel::runInferenceEngine()
                 LOG_INFO_S << "inference: '" << *actorIt << "' checkIfFulfills? '" << *serviceIt << "'";
                 if( checkIfFulfills(*actorIt, *serviceIt) )
                 {
-                    LOG_INFO_S << "inference: '" << *actorIt << "' provides '" << *serviceIt << "'";
                     mpOntology->relatedTo(*actorIt, OM::provides(), *serviceIt);
+                    IRI serviceInstance = createNewFromModel(OM::ServiceModel(), *serviceIt);
+                    mpOntology->relatedTo(*actorIt, OM::has(), serviceInstance);
+
+                    LOG_INFO_S << "inference: " << std::endl
+                        << "     actor:     " << *actorIt << std::endl
+                        << "     provides:  " << *serviceIt << "( " << serviceInstance << " )" << std::endl;
                     updated = true;
                 } else {
                     LOG_INFO_S << "inference: '" << *actorIt << "' does not provide '" << *serviceIt << "'";
@@ -227,7 +248,6 @@ bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& 
 
     IRI requirementModel = getResourceModel(resourceRequirements);
     IRIList requirements = mpOntology->allRelatedInstances( requirementModel, OM::dependsOn());
-    std::map<IRI,IRI> grounding;
 
     LOG_INFO_S << "Check " << std::endl
         << "    resourceProvider [" << resourceProviderModel << "] '" << resourceProvider  << std::endl
@@ -238,6 +258,8 @@ bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& 
 
     IRIList::const_iterator cit = requirements.begin();
     bool success = true;
+    std::map<IRI,IRI> grounding;
+    std::map<IRI,bool> grounded;
     for(; cit != requirements.end(); ++cit)
     {
         IRI requirement = *cit;
@@ -245,15 +267,24 @@ bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& 
         {
             LOG_DEBUG_S << "no available resources on '" << resourceProvider << "'";
         }
+
         IRIList::iterator nit = availableResources.begin();
         bool dependencyFulfilled = false;
         for(; nit != availableResources.end(); ++nit)
         {
             IRI availableResource = *nit;
+
+            if( grounded[availableResource] )
+            {
+                LOG_INFO_S << "resource '" << availableResource << "' already in use (grounded)";
+                continue;
+            }
+
             if( isSameResourceModel(requirement, availableResource) )
             {
                 LOG_INFO_S << "requirement " << requirement << " fulfilled by '" << resourceProvider << "' using '"<< availableResource << "'";
                 grounding[requirement] = availableResource;
+                grounded[availableResource] = true;
                 dependencyFulfilled = true;
                 break;
             }
@@ -472,6 +503,52 @@ IRI OrganizationModel::getResourceModel(const IRI& instance) const
     }
 }
 
+IRI OrganizationModel::createNewFromModel(const IRI& classType, const IRI& model) const
+{
+    LOG_DEBUG_S << "CreateNewFromModel: " << std::endl
+        << "    class:    " << classType << std::endl
+        << "    model:    " << model << std::endl;
+
+    IRIList modelInstances = mpOntology->allInverseRelatedInstances(model, OM::modelledBy());
+    std::stringstream ss;
+    ss << modelInstances.size();
+    IRI newInstanceName = model.toString() + "-instance-" + ss.str();
+
+    mpOntology->instanceOf(newInstanceName, classType);
+    mpOntology->relatedTo(newInstanceName, OM::modelledBy(), model);
+
+    // Create dependencies that come with that model
+    IRIList dependencies = mpOntology->allRelatedInstances(model, OM::dependsOn());
+    IRIList newDependants;
+    BOOST_FOREACH(IRI dependency, dependencies)
+    {
+        // Find out the actual model of this resource (in case in need to instanciate further
+        // requirements)
+        IRIList resourceModel = mpOntology->allRelatedInstances(dependency, OM::modelledBy());
+        if(resourceModel.empty())
+        {
+            throw std::invalid_argument("owl_om::OrganizationModel::createNewFromModel: could not infer model for dependency '" + dependency.toString() + "'");
+        } else if(resourceModel.size() > 1)
+        {
+            throw std::invalid_argument("owl_om::OrganizationModel::createNewFromModel: could not infer model for dependency '" + dependency.toString() + "' since there are multiple defined");
+        }
+
+        LOG_DEBUG_S << "CreateNewFromModel: " << std::endl
+            << "    dependency:        " << dependency << std::endl
+            << "    resource model:    " << resourceModel[0] << std::endl;
+
+        // dependency is a placeholder requirement of the same class as the final
+        IRI dependant = createNewFromModel( mpOntology->typeOf(dependency), resourceModel[0] );
+        mpOntology->relatedTo(newInstanceName, OM::has(), dependant);
+
+        LOG_DEBUG_S << "Created dependency: " << std::endl
+            << "    instance:                 " << newInstanceName << std::endl
+            << "    dependant (has relation): " << dependant;
+    }
+
+    return newInstanceName;
+}
+
 bool OrganizationModel::isSameResourceModel(const IRI& instance, const IRI& otherInstance)
 {
     return getResourceModel(instance) == getResourceModel(otherInstance);
@@ -493,13 +570,21 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
     // Get all basic actors to get number of actors, associated interface and maximum number of connections
     // we have to account for
     IRIList interfaces;
-    IRIList actors = mpOntology->allInstancesOf( OM::Actor() );
+    IRIList actors = mpOntology->allInstancesOf( OM::Actor(), true );
+    if(actors.size() < 2)
+    {
+        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not actors for recombination available, i.e. no more than 1");
+    }
     {
         IRIList::const_iterator ait = actors.begin();
         for(; ait != actors.end(); ++ait)
         {
             // Identify the list of interfaces for 'instance'
             IRIList actorInterfaces = mpOntology->allRelatedInstances( *ait, OM::has());
+            LOG_DEBUG_S << "All related interfaces:" << std::endl
+                << "    actor:      " << *ait << std::endl
+                << "    interfaces: " << actorInterfaces << std::endl;
+
             IRIList::const_iterator cit = actorInterfaces.begin();
             for(; cit != actorInterfaces.end(); ++cit)
             {
