@@ -8,6 +8,7 @@ class OM
 {
 public:
     VOCABULARY_BASE_IRI("http://www.rock-robotics.org/2014/01/om-schema#");
+    VOCABULARY_DYNAMIC_EXTENSION
     VOCABULARY_ADD_WORD(Actor);
     VOCABULARY_ADD_WORD(ActorModel);
     VOCABULARY_ADD_WORD(CompositeActor);

@@ -8,6 +8,8 @@
     static owlapi::model::IRI IRIPrefix() { static owlapi::model::IRI iri(X); return iri;}
 #define VOCABULARY_ADD_WORD(NAME) \
     static owlapi::model::IRI NAME() { static owlapi::model::IRI name = IRIPrefix().resolve(#NAME); return name; }
+#define VOCABULARY_DYNAMIC_EXTENSION \
+    static owlapi::model::IRI resolve(const std::string& name) { return IRIPrefix().resolve(name); }
 
 namespace owl_om {
 namespace vocabulary {
