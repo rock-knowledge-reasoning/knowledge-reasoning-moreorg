@@ -325,20 +325,19 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
     using namespace owl_om;
     using namespace owl_om::vocabulary;
     {
-        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("Sherpa"));
-
-        BOOST_TEST_MESSAGE("Created new from model" << instance);
-        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
-    }
-
-    {
-        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("CREX"));
+        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("Sherpa"), true);
 
         BOOST_TEST_MESSAGE("Created new from model" << instance);
         BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
     }
     {
-        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("PayloadCamera"));
+        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("CREX"), true);
+
+        BOOST_TEST_MESSAGE("Created new from model" << instance);
+        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
+    }
+    {
+        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("PayloadCamera"), true);
 
         BOOST_TEST_MESSAGE("Created new from model" << instance);
         BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");

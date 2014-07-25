@@ -205,37 +205,84 @@ void OrganizationModel::createInstance(const IRI& instanceName, const IRI& klass
 void OrganizationModel::runInferenceEngine()
 {
     IRIList actors = mpOntology->allInstancesOf( OM::Actor() );
-    IRIList services = mpOntology->allInstancesOf( OM::ServiceModel() );
-    IRIList::const_iterator actorIt = actors.begin();
 
-    LOG_INFO_S << "Run inference engine: # of actors: '" << actors.size();
+    // Infer services
+    IRIList services = mpOntology->allInstancesOf( OM::ServiceModel() );
+    LOG_INFO_S << "Validate known services: " << services;
+
+    IRIList capabilities = mpOntology->allInstancesOf( OM::CapabilityModel() );
+    LOG_INFO_S << "Validate known capabilities: " << capabilities;
 
     bool updated = true;
     while(updated)
     {
+        LOG_INFO_S << "Run inference engine for actors: " << actors;
+
+        IRIList::const_iterator actorIt = actors.begin();
         updated = false;
         for(; actorIt != actors.end(); ++actorIt)
         {
-            IRIList::const_iterator serviceIt = services.begin();
-            for(; serviceIt != services.end(); ++serviceIt)
-            {
-                LOG_INFO_S << "inference: '" << *actorIt << "' checkIfFulfills? '" << *serviceIt << "'";
-                if( checkIfFulfills(*actorIt, *serviceIt) )
-                {
-                    mpOntology->relatedTo(*actorIt, OM::provides(), *serviceIt);
-                    IRI serviceInstance = createNewFromModel(OM::ServiceModel(), *serviceIt);
-                    mpOntology->relatedTo(*actorIt, OM::has(), serviceInstance);
+            const IRI& actor = *actorIt;
 
-                    LOG_INFO_S << "inference: " << std::endl
-                        << "     actor:     " << *actorIt << std::endl
-                        << "     provides:  " << *serviceIt << "( " << serviceInstance << " )" << std::endl;
+            {
+                IRIList inferred = infer(actor, OM::Service(), services);
+                if(!inferred.empty())
+                {
                     updated = true;
-                } else {
-                    LOG_INFO_S << "inference: '" << *actorIt << "' does not provide '" << *serviceIt << "'";
+                }
+            }
+            {
+                IRIList inferred = infer(actor, OM::Capability(), capabilities);
+                if(!inferred.empty())
+                {
+                    updated = true;
                 }
             }
         }
     }
+}
+
+IRIList OrganizationModel::infer(const IRI& actor, const IRI& classTypeOfInferred, const IRIList& models)
+{
+    IRIList inferred;
+
+    IRIList::const_iterator modelsIt = models.begin();
+    for(; modelsIt != models.end(); ++modelsIt)
+    {
+        const IRI& model = *modelsIt;
+
+        // If model is not already provided check if its provided now
+        if( !mpOntology->isRelatedTo(actor, OM::provides(), model) )
+        {
+            IRI modelType = ontology()->typeOf(model);
+
+            LOG_INFO_S << "infer " << modelType << " : actor '" << actor << "' checkIfFulfills? '" << model << "'";
+
+            try {
+                if( checkIfFulfills(actor, model) )
+                {
+                    IRI instance = createNewFromModel( classTypeOfInferred, model);
+
+                    mpOntology->relatedTo(actor, OM::provides(), model);
+                    mpOntology->relatedTo(actor, OM::has(), instance);
+
+                    LOG_INFO_S << modelType << " inference: " << std::endl
+                        << "     actor:     " << actor << std::endl
+                        << "     provides:  " << model << std::endl
+                        << "     has:       " << instance << std::endl;
+
+                    inferred.push_back(model);
+                } else {
+                    LOG_INFO_S << "inference: '" << actor << "' does not provide '" << model << "'";
+                }
+            } catch(const std::invalid_argument& e)
+            {
+                LOG_DEBUG_S << "Check failed for '" << model << "' failed " << e.what();
+            }
+        }
+    }
+
+    return inferred;
 }
 
 bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& resourceRequirements)
@@ -243,19 +290,28 @@ bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& 
     IRI resourceProviderModel = getResourceModel(resourceProvider);
 
     IRIList availableResources = mpOntology->allRelatedInstances(resourceProvider, OM::has());
-    IRIList availableServices = mpOntology->allRelatedInstances(resourceProviderModel, OM::provides());
+    IRIList availableServices = mpOntology->allRelatedInstances(resourceProvider, OM::provides(), OM::ServiceModel());
+
+    IRIList availableCapabilities = mpOntology->allRelatedInstances(resourceProvider, OM::has(), OM::Capability());
 
     IRI requirementModel = getResourceModel(resourceRequirements);
     IRIList requirements = mpOntology->allRelatedInstances( requirementModel, OM::dependsOn());
 
+    if(requirements.empty())
+    {
+        throw std::invalid_argument("OrganizationModel::checkIfFulfills: no requirements found");
+    }
+
     LOG_INFO_S << "Check " << std::endl
         << "    resourceProvider [" << resourceProviderModel << "] '" << resourceProvider  << std::endl
         << "    requirements for '" << requirementModel << "'" << std::endl
-        << "    available resources: " << availableResources << std::endl
-        << "    available services: " << availableServices << std::endl
+        << "    available resources:     " << availableResources << std::endl
+        << "    available services:      " << availableServices << std::endl
+        << "    available capabilities:  " << availableCapabilities << std::endl
         << "    requirements: " << requirements;
 
     IRIList::const_iterator cit = requirements.begin();
+
     bool success = true;
     std::map<IRI,IRI> grounding;
     std::map<IRI,bool> grounded;
@@ -289,20 +345,44 @@ bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& 
             }
         }
 
-        IRI resourceModel = getResourceModel(requirement);
-        LOG_DEBUG_S << "Search for service: '" << resourceModel << "'";
-        IRIList::iterator sit = std::find(availableServices.begin(), availableServices.end(), resourceModel);
-        if(sit != availableServices.end())
-        {
-            IRI availableService = *sit;
-            LOG_INFO_S << "requirement " << requirement << " fulfilled by service " << availableService;
-            grounding[requirement] = availableService;
-            dependencyFulfilled = true;
-        }
+        //// Skip next step if dependency is fulfilled
+        //if(dependencyFulfilled)
+        //{
+        //    continue;
+        //}
+
+        //IRI resourceModel = getResourceModel(requirement);
+        //// Check for service
+        //{
+        //    LOG_DEBUG_S << "Search for service: '" << resourceModel << "'";
+        //    IRIList::iterator sit = std::find(availableServices.begin(), availableServices.end(), resourceModel);
+        //    if(sit != availableServices.end())
+        //    {
+        //        IRI availableService = *sit;
+        //        LOG_INFO_S << "requirement " << requirement << " fulfilled by service " << availableService;
+        //        grounding[requirement] = availableService;
+        //        dependencyFulfilled = true;
+        //        continue;
+        //    }
+        //}
+
+        // Check for capability
+        //{
+        //    LOG_DEBUG_S << "Search for capability: '" << resourceModel << "'";
+        //    IRIList::iterator sit = std::find(availableCapabilities.begin(), availableCapabilities.end(), resourceModel);
+        //    if(sit != availableCapabilities.end())
+        //    {
+        //        IRI availableCapability = *sit;
+        //        LOG_INFO_S << "requirement " << requirement << " fulfilled by capability " << availableCapability;
+        //        grounding[requirement] = availableCapability;
+        //        dependencyFulfilled = true;
+        //        continue;
+        //    }
+        //}
 
         if(!dependencyFulfilled)
         {
-            LOG_INFO_S << "requirement " << requirement << " cannot be fulfilled by service '" << resourceProvider << "'";
+            LOG_INFO_S << "requirement " << requirement << " cannot be fulfilled by '" << resourceProvider << "'";
             grounding[requirement] = IRI("?");
             success = false;
             break;
@@ -502,7 +582,7 @@ IRI OrganizationModel::getResourceModel(const IRI& instance) const
     }
 }
 
-IRI OrganizationModel::createNewFromModel(const IRI& classType, const IRI& model) const
+IRI OrganizationModel::createNewFromModel(const IRI& classType, const IRI& model, bool createDependants) const
 {
     LOG_DEBUG_S << "CreateNewFromModel: " << std::endl
         << "    class:    " << classType << std::endl
@@ -515,6 +595,15 @@ IRI OrganizationModel::createNewFromModel(const IRI& classType, const IRI& model
 
     mpOntology->instanceOf(newInstanceName, classType);
     mpOntology->relatedTo(newInstanceName, OM::modelledBy(), model);
+
+    if(!createDependants)
+    {
+        LOG_DEBUG_S << "CreateNewFromModel: " << std::endl
+            << "    instance:                 " << newInstanceName << std::endl
+            << "    dependant (has relation): [ creation not requested ]";
+
+        return newInstanceName;
+    }
 
     // Create dependencies that come with that model
     IRIList dependencies = mpOntology->allRelatedInstances(model, OM::dependsOn());
@@ -532,18 +621,20 @@ IRI OrganizationModel::createNewFromModel(const IRI& classType, const IRI& model
             throw std::invalid_argument("owl_om::OrganizationModel::createNewFromModel: could not infer model for dependency '" + dependency.toString() + "' since there are multiple defined");
         }
 
-        LOG_DEBUG_S << "CreateNewFromModel: " << std::endl
+        LOG_DEBUG_S << "CreateNewFromModel: dependency of " << newInstanceName << std::endl
             << "    dependency:        " << dependency << std::endl
             << "    resource model:    " << resourceModel[0] << std::endl;
 
         // dependency is a placeholder requirement of the same class as the final
-        IRI dependant = createNewFromModel( mpOntology->typeOf(dependency), resourceModel[0] );
+        IRI dependant = createNewFromModel( mpOntology->typeOf(dependency), resourceModel[0], true );
         mpOntology->relatedTo(newInstanceName, OM::has(), dependant);
 
-        LOG_DEBUG_S << "Created dependency: " << std::endl
-            << "    instance:                 " << newInstanceName << std::endl
-            << "    dependant (has relation): " << dependant;
+        newDependants.push_back(dependant);
     }
+
+    LOG_DEBUG_S << "CreateNewFromModel: " << std::endl
+        << "    instance:                 " << newInstanceName << std::endl
+        << "    dependants (has relation): " << newDependants;
 
     return newInstanceName;
 }

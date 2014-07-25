@@ -48,6 +48,17 @@ class OrganizationModel
 
     IRI createNewActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id);
 
+    /**
+     * Infer new instance of a given class type, base on checking whether a given model
+     * is fulfilled
+     * \param actor Actor to perform inference for, actor will in effect have two types of relationships:
+     *     (a) provides model
+     *     (b) has instance of the class type  (where instance is modelledBy the given model)
+     * \param classTypeOfInferred Class type of the inferred instances
+     * \param models List of models that should be check
+     */
+    IRIList infer(const IRI& actor, const IRI& classTypeOfInferred, const IRIList& models);
+
 public:
 
     /**
@@ -109,7 +120,7 @@ public:
     IRIList compactActorList();
 
     IRI getResourceModel(const IRI& instance) const;
-    
+
     bool isSameResourceModel(const IRI& instance, const IRI& otherInstance);
 
     /**
@@ -118,9 +129,10 @@ public:
      * classType
      * \param classType New instance will be subclass of this type
      * \param model New instance will be modelledBy this model
+     * \param createDependantResources create dependants objects if required
      * \return IRI to new model
      */
-    IRI createNewFromModel(const IRI& classType, const IRI& model) const;
+    IRI createNewFromModel(const IRI& classType, const IRI& model, bool createDependantResources = false) const;
 
     /**
      * Generate a combination list based on actor interface
