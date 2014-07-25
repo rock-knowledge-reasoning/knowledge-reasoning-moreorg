@@ -23,6 +23,7 @@ rock_library(owl_om
         owlapi/model/IRI.cpp
         owlapi/model/URI.cpp
         exporter/PDDLExporter.cpp
+        metrics/Redundancy.cpp
     HEADERS KnowledgeBase.hpp
         OrganizationModel.hpp
         OWLApi.hpp
@@ -38,6 +39,7 @@ rock_library(owl_om
         db/rdf/SparqlInterface.hpp
         db/rdf/Variable.hpp
         exporter/PDDLExporter.hpp
+        metrics/Redundancy.hpp
         owlapi/io/XMLUtils.hpp
         owlapi/model/AnonymousIndividual.hpp
         owlapi/model/HasIRI.hpp

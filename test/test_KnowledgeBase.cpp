@@ -5,6 +5,7 @@
 #include <owl_om/OrganizationModel.hpp>
 #include <owl_om/exporter/PDDLExporter.hpp>
 #include <owl_om/Combinatorics.hpp>
+#include <owl_om/metrics/Redundancy.hpp>
 
 using namespace owl_om;
 
@@ -388,5 +389,24 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
 
     BOOST_REQUIRE_MESSAGE(true, "Domain:" << domain.toLISP());
     BOOST_REQUIRE_MESSAGE(true, "Problem:" << problem.toLISP());
+}
+
+BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_metrics)
+{
+    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.3.owl" );
+
+    using namespace owl_om;
+    using namespace owl_om::vocabulary;
+    {
+        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("Sherpa"), true);
+
+        BOOST_TEST_MESSAGE("Created new from model" << instance);
+        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
+    }
+    om.refresh();
+
+    metrics::Redundancy redundancy(om);
+    metrics::IRIMetricMap metrics = redundancy.compute();
+
 }
 
