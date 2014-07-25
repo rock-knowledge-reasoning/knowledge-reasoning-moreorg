@@ -42,6 +42,26 @@ std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection
 std::ostream& operator<<(std::ostream& os, const InterfaceConnectionList& list);
 std::ostream& operator<<(std::ostream& os, const InterfaceCombinationList& list);
 
+typedef std::map<IRI,IRI> RequirementsGrounding;
+
+class Grounding
+{
+    RequirementsGrounding mRequirementToResourceMap;
+public:
+    Grounding(const RequirementsGrounding& grounding)
+        : mRequirementToResourceMap(grounding)
+    {}
+
+    const RequirementsGrounding& getRequirementsGrounding() { return mRequirementToResourceMap; }
+
+    bool isComplete() const;
+
+    static IRI ungrounded() { static IRI iri("?"); return iri; }
+
+    std::string toString() const;
+};
+
+
 class OrganizationModel
 {
     Ontology::Ptr mpOntology;
@@ -86,14 +106,13 @@ public:
      */
     void createInstance(const IRI& instanceName, const IRI& klass, const IRI& model);
 
-    // PREDICATES
     /**
-     * Test if a resource requirement is fullfilled
-     *
-     * used properties: 'has','provides', and 'dependsOn'
+     * Try to map requirements to provider
+     * \return corresponding grounding, which need to be check on completness
      */
-    bool checkIfFulfills(const IRI& resourceProvider, const IRI& resourceRequirement);
+    Grounding resolveRequirements(const IRI& resourceProvider, const IRI& resourceRequirement);
 
+    // PREDICATES
     /**
      * Test if a set of interfaces is compatible (in general)
      *

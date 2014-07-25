@@ -77,6 +77,32 @@ std::ostream& operator<<(std::ostream& os, const InterfaceCombinationList& list)
     return os;
 }
 
+bool Grounding::isComplete() const
+{
+    RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
+    for(; mip != mRequirementToResourceMap.end(); ++mip)
+    {
+        if(mip->second == Grounding::ungrounded())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::string Grounding::toString() const
+{
+    std::stringstream ss;
+    ss << "Grounding:" << std::endl;
+
+    RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
+    for(; mip != mRequirementToResourceMap.end(); ++mip)
+    {
+        ss << "    " << mip->first  << " -> " << mip->second << std::endl;
+    }
+    return ss.str();
+}
+
 OrganizationModel::OrganizationModel()
     : mpOntology( new Ontology())
 {}
@@ -246,25 +272,28 @@ IRIList OrganizationModel::infer(const IRI& actor, const IRI& classTypeOfInferre
 {
     IRIList inferred;
 
-    IRIList::const_iterator modelsIt = models.begin();
-    for(; modelsIt != models.end(); ++modelsIt)
+    BOOST_FOREACH(const IRI& model, models)
     {
-        const IRI& model = *modelsIt;
-
         // If model is not already provided check if its provided now
         if( !mpOntology->isRelatedTo(actor, OM::provides(), model) )
         {
             IRI modelType = ontology()->typeOf(model);
 
-            LOG_INFO_S << "infer " << modelType << " : actor '" << actor << "' checkIfFulfills? '" << model << "'";
+            LOG_INFO_S << "infer " << modelType << " : actor '" << actor << "' resolveRequirements '" << model << "'";
 
             try {
-                if( checkIfFulfills(actor, model) )
+                Grounding grounding = resolveRequirements(actor, model);
+                if(grounding.isComplete())
                 {
                     IRI instance = createNewFromModel( classTypeOfInferred, model);
 
                     mpOntology->relatedTo(actor, OM::provides(), model);
                     mpOntology->relatedTo(actor, OM::has(), instance);
+
+                    BOOST_FOREACH(const RequirementsGrounding::value_type& pair, grounding.getRequirementsGrounding())
+                    {
+                        mpOntology->relatedTo(instance, OM::uses(), pair.second);
+                    }
 
                     LOG_INFO_S << modelType << " inference: " << std::endl
                         << "     actor:     " << actor << std::endl
@@ -285,7 +314,7 @@ IRIList OrganizationModel::infer(const IRI& actor, const IRI& classTypeOfInferre
     return inferred;
 }
 
-bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& resourceRequirements)
+Grounding OrganizationModel::resolveRequirements(const IRI& resourceProvider, const IRI& resourceRequirements)
 {
     IRI resourceProviderModel = getResourceModel(resourceProvider);
 
@@ -299,7 +328,7 @@ bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& 
 
     if(requirements.empty())
     {
-        throw std::invalid_argument("OrganizationModel::checkIfFulfills: no requirements found");
+        throw std::invalid_argument("OrganizationModel::resolveRequirements: no requirements found");
     }
 
     LOG_INFO_S << "Check " << std::endl
@@ -313,7 +342,7 @@ bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& 
     IRIList::const_iterator cit = requirements.begin();
 
     bool success = true;
-    std::map<IRI,IRI> grounding;
+    RequirementsGrounding grounding;
     std::map<IRI,bool> grounded;
     for(; cit != requirements.end(); ++cit)
     {
@@ -345,51 +374,17 @@ bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& 
             }
         }
 
-        //// Skip next step if dependency is fulfilled
-        //if(dependencyFulfilled)
-        //{
-        //    continue;
-        //}
-
-        //IRI resourceModel = getResourceModel(requirement);
-        //// Check for service
-        //{
-        //    LOG_DEBUG_S << "Search for service: '" << resourceModel << "'";
-        //    IRIList::iterator sit = std::find(availableServices.begin(), availableServices.end(), resourceModel);
-        //    if(sit != availableServices.end())
-        //    {
-        //        IRI availableService = *sit;
-        //        LOG_INFO_S << "requirement " << requirement << " fulfilled by service " << availableService;
-        //        grounding[requirement] = availableService;
-        //        dependencyFulfilled = true;
-        //        continue;
-        //    }
-        //}
-
-        // Check for capability
-        //{
-        //    LOG_DEBUG_S << "Search for capability: '" << resourceModel << "'";
-        //    IRIList::iterator sit = std::find(availableCapabilities.begin(), availableCapabilities.end(), resourceModel);
-        //    if(sit != availableCapabilities.end())
-        //    {
-        //        IRI availableCapability = *sit;
-        //        LOG_INFO_S << "requirement " << requirement << " fulfilled by capability " << availableCapability;
-        //        grounding[requirement] = availableCapability;
-        //        dependencyFulfilled = true;
-        //        continue;
-        //    }
-        //}
-
         if(!dependencyFulfilled)
         {
             LOG_INFO_S << "requirement " << requirement << " cannot be fulfilled by '" << resourceProvider << "'";
-            grounding[requirement] = IRI("?");
+            grounding[requirement] = Grounding::ungrounded();
             success = false;
             break;
         }
     }
 
-    std::map<IRI,IRI>::const_iterator mip = grounding.begin();
+    Grounding groundingMap(grounding);
+
     std::stringstream ss;
     ss << "Fulfillment: ";
     if(success)
@@ -401,13 +396,10 @@ bool OrganizationModel::checkIfFulfills(const IRI& resourceProvider, const IRI& 
 
     ss << "    resourceProvider [" << resourceProviderModel << "] '" << resourceProvider  << std::endl;
     ss << "    requirements for '" << requirementModel << "'" << std::endl;
+    ss << groundingMap.toString();
 
-    for(; mip != grounding.end(); ++mip)
-    {
-        ss << "    " << mip->first  << " -> " << mip->second << std::endl;
-    }
     LOG_INFO_S << ss.str();
-    return success;
+    return groundingMap;
 }
 
 bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherResource)
