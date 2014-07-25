@@ -93,6 +93,7 @@
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Actor">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+        <rdfs:comment>An actor is a physical or logical entity that can act, i.e. perform actions which have an effect</rdfs:comment>
     </owl:Class>
     
 
@@ -101,6 +102,31 @@
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ActorModel">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ResourceModel"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#Capability -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Capability">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+        <rdfs:comment>Capabililties represent &apos;soft&apos; resources that need to be available to provide services of perform actions</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#CapabilityModel -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#CapabilityModel">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ResourceModel"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#CompositeActor -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#CompositeActor">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Actor"/>
     </owl:Class>
     
 
@@ -137,14 +163,6 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerServiceModel -->
-
-    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerServiceModel">
-        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ServiceModel"/>
-    </owl:Class>
-    
-
-
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Resource -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
@@ -159,13 +177,18 @@
 
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Service -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Service"/>
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Service">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+        <rdfs:comment>A service is an offer to potential consumers</rdfs:comment>
+    </owl:Class>
     
 
 
     <!-- http://www.rock-robotics.org/2014/01/om-schema#ServiceModel -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ServiceModel"/>
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ServiceModel">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ResourceModel"/>
+    </owl:Class>
     
 
 
@@ -328,7 +351,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerServiceModel"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ServiceModel"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
@@ -349,7 +372,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#ImageProvider-requirement-0 -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ImageProvider-requirement-0">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Service"/>
         <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ImageProvider"/>
     </owl:NamedIndividual>
     
@@ -358,7 +381,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#ImageProvider-requirement-1 -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ImageProvider-requirement-1">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Service"/>
         <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ImageProvider"/>
     </owl:NamedIndividual>
     
@@ -367,7 +390,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Localization -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Localization">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ResourceModel"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#CapabilityModel"/>
     </owl:NamedIndividual>
     
 
@@ -375,7 +398,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Localization-requirement-0 -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Localization-requirement-0">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Capability"/>
         <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization"/>
     </owl:NamedIndividual>
     
@@ -394,7 +417,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Locomotion -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Locomotion">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ResourceModel"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#CapabilityModel"/>
     </owl:NamedIndividual>
     
 
@@ -402,7 +425,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Locomotion-requirement-0 -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Locomotion-requirement-0">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Capability"/>
         <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion"/>
     </owl:NamedIndividual>
     
@@ -411,7 +434,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Mapping -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Mapping">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ResourceModel"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#CapabilityModel"/>
     </owl:NamedIndividual>
     
 
@@ -419,7 +442,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Mapping-requirement-0 -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Mapping-requirement-0">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Capability"/>
         <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping"/>
     </owl:NamedIndividual>
     
@@ -436,7 +459,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#MoveTo -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#MoveTo">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ServiceModel"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#CapabilityModel"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping-requirement-0"/>
@@ -448,7 +471,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#MoveTo-requirement-0 -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#MoveTo-requirement-0">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Capability"/>
         <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MoveTo"/>
     </owl:NamedIndividual>
     
@@ -486,6 +509,7 @@
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Sherpa">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ActorModel"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera-requirement-1"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive-requirement-1"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-0"/>
@@ -513,7 +537,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider-requirement-0 -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider-requirement-0">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Service"/>
         <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider"/>
     </owl:NamedIndividual>
 </rdf:RDF>

@@ -157,7 +157,6 @@ IRI OrganizationModel::createNewActor(const IRISet& actorSet, const InterfaceCon
     mpOntology->instanceOf(actorModelName, OM::ActorModel());
 
     // Create Instance
-    mpOntology->subclassOf(OM::CompositeActor(), OM::Actor());
     mpOntology->instanceOf(actorName, OM::CompositeActor());
     mpOntology->relatedTo(actorName, OM::modelledBy(), actorModelName);
 
