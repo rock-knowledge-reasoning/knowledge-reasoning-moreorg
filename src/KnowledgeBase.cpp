@@ -627,8 +627,6 @@ IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& rel
                 individuals.push_back(iri);
             }
         }
-
-        LOG_DEBUG_S << "'" << individual << "' related via '" << relationProperty << "' to " << individuals;
     } catch(const std::exception& e)
     {
         LOG_WARN_S << "'" << individual << "' not related to any via '" << relationProperty << "': " << e.what();
