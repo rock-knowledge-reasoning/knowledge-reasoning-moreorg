@@ -140,24 +140,5 @@ public:
     InterfaceCombinationList generateInterfaceCombinations();
 };
 
-//
-///**
-// *
-// */
-//class SequenceHandler
-//{
-//    operator()
-//};
-//
-//class CombinatoricEngine
-//{
-//    IRIList resources;
-//
-//    void permutations(SequenceHandler handler, SequenceFilter filter);
-//
-//    void combinations(
-//
-//};
-
 } // end namespace owl_om
 #endif // OWL_OM_ORGANIZATION_MODEL_HPP
