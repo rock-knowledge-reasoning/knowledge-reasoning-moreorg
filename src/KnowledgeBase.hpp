@@ -390,10 +390,13 @@ public:
 
     /**
      * Retrieve all instances regarding a single instance and a selected property
+     * \param instance Instance where this relation is bound to
+     * \param relationProperty Property for this relation (which will be inverted)
+     * \param klass Optional filter klass for the result list, check if result is instance of given klass
      * \return list of instance that are related to instance via the inverse of the given 
      * relationProperty
      */
-    IRIList allInverseRelatedInstances(const IRI& instance, const IRI& relationProperty);
+    IRIList allInverseRelatedInstances(const IRI& instance, const IRI& relationProperty, const IRI& klass = IRI());
 
     /**
      * Retrieve all object properties

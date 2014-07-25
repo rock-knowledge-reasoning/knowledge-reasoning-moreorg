@@ -647,7 +647,7 @@ IRI KnowledgeBase::relatedInstance(const IRI& individual, const IRI& relationPro
     return instances.front();
 }
 
-IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const IRI& relationProperty)
+IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const IRI& relationProperty, const IRI& klass)
 {
     IRIList individuals;
     try {
@@ -662,8 +662,12 @@ IRIList KnowledgeBase::allInverseRelatedInstances(const IRI& individual, const I
         for(; cit != relatedIndividuals.end(); ++cit)
         {
             const TNamedEntry* entry = *cit;
-            LOG_INFO_S << "'" << individual << "' -" << relationProperty << " '" << entry->getName() << "'";
-            individuals.push_back( IRI::create( entry->getName() ) );
+            IRI iri( entry->getName() );
+
+            if( klass.empty() || isInstanceOf(iri, klass) )
+            {
+                individuals.push_back(iri);
+            }
         }
     } catch(const std::exception& e)
     {
