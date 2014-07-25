@@ -192,7 +192,7 @@ pddl_planner::representation::Problem PDDLExporter::toProblem(const Organization
     std::string embodies = "embodies";
     std::string mobile = "mobile";
     std::string provides = "provides";
-    std::string mobilityService = "MoveTo";
+    std::string mobilityCapability = "MoveTo";
 
     IRIList instances = model.ontology()->allInstancesOf( OM::Actor(), false);
     BOOST_FOREACH(IRI instance, instances)
@@ -207,16 +207,21 @@ pddl_planner::representation::Problem PDDLExporter::toProblem(const Organization
             }
 
             // provides: Actor provides Capability / Service
-            IRIList relatedServices = model.ontology()->allRelatedInstances(instance, OM::provides());
-            BOOST_FOREACH(IRI relatedService, relatedServices)
+            IRIList relatedServicesOrCapabilities = model.ontology()->allRelatedInstances(instance, OM::provides());
+            BOOST_FOREACH(IRI related, relatedServicesOrCapabilities)
             {
-                // embodies: CombinedActor embodies Actor
-                problem.addInitialStatus( Expression(provides, instanceName, relatedService.getFragment()) );
-
-                // mobile: general characteristics
-                if(relatedService.getFragment() == mobilityService)
+                if(model.ontology()->isInstanceOf(related, OM::ServiceModel()))
                 {
-                    problem.addInitialStatus( Expression(mobile, instanceName) );
+                    problem.addInitialStatus( Expression(provides, instanceName, related.getFragment()) );
+                }
+
+                if(model.ontology()->isInstanceOf(related, OM::CapabilityModel()))
+                {
+                    // mobile: general characteristics
+                    if(related.getFragment() == mobilityCapability)
+                    {
+                        problem.addInitialStatus( Expression(mobile, instanceName) );
+                    }
                 }
             }
         } catch(const std::invalid_argument& e)
