@@ -1,9 +1,11 @@
 #include "KnowledgeBase.hpp"
 
+#include <boost/assign/list_of.hpp>
+#include <boost/foreach.hpp>
+#include <base/Logging.hpp>
+
 #include <factpp/Kernel.h>
 #include <factpp/Actor.h>
-#include <boost/assign/list_of.hpp>
-#include <base/Logging.hpp>
 #include <factpp/tOntologyPrinterLISP.h>
 
 namespace owl_om {
@@ -20,27 +22,6 @@ std::map<KnowledgeBase::EntityType, std::string> KnowledgeBase::EntityTypeTxt = 
     ( KnowledgeBase::OBJECT_PROPERTY, "OBJECT_RELATION")
     ( KnowledgeBase::DATA_PROPERTY, "DATA_RELATION");
 
-
-Axiom::Axiom(TDLAxiom* axiom)
-    : mAxiom(axiom)
-{
-}
-
-ClassExpression::ClassExpression(TDLConceptExpression* expression)
-    : mExpression(expression)
-{}
-
-InstanceExpression::InstanceExpression(TDLIndividualExpression* expression)
-    : mExpression(expression)
-{}
-
-ObjectPropertyExpression::ObjectPropertyExpression(TDLObjectRoleExpression* expression)
-    : mExpression(expression)
-{}
-
-DataPropertyExpression::DataPropertyExpression(TDLDataRoleExpression* expression)
-    : mExpression(expression)
-{}
 
 TExpressionManager* KnowledgeBase::getExpressionManager()
 {
@@ -155,6 +136,14 @@ KnowledgeBase::KnowledgeBase()
         "http://www.w3.org/2002/07/owl#bottomObjectProperty", \
         "http://www.w3.org/2002/07/owl#topDataProperty", \
         "http://www.w3.org/2002/07/owl#bottomDataProperty");
+
+    // registry
+    // default data types
+    mDataTypes["string"] = getExpressionManager()->getStrDataType();
+    mDataTypes["int"] = getExpressionManager()->getIntDataType();
+    mDataTypes["double"] = getExpressionManager()->getRealDataType();
+    mDataTypes["bool"] = getExpressionManager()->getBoolDataType();
+    mDataTypes["time"] = getExpressionManager()->getTimeDataType();
 }
 
 KnowledgeBase::~KnowledgeBase()
@@ -419,6 +408,25 @@ Axiom KnowledgeBase::domainOf(const IRI& property, const IRI& domain, PropertyTy
             throw std::invalid_argument("Invalid property type '" + PropertyTypeTxt[propertyType] + "' for domainOf");
         }
     }
+}
+
+Axiom KnowledgeBase::valueOf(const IRI& individual, const IRI& property, const DataValue& dataValue)
+{
+    TDLAxiom* axiom = mKernel->valueOf( getInstance(individual).get(), getDataProperty(property).get(),dataValue.get());
+    return Axiom(axiom);
+}
+
+DataValue KnowledgeBase::dataValue(const std::string& value, const std::string& dataType)
+{
+    IRIDataTypeMap::const_iterator cit = mDataTypes.find(dataType);
+    if(cit == mDataTypes.end())
+    {
+        throw std::invalid_argument("owl_om::KnowledgeBase::dataValue: dataType '" + dataType + "' is unkown");
+    }
+
+    DataTypeName dataTypeName = cit->second;
+    const TDLDataValue* dataValue = getExpressionManager()->DataValue(value, dataTypeName.get());
+    return DataValue(dataValue);
 }
 
 Axiom KnowledgeBase::inverseOf(const IRI& base, const IRI& inverse)
@@ -809,6 +817,24 @@ bool KnowledgeBase::assertAndAddRelation(const IRI& instance, const IRI& relatio
             return false;
         }
     }
+}
+
+DataValue KnowledgeBase::getDataValue(const IRI& instance, const IRI& dataProperty)
+{
+    // Iterate overa all axioms and filter the relevant one
+    const AxiomVec& axioms = mKernel->getOntology().getAxioms();
+    BOOST_FOREACH(TDLAxiom* axiom, axioms)
+    {
+        TDLAxiomValueOf* valueAxiom = dynamic_cast<TDLAxiomValueOf*>(axiom);
+        DataPropertyExpression dataPropertyExpression = getDataProperty(dataProperty);
+        if(valueAxiom && dataPropertyExpression.get() == valueAxiom->getAttribute())
+        {
+            return DataValue( valueAxiom->getValue());
+        }
+    }
+
+    throw std::runtime_error("owl_om::KnowledgeBase::getDataValue: instance " + instance.toQuotedString() + " has no value related via " + dataProperty.toQuotedString());
+
 }
 
 std::string KnowledgeBase::toString(representation::Type representation) const

@@ -29,6 +29,7 @@ typedef std::map<IRI, ClassExpression > IRIClassExpressionMap;
 typedef std::map<IRI, InstanceExpression > IRIInstanceExpressionMap;
 typedef std::map<IRI, ObjectPropertyExpression > IRIObjectPropertyExpressionMap;
 typedef std::map<IRI, DataPropertyExpression > IRIDataPropertyExpressionMap;
+typedef std::map<IRI, DataTypeName > IRIDataTypeMap;
 
 enum Representation { UNKNOWN = 0, LISP = 1 };
 
@@ -44,6 +45,7 @@ class KnowledgeBase
     IRIClassExpressionMap mClasses;
     IRIObjectPropertyExpressionMap mObjectProperties;
     IRIDataPropertyExpressionMap mDataProperties;
+    IRIDataTypeMap mDataTypes;
 
     bool hasClass(const IRI& klass) const { return mClasses.count(klass); }
 
@@ -58,6 +60,8 @@ public:
 
     KnowledgeBase();
     ~KnowledgeBase();
+
+    ReasoningKernel* getReasoningKernel() { return mKernel; }
 
     /**
      * Activate verbose output
@@ -244,6 +248,17 @@ public:
      * \param domain Type of subject for this relation
      */
     Axiom domainOf(const IRI& property, const IRI& domain, PropertyType PropertyType);
+
+    /**
+     * Define associated value of an individual
+     * \param value of
+     */
+    Axiom valueOf(const IRI& individual, const IRI& property, const DataValue& dataValue);
+
+    /**
+     * Define a dataType
+     */
+    DataValue dataValue(const std::string& value, const std::string& dataType);
 
     /**
      * Define one of a class relationship
@@ -443,6 +458,12 @@ public:
      * \return true if relation has been successfully been added
      */
     bool assertAndAddRelation(const IRI& instance, const IRI& relation, const IRI& otherInstance);
+
+    /**
+     * Retrieve data value associated with instance
+     * \return data value
+     */
+    DataValue getDataValue(const IRI& instance, const IRI& dataProperty);
 
     /**
      * Print the ontology

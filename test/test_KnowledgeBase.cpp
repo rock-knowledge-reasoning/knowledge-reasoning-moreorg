@@ -7,6 +7,9 @@
 #include <owl_om/Combinatorics.hpp>
 #include <owl_om/metrics/Redundancy.hpp>
 
+#include <factpp/Kernel.h>
+#include <factpp/Actor.h>
+
 using namespace owl_om;
 
 BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
@@ -43,6 +46,61 @@ BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
     BOOST_REQUIRE_MESSAGE( klasses.size() == 3, "Number of classes is '" << klasses.size() << "' expected 3");
 
 }
+
+BOOST_AUTO_TEST_CASE(it_should_handle_om_datavalues)
+{
+    using namespace owlapi::model;
+    KnowledgeBase kb;
+    kb.subclassOf("Robot","TOP");
+    kb.instanceOf("CREX","Robot");
+    kb.dataProperty("hasWeight");
+
+    DataValue dataValue = kb.dataValue("100","int");
+    kb.valueOf("CREX","hasWeight", dataValue);
+
+    // getNeighbours etc. do not work for data, thus implemented an alternative way 
+    // to retrieve information about data value from this representation
+    //
+    //kb.subclassOf("Sensor","TOP");
+    //kb.instanceOf("Camera","Sensor");
+    //kb.objectProperty("hasPart");
+    //kb.relatedTo("CREX","hasPart", "Camera");
+    //const KnowledgeExplorer::TCGNode* node = kb.getReasoningKernel()->buildCompletionTree(klass.get());
+    //
+    //ClassExpression klass = kb.getClassLazy("Robot");
+    //InstanceExpression instance = kb.getInstance("CREX");
+    //
+    //{
+    //    KnowledgeExplorer::TCGNodeVec result;
+    //    kb.getReasoningKernel()->getNeighbours ( node, dataRole.get(), result );
+    //    BOOST_TEST_MESSAGE("RESULT SIZE: " << result.size());
+    //}
+
+    //{
+    //    ReasoningKernel::NamesVector vector;
+    //    bool data = true;
+    //    bool needInverse = false;
+    //    kb.getReasoningKernel()->getRelatedRoles (instance.get(), vector, data, needInverse);
+    //    BOOST_TEST_MESSAGE("RESULT SIZE: " << vector.size());
+    //    // std::vector<const TNamedEntry*>
+    //    BOOST_FOREACH(const TNamedEntry* entry, vector)
+    //    {
+    //        BOOST_TEST_MESSAGE("Entry " << entry->getName() << " id: " << entry->getId());
+    //    }
+    //}
+
+    //{
+    //    ReasoningKernel::TCGRoleSet result;
+    //    bool onlyDet = false;
+    //    kb.getReasoningKernel()->getDataRoles (node, result, onlyDet );
+    //    BOOST_TEST_MESSAGE("ROLE SET SIZE: " << result.size());
+    //}
+    {
+        DataValue dataValue = kb.getDataValue("CREX","hasWeight");
+        BOOST_TEST_MESSAGE( "DataValue: " << dataValue.getType() << " - " << dataValue.getValue());
+    }
+}
+
 
 BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
 {

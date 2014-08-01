@@ -24,6 +24,7 @@ rock_library(owl_om
         owlapi/model/URI.cpp
         exporter/PDDLExporter.cpp
         metrics/Redundancy.cpp
+        reasoner/factpp/Types.cpp
     HEADERS KnowledgeBase.hpp
         OrganizationModel.hpp
         OWLApi.hpp

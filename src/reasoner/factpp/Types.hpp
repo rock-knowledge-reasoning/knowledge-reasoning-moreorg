@@ -1,12 +1,18 @@
 #ifndef OWL_OM_REASONER_FACTPP_TYPES_HPP
 #define OWL_OM_REASONER_FACTPP_TYPES_HPP
 
+#include <string>
+#include <cstdlib>
+
 class TExpressionManager;
 class TDLAxiom;
 class TDLConceptExpression;
 class TDLIndividualExpression;
 class TDLObjectRoleExpression;
 class TDLDataRoleExpression;
+class TDLDataValue;
+class TDLDataExpression;
+class TDLDataTypeName;
 class ReasoningKernel;
 
 namespace owl_om {
@@ -61,6 +67,42 @@ public:
 
     const TDLDataRoleExpression* get() const { return mExpression; }
 };
+
+class DataValue
+{
+    const TDLDataValue* mExpression;
+
+public:
+    DataValue(const TDLDataValue* expression = NULL);
+
+    const TDLDataValue* get() const { return mExpression; }
+
+    std::string getValue() const;
+    std::string getType() const;
+};
+
+class DataRange
+{
+    const TDLDataExpression* mExpression;
+
+public:
+    DataRange(const TDLDataExpression* expression = NULL);
+
+    const TDLDataExpression* get() const { return mExpression; }
+};
+
+class DataTypeName
+{
+    TDLDataTypeName* mExpression;
+
+public:
+    DataTypeName(TDLDataTypeName* expression = NULL);
+
+    const TDLDataTypeName* get() const { return mExpression; }
+    TDLDataTypeName* get() { return mExpression; }
+};
+
+
 
 } // end namespace owl_om
 #endif
