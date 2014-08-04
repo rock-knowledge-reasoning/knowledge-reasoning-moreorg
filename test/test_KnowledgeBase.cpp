@@ -58,6 +58,11 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_datavalues)
     DataValue dataValue = kb.dataValue("100","int");
     kb.valueOf("CREX","hasWeight", dataValue);
 
+    BOOST_REQUIRE_MESSAGE( dataValue.toDouble() == 100.0, "Conversion to double");
+
+    DataValue dataValueString = kb.dataValue("foo","string");
+    BOOST_REQUIRE_THROW( dataValueString.toDouble(), std::runtime_error)
+
     // getNeighbours etc. do not work for data, thus implemented an alternative way 
     // to retrieve information about data value from this representation
     //

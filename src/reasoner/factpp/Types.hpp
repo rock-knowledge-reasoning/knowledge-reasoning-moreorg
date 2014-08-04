@@ -79,6 +79,12 @@ public:
 
     std::string getValue() const;
     std::string getType() const;
+
+    /**
+     * Convert value to double if possible
+     * \throw
+     */
+    double toDouble() const;
 };
 
 class DataRange

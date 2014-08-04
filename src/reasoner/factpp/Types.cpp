@@ -1,4 +1,6 @@
 #include "Types.hpp"
+#include <sstream>
+#include <stdexcept>
 
 #include <factpp/Kernel.h>
 #include <factpp/Actor.h>
@@ -48,6 +50,23 @@ std::string DataValue::getType() const
         return getBasicDataType(dataTypeName)->getName();
     }
     return std::string();
+
+}
+
+double DataValue::toDouble() const
+{
+    std::stringstream ss;
+    ss.exceptions(std::ios::failbit);
+    ss << getValue();
+
+    double numericValue;
+    try {
+        ss >> numericValue;
+        return numericValue;
+    } catch(const std::exception& e)
+    {
+        throw std::runtime_error("owl_om::DataValue::toDouble invalid value format -- '" + getValue() + "' cannot be converted to double");
+    }
 
 }
 
