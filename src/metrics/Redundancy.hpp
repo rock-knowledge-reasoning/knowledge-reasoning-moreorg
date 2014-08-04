@@ -41,6 +41,12 @@ class Redundancy
     uint32_t computeOutDegree(const IRI& iri, const IRI& relation, const IRI& filter = IRI());
     uint32_t computeInDegree(const IRI& iri, const IRI& relation, const IRI& filter = IRI());
 
+    /**
+     * Compute the probability of survival for a resource with respect to a given actor
+     *
+     */
+    double computeProbabilityOfSurvival(const IRI& resource, const IRI& actor);
+
 public:
     Redundancy(const OrganizationModel& organization);
 

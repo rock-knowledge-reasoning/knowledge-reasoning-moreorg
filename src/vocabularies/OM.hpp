@@ -31,6 +31,8 @@ public:
     VOCABULARY_ADD_WORD(modelledBy);
     VOCABULARY_ADD_WORD(provides);
     VOCABULARY_ADD_WORD(uses);
+
+    VOCABULARY_ADD_WORD(probabilityOfFailure);
 };
 
 } // end namespace vocabulary
