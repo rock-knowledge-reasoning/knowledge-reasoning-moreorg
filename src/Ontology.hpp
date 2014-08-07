@@ -19,10 +19,13 @@ class Ontology : public owl_om::KnowledgeBase
 {
     friend class OrganizationModel;
 
-private:
+public:
+    /**
+     * Contructs an empty ontology
+     * Prefer using Ontology::fromFile
+     */
     Ontology();
 
-public:
     /**
      * Deconstructor implementation
      */
