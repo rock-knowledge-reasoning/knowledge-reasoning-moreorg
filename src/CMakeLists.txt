@@ -25,10 +25,12 @@ rock_library(owl_om
         exporter/PDDLExporter.cpp
         metrics/Redundancy.cpp
         reasoner/factpp/Types.cpp
-    HEADERS KnowledgeBase.hpp
+    HEADERS Combinatorics.hpp
+        Exceptions.hpp
+        KnowledgeBase.hpp
+        Ontology.hpp
         OrganizationModel.hpp
         OWLApi.hpp
-        Ontology.hpp
         Vocabulary.hpp
         vocabularies/OM.hpp
         vocabularies/OWL.hpp
@@ -42,7 +44,7 @@ rock_library(owl_om
         exporter/PDDLExporter.hpp
         metrics/Redundancy.hpp
         owlapi/io/XMLUtils.hpp
-        owlapi/model/AnonymousIndividual.hpp
+        #owlapi/model/AnonymousIndividual.hpp
         owlapi/model/HasIRI.hpp
         owlapi/model/HasAnnotations.hpp
         owlapi/model/IRI.hpp
