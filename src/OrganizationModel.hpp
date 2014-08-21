@@ -81,6 +81,8 @@ class OrganizationModel
 
 public:
 
+    typedef boost::shared_ptr<OrganizationModel> Ptr;
+
     /**
      * Constructor for an empty OrganizationModel
      */
