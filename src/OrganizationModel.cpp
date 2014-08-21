@@ -655,7 +655,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
     IRIList actors = mpOntology->allInstancesOf( OM::Actor(), true );
     if(actors.size() < 2)
     {
-        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not actors for recombination available, i.e. no more than 1");
+        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: no actors for recombination available, i.e. no more than 1");
     }
     {
         IRIList::const_iterator ait = actors.begin();
