@@ -315,20 +315,49 @@ void OrganizationModel::runInferenceEngine()
     mStats.numberOfInferenceEpochs = count;
 }
 
+IRIList OrganizationModel::allRelatedInstances(const IRI& instance, const IRI& relation) const
+{
+    std::pair<IRI,IRI> key(instance, relation);
+    IRIRelationCache::const_iterator it = mRelationsCache.find(key);
+    if(it != mRelationsCache.end())
+    {
+        return it->second;
+    }
+
+    IRIList all = mpOntology->allRelatedInstances(instance, relation);
+    mRelationsCache[key] = all;
+    return all;
+}
+
+IRIList OrganizationModel::getModelRequirements(const IRI& model) const
+{
+    IRICache::const_iterator it = mModelRequirementsCache.find(model);
+    if(it != mModelRequirementsCache.end())
+    {
+        return it->second;
+    }
+
+    IRI requirementModel = getResourceModel(model);
+    IRIList requirements = mpOntology->allRelatedInstances( requirementModel, OM::dependsOn(), OM::Requirement());
+    mModelRequirementsCache[model] = requirements;
+    return requirements;
+}
+
 IRIList OrganizationModel::infer(const IRI& actor, const IRIList& models)
 {
     IRIList inferred;
 
     IRI resourceProviderModel = getResourceModel(actor);
-    IRIList availableResources = mpOntology->allRelatedInstances(actor, OM::has());
-    IRIList availableServices = mpOntology->allRelatedInstances(actor, OM::provides(), OM::ServiceModel());
-    IRIList availableCapabilities = mpOntology->allRelatedInstances(actor, OM::has(), OM::Capability());
+    IRIList availableResources = allRelatedInstances(actor, OM::has());
+    //IRIList availableServices = mpOntology->allRelatedInstances(actor, OM::provides(), OM::ServiceModel());
+    //IRIList availableCapabilities = mpOntology->allRelatedInstances(actor, OM::has(), OM::Capability());
 
     LOG_DEBUG_S << "Check " << std::endl
         << "    resourceProvider [" << resourceProviderModel << "] '" << actor  << std::endl
-        << "    available resources:     " << availableResources << std::endl
-        << "    available services:      " << availableServices << std::endl
-        << "    available capabilities:  " << availableCapabilities << std::endl;
+        << "    available resources:     " << availableResources << std::endl;
+    //    << "    available services:      " << availableServices << std::endl
+    //    << "    available capabilities:  " << availableCapabilities << std::endl;
+
 
     BOOST_FOREACH(const IRI& model, models)
     {
@@ -340,7 +369,8 @@ IRIList OrganizationModel::infer(const IRI& actor, const IRIList& models)
             LOG_DEBUG_S << "infer " << modelType << " : actor '" << actor << "' resolveRequirements '" << model << "'";
 
             try {
-                Grounding grounding = resolveRequirements(model, availableResources, actor);
+                IRIList requirements = getModelRequirements(model);
+                Grounding grounding = resolveRequirements(requirements, availableResources, actor, model);
                 if(grounding.isComplete())
                 {
                     IRI instance = createNewFromModel(model);
@@ -372,11 +402,8 @@ IRIList OrganizationModel::infer(const IRI& actor, const IRIList& models)
     return inferred;
 }
 
-Grounding OrganizationModel::resolveRequirements(const IRI& resourceRequirement, const IRIList& availableResources, const IRI& resourceProvider)
+Grounding OrganizationModel::resolveRequirements(const IRIList& requirements, const IRIList& availableResources, const IRI& resourceProvider, const IRI& requirementModel)
 {
-    IRI requirementModel = getResourceModel(resourceRequirement);
-    IRIList requirements = mpOntology->allRelatedInstances( requirementModel, OM::dependsOn(), OM::Requirement());
-
     if(requirements.empty())
     {
         throw std::invalid_argument("OrganizationModel::resolveRequirements: no requirements found");
@@ -505,7 +532,7 @@ IRI OrganizationModel::createNewFromModel(const IRI& model, bool createDependant
     }
 
     // Create dependencies that come with that model
-    IRIList dependencies = mpOntology->allRelatedInstances(model, OM::dependsOn(), OM::Requirement());
+    IRIList dependencies = getModelRequirements(model);
     IRIList newDependants;
     BOOST_FOREACH(IRI dependency, dependencies)
     {

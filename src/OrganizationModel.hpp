@@ -91,6 +91,8 @@ class OrganizationModel
 public:
 
     typedef boost::shared_ptr<OrganizationModel> Ptr;
+    typedef std::map< IRI, IRIList> IRICache;
+    typedef std::map< std::pair<IRI,IRI>, IRIList> IRIRelationCache;
 
     /**
      * Constructor for an empty OrganizationModel
@@ -122,9 +124,10 @@ public:
      * \param resourceRequirement Resource requirement
      * \param availableResources List of available resources
      * \param resourceProvider Optional label for the resource provider
+     * \param requirementModel Optional label for requirement model that the requirements originate from
      * \return corresponding grounding, which need to be check on completness
      */
-    Grounding resolveRequirements(const IRI& resourceRequirement, const IRIList& availableResources, const IRI& resourceProvider = IRI());
+    Grounding resolveRequirements(const IRIList& resourceRequirements, const IRIList& availableResources, const IRI& resourceProvider = IRI(), const IRI& requirementModel = IRI());
 
     // PREDICATES
     /**
@@ -198,6 +201,14 @@ public:
     Statistics getStatistics() { return mStats; }
 
 private:
+
+    /**
+     * Cached version
+     */
+    IRIList allRelatedInstances(const IRI& actor, const IRI& relation) const;
+
+    IRIList getModelRequirements(const IRI& model) const;
+
     /**
      * Creates a new clas of actor from the given set of actor
      * \return IRI of new actor, or empty IRI if the actor already exists
@@ -218,6 +229,9 @@ private:
     Ontology::Ptr mpOntology;
 
     Statistics mStats;
+
+    mutable IRICache mModelRequirementsCache;
+    mutable IRIRelationCache mRelationsCache;
 };
 
 } // end namespace owl_om
