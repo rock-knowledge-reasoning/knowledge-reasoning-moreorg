@@ -47,6 +47,22 @@ std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection
     return os;
 }
 
+std::string Statistics::toString() const
+{
+    std::stringstream txt;
+    txt << "Organization Model Statistics" << std::endl
+        << "    upper bound for combinations:  " << upperCombinationBound << std::endl
+        << "    number of inference epochs:    " << numberOfInferenceEpochs << std::endl
+        << "    time elapsed in s:             " << timeElapsed.toSeconds() << std::endl
+        << "    # of interface combinations:   " << interfaceCombinations.size() << std::endl
+        << "    # of known actors:             " << actorsKnown.size() << std::endl
+        << "    # of inferred actors:          " << actorsInferred.size() << std::endl
+        << "    # of composite actors pre:     " << actorsCompositePrevious.size() << std::endl
+        << "    # of composite actors post:     " << actorsCompositePost.size() << std::endl;
+
+    return txt.str();
+}
+
 std::ostream& operator<<(std::ostream& os, const InterfaceConnectionList& list)
 {
     InterfaceConnectionList::const_iterator cit = list.begin();
@@ -116,6 +132,9 @@ void OrganizationModel::refresh()
 {
     mpOntology->refresh();
 
+    mStats.upperCombinationBound = upperCombinationBound();
+    mStats.timeElapsed = base::Time::now();
+
     InterfaceCombinationList interfaceCombinations;
     try {
         interfaceCombinations = generateInterfaceCombinations();
@@ -124,6 +143,11 @@ void OrganizationModel::refresh()
     {
         LOG_WARN_S << e.what();
     }
+
+    mStats.actorsKnown = mpOntology->allInstancesOf(OM::Actor(), false);
+    mStats.actorsCompositePrevious = mpOntology->allInstancesOf(OM::CompositeActor(), true);
+    mStats.actorsCompositeModelPrevious = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
+    mStats.interfaceCombinations = interfaceCombinations;
 
     if(!interfaceCombinations.empty())
     {
@@ -150,11 +174,16 @@ void OrganizationModel::refresh()
         mpOntology->refresh();
         LOG_INFO_S << "OrganizationModel: with inferred actors: " << newActors;
 
+        mStats.actorsInferred = newActors;
+
     } else {
         LOG_INFO_S << "OrganizationModel: no interface combinations available, so no actors inferred";
     }
 
     runInferenceEngine();
+    mStats.timeElapsed = base::Time::now() - mStats.timeElapsed;
+    mStats.actorsCompositePost = mpOntology->allInstancesOf(OM::CompositeActor(), true);
+    mStats.actorsCompositeModelPost = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
 }
 
 IRI OrganizationModel::createNewActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id)
@@ -255,6 +284,7 @@ void OrganizationModel::runInferenceEngine()
     LOG_DEBUG_S << "Validate known capabilities: " << capabilities;
 
     bool updated = true;
+    uint32_t count = 0;
     while(updated)
     {
         LOG_DEBUG_S << "Run inference engine for actors: " << actors;
@@ -281,6 +311,8 @@ void OrganizationModel::runInferenceEngine()
             }
         }
     }
+
+    mStats.numberOfInferenceEpochs = count;
 }
 
 IRIList OrganizationModel::infer(const IRI& actor, const IRIList& models)
@@ -483,7 +515,7 @@ IRI OrganizationModel::createNewFromModel(const IRI& model, bool createDependant
         if(resourceModel.empty())
         {
             throw std::invalid_argument("owl_om::OrganizationModel::createNewFromModel: could not infer model for dependency / requirement '" + dependency.toString() + "'");
-        } 
+        }
 
         LOG_DEBUG_S << "CreateNewFromModel: dependency of " << newInstanceName << std::endl
             << "    dependency:        " << dependency << std::endl
@@ -615,6 +647,32 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
 
     LOG_DEBUG_S << "Valid combinations: " << validCombinations;
     return validCombinations;
+}
+
+uint32_t OrganizationModel::upperCombinationBound()
+{
+    using namespace base::combinatorics;
+
+    IRIList interfaces = mpOntology->allInstancesOf( OM::Interface(), true);
+    if(interfaces.size() < 2)
+    {
+        return 0;
+    }
+
+    Combination<IRI> interfaceCombinations(interfaces, 2, EXACT);
+
+    IRIList actors = mpOntology->allInstancesOf( OM::Actor(), true );
+    if(actors.size() == 1)
+    {
+        return 0;
+    }
+
+    uint32_t numberOfInterfaceCombinations = interfaceCombinations.numberOfCombinations();
+    size_t maximumNumberOfConnections =  actors.size() - 1;
+
+    std::vector<InterfaceConnection> validConnections( numberOfInterfaceCombinations );
+    Combination<InterfaceConnection> connectionCombination( validConnections, maximumNumberOfConnections, MAX);
+    return connectionCombination.numberOfCombinations();
 }
 
 }

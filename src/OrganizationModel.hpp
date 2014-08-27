@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <owl_om/Ontology.hpp>
+#include <base/Time.hpp>
 
 namespace owl_om {
 
@@ -37,6 +38,29 @@ struct InterfaceConnection
 
 typedef std::vector< InterfaceConnection > InterfaceConnectionList;
 typedef std::vector< InterfaceConnectionList > InterfaceCombinationList;
+
+/**
+ * Statistic of the organization model engine
+ */
+struct Statistics
+{
+    uint32_t upperCombinationBound;
+    uint32_t numberOfInferenceEpochs;
+    base::Time timeElapsed;
+
+    InterfaceCombinationList interfaceCombinations;
+
+    IRIList actorsKnown;
+    IRIList actorsInferred;
+
+    IRIList actorsCompositePrevious;
+    IRIList actorsCompositePost;
+
+    IRIList actorsCompositeModelPrevious;
+    IRIList actorsCompositeModelPost;
+
+    std::string toString() const;
+};
 
 std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection);
 std::ostream& operator<<(std::ostream& os, const InterfaceConnectionList& list);
@@ -162,6 +186,17 @@ public:
      */
     InterfaceCombinationList generateInterfaceCombinations();
 
+    /**
+     * Compute upper bound for actor combinations
+     * \return upper bound
+     */
+    uint32_t upperCombinationBound();
+
+    /**
+     * Statistics
+     */
+    Statistics getStatistics() { return mStats; }
+
 private:
     /**
      * Creates a new clas of actor from the given set of actor
@@ -182,6 +217,7 @@ private:
 
     Ontology::Ptr mpOntology;
 
+    Statistics mStats;
 };
 
 } // end namespace owl_om
