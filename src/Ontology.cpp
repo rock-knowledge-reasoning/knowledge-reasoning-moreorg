@@ -37,6 +37,9 @@ void Ontology::reload()
 {
     using namespace owl_om::db::query;
 
+    // Default initialization
+    getClassLazy(vocabulary::OWL::Class());
+
     {
         db::query::Results results = findAll(Subject(),vocabulary::RDF::type(),vocabulary::OWL::Class());
         ResultsIterator it(results);
@@ -87,6 +90,7 @@ void Ontology::reload()
                 } else if ( object == vocabulary::OWL::ObjectProperty())
                 {
                     objectProperty(subject);
+
                 } else if ( object == vocabulary::OWL::FunctionalProperty())
                 {
                     // delayed handling
@@ -177,6 +181,21 @@ void Ontology::reload()
                 }
             }
         }
+        {
+            Results inverses = findAll(relation, vocabulary::OWL::inverseOf(), Object());
+            if(!inverses.empty())
+            {
+                ResultsIterator inversesIt(inverses);
+                while(inversesIt.next())
+                {
+                    owlapi::model::IRI inverseType = inversesIt[Object()];
+                    inverseOf(relation, inverseType);
+
+                    LOG_WARN_S << "SET INVERSE: " << relation << " to " << inverseType;
+                }
+            }
+        }
+
     }
 }
 

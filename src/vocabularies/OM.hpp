@@ -24,11 +24,14 @@ public:
     VOCABULARY_ADD_WORD(Location);
     VOCABULARY_ADD_WORD(Service);
 
+    VOCABULARY_ADD_WORD(Requirement);
+
     // Properties
     VOCABULARY_ADD_WORD(compatibleWith);
     VOCABULARY_ADD_WORD(dependsOn);
     VOCABULARY_ADD_WORD(has);
     VOCABULARY_ADD_WORD(modelledBy);
+    VOCABULARY_ADD_WORD(models);
     VOCABULARY_ADD_WORD(provides);
     VOCABULARY_ADD_WORD(uses);
 

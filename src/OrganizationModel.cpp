@@ -193,20 +193,21 @@ IRI OrganizationModel::createNewActor(const IRISet& actorSet, const InterfaceCon
         {
             LOG_DEBUG_S << "New actor '" << actorName << "' has '" << *ait << " with count " << actorSet.size();
             mpOntology->relatedTo(actorName, OM::has(), *ait);
+
+            // ActorModel dependsOn the 'requirement instances of the modelled resources
+            //mpOntology->relatedTo(actorModelName, OM::dependsOn(), getResourceModelRequirement(*ait));
         }
     }
 
     IRIList usedInterfaces;
-    // TODO: add depend_on dependency for actor model resources
     {
-        // mpOntology->relatedTo(actorClassFromRecombination, OM::dependsOn(), getResourceModel(actor));
-        // mpOntology->relatedTo(actorClassFromRecombination, OM::dependsOn(), getResourceModel(*cit));
-
+        // Associate actor with used interfaces
         InterfaceConnectionList::const_iterator iit = interfaceConnections.begin();
         for(; iit != interfaceConnections.end(); ++iit)
         {
-            mpOntology->relatedTo(actorModelName, OM::uses(), iit->begin);
-            mpOntology->relatedTo(actorModelName, OM::uses(), iit->end);
+
+            mpOntology->relatedTo(actorName, OM::uses(), iit->begin);
+            mpOntology->relatedTo(actorName, OM::uses(), iit->end);
 
             usedInterfaces.push_back(iit->begin);
             usedInterfaces.push_back(iit->end);
@@ -251,14 +252,14 @@ void OrganizationModel::runInferenceEngine()
             const IRI& actor = *actorIt;
 
             {
-                IRIList inferred = infer(actor, OM::Service(), services);
+                IRIList inferred = infer(actor, services);
                 if(!inferred.empty())
                 {
                     updated = true;
                 }
             }
             {
-                IRIList inferred = infer(actor, OM::Capability(), capabilities);
+                IRIList inferred = infer(actor, capabilities);
                 if(!inferred.empty())
                 {
                     updated = true;
@@ -268,7 +269,7 @@ void OrganizationModel::runInferenceEngine()
     }
 }
 
-IRIList OrganizationModel::infer(const IRI& actor, const IRI& classTypeOfInferred, const IRIList& models)
+IRIList OrganizationModel::infer(const IRI& actor, const IRIList& models)
 {
     IRIList inferred;
 
@@ -285,7 +286,7 @@ IRIList OrganizationModel::infer(const IRI& actor, const IRI& classTypeOfInferre
                 Grounding grounding = resolveRequirements(actor, model);
                 if(grounding.isComplete())
                 {
-                    IRI instance = createNewFromModel( classTypeOfInferred, model);
+                    IRI instance = createNewFromModel(model);
 
                     mpOntology->relatedTo(actor, OM::provides(), model);
                     mpOntology->relatedTo(actor, OM::has(), instance);
@@ -324,7 +325,7 @@ Grounding OrganizationModel::resolveRequirements(const IRI& resourceProvider, co
     IRIList availableCapabilities = mpOntology->allRelatedInstances(resourceProvider, OM::has(), OM::Capability());
 
     IRI requirementModel = getResourceModel(resourceRequirements);
-    IRIList requirements = mpOntology->allRelatedInstances( requirementModel, OM::dependsOn());
+    IRIList requirements = mpOntology->allRelatedInstances( requirementModel, OM::dependsOn(), OM::Requirement());
 
     if(requirements.empty())
     {
@@ -404,169 +405,13 @@ Grounding OrganizationModel::resolveRequirements(const IRI& resourceProvider, co
 
 bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherResource)
 {
-    IRIList resourceInterfaces;
-    IRIList otherResourceInterfaces;
-
-    // First extract available interfaces from the associated models
-    {
-        IRIList interfaces = mpOntology->allRelatedInstances(resource, OM::has());
-        IRIList::const_iterator cit = interfaces.begin();
-        for(; cit != interfaces.end(); ++cit)
-        {
-            if( mpOntology->isInstanceOf(*cit, OM::Interface()) )
-            {
-                LOG_INFO_S << resource << " has (Interface) " << *cit;
-                resourceInterfaces.push_back(*cit);
-            }
-        }
-    }
-    {
-        IRIList interfaces = mpOntology->allRelatedInstances(otherResource, OM::has());
-        IRIList::const_iterator cit = interfaces.begin();
-        for(; cit != interfaces.end(); ++cit)
-        {
-            if( mpOntology->isInstanceOf(*cit, OM::Interface()) )
-            {
-                LOG_INFO_S << otherResource << " has (Interface) " << *cit;
-                otherResourceInterfaces.push_back(*cit);
-            }
-        }
-    }
-
-
-    LOG_DEBUG_S << "Check compatibility of '" << resource << " with '" << otherResource << "'" << std::endl
-        << "    interfaces of first: " << resourceInterfaces << std::endl
-        << "    interfaces of second: " << otherResourceInterfaces << std::endl;
-
-    // For each interface check if the models are compatible to each other
-    IRIList::const_iterator rit = resourceInterfaces.begin();
-    for(; rit != resourceInterfaces.end(); ++rit)
-    {
-        IRI interface = *rit;
-        IRI interfaceModel = getResourceModel(interface);
-
-        IRIList::const_iterator oit = otherResourceInterfaces.begin();
-        for(; oit != otherResourceInterfaces.end(); ++oit)
-        {
-            IRI otherInterface = *oit;
-            IRI otherInterfaceModel = getResourceModel(otherInterface);
-
-            if( mpOntology->isRelatedTo(interfaceModel, OM::compatibleWith(), otherInterfaceModel) )
-            {
-                LOG_DEBUG_S << resource << " compatibleWith " << otherResource << " via " << interface << "[" << interfaceModel << "] and " << otherInterface << "[" << otherInterfaceModel << "]";
-                return true;
-            }
-        }
-    }
-
-    LOG_DEBUG_S << resource << " is not compatibleWith " << otherResource << " via any interface";
-    return false;
-}
-
-CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, const IRI& otherInstance)
-{
-    IRIList usedInterfaces;
-
-    IRIList resourceInterfaces;
-    IRIList otherResourceInterfaces;
-
-    IRIList resourceUsedInstances = mpOntology->allRelatedInstances(instance, OM::uses());
-    IRIList otherResourceUsedInstances = mpOntology->allRelatedInstances(otherInstance, OM::uses());
-
-    {
-        // Identify the list of unused interfaces for 'instance'
-        IRIList interfaces = mpOntology->allRelatedInstances( instance, OM::has());
-        IRIList::const_iterator cit = interfaces.begin();
-        for(; cit != interfaces.end(); ++cit)
-        {
-            if( mpOntology->isInstanceOf(*cit, OM::Interface()) )
-            {
-                IRIList::iterator uit = std::find(resourceUsedInstances.begin(), resourceUsedInstances.end(), *cit);
-                if( uit != resourceUsedInstances.end())
-                {
-                    LOG_DEBUG_S << instance << " uses (Interface) " << *cit << " already";
-                } else {
-                    LOG_DEBUG_S << instance << " has unused (Interface) " << *cit;
-                    resourceInterfaces.push_back(*cit);
-                }
-            }
-        }
-    }
-    {
-        // Identify the list of unused interfaces for 'otherInstance'
-        IRIList interfaces = mpOntology->allRelatedInstances( otherInstance, OM::has());
-        IRIList::const_iterator cit = interfaces.begin();
-        for(; cit != interfaces.end(); ++cit)
-        {
-            if( mpOntology->isInstanceOf(*cit, OM::Interface()) )
-            {
-                IRIList::iterator uit = std::find(otherResourceUsedInstances.begin(), otherResourceUsedInstances.end(), *cit);
-                if( uit != otherResourceUsedInstances.end())
-                {
-                    LOG_DEBUG_S << otherInstance << " uses (Interface) " << *cit << " already";
-                } else {
-                    LOG_DEBUG_S << otherInstance << " has (Interface) " << *cit;
-                    otherResourceInterfaces.push_back(*cit);
-                }
-            }
-        }
-    }
-
-    LOG_DEBUG_S << "Check compatibility: " << instance << " <--> " << otherInstance << std::endl
-        << "    used instances by first:        " << resourceUsedInstances << std::endl
-        << "    used instances by second:       " << otherResourceUsedInstances << std::endl
-        << "    available interfaces by first:  " << resourceInterfaces << std::endl
-        << "    available interfaces by second: " << otherResourceInterfaces << std::endl;
-
-    if(resourceInterfaces.empty() || otherResourceInterfaces.empty())
-    {
-        LOG_INFO_S << "'" << instance << "' or '" << otherInstance << "' has no interfaces -- returning empty candidate list";
-        return CandidatesList();
-    }
-
-    CandidatesList candidates;
-    // Identify how both resources can be matched -- i.e. which interfaces mapping are available
-    // Currently greedy: picks the first match
-    IRIList::const_iterator rit = resourceInterfaces.begin();
-    for(; rit != resourceInterfaces.end(); ++rit)
-    {
-        IRI interface = *rit;
-        IRI interfaceModel = getResourceModel(interface);
-
-        LOG_DEBUG_S << "Checking resource: '" << interface << "' of '" << instance << "' on compatiblity";
-
-        IRIList::const_iterator oit = otherResourceInterfaces.begin();
-        for(; oit != otherResourceInterfaces.end(); ++oit)
-        {
-            IRI otherInterface = *oit;
-            IRI otherInterfaceModel = getResourceModel(otherInterface);
-
-
-            if( mpOntology->isRelatedTo(interfaceModel, OM::compatibleWith(), otherInterfaceModel) )
-            {
-                LOG_DEBUG_S << instance << " compatibleWith " << otherInstance << " via " << interface << " and " << otherInterface;
-                usedInterfaces.push_back(interface);
-                usedInterfaces.push_back(otherInterface);
-
-                // One candidate for the matching
-                candidates.push_back(usedInterfaces);
-            }
-        }
-    }
-
-    if(candidates.empty())
-    {
-        LOG_DEBUG_S << instance << " is not compatibleWith " << otherInstance << " via any interface";
-    } else {
-        LOG_INFO_S << "Candidates: " << candidates;
-    }
-    return candidates;
+    return mpOntology->isRelatedTo( resource, OM::compatibleWith(), otherResource );
 }
 
 IRI OrganizationModel::getResourceModel(const IRI& instance) const
 {
     try {
-        return mpOntology->relatedInstance(instance, OM::modelledBy());
+        return mpOntology->relatedInstance(instance, OM::modelledBy(), OM::ResourceModel());
     } catch(const std::invalid_argument& e)
     {
         // no model means, this instance is a model by itself
@@ -574,11 +419,25 @@ IRI OrganizationModel::getResourceModel(const IRI& instance) const
     }
 }
 
-IRI OrganizationModel::createNewFromModel(const IRI& classType, const IRI& model, bool createDependants) const
+IRI OrganizationModel::getResourceModelInstanceType(const IRI& model) const
 {
+    IRI modelType;
+    try {
+        modelType = mpOntology->typeOf(model);
+        return mpOntology->relatedInstance(modelType, OM::models(), OM::Resource());
+    } catch(const std::invalid_argument& e)
+    {
+        throw std::invalid_argument("OrganizationModel::createResourceModelInstanceType: '" + modelType.toString() + "' does not specify 'models' relation, thus cannot infer type for new model instances of " + model.toString()); 
+    }
+}
+
+IRI OrganizationModel::createNewFromModel(const IRI& model, bool createDependants) const
+{
+    IRI classType = getResourceModelInstanceType(model);
+
     LOG_DEBUG_S << "CreateNewFromModel: " << std::endl
-        << "    class:    " << classType << std::endl
-        << "    model:    " << model << std::endl;
+        << "    model:    " << model << std::endl
+        << "    new class type:    " << classType << std::endl;
 
     IRIList modelInstances = mpOntology->allInverseRelatedInstances(model, OM::modelledBy());
     std::stringstream ss;
@@ -598,27 +457,24 @@ IRI OrganizationModel::createNewFromModel(const IRI& classType, const IRI& model
     }
 
     // Create dependencies that come with that model
-    IRIList dependencies = mpOntology->allRelatedInstances(model, OM::dependsOn());
+    IRIList dependencies = mpOntology->allRelatedInstances(model, OM::dependsOn(), OM::Requirement());
     IRIList newDependants;
     BOOST_FOREACH(IRI dependency, dependencies)
     {
         // Find out the actual model of this resource (in case in need to instanciate further
         // requirements)
-        IRIList resourceModel = mpOntology->allRelatedInstances(dependency, OM::modelledBy());
+        IRI resourceModel = getResourceModel(dependency);
         if(resourceModel.empty())
         {
-            throw std::invalid_argument("owl_om::OrganizationModel::createNewFromModel: could not infer model for dependency '" + dependency.toString() + "'");
-        } else if(resourceModel.size() > 1)
-        {
-            throw std::invalid_argument("owl_om::OrganizationModel::createNewFromModel: could not infer model for dependency '" + dependency.toString() + "' since there are multiple defined");
-        }
+            throw std::invalid_argument("owl_om::OrganizationModel::createNewFromModel: could not infer model for dependency / requirement '" + dependency.toString() + "'");
+        } 
 
         LOG_DEBUG_S << "CreateNewFromModel: dependency of " << newInstanceName << std::endl
             << "    dependency:        " << dependency << std::endl
-            << "    resource model:    " << resourceModel[0] << std::endl;
+            << "    resource model:    " << resourceModel << std::endl;
 
         // dependency is a placeholder requirement of the same class as the final
-        IRI dependant = createNewFromModel( mpOntology->typeOf(dependency), resourceModel[0], true );
+        IRI dependant = createNewFromModel(resourceModel, true );
         mpOntology->relatedTo(newInstanceName, OM::has(), dependant);
 
         newDependants.push_back(dependant);
@@ -707,7 +563,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
             continue;
         }
 
-        if( ! mpOntology->isRelatedTo( getResourceModel( match[0] ), OM::compatibleWith(), getResourceModel( match[1] )) )
+        if( ! checkIfCompatible( getResourceModel(match[0]), getResourceModel(match[1])) )
         {
             // Reject: interfaces are not compatible with each other
             continue;

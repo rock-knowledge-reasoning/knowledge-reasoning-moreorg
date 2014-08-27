@@ -113,12 +113,15 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
 
     Ontology::Ptr ontology = om.ontology();
 
+    using namespace owl_om;
+    using namespace owl_om::vocabulary;
+
     // Resource definitions
-    ontology->transitiveProperty("dependsOn");
-    ontology->transitiveProperty("provides");
-    ontology->transitiveProperty("uses");
-    ontology->transitiveProperty("modeledBy");
-    ontology->symmetricProperty("compatibleWith");
+    ontology->transitiveProperty(OM::dependsOn());
+    ontology->transitiveProperty(OM::provides());
+    ontology->transitiveProperty(OM::uses());
+    ontology->transitiveProperty(OM::modelledBy());
+    ontology->symmetricProperty(OM::compatibleWith());
 
     ontology->setVerbose();
     // General concepts:
@@ -128,252 +131,190 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
     // subclasses includes Mission and BOTTOM
     assert( ontology->allSubclassesOf("Thing").size() == 2);
 
-    ontology->subclassOf("Resource", "Thing");
-    ontology->subclassOf("ResourceModel", "Thing");
-    ontology->subclassOf("ResourceRequirement", "Thing");
-    ontology->subclassOf("Interface", "Resource");
-    ontology->subclassOf("InterfaceModel", "ResourceModel");
-    ontology->subclassOf("Service", "Resource");
-    ontology->subclassOf("ServiceModel", "ResourceModel");
-    ontology->subclassOf("Actor", "Resource");
-    ontology->subclassOf("ActorModel", "ResourceModel");
+    ontology->subclassOf(OM::Resource(), "Thing");
+    ontology->subclassOf(OM::ResourceModel(), "Thing");
+    ontology->subclassOf(OM::Requirement(), "Thing");
+    ontology->subclassOf(OM::Interface(), OM::Resource());
+    ontology->subclassOf(OM::InterfaceModel(), OM::ResourceModel());
+    ontology->subclassOf(OM::Service(), OM::Resource());
+    ontology->subclassOf(OM::ServiceModel(), OM::ResourceModel());
+    ontology->subclassOf(OM::Actor(), OM::Resource());
+    ontology->subclassOf(OM::ActorModel(), OM::ResourceModel());
 
-    ontology->instanceOf("Mapping", "ResourceModel");
-    ontology->instanceOf("Localization", "ResourceModel");
-    ontology->instanceOf("Locomotion", "ResourceModel");
+    ontology->instanceOf("Mapping", OM::ResourceModel());
+    ontology->instanceOf("Localization", OM::ResourceModel());
+    ontology->instanceOf("Locomotion", OM::ResourceModel());
 
-    ontology->instanceOf("Camera", "ResourceModel");
-    ontology->instanceOf("Power", "ResourceModel");
+    ontology->instanceOf("Camera", OM::ResourceModel());
+    ontology->instanceOf("Power", OM::ResourceModel());
 
-    ontology->instanceOf("MechanicalInterface", "InterfaceModel");
-    ontology->instanceOf("ElectricalInterface", "InterfaceModel");
-    ontology->instanceOf("ElectroMechanicalInterface", "InterfaceModel");
+    ontology->instanceOf("MechanicalInterface", OM::InterfaceModel());
+    ontology->instanceOf("ElectricalInterface", OM::InterfaceModel());
+    ontology->instanceOf("ElectroMechanicalInterface", OM::InterfaceModel());
 
-    ontology->instanceOf("EmiActive", "InterfaceModel");
-    ontology->instanceOf("EmiPassive", "InterfaceModel");
-    ontology->instanceOf("EmiNeutral", "InterfaceModel");
+    ontology->instanceOf("EmiActive", OM::InterfaceModel());
+    ontology->instanceOf("EmiPassive", OM::InterfaceModel());
+    ontology->instanceOf("EmiNeutral", OM::InterfaceModel());
 
-    ontology->relatedTo("EmiActive", "compatibleWith", "EmiPassive");
+    ontology->relatedTo("EmiActive", OM::compatibleWith(), "EmiPassive");
 
-    om.createInstance("Mapping/instance#0", "Resource", "Mapping");
-    om.createInstance("Mapping/instance#1", "Resource", "Mapping");
-    om.createInstance("Mapping/instance#2", "Resource", "Mapping");
-    om.createInstance("Mapping/instance#10", "Resource", "Mapping");
-    om.createInstance("Mapping/instance#20", "Resource", "Mapping");
+    om.createInstance("Mapping/instance#0", OM::Resource(), "Mapping");
+    om.createInstance("Mapping/instance#1", OM::Resource(), "Mapping");
+    om.createInstance("Mapping/instance#2", OM::Resource(), "Mapping");
+    om.createInstance("Mapping/instance#10", OM::Resource(), "Mapping");
+    om.createInstance("Mapping/instance#20", OM::Resource(), "Mapping");
 
-    BOOST_REQUIRE_MESSAGE(ontology->isInstanceOf("Mapping/instance#0", "Resource"), "Instance of Mapping");
-    BOOST_REQUIRE_MESSAGE(ontology->isRelatedTo("Mapping/instance#0", "modeledBy", "Mapping"), "Resource Mapping/instance#0 typeOf Mapping");
+    BOOST_REQUIRE_MESSAGE(ontology->isInstanceOf("Mapping/instance#0", OM::Resource()), "Instance of Mapping");
+    BOOST_REQUIRE_MESSAGE(ontology->isRelatedTo("Mapping/instance#0", OM::modelledBy(), "Mapping"), "Resource Mapping/instance#0 typeOf Mapping");
 
-    om.createInstance("Localization/instance#0", "Resource", "Localization");
-    om.createInstance("Localization/instance#1", "Resource", "Localization");
-    om.createInstance("Localization/instance#10", "Resource", "Localization");
-    om.createInstance("Localization/instance#20", "Resource", "Localization");
+    om.createInstance("Localization/instance#0", OM::Resource(), "Localization");
+    om.createInstance("Localization/instance#1", OM::Resource(), "Localization");
+    om.createInstance("Localization/instance#10", OM::Resource(), "Localization");
+    om.createInstance("Localization/instance#20", OM::Resource(), "Localization");
 
-    om.createInstance("Locomotion/instance#0", "Resource", "Locomotion");
-    om.createInstance("Locomotion/instance#1", "Resource", "Locomotion");
-    om.createInstance("Locomotion/instance#2", "Resource", "Locomotion");
-    om.createInstance("Locomotion/instance#10", "Resource", "Locomotion");
-    om.createInstance("Locomotion/instance#20", "Resource", "Locomotion");
+    om.createInstance("Locomotion/instance#0", OM::Resource(), "Locomotion");
+    om.createInstance("Locomotion/instance#1", OM::Resource(), "Locomotion");
+    om.createInstance("Locomotion/instance#2", OM::Resource(), "Locomotion");
+    om.createInstance("Locomotion/instance#10", OM::Resource(), "Locomotion");
+    om.createInstance("Locomotion/instance#20", OM::Resource(), "Locomotion");
 
-    om.createInstance("EmiActive/requirement#0", "ResourceRequirement", "EmiActive");
-    om.createInstance("EmiActive/instance#0" , "Interface", "EmiActive");
-    om.createInstance("EmiActive/instance#1" , "Interface", "EmiActive");
-    om.createInstance("EmiActive/instance#2" , "Interface", "EmiActive");
-    om.createInstance("EmiActive/instance#3" , "Interface", "EmiActive");
-    om.createInstance("EmiActive/instance#10", "Interface", "EmiActive");
-    om.createInstance("EmiActive/instance#11", "Interface", "EmiActive");
-    om.createInstance("EmiActive/instance#30", "Interface", "EmiActive");
+    om.createInstance("EmiActive/requirement#0", OM::Requirement(), "EmiActive");
+    om.createInstance("EmiActive/instance#0" , OM::Interface(), "EmiActive");
+    om.createInstance("EmiActive/instance#1" , OM::Interface(), "EmiActive");
+    om.createInstance("EmiActive/instance#2" , OM::Interface(), "EmiActive");
+    om.createInstance("EmiActive/instance#3" , OM::Interface(), "EmiActive");
+    om.createInstance("EmiActive/instance#10", OM::Interface(), "EmiActive");
+    om.createInstance("EmiActive/instance#11", OM::Interface(), "EmiActive");
+    om.createInstance("EmiActive/instance#30", OM::Interface(), "EmiActive");
 
-    om.createInstance("EmiPassive/requirement#0", "ResourceRequirement", "EmiPassive");
-    om.createInstance("EmiPassive/instance#0" , "Interface", "EmiPassive");
-    om.createInstance("EmiPassive/instance#1" , "Interface", "EmiPassive");
-    om.createInstance("EmiPassive/instance#2" , "Interface", "EmiPassive");
-    om.createInstance("EmiPassive/instance#3" , "Interface", "EmiPassive");
-    om.createInstance("EmiPassive/instance#11", "Interface", "EmiPassive");
-    om.createInstance("EmiPassive/instance#12", "Interface", "EmiPassive");
-    om.createInstance("EmiPassive/instance#13", "Interface", "EmiPassive");
-    om.createInstance("EmiPassive/instance#10", "Interface", "EmiPassive");
-    om.createInstance("EmiPassive/instance#20", "Interface", "EmiPassive");
-    om.createInstance("EmiPassive/instance#30", "Interface", "EmiPassive");
+    om.createInstance("EmiPassive/requirement#0", OM::Requirement(), "EmiPassive");
+    om.createInstance("EmiPassive/instance#0" , OM::Interface(), "EmiPassive");
+    om.createInstance("EmiPassive/instance#1" , OM::Interface(), "EmiPassive");
+    om.createInstance("EmiPassive/instance#2" , OM::Interface(), "EmiPassive");
+    om.createInstance("EmiPassive/instance#3" , OM::Interface(), "EmiPassive");
+    om.createInstance("EmiPassive/instance#11", OM::Interface(), "EmiPassive");
+    om.createInstance("EmiPassive/instance#12", OM::Interface(), "EmiPassive");
+    om.createInstance("EmiPassive/instance#13", OM::Interface(), "EmiPassive");
+    om.createInstance("EmiPassive/instance#10", OM::Interface(), "EmiPassive");
+    om.createInstance("EmiPassive/instance#20", OM::Interface(), "EmiPassive");
+    om.createInstance("EmiPassive/instance#30", OM::Interface(), "EmiPassive");
 
-    om.createInstance("Camera/requirement#0" , "ResourceRequirement", "Camera");
-    om.createInstance("Camera/requirement#1" , "ResourceRequirement", "Camera");
-    om.createInstance("Camera/instance#0" , "Resource", "Camera");
-    om.createInstance("Camera/instance#10" , "Resource", "Camera");
-    om.createInstance("Camera/instance#20" , "Resource", "Camera");
-    om.createInstance("Camera/instance#30" , "Resource", "Camera");
+    om.createInstance("Camera/requirement#0" , OM::Requirement(), "Camera");
+    om.createInstance("Camera/requirement#1" , OM::Requirement(), "Camera");
+    om.createInstance("Camera/instance#0" , OM::Resource(), "Camera");
+    om.createInstance("Camera/instance#10" , OM::Resource(), "Camera");
+    om.createInstance("Camera/instance#20" , OM::Resource(), "Camera");
+    om.createInstance("Camera/instance#30" , OM::Resource(), "Camera");
 
-    om.createInstance("Power/requirement#0", "ResourceRequirement", "Power");
-    om.createInstance("Power/instance#0", "Resource", "Power");
+    om.createInstance("Power/requirement#0", OM::Requirement(), "Power");
+    om.createInstance("Power/instance#0", OM::Resource(), "Power");
 
-    ontology->instanceOf("ImageProvider", "ServiceModel");
+    ontology->instanceOf("ImageProvider", OM::ServiceModel());
     // to allow a higher arity, e.g., for a stereo camera that requires distinct services
-    om.createInstance("ImageProvider/requirement#0", "ResourceRequirement", "ImageProvider");
-    om.createInstance("ImageProvider/requirement#1", "ResourceRequirement", "ImageProvider");
+    om.createInstance("ImageProvider/requirement#0", OM::Requirement(), "ImageProvider");
+    om.createInstance("ImageProvider/requirement#1", OM::Requirement(), "ImageProvider");
 
-    ontology->instanceOf("StereoImageProvider", "ServiceModel");
-    om.createInstance("StereoImageProvider/requirement#0", "Service", "StereoImageProvider");
+    ontology->instanceOf("StereoImageProvider", OM::ServiceModel());
+    om.createInstance("StereoImageProvider/requirement#0", OM::Service(), "StereoImageProvider");
 
     ontology->refresh();
     BOOST_REQUIRE_MESSAGE( ontology->allInstancesOf("Thing").size() != 0, "# of instances of Thing > 0, i.e. " << ontology->allInstancesOf("Thing").size());
 
     //// Service definitions
-    ontology->instanceOf("MoveTo", "ServiceModel");
-    om.createInstance("Mapping/requirement#0", "ResourceRequirement", "Mapping");
-    om.createInstance("Localization/requirement#0", "ResourceRequirement", "Mapping");
-    om.createInstance("Locomotion/requirement#0", "ResourceRequirement", "Mapping");
+    ontology->instanceOf("MoveTo", OM::ServiceModel());
+    om.createInstance("Mapping/requirement#0", OM::Requirement(), "Mapping");
+    om.createInstance("Localization/requirement#0", OM::Requirement(), "Mapping");
+    om.createInstance("Locomotion/requirement#0", OM::Requirement(), "Mapping");
     // The following requirement is already defined
-    // om.createInstance("Power/requirement#0", "ResourceRequirement", "Power");
+    // om.createInstance("Power/requirement#0", OM::Requirement(), "Power");
 
-    ontology->relatedTo("MoveTo", "dependsOn", "Mapping/requirement#0");
-    ontology->relatedTo("MoveTo", "dependsOn", "Localization/requirement#0");
-    ontology->relatedTo("MoveTo", "dependsOn", "Locomotion/requirement#0");
-    ontology->relatedTo("MoveTo", "dependsOn", "Power/requirement#0");
+    ontology->relatedTo("MoveTo", OM::dependsOn(), "Mapping/requirement#0");
+    ontology->relatedTo("MoveTo", OM::dependsOn(), "Localization/requirement#0");
+    ontology->relatedTo("MoveTo", OM::dependsOn(), "Locomotion/requirement#0");
+    ontology->relatedTo("MoveTo", OM::dependsOn(), "Power/requirement#0");
 
-    BOOST_REQUIRE_MESSAGE( ontology->isRelatedTo("MoveTo", "dependsOn", "Mapping/requirement#0"), "Check dependency");
+    BOOST_REQUIRE_MESSAGE( ontology->isRelatedTo("MoveTo", OM::dependsOn(), "Mapping/requirement#0"), "Check dependency");
 
-    om.createInstance("Camera/requirement#0", "ResourceRequirement", "Camera");
-    om.createInstance("Power/requirement#0", "ResourceRequirement", "Power");
-    ontology->relatedTo("ImageProvider", "dependsOn", "Camera/requirement#0");
-    ontology->relatedTo("ImageProvider", "dependsOn", "Power/requirement#0");
+    om.createInstance("Camera/requirement#0", OM::Requirement(), "Camera");
+    om.createInstance("Power/requirement#0", OM::Requirement(), "Power");
+    ontology->relatedTo("ImageProvider", OM::dependsOn(), "Camera/requirement#0");
+    ontology->relatedTo("ImageProvider", OM::dependsOn(), "Power/requirement#0");
 
 
-    ontology->instanceOf("StereoImageProvider", "ServiceModel");
-    ontology->relatedTo("StereoImageProvider", "dependsOn", "ImageProvider/requirement#0");
-    ontology->relatedTo("StereoImageProvider", "dependsOn", "ImageProvider/requirement#1");
+    ontology->instanceOf("StereoImageProvider", OM::ServiceModel());
+    ontology->relatedTo("StereoImageProvider", OM::dependsOn(), "ImageProvider/requirement#0");
+    ontology->relatedTo("StereoImageProvider", OM::dependsOn(), "ImageProvider/requirement#1");
 
-    om.createInstance("MoveTo/requirement#0", "ResourceRequirement", "MoveTo");
-    ontology->instanceOf("LocationImageProvider", "ServiceModel");
-    ontology->relatedTo("LocationImageProvider", "dependsOn", "ImageProvider/requirement#0");
-    ontology->relatedTo("LocationImageProvider", "dependsOn", "MoveTo/requirement#0");
+    om.createInstance("MoveTo/requirement#0", OM::Requirement(), "MoveTo");
+    ontology->instanceOf("LocationImageProvider", OM::ServiceModel());
+    ontology->relatedTo("LocationImageProvider", OM::dependsOn(), "ImageProvider/requirement#0");
+    ontology->relatedTo("LocationImageProvider", OM::dependsOn(), "MoveTo/requirement#0");
 
-    om.createInstance("LocationImageProvider/requirement#0", "ResourceRequirement", "LocationImageProvider");
+    om.createInstance("LocationImageProvider/requirement#0", OM::Requirement(), "LocationImageProvider");
     ontology->alias("location_image_provider", "LocationImageProvider/requirement#0", KnowledgeBase::INSTANCE);
     {
         ontology->refresh();
-        int allInstances = ontology->allRelatedInstances("location_image_provider","modeledBy").size();
-        BOOST_REQUIRE_MESSAGE ( ontology->allRelatedInstances("location_image_provider","modeledBy").size() == 1, "All related instances " << allInstances << " expected > 2" );
+        int allInstances = ontology->allRelatedInstances("location_image_provider",OM::modelledBy()).size();
+        BOOST_REQUIRE_MESSAGE ( ontology->allRelatedInstances("location_image_provider",OM::modelledBy()).size() == 1, "All related instances " << allInstances << " expected > 2" );
 
-        allInstances = ontology->allRelatedInstances("LocationImageProvider","dependsOn").size();
-        BOOST_REQUIRE_MESSAGE ( ontology->allRelatedInstances("LocationImageProvider","dependsOn").size() == 2, "All related instances " << allInstances << " expected > 2" );
+        allInstances = ontology->allRelatedInstances("LocationImageProvider",OM::dependsOn()).size();
+        BOOST_REQUIRE_MESSAGE ( ontology->allRelatedInstances("LocationImageProvider",OM::dependsOn()).size() == 2, "All related instances " << allInstances << " expected > 2" );
     }
 
-    ontology->instanceOf("PowerProvider", "ServiceModel");
-    om.createInstance("EmiPowerProvider", "Service", "PowerProvider");
-    ontology->relatedTo("EmiPowerProvider", "dependsOn", "EmiActive/requirement#0");
-    ontology->relatedTo("EmiPowerProvider", "dependsOn", "EmiPassive/requirement#0");
-    ontology->relatedTo("EmiPowerProvider", "dependsOn", "Power/requirement#0");
-    om.createInstance("EmiPowerPower/requirement#0", "ResourceRequirement", "EmiPowerProvider");
+    ontology->instanceOf("PowerProvider", OM::ServiceModel());
+    om.createInstance("EmiPowerProvider", OM::Service(), "PowerProvider");
+    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(), "EmiActive/requirement#0");
+    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(), "EmiPassive/requirement#0");
+    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(), "Power/requirement#0");
+    om.createInstance("EmiPowerPower/requirement#0", OM::Requirement(), "EmiPowerProvider");
 
     //// Actor definition
-    ontology->instanceOf("Sherpa","ActorModel");
-    om.createInstance("Sherpa/instance#0","Actor", "Sherpa");
+    ontology->instanceOf("Sherpa",OM::ActorModel());
+    om.createInstance("Sherpa/instance#0",OM::Actor(), "Sherpa");
     ontology->alias("sherpa", "Sherpa/instance#0", KnowledgeBase::INSTANCE);
 
-    ontology->instanceOf("CREX","ActorModel");
-    om.createInstance("CREX/instance#0","Actor", "CREX");
+    ontology->instanceOf("CREX",OM::ActorModel());
+    om.createInstance("CREX/instance#0",OM::Actor(), "CREX");
     ontology->alias("crex", "CREX/instance#0", KnowledgeBase::INSTANCE);
 
-    ontology->instanceOf("PayloadCamera","ActorModel");
-    om.createInstance("PayloadCamera/instance#0","Actor", "PayloadCamera");
+    ontology->instanceOf("PayloadCamera",OM::ActorModel());
+    om.createInstance("PayloadCamera/instance#0",OM::Actor(), "PayloadCamera");
     ontology->alias("payload_camera", "PayloadCamera/instance#0", KnowledgeBase::INSTANCE);
 
-    ontology->transitiveProperty("has");
-    ontology->relatedTo("Sherpa", "has", "Mapping/instance#10");
-    ontology->relatedTo("Sherpa", "has", "Localization/instance#10");
-    ontology->relatedTo("Sherpa", "has", "Locomotion/instance#10");
-    ontology->relatedTo("Sherpa", "has", "Camera/instance#10");
-    ontology->relatedTo("Sherpa", "has", "EmiActive/instance#10");
-    ontology->relatedTo("Sherpa", "has", "EmiActive/instance#11");
-    ontology->relatedTo("Sherpa", "has", "EmiPassive/instance#10");
-    ontology->relatedTo("Sherpa", "has", "EmiPassive/instance#11");
-    ontology->relatedTo("Sherpa", "has", "EmiPassive/instance#12");
-    ontology->relatedTo("Sherpa", "has", "EmiPassive/instance#13");
-    ontology->relatedTo("Sherpa", "has", "Power/instance#0");
+    ontology->transitiveProperty(OM::has());
+    ontology->relatedTo("Sherpa", OM::has(), "Mapping/instance#10");
+    ontology->relatedTo("Sherpa", OM::has(), "Localization/instance#10");
+    ontology->relatedTo("Sherpa", OM::has(), "Locomotion/instance#10");
+    ontology->relatedTo("Sherpa", OM::has(), "Camera/instance#10");
+    ontology->relatedTo("Sherpa", OM::has(), "EmiActive/instance#10");
+    ontology->relatedTo("Sherpa", OM::has(), "EmiActive/instance#11");
+    ontology->relatedTo("Sherpa", OM::has(), "EmiPassive/instance#10");
+    ontology->relatedTo("Sherpa", OM::has(), "EmiPassive/instance#11");
+    ontology->relatedTo("Sherpa", OM::has(), "EmiPassive/instance#12");
+    ontology->relatedTo("Sherpa", OM::has(), "EmiPassive/instance#13");
+    ontology->relatedTo("Sherpa", OM::has(), "Power/instance#0");
 
-    ontology->relatedTo("CREX", "has", "Mapping/instance#20");
-    ontology->relatedTo("CREX", "has", "Localization/instance#20");
-    ontology->relatedTo("CREX", "has", "Locomotion/instance#20");
-    ontology->relatedTo("CREX", "has", "Camera/instance#20");
-    ontology->relatedTo("CREX", "has", "EmiPassive/instance#20");
-    ontology->relatedTo("CREX", "has", "Power/instance#0");
+    ontology->relatedTo("CREX", OM::has(), "Mapping/instance#20");
+    ontology->relatedTo("CREX", OM::has(), "Localization/instance#20");
+    ontology->relatedTo("CREX", OM::has(), "Locomotion/instance#20");
+    ontology->relatedTo("CREX", OM::has(), "Camera/instance#20");
+    ontology->relatedTo("CREX", OM::has(), "EmiPassive/instance#20");
+    ontology->relatedTo("CREX", OM::has(), "Power/instance#0");
 
-    ontology->relatedTo("PayloadCamera", "has", "Camera/instance#30");
-    ontology->relatedTo("PayloadCamera", "has", "EmiPassive/instance#30");
-    ontology->relatedTo("PayloadCamera", "has", "EmiActive/instance#30");
+    ontology->relatedTo("PayloadCamera", OM::has(), "Camera/instance#30");
+    ontology->relatedTo("PayloadCamera", OM::has(), "EmiPassive/instance#30");
+    ontology->relatedTo("PayloadCamera", OM::has(), "EmiActive/instance#30");
 
     //// Mission requirements
     ontology->instanceOf("simple_mission", "Mission");
-    ontology->relatedTo("simple_mission", "dependsOn", "LocationImageProvider/requirement#0");
+    ontology->relatedTo("simple_mission", OM::dependsOn(), "LocationImageProvider/requirement#0");
     ontology->refresh();
 
-    assert ( ontology->allRelatedInstances("simple_mission", "dependsOn").size() != 0 );
+    assert ( ontology->allRelatedInstances("simple_mission", OM::dependsOn()).size() != 0 );
 
-    ontology->allInverseRelatedInstances("Camera/instance#0","dependsOn");
-    ontology->allInverseRelatedInstances("Camera/instance#0","has");
+    ontology->allInverseRelatedInstances("Camera/instance#0",OM::dependsOn());
+    ontology->allInverseRelatedInstances("Camera/instance#0",OM::has());
 
-    BOOST_REQUIRE_MESSAGE( om.checkIfCompatible("Sherpa/instance#0","CREX/instance#0"), "Sherpa compatible to CREX");
-    BOOST_REQUIRE_MESSAGE( om.checkIfCompatible("Sherpa/instance#0","PayloadCamera/instance#0"), " Sherpa compatible to PayloadCamera" );
-    BOOST_REQUIRE_MESSAGE( !om.checkIfCompatible("CREX/instance#0","CREX/instance#0"), "CREX incompatible to CREX");
-
-    // TODO: Disable and check with using proper vocabulary
-    //om.runInferenceEngine();
-
-    //BOOST_REQUIRE( om.checkIfFulfills("Sherpa/instance#0", "LocationImageProvider/requirement#0") );
-    //BOOST_REQUIRE( ontology->isRelatedTo("Sherpa", "provides", "LocationImageProvider") );
-    //{
-    //    IRIList newActors = om.computeActorsFromRecombination();
-    //    IRIList::iterator ait = newActors.begin();
-    //    for(; ait != newActors.end(); ++ait)
-    //    {
-    //        LOG_INFO_S << "New actor: '" << *ait;
-    //    }
-    //    om.runInferenceEngine();
-    //}
-    //{
-    //    IRIList newActors = om.computeActorsFromRecombination();
-    //    IRIList::iterator ait = newActors.begin();
-    //    for(; ait != newActors.end(); ++ait)
-    //    {
-    //        LOG_INFO_S << "New actor after inference: '" << *ait;
-    //    }
-    //}
-
-//    // Each property that hasInterface with an concept of EmiActive
-//    // has to be a ReconfigurableActor
-//    ontology->subclassOf("ReconfigurableActor","Actor");
-//    ontology->disjoint("Interface","ReconfigurableActor", KnowledgeBase::CLASS);
-//    ontology->inverseOf("has","availableFor");
-//
-//    // Creates a restriction that all systems that own an EMI are ReconfigurableActors
-//    ClassExpression forallRestriction = ontology->objectPropertyRestriction(restriction::FORALL, "availableFor", "ReconfigurableActor");
-//    ontology->subclassOf("ElectroMechanicalInterface", forallRestriction);
-//    ontology->refresh();
-//
-//    //std::vector<std::string> types = ontology->typesOf("PayloadCamera/instance#0");
-//    //for(int i =0; i < types.size(); ++i)
-//    //{
-//    //    LOG_WARN_S << types[i];
-//    //}
-//
-//    BOOST_REQUIRE_MESSAGE( ontology->isInstanceOf("PayloadCamera/instance#0", "ReconfigurableActor"), "PayloadCamera instance of ReconfigurableActor" );
-//    BOOST_REQUIRE_MESSAGE( ontology->isInstanceOf("Sherpa/instance#0", "ReconfigurableActor"), "Sherpa instance of ReconfigurableActor" );
-//    BOOST_REQUIRE_MESSAGE( ontology->isInstanceOf("CREX/instance#0", "ReconfigurableActor"), "CREX instance of ReconfigurableActor");
-//
-//
-//    //// A version of Sherpa without interface defined
-//    ontology->instanceOf("Sherpa/instance#1", "Sherpa");
-//    BOOST_REQUIRE_MESSAGE( !ontology->isInstanceOf("Sherpa/instance#1", "ReconfigurableActor"), "Sherpa#1 not instance of ReconfigurableActor");
-//
-//
-//    // --
-//    // how to
-//    // - identify the number of dependencies for a certain instance, i.e.
-//    // - differentiate between consumables and non-consumables, e.g. such as the interface
-//    // - count service required
-//    // - permutations should consider the associated interface (future version)
-//    //
-//
     // Export PDDL
     PDDLExporter exporter;
     pddl_planner::representation::Domain domain = exporter.toDomain(om);
@@ -382,26 +323,54 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
 }
 
 
-BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
+BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_with_punning)
 {
-    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.3.owl" );
-
     using namespace owl_om;
     using namespace owl_om::vocabulary;
+
+    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
+
+    BOOST_TEST_MESSAGE(om.ontology()->toString());
     {
-        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("Sherpa"), true);
+        {
+            IRI iri = om.ontology()->relatedInstance(OM::Service(), OM::modelledBy(), OM::ResourceModel());
+            BOOST_REQUIRE_MESSAGE(iri == OM::ServiceModel(), "Service is modelledBy ServiceModel");
+        }
+        {
+            IRI iri = om.ontology()->relatedInstance(OM::ServiceModel(), OM::models(), OM::Resource());
+            BOOST_REQUIRE_MESSAGE(iri == OM::Service(), "ServiceModel is models Service");
+        }
+        {
+            IRI iri = om.getResourceModel(OM::resolve("EmiActive-requirement-0"));
+            BOOST_REQUIRE_MESSAGE(iri == OM::resolve("EmiActive"), "EmiActive-requirement-0 should have EmiActive as interface");
+        }
+        {
+            IRI iri = om.getResourceModelInstanceType(OM::resolve("EmiActive"));
+            BOOST_REQUIRE_MESSAGE(iri == OM::resolve("Interface"), "EmiActive should map to Interface instances");
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
+{
+    using namespace owl_om;
+    using namespace owl_om::vocabulary;
+    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
+
+    {
+        IRI instance = om.createNewFromModel(OM::resolve("Sherpa"), true);
 
         BOOST_TEST_MESSAGE("Created new from model" << instance);
         BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
     }
     {
-        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("CREX"), true);
+        IRI instance = om.createNewFromModel(OM::resolve("CREX"), true);
 
         BOOST_TEST_MESSAGE("Created new from model" << instance);
         BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
     }
     {
-        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("PayloadCamera"), true);
+        IRI instance = om.createNewFromModel(OM::resolve("PayloadCamera"), true);
 
         BOOST_TEST_MESSAGE("Created new from model" << instance);
         BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
@@ -456,12 +425,12 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
 
 BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_metrics)
 {
-    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.3.owl" );
+    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
 
     using namespace owl_om;
     using namespace owl_om::vocabulary;
     {
-        IRI instance = om.createNewFromModel(OM::Actor(), OM::resolve("Sherpa"), true);
+        IRI instance = om.createNewFromModel(OM::resolve("Sherpa"), true);
 
         BOOST_TEST_MESSAGE("Created new from model" << instance);
         BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
@@ -471,5 +440,11 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_metrics)
     metrics::Redundancy redundancy(om);
     metrics::IRIMetricMap metrics = redundancy.compute();
 
+}
+
+BOOST_AUTO_TEST_CASE(it_should_load_om_file)
+{
+    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
+    BOOST_TEST_MESSAGE("Loaded om");
 }
 
