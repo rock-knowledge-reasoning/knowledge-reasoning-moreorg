@@ -58,7 +58,7 @@ bool IRI::isAbsolute() const
         if( !(isalpha(ch) || isdigit(ch) || ch == '.' ||
                     ch == '+' || ch == '-'))
         {
-            LOG_DEBUG_S << "owlapi::model::IRI::isAbsolute: Invalid character in prefix '" << ch << "'";
+            LOG_WARN_S << "owlapi::model::IRI::isAbsolute: Invalid character in prefix '" << ch << "'";
             return false;
         }
     }
@@ -103,7 +103,6 @@ IRI IRI::create(const std::string& s)
 {
     if(s.empty())
     {
-        LOG_DEBUG_S << "IRI::create iri created from empty string";
         return IRI();
     }
 

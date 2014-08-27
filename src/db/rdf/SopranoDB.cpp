@@ -54,14 +54,11 @@ query::Results SopranoDB::query(const std::string& query, const query::Bindings&
         {
             query::Variable binding = *bit;
             std::string boundValue = qit.binding(QString(binding.getName().c_str())).toString().toStdString();
-            LOG_DEBUG_S << "Found result for '" << binding.toString() << "' -> '" << boundValue << "'";
             row[binding] = owlapi::model::IRI::create( boundValue );
         }
 
         queryResults.rows.push_back(row);
     }
-
-    LOG_DEBUG_S << "Results: " << queryResults.toString();
 
     return queryResults;
 }
