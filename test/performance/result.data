@@ -1,0 +1,20 @@
+Organization Model Statistics: crex, sherpa, 2x payloadc
+    upper bound for combinations:  27775
+    number of inference epochs:    0
+    time elapsed in s:             49.4873
+    # of interface combinations:   202
+    # of known actors:             4
+    # of inferred actors:          202
+    # of composite actors pre:     0
+    # of composite actors post:     202
+
+Organization Model Statistics crex 2x, sherpa, 2x payloadc
+    upper bound for combinations:  768691
+    number of inference epochs:    0
+    time elapsed in s:             851.838
+    # of interface combinations:   544
+    # of known actors:             5
+    # of inferred actors:          544
+    # of composite actors pre:     0
+    # of composite actors post:     544
+
