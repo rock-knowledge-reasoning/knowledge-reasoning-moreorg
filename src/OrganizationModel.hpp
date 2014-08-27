@@ -64,20 +64,6 @@ public:
 
 class OrganizationModel
 {
-    Ontology::Ptr mpOntology;
-
-    IRI createNewActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id);
-
-    /**
-     * Infer new instance of a given class type, base on checking whether a given model
-     * is fulfilled
-     * \param actor Actor to perform inference for, actor will in effect have two types of relationships:
-     *     (a) provides model
-     *     (b) has instance of the class type  (where instance is modelledBy the given model)
-     * \param models List of models that should be check
-     */
-    IRIList infer(const IRI& actor, const IRIList& models);
-
 public:
 
     typedef boost::shared_ptr<OrganizationModel> Ptr;
@@ -109,9 +95,12 @@ public:
 
     /**
      * Try to map requirements to provider
+     * \param resourceRequirement Resource requirement
+     * \param availableResources List of available resources
+     * \param resourceProvider Optional label for the resource provider
      * \return corresponding grounding, which need to be check on completness
      */
-    Grounding resolveRequirements(const IRI& resourceProvider, const IRI& resourceRequirement);
+    Grounding resolveRequirements(const IRI& resourceRequirement, const IRIList& availableResources, const IRI& resourceProvider = IRI());
 
     // PREDICATES
     /**
@@ -172,6 +161,27 @@ public:
      * \return List of interface combinations
      */
     InterfaceCombinationList generateInterfaceCombinations();
+
+private:
+    /**
+     * Creates a new clas of actor from the given set of actor
+     * \return IRI of new actor, or empty IRI if the actor already exists
+     */
+    IRI createNewActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id);
+
+    /**
+     * Infer new instance of a given class type, base on checking whether a given model
+     * is fulfilled
+     * \param actor Actor to perform inference for, actor will in effect have two types of relationships:
+     *     (a) provides model
+     *     (b) has instance of the class type  (where instance is modelledBy the given model)
+     * \param models List of models that should be check
+     */
+    IRIList infer(const IRI& actor, const IRIList& models);
+
+
+    Ontology::Ptr mpOntology;
+
 };
 
 } // end namespace owl_om
