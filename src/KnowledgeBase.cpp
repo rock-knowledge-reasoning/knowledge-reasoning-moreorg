@@ -610,7 +610,6 @@ IRIList KnowledgeBase::allSubclassesOf(const IRI& klass, bool direct)
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
-        LOG_DEBUG_S << "subconcept of '" << klass << "': " << result[i];
         subclasses.push_back( IRI::create(result[i]) );
     }
     delete[] result;
@@ -628,7 +627,6 @@ IRIList KnowledgeBase::allAncestorsOf(const IRI& klass, bool direct)
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
-        LOG_DEBUG_S << "super concept of '" << klass << "': " << result[i];
         superclasses.push_back( IRI::create(result[i]) );
     }
     delete[] result;
@@ -662,10 +660,8 @@ IRIList KnowledgeBase::allInstancesOf(const IRI& klass, bool direct)
         IRI instanceName = IRI::create(result[i]);
         if(direct && ! (typeOf(instanceName) == klass) )
         {
-            LOG_DEBUG_S << "instance '" << instanceName << "' not a direct instance of '" << klass << "'";
             continue;
         }
-        LOG_DEBUG_S << "instance of '" << klass << "': " << instanceName;
         instances.push_back(instanceName);
 
     }
@@ -776,7 +772,6 @@ IRIList KnowledgeBase::typesOf(const IRI& instance, bool direct) const
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
-        LOG_INFO_S << "instance " << instance << " of type '" << result[i] << "'";
         klasses.push_back( IRI::create(result[i]) );
     }
     delete[] result;
@@ -802,7 +797,6 @@ IRIList KnowledgeBase::getSameAs(const IRI& aliasOrInstance)
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
-        LOG_INFO_S << "instance or alias of " << aliasOrInstance << " -> '" << result[i] << "'";
         alias.push_back( IRI::create(result[i]) );
     }
     delete[] result;
