@@ -143,6 +143,14 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#CompositeActorModel -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#CompositeActorModel">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ActorModel"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Interface -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Interface">

@@ -12,6 +12,7 @@ public:
 
     VOCABULARY_ADD_WORD(ResourceModel);
     VOCABULARY_ADD_WORD(ActorModel);
+    VOCABULARY_ADD_WORD(CompositeActorModel);
     VOCABULARY_ADD_WORD(CapabilityModel);
     VOCABULARY_ADD_WORD(InterfaceModel);
     VOCABULARY_ADD_WORD(ServiceModel);

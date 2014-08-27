@@ -180,7 +180,7 @@ IRI OrganizationModel::createNewActor(const IRISet& actorSet, const InterfaceCon
     }
 
     // Create ActorModel
-    mpOntology->instanceOf(actorModelName, OM::ActorModel());
+    mpOntology->instanceOf(actorModelName, OM::CompositeActorModel());
 
     // Create Instance
     mpOntology->instanceOf(actorName, OM::CompositeActor());
