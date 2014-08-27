@@ -72,6 +72,11 @@ public:
     std::string toString() const { return mPrefix + mRemainder; }
 
     /**
+     * To escape string, e.g. for usage as regular expression
+     */
+    std::string toEscapedString() const;
+
+    /**
      * Get Fragement of IRI, i.e. everything past #
      */
     std::string getFragment() const;

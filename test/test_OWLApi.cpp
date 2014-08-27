@@ -3,6 +3,7 @@
 
 #include <owl_om/OWLApi.hpp>
 #include <owl_om/Vocabulary.hpp>
+#include <boost/regex.hpp>
 
 BOOST_AUTO_TEST_CASE(it_should_handle_iris)
 {
@@ -81,5 +82,13 @@ BOOST_AUTO_TEST_CASE(it_should_handle_iris)
 
     }
 
+    {
+        IRI iri("http://www.w3.org/2002/07/owl#One+Two+Three[12]*");
+        IRI iriFail("http://www.w3.org/2002/07/owl#One+Two+Three[]*");
+        std::string escapedIri = iri.toEscapedString();
 
+        boost::regex r(escapedIri);
+        BOOST_REQUIRE_MESSAGE(regex_match(iri.toString(), r), "IRI correctly escaped -- positive test: regex is: " << r.str());
+        BOOST_REQUIRE_MESSAGE(!regex_match(iriFail.toString(), r), "IRI correctly escaped -- negative test");
+    }
 }

@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <owl_om/owlapi/io/XMLUtils.hpp>
 #include <base/Logging.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace owlapi {
 namespace model {
@@ -140,6 +141,19 @@ IRI IRI::create(const std::string& prefix, const std::string& suffix)
         // constructor
         return create(prefix + suffix);
     }
+}
+
+
+std::string IRI::toEscapedString() const
+{
+    std::string iri = toString();
+    boost::replace_all(iri, "/","\\/");
+    boost::replace_all(iri, "[","\\[");
+    boost::replace_all(iri, "]","\\]");
+    boost::replace_all(iri, "+","\\+");
+    boost::replace_all(iri, "*","\\*");
+
+    return iri;
 }
 
 
