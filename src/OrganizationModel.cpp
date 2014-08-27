@@ -27,7 +27,6 @@ bool InterfaceConnection::sameParents(const InterfaceConnection& other) const
 
 bool InterfaceConnection::useSameInterface(const InterfaceConnection& other) const
 {
-    LOG_DEBUG_S << "Use same interface of " << *this << " against " << other;
     return other.begin == this->begin || other.begin == this->end || other.end == this->begin || other.end == this->end;
 }
 
@@ -120,6 +119,7 @@ void OrganizationModel::refresh()
     InterfaceCombinationList interfaceCombinations;
     try {
         interfaceCombinations = generateInterfaceCombinations();
+        LOG_WARN_S << "Number of interface combinations: " << interfaceCombinations.size();
     } catch(const std::invalid_argument& e)
     {
         LOG_WARN_S << e.what();
@@ -145,7 +145,7 @@ void OrganizationModel::refresh()
         }
 
         mpOntology->refresh();
-        LOG_DEBUG_S << "OrganizationModel: with inferred actors: " << newActors;
+        LOG_INFO_S << "OrganizationModel: with inferred actors: " << newActors;
 
     } else {
         LOG_INFO_S << "OrganizationModel: no interface combinations available, so no actors inferred";
@@ -234,15 +234,15 @@ void OrganizationModel::runInferenceEngine()
 
     // Infer services
     IRIList services = mpOntology->allInstancesOf( OM::ServiceModel() );
-    LOG_INFO_S << "Validate known services: " << services;
+    LOG_DEBUG_S << "Validate known services: " << services;
 
     IRIList capabilities = mpOntology->allInstancesOf( OM::CapabilityModel() );
-    LOG_INFO_S << "Validate known capabilities: " << capabilities;
+    LOG_DEBUG_S << "Validate known capabilities: " << capabilities;
 
     bool updated = true;
     while(updated)
     {
-        LOG_INFO_S << "Run inference engine for actors: " << actors;
+        LOG_DEBUG_S << "Run inference engine for actors: " << actors;
 
         IRIList::const_iterator actorIt = actors.begin();
         updated = false;
@@ -279,7 +279,7 @@ IRIList OrganizationModel::infer(const IRI& actor, const IRI& classTypeOfInferre
         {
             IRI modelType = ontology()->typeOf(model);
 
-            LOG_INFO_S << "infer " << modelType << " : actor '" << actor << "' resolveRequirements '" << model << "'";
+            LOG_DEBUG_S << "infer " << modelType << " : actor '" << actor << "' resolveRequirements '" << model << "'";
 
             try {
                 Grounding grounding = resolveRequirements(actor, model);
@@ -295,14 +295,14 @@ IRIList OrganizationModel::infer(const IRI& actor, const IRI& classTypeOfInferre
                         mpOntology->relatedTo(instance, OM::uses(), pair.second);
                     }
 
-                    LOG_INFO_S << modelType << " inference: " << std::endl
+                    LOG_DEBUG_S << modelType << " inference: " << std::endl
                         << "     actor:     " << actor << std::endl
                         << "     provides:  " << model << std::endl
                         << "     has:       " << instance << std::endl;
 
                     inferred.push_back(model);
                 } else {
-                    LOG_INFO_S << "inference: '" << actor << "' does not provide '" << model << "'";
+                    LOG_DEBUG_S << "inference: '" << actor << "' does not provide '" << model << "'";
                 }
             } catch(const std::invalid_argument& e)
             {
@@ -331,7 +331,7 @@ Grounding OrganizationModel::resolveRequirements(const IRI& resourceProvider, co
         throw std::invalid_argument("OrganizationModel::resolveRequirements: no requirements found");
     }
 
-    LOG_INFO_S << "Check " << std::endl
+    LOG_DEBUG_S << "Check " << std::endl
         << "    resourceProvider [" << resourceProviderModel << "] '" << resourceProvider  << std::endl
         << "    requirements for '" << requirementModel << "'" << std::endl
         << "    available resources:     " << availableResources << std::endl
@@ -360,13 +360,13 @@ Grounding OrganizationModel::resolveRequirements(const IRI& resourceProvider, co
 
             if( grounded[availableResource] )
             {
-                LOG_INFO_S << "resource '" << availableResource << "' already in use (grounded)";
+                LOG_DEBUG_S << "resource '" << availableResource << "' already in use (grounded)";
                 continue;
             }
 
             if( isSameResourceModel(requirement, availableResource) )
             {
-                LOG_INFO_S << "requirement " << requirement << " fulfilled by '" << resourceProvider << "' using '"<< availableResource << "'";
+                LOG_DEBUG_S << "requirement " << requirement << " fulfilled by '" << resourceProvider << "' using '"<< availableResource << "'";
                 grounding[requirement] = availableResource;
                 grounded[availableResource] = true;
                 dependencyFulfilled = true;
@@ -376,7 +376,7 @@ Grounding OrganizationModel::resolveRequirements(const IRI& resourceProvider, co
 
         if(!dependencyFulfilled)
         {
-            LOG_INFO_S << "requirement " << requirement << " cannot be fulfilled by '" << resourceProvider << "'";
+            LOG_DEBUG_S << "requirement " << requirement << " cannot be fulfilled by '" << resourceProvider << "'";
             grounding[requirement] = Grounding::ungrounded();
             success = false;
             break;
@@ -398,7 +398,7 @@ Grounding OrganizationModel::resolveRequirements(const IRI& resourceProvider, co
     ss << "    requirements for '" << requirementModel << "'" << std::endl;
     ss << groundingMap.toString();
 
-    LOG_INFO_S << ss.str();
+    LOG_DEBUG_S << ss.str();
     return groundingMap;
 }
 
@@ -453,13 +453,13 @@ bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherR
 
             if( mpOntology->isRelatedTo(interfaceModel, OM::compatibleWith(), otherInterfaceModel) )
             {
-                LOG_INFO_S << resource << " compatibleWith " << otherResource << " via " << interface << "[" << interfaceModel << "] and " << otherInterface << "[" << otherInterfaceModel << "]";
+                LOG_DEBUG_S << resource << " compatibleWith " << otherResource << " via " << interface << "[" << interfaceModel << "] and " << otherInterface << "[" << otherInterfaceModel << "]";
                 return true;
             }
         }
     }
 
-    LOG_INFO_S << resource << " is not compatibleWith " << otherResource << " via any interface";
+    LOG_DEBUG_S << resource << " is not compatibleWith " << otherResource << " via any interface";
     return false;
 }
 
@@ -484,9 +484,9 @@ CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, cons
                 IRIList::iterator uit = std::find(resourceUsedInstances.begin(), resourceUsedInstances.end(), *cit);
                 if( uit != resourceUsedInstances.end())
                 {
-                    LOG_INFO_S << instance << " uses (Interface) " << *cit << " already";
+                    LOG_DEBUG_S << instance << " uses (Interface) " << *cit << " already";
                 } else {
-                    LOG_INFO_S << instance << " has unused (Interface) " << *cit;
+                    LOG_DEBUG_S << instance << " has unused (Interface) " << *cit;
                     resourceInterfaces.push_back(*cit);
                 }
             }
@@ -503,16 +503,16 @@ CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, cons
                 IRIList::iterator uit = std::find(otherResourceUsedInstances.begin(), otherResourceUsedInstances.end(), *cit);
                 if( uit != otherResourceUsedInstances.end())
                 {
-                    LOG_INFO_S << otherInstance << " uses (Interface) " << *cit << " already";
+                    LOG_DEBUG_S << otherInstance << " uses (Interface) " << *cit << " already";
                 } else {
-                    LOG_INFO_S << otherInstance << " has (Interface) " << *cit;
+                    LOG_DEBUG_S << otherInstance << " has (Interface) " << *cit;
                     otherResourceInterfaces.push_back(*cit);
                 }
             }
         }
     }
 
-    LOG_INFO_S << "Check compatibility: " << instance << " <--> " << otherInstance << std::endl
+    LOG_DEBUG_S << "Check compatibility: " << instance << " <--> " << otherInstance << std::endl
         << "    used instances by first:        " << resourceUsedInstances << std::endl
         << "    used instances by second:       " << otherResourceUsedInstances << std::endl
         << "    available interfaces by first:  " << resourceInterfaces << std::endl
@@ -533,7 +533,7 @@ CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, cons
         IRI interface = *rit;
         IRI interfaceModel = getResourceModel(interface);
 
-        LOG_INFO_S << "Checking resource: '" << interface << "' of '" << instance << "' on compatiblity";
+        LOG_DEBUG_S << "Checking resource: '" << interface << "' of '" << instance << "' on compatiblity";
 
         IRIList::const_iterator oit = otherResourceInterfaces.begin();
         for(; oit != otherResourceInterfaces.end(); ++oit)
@@ -544,7 +544,7 @@ CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, cons
 
             if( mpOntology->isRelatedTo(interfaceModel, OM::compatibleWith(), otherInterfaceModel) )
             {
-                LOG_INFO_S << instance << " compatibleWith " << otherInstance << " via " << interface << " and " << otherInterface;
+                LOG_DEBUG_S << instance << " compatibleWith " << otherInstance << " via " << interface << " and " << otherInterface;
                 usedInterfaces.push_back(interface);
                 usedInterfaces.push_back(otherInterface);
 
@@ -556,7 +556,7 @@ CandidatesList OrganizationModel::checkIfCompatibleNow(const IRI& instance, cons
 
     if(candidates.empty())
     {
-        LOG_INFO_S << instance << " is not compatibleWith " << otherInstance << " via any interface";
+        LOG_DEBUG_S << instance << " is not compatibleWith " << otherInstance << " via any interface";
     } else {
         LOG_INFO_S << "Candidates: " << candidates;
     }
@@ -655,7 +655,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
     IRIList actors = mpOntology->allInstancesOf( OM::Actor(), true );
     if(actors.size() < 2)
     {
-        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: no actors for recombination available, i.e. no more than 1");
+        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
     }
     {
         IRIList::const_iterator ait = actors.begin();
@@ -712,7 +712,6 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
             // Reject: interfaces are not compatible with each other
             continue;
         }
-
         // Add connection
         InterfaceConnection connection(match[0], match[1]);
         connection.addParent(parents0.front());
@@ -724,6 +723,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
     LOG_DEBUG_S << "Valid connections: " << validConnections;
 
 
+    // Maximum number of connections for a composite actor
     size_t maximumNumberOfConnections =  actors.size() - 1;
 
     // Compute valid combinations, i.e.
@@ -738,12 +738,13 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
         // 1. Make sure only one(!) connection exists between two systems
         // 2. Make sure each interface is used only once
         //
-        // Validate by caching all interface that are used by previous connections
+        // Validate by caching all interfaces that are used by previous connections
         InterfaceConnectionList usedInterfaceConnections;
         for(; cit != connectionList.end(); ++cit)
         {
             InterfaceConnection connection = *cit;
 
+            // check constraints
             InterfaceConnectionList::const_iterator uit = std::find_if(usedInterfaceConnections.begin(), usedInterfaceConnections.end(), boost::bind(&InterfaceConnection::sameParents, &connection, boost::lambda::_1) || boost::bind(&InterfaceConnection::useSameInterface, &connection, boost::lambda::_1));
             if(uit != usedInterfaceConnections.end())
             {
