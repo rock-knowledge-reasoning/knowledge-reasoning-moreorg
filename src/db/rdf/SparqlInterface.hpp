@@ -25,6 +25,8 @@ struct Results
 {
     std::vector<Row> rows;
     std::string toString() const;
+
+    bool empty() { return rows.empty(); }
 };
 
 class ResultsIterator
