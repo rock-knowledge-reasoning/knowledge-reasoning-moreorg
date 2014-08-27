@@ -54,6 +54,17 @@ public:
     std::string toString() const;
 
 private:
+
+    /**
+     * Initialize all default classes used in the ontology
+     */
+    void initializeDefaultClasses();
+
+    /**
+     * Load all object properties
+     */
+    void loadObjectProperties();
+
     db::query::SparqlInterface* mSparqlInterface;
 };
 

@@ -37,8 +37,7 @@ void Ontology::reload()
 {
     using namespace owl_om::db::query;
 
-    // Default initialization
-    getClassLazy(vocabulary::OWL::Class());
+    initializeDefaultClasses();
 
     {
         db::query::Results results = findAll(Subject(),vocabulary::RDF::type(),vocabulary::OWL::Class());
@@ -135,14 +134,26 @@ void Ontology::reload()
         }
     }
 
+    loadObjectProperties();
+}
+
+void Ontology::initializeDefaultClasses()
+{
+    // Trigger instanciation of the following classes
+    getClassLazy(vocabulary::OWL::Class());
+}
+
+
+void Ontology::loadObjectProperties()
+{
+    using namespace owl_om::db::query;
+
     IRIList objectProperties = allObjectProperties();
     IRIList::const_iterator cit = objectProperties.begin();
     for(; cit != objectProperties.end(); ++cit)
     {
         IRI relation = *cit;
         Results results = findAll(Subject(), relation, Object());
-        LOG_DEBUG_S << "PROPERTY QUERY RESULTS:" << std::endl
-            << results.toString() << std::endl;
         ResultsIterator it(results);
         while(it.next())
         {
@@ -153,6 +164,7 @@ void Ontology::reload()
             relatedTo(subject, relation, object);
         }
 
+        // Setting domain of property
         {
             Results domain = findAll(relation, vocabulary::RDFS::domain(), Object());
             if(!domain.empty())
@@ -162,11 +174,10 @@ void Ontology::reload()
                 {
                     owlapi::model::IRI classType = domainIt[Object()];
                     domainOf(relation, classType, OBJECT);
-
-                    LOG_WARN_S << "SET DOMAIN: " << relation << " to " << getObjectPropertyDomain(relation);
                 }
             }
         }
+        // Setting range of property
         {
             Results range = findAll(relation, vocabulary::RDFS::range(), Object());
             if(!range.empty())
@@ -176,11 +187,10 @@ void Ontology::reload()
                 {
                     owlapi::model::IRI classType = rangeIt[Object()];
                     rangeOf(relation, classType, OBJECT);
-
-                    LOG_WARN_S << "SET RANGE: " << relation << " to " << getObjectPropertyRange(relation);
                 }
             }
         }
+        // Setting inverse property
         {
             Results inverses = findAll(relation, vocabulary::OWL::inverseOf(), Object());
             if(!inverses.empty())
@@ -191,11 +201,9 @@ void Ontology::reload()
                     owlapi::model::IRI inverseType = inversesIt[Object()];
                     inverseOf(relation, inverseType);
 
-                    LOG_WARN_S << "SET INVERSE: " << relation << " to " << inverseType;
                 }
             }
         }
-
     }
 }
 
