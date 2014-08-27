@@ -250,6 +250,13 @@ public:
     Axiom domainOf(const IRI& property, const IRI& domain, PropertyType PropertyType);
 
     /**
+     * Define an object relation / role and its range
+     * \param relation
+     * \param range Type of subject for this relation
+     */
+    Axiom rangeOf(const IRI& property, const IRI& domain, PropertyType PropertyType);
+
+    /**
      * Define associated value of an individual
      * \param value of
      */
@@ -370,6 +377,23 @@ public:
 
     ObjectPropertyExpression getObjectProperty(const IRI& property) const;
     ObjectPropertyExpression getObjectPropertyLazy(const IRI& property);
+
+    /**
+     * Get property domain
+     * \param property Name of property
+     * \param direct If direct is true, an exact domain is retrieved if available, otherwise the most specific concept set
+     * default is true
+     */
+    IRIList getObjectPropertyDomain(const IRI& property, bool direct = true) const;
+
+    /**
+     * Get property range
+     * \param property Name of property
+     * \param direct If direct is true, an exact range is retrieved if available, otherwise the most specific concept set
+     * default is true
+     */
+    IRIList getObjectPropertyRange(const IRI& property, bool direct = false) const;
+
     DataPropertyExpression getDataProperty(const IRI& property) const;
     DataPropertyExpression getDataPropertyLazy(const IRI& property);
 
@@ -398,10 +422,13 @@ public:
     IRIList allRelatedInstances(const IRI& instance, const IRI& relationProperty, const IRI& klass = IRI());
 
     /**
-     * Retrieve all related instances regarding a single instance and a selected property
-     * \return list of instances that are related to instance via the relationProperty
+     * Retrieve the first found related instance regarding a single instance and a selected property
+     * \param instance Instance name
+     * \param relationProperty
+     * \param klass Klass type the relation should map to
+     * \return instance that is related to instance via the relationProperty
      */
-    IRI relatedInstance(const IRI& instance, const IRI& relationProperty);
+    IRI relatedInstance(const IRI& instance, const IRI& relationProperty, const IRI& klass = IRI());
 
     /**
      * Retrieve all instances regarding a single instance and a selected property

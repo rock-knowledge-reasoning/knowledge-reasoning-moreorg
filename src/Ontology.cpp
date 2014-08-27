@@ -148,6 +148,35 @@ void Ontology::reload()
             LOG_DEBUG_S << subject << " " << relation << " " << object;
             relatedTo(subject, relation, object);
         }
+
+        {
+            Results domain = findAll(relation, vocabulary::RDFS::domain(), Object());
+            if(!domain.empty())
+            {
+                ResultsIterator domainIt(domain);
+                while(domainIt.next())
+                {
+                    owlapi::model::IRI classType = domainIt[Object()];
+                    domainOf(relation, classType, OBJECT);
+
+                    LOG_WARN_S << "SET DOMAIN: " << relation << " to " << getObjectPropertyDomain(relation);
+                }
+            }
+        }
+        {
+            Results range = findAll(relation, vocabulary::RDFS::range(), Object());
+            if(!range.empty())
+            {
+                ResultsIterator rangeIt(range);
+                while(rangeIt.next())
+                {
+                    owlapi::model::IRI classType = rangeIt[Object()];
+                    rangeOf(relation, classType, OBJECT);
+
+                    LOG_WARN_S << "SET RANGE: " << relation << " to " << getObjectPropertyRange(relation);
+                }
+            }
+        }
     }
 }
 

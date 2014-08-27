@@ -104,6 +104,43 @@ ObjectPropertyExpression KnowledgeBase::getObjectPropertyLazy(const IRI& propert
     }
 }
 
+IRIList KnowledgeBase::getObjectPropertyDomain(const IRI& property, bool direct) const
+{
+    ObjectPropertyExpression e_property = getObjectProperty(property);
+    IRIList classes;
+
+    Actor actor;
+    actor.needConcepts();
+    mKernel->getORoleDomain( e_property.get(), direct, actor);
+
+    const char** result = actor.getElements1D();
+    for(size_t i = 0; result[i] != NULL; ++i)
+    {
+        classes.push_back( IRI::create(result[i]) );
+    }
+    delete[] result;
+    return classes;
+
+}
+
+IRIList KnowledgeBase::getObjectPropertyRange(const IRI& property, bool direct) const
+{
+    ObjectPropertyExpression e_property = getObjectProperty(property);
+    IRIList classes;
+
+    Actor actor;
+    actor.needConcepts();
+    mKernel->getRoleRange( e_property.get(), direct, actor);
+
+    const char** result = actor.getElements1D();
+    for(size_t i = 0; result[i] != NULL; ++i)
+    {
+        classes.push_back( IRI::create(result[i]) );
+    }
+    delete[] result;
+    return classes;
+}
+
 DataPropertyExpression KnowledgeBase::getDataProperty(const IRI& property) const
 {
     IRIDataPropertyExpressionMap::const_iterator cit = mDataProperties.find(property);
@@ -410,6 +447,28 @@ Axiom KnowledgeBase::domainOf(const IRI& property, const IRI& domain, PropertyTy
     }
 }
 
+Axiom KnowledgeBase::rangeOf(const IRI& property, const IRI& range, PropertyType propertyType)
+{
+    switch(propertyType)
+    {
+        case OBJECT:
+        {
+            ObjectPropertyExpression e_role = getObjectPropertyLazy(property);
+            ClassExpression e_range = getClassLazy(range);
+
+            return Axiom( mKernel->setORange(e_role.get(), e_range.get()) );
+        }
+        case DATA:
+        {
+            throw std::runtime_error("KnowledgeBase::rangeOf not implemented for data property");
+        }
+        default:
+        {
+            throw std::invalid_argument("Invalid property type '" + PropertyTypeTxt[propertyType] + "' for domainOf");
+        }
+    }
+}
+
 Axiom KnowledgeBase::valueOf(const IRI& individual, const IRI& property, const DataValue& dataValue)
 {
     TDLAxiom* axiom = mKernel->valueOf( getInstance(individual).get(), getDataProperty(property).get(),dataValue.get());
@@ -643,9 +702,9 @@ IRIList KnowledgeBase::allRelatedInstances(const IRI& individual, const IRI& rel
     return individuals;
 }
 
-IRI KnowledgeBase::relatedInstance(const IRI& individual, const IRI& relationProperty)
+IRI KnowledgeBase::relatedInstance(const IRI& individual, const IRI& relationProperty, const IRI& klass)
 {
-    IRIList instances = allRelatedInstances(individual, relationProperty);
+    IRIList instances = allRelatedInstances(individual, relationProperty, klass);
     if(instances.empty())
     {
         throw std::invalid_argument("KnowledgeBase::relatedInstance: no instance related to '" + individual.toString() + "' via property '" + relationProperty.toString() + "'");
