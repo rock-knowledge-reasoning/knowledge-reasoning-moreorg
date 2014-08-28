@@ -16,6 +16,7 @@ int main(int argc, char** argv)
     if(!o_filename.empty())
     {
         OrganizationModel om( o_filename );
+        om.setMaximumNumberOfLinks(2);
 
         using namespace owl_om;
         using namespace owl_om::vocabulary;

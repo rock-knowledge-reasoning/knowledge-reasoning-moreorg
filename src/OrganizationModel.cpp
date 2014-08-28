@@ -6,6 +6,7 @@
 #include <boost/foreach.hpp>
 #include <owl_om/Vocabulary.hpp>
 #include <owl_om/Combinatorics.hpp>
+#include <math.h>
 
 using namespace owl_om::vocabulary;
 
@@ -51,14 +52,17 @@ std::string Statistics::toString() const
 {
     std::stringstream txt;
     txt << "Organization Model Statistics" << std::endl
-        << "    upper bound for combinations:  " << upperCombinationBound << std::endl
-        << "    number of inference epochs:    " << numberOfInferenceEpochs << std::endl
-        << "    time elapsed in s:             " << timeElapsed.toSeconds() << std::endl
-        << "    # of interface combinations:   " << interfaceCombinations.size() << std::endl
-        << "    # of known actors:             " << actorsKnown.size() << std::endl
-        << "    # of inferred actors:          " << actorsInferred.size() << std::endl
-        << "    # of composite actors pre:     " << actorsCompositePrevious.size() << std::endl
-        << "    # of composite actors post:     " << actorsCompositePost.size() << std::endl;
+        << "    upper bound for combinations:    " << upperCombinationBound << std::endl
+        << "    number of inference epochs:      " << numberOfInferenceEpochs << std::endl
+        << "    time elapsed in s:               " << timeElapsed.toSeconds() << std::endl
+        << "    # of interface combinations:     " << interfaceCombinations.size() << std::endl
+        << "    # of known actors:               " << actorsKnown.size() << std::endl
+        << "    # of inferred actors:            " << actorsInferred.size() << std::endl
+        << "    # of composite actors pre:       " << actorsCompositePrevious.size() << std::endl
+        << "    # of composite actors post:      " << actorsCompositePost.size() << std::endl
+        << "    # of composite actor model pre:  " << actorsCompositeModelPrevious.size() << std::endl
+        << "    # of composite actor model post: " << actorsCompositeModelPost.size() << std::endl
+        << "    composite actor models post: " << actorsCompositeModelPost << std::endl;
 
     return txt.str();
 }
@@ -118,14 +122,15 @@ std::string Grounding::toString() const
     return ss.str();
 }
 
-OrganizationModel::OrganizationModel()
-    : mpOntology( new Ontology())
-{}
-
 OrganizationModel::OrganizationModel(const std::string& filename)
+    : mpOntology( new Ontology())
+    , mMaximumNumberOfLinks(32)
 {
-    mpOntology = Ontology::fromFile(filename);
-    refresh();
+    if(!filename.empty())
+    {
+        mpOntology = Ontology::fromFile(filename);
+        refresh();
+    }
 }
 
 void OrganizationModel::refresh()
@@ -149,11 +154,11 @@ void OrganizationModel::refresh()
     mStats.actorsCompositeModelPrevious = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
     mStats.interfaceCombinations = interfaceCombinations;
 
+    IRIList newActors;
     if(!interfaceCombinations.empty())
     {
         InterfaceCombinationList::const_iterator cit = interfaceCombinations.begin();
         std::map<IRISet, uint32_t> actorTypes;
-        IRIList newActors;
         for(; cit != interfaceCombinations.end(); ++cit)
         {
             IRISet actorCombination;
@@ -180,7 +185,8 @@ void OrganizationModel::refresh()
         LOG_INFO_S << "OrganizationModel: no interface combinations available, so no actors inferred";
     }
 
-    runInferenceEngine();
+    runInferenceEngine(newActors);
+
     mStats.timeElapsed = base::Time::now() - mStats.timeElapsed;
     mStats.actorsCompositePost = mpOntology->allInstancesOf(OM::CompositeActor(), true);
     mStats.actorsCompositeModelPost = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
@@ -272,10 +278,8 @@ void OrganizationModel::createInstance(const IRI& instanceName, const IRI& klass
     mpOntology->relatedTo(instanceName, OM::modelledBy(), model);
 }
 
-void OrganizationModel::runInferenceEngine()
+void OrganizationModel::runInferenceEngine(const IRIList& actors)
 {
-    IRIList actors = mpOntology->allInstancesOf( OM::Actor() );
-
     // Infer services
     IRIList services = mpOntology->allInstancesOf( OM::ServiceModel() );
     LOG_DEBUG_S << "Validate known services: " << services;
@@ -285,40 +289,80 @@ void OrganizationModel::runInferenceEngine()
 
     bool updated = true;
     uint32_t count = 0;
+
+    // Since some service migh depend on other services we run the
+    // inference engine until no changes can be seen
     while(updated)
     {
         LOG_DEBUG_S << "Run inference engine for actors: " << actors;
 
-        IRIList::const_iterator actorIt = actors.begin();
         updated = false;
-        for(; actorIt != actors.end(); ++actorIt)
+        BOOST_FOREACH(const IRI& actor, actors)
         {
-            const IRI& actor = *actorIt;
+            IRI actorModel = getResourceModel(actor);
 
+            BOOST_FOREACH(const IRI& service, services)
             {
-                IRIList inferred = infer(actor, services);
-                if(!inferred.empty())
+                if( !isProviding(actor, service) && isModelProvider(actorModel, service) )
                 {
-                    updated = true;
+                    addProvider(actor, service);
                 }
             }
+
+            BOOST_FOREACH(const IRI& capability, capabilities)
             {
-                IRIList inferred = infer(actor, capabilities);
-                if(!inferred.empty())
+                if( !isProviding(actor, capability) && isModelProvider(actorModel, capability) )
                 {
-                    updated = true;
+                    addProvider(actor, capability);
                 }
             }
+
+            //{
+            //    IRIList inferred = infer(actor, services);
+            //    if(!inferred.empty())
+            //    {
+            //        updated = true;
+            //    }
+            //}
+            //{
+            //    IRIList inferred = infer(actor, capabilities);
+            //    if(!inferred.empty())
+            //    {
+            //        updated = true;
+            //    }
+            //}
         }
     }
 
     mStats.numberOfInferenceEpochs = count;
 }
 
+void OrganizationModel::addProvider(const IRI& actor, const IRI& model)
+{
+    mpOntology->relatedTo(actor, OM::provides(), model);
+    std::pair<IRI, IRI> key(actor, model);
+    mProviderCache[key] = true;
+}
+
+bool OrganizationModel::isProviding(const IRI& actor, const IRI& model) const
+{
+    std::pair<IRI,IRI> key(actor, model);
+    RelationPredicateCache::const_iterator cit = mProviderCache.find(key);
+    if(cit != mProviderCache.end())
+    {
+        return cit->second;
+    }
+
+    IRI actorModel = getResourceModel(actor);
+    bool providing = mpOntology->isRelatedTo(actorModel, OM::provides(), model);
+    mProviderCache[key] = providing;
+    return providing;
+}
+
 IRIList OrganizationModel::allRelatedInstances(const IRI& instance, const IRI& relation) const
 {
     std::pair<IRI,IRI> key(instance, relation);
-    IRIRelationCache::const_iterator it = mRelationsCache.find(key);
+    RelationCache::const_iterator it = mRelationsCache.find(key);
     if(it != mRelationsCache.end())
     {
         return it->second;
@@ -331,7 +375,7 @@ IRIList OrganizationModel::allRelatedInstances(const IRI& instance, const IRI& r
 
 IRIList OrganizationModel::getModelRequirements(const IRI& model) const
 {
-    IRICache::const_iterator it = mModelRequirementsCache.find(model);
+    IRI2IRIListCache::const_iterator it = mModelRequirementsCache.find(model);
     if(it != mModelRequirementsCache.end())
     {
         return it->second;
@@ -343,66 +387,82 @@ IRIList OrganizationModel::getModelRequirements(const IRI& model) const
     return requirements;
 }
 
-IRIList OrganizationModel::infer(const IRI& actor, const IRIList& models)
+bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& model) const
 {
-    IRIList inferred;
+    // actorModels define the requirements (that will be fulfilled by instances of this actor model
+    IRIList availableResources = getModelRequirements(actorModel);
+    // model (service/capability/...) define the set of requirements
+    IRIList requirements = getModelRequirements(model);
 
-    IRI resourceProviderModel = getResourceModel(actor);
-    IRIList availableResources = allRelatedInstances(actor, OM::has());
-    //IRIList availableServices = mpOntology->allRelatedInstances(actor, OM::provides(), OM::ServiceModel());
-    //IRIList availableCapabilities = mpOntology->allRelatedInstances(actor, OM::has(), OM::Capability());
-
-    LOG_DEBUG_S << "Check " << std::endl
-        << "    resourceProvider [" << resourceProviderModel << "] '" << actor  << std::endl
-        << "    available resources:     " << availableResources << std::endl;
-    //    << "    available services:      " << availableServices << std::endl
-    //    << "    available capabilities:  " << availableCapabilities << std::endl;
-
-
-    BOOST_FOREACH(const IRI& model, models)
+    try {
+        Grounding grounding = resolveRequirements(requirements, availableResources, model, actorModel);
+        return grounding.isComplete();
+    } catch(const std::invalid_argument& e)
     {
-        // If model is not already provided check if its provided now
-        if( !mpOntology->isRelatedTo(actor, OM::provides(), model) )
-        {
-            IRI modelType = ontology()->typeOf(model);
-
-            LOG_DEBUG_S << "infer " << modelType << " : actor '" << actor << "' resolveRequirements '" << model << "'";
-
-            try {
-                IRIList requirements = getModelRequirements(model);
-                Grounding grounding = resolveRequirements(requirements, availableResources, actor, model);
-                if(grounding.isComplete())
-                {
-                    IRI instance = createNewFromModel(model);
-
-                    mpOntology->relatedTo(actor, OM::provides(), model);
-                    mpOntology->relatedTo(actor, OM::has(), instance);
-
-                    BOOST_FOREACH(const RequirementsGrounding::value_type& pair, grounding.getRequirementsGrounding())
-                    {
-                        mpOntology->relatedTo(instance, OM::uses(), pair.second);
-                    }
-
-                    LOG_DEBUG_S << modelType << " inference: " << std::endl
-                        << "     actor:     " << actor << std::endl
-                        << "     provides:  " << model << std::endl
-                        << "     has:       " << instance << std::endl;
-
-                    inferred.push_back(model);
-                } else {
-                    LOG_DEBUG_S << "inference: '" << actor << "' does not provide '" << model << "'";
-                }
-            } catch(const std::invalid_argument& e)
-            {
-                LOG_DEBUG_S << "Check failed for '" << model << "' failed " << e.what();
-            }
-        }
+        return false;
     }
-
-    return inferred;
 }
 
-Grounding OrganizationModel::resolveRequirements(const IRIList& requirements, const IRIList& availableResources, const IRI& resourceProvider, const IRI& requirementModel)
+//IRIList OrganizationModel::infer(const IRI& actor, const IRIList& models)
+//{
+//    IRIList inferred;
+//
+//    IRI resourceProviderModel = getResourceModel(actor);
+//    IRIList availableResources = allRelatedInstances(actor, OM::has());
+//    //IRIList availableServices = mpOntology->allRelatedInstances(actor, OM::provides(), OM::ServiceModel());
+//    //IRIList availableCapabilities = mpOntology->allRelatedInstances(actor, OM::has(), OM::Capability());
+//
+//    LOG_DEBUG_S << "Check " << std::endl
+//        << "    resourceProvider [" << resourceProviderModel << "] '" << actor  << std::endl
+//        << "    available resources:     " << availableResources << std::endl;
+//    //    << "    available services:      " << availableServices << std::endl
+//    //    << "    available capabilities:  " << availableCapabilities << std::endl;
+//
+//
+//    BOOST_FOREACH(const IRI& model, models)
+//    {
+//        // If model is not already provided check if its provided now
+//        if( !isProviding(actor, model))
+//        {
+//            IRI modelType = ontology()->typeOf(model);
+//
+//            LOG_DEBUG_S << "infer " << modelType << " : actor '" << actor << "' resolveRequirements '" << model << "'";
+//
+//            try {
+//                IRIList requirements = getModelRequirements(model);
+//                Grounding grounding = resolveRequirements(requirements, availableResources, actor, model);
+//                if(grounding.isComplete())
+//                {
+//                    IRI instance = createNewFromModel(model);
+//
+//                    addProvider(actor, model);
+//                    mpOntology->relatedTo(actor, OM::has(), instance);
+//
+//                    BOOST_FOREACH(const RequirementsGrounding::value_type& pair, grounding.getRequirementsGrounding())
+//                    {
+//                        mpOntology->relatedTo(instance, OM::uses(), pair.second);
+//                    }
+//
+//                    LOG_DEBUG_S << modelType << " inference: " << std::endl
+//                        << "     actor:     " << actor << std::endl
+//                        << "     provides:  " << model << std::endl
+//                        << "     has:       " << instance << std::endl;
+//
+//                    inferred.push_back(model);
+//                } else {
+//                    LOG_DEBUG_S << "inference: '" << actor << "' does not provide '" << model << "'";
+//                }
+//            } catch(const std::invalid_argument& e)
+//            {
+//                LOG_DEBUG_S << "Check failed for '" << model << "' failed " << e.what();
+//            }
+//        }
+//    }
+//
+//    return inferred;
+//}
+
+Grounding OrganizationModel::resolveRequirements(const IRIList& requirements, const IRIList& availableResources, const IRI& resourceProvider, const IRI& requirementModel) const
 {
     if(requirements.empty())
     {
@@ -480,18 +540,38 @@ Grounding OrganizationModel::resolveRequirements(const IRIList& requirements, co
 
 bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherResource)
 {
-    return mpOntology->isRelatedTo( resource, OM::compatibleWith(), otherResource );
+    std::pair<IRI,IRI> key = std::pair<IRI,IRI>(resource, otherResource);
+
+    RelationPredicateCache::const_iterator cit = mCompatibilityCache.find(key);
+    if(cit != mCompatibilityCache.end())
+    {
+        return cit->second;
+    }
+
+    bool isCompatible = mpOntology->isRelatedTo( resource, OM::compatibleWith(), otherResource );
+    mCompatibilityCache[key] = isCompatible;
+    return isCompatible;
 }
 
 IRI OrganizationModel::getResourceModel(const IRI& instance) const
 {
+    // Try cache first
+    IRI2IRICache::const_iterator cit = mResourceModelCache.find(instance);
+    if(cit != mResourceModelCache.end())
+    {
+        return cit->second;
+    }
+
+    IRI model;
     try {
-        return mpOntology->relatedInstance(instance, OM::modelledBy(), OM::ResourceModel());
+         model = mpOntology->relatedInstance(instance, OM::modelledBy(), OM::ResourceModel());
     } catch(const std::invalid_argument& e)
     {
         // no model means, this instance is a model by itself
-        return instance;
+        model = instance;
     }
+    mResourceModelCache[instance] = model;
+    return  model;
 }
 
 IRI OrganizationModel::getResourceModelInstanceType(const IRI& model) const
@@ -502,7 +582,7 @@ IRI OrganizationModel::getResourceModelInstanceType(const IRI& model) const
         return mpOntology->relatedInstance(modelType, OM::models(), OM::Resource());
     } catch(const std::invalid_argument& e)
     {
-        throw std::invalid_argument("OrganizationModel::createResourceModelInstanceType: '" + modelType.toString() + "' does not specify 'models' relation, thus cannot infer type for new model instances of " + model.toString()); 
+        throw std::invalid_argument("OrganizationModel::createResourceModelInstanceType: '" + modelType.toString() + "' does not specify 'models' relation, thus cannot infer type for new model instances of " + model.toString());
     }
 }
 
@@ -562,7 +642,7 @@ IRI OrganizationModel::createNewFromModel(const IRI& model, bool createDependant
     return newInstanceName;
 }
 
-bool OrganizationModel::isSameResourceModel(const IRI& instance, const IRI& otherInstance)
+bool OrganizationModel::isSameResourceModel(const IRI& instance, const IRI& otherInstance) const
 {
     return getResourceModel(instance) == getResourceModel(otherInstance);
 }
@@ -635,7 +715,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
 
 
     // Maximum number of connections for a composite actor
-    size_t maximumNumberOfConnections =  actors.size() - 1;
+    size_t maximumNumberOfConnections =  fmin(actors.size() - 1, mMaximumNumberOfLinks);
 
     // Compute valid combinations, i.e.
     //    - each interface is only used once in a combination

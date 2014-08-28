@@ -91,19 +91,16 @@ class OrganizationModel
 public:
 
     typedef boost::shared_ptr<OrganizationModel> Ptr;
-    typedef std::map< IRI, IRIList> IRICache;
-    typedef std::map< std::pair<IRI,IRI>, IRIList> IRIRelationCache;
-
-    /**
-     * Constructor for an empty OrganizationModel
-     */
-    OrganizationModel();
+    typedef std::map< IRI, IRIList> IRI2IRIListCache;
+    typedef std::map< IRI, IRI> IRI2IRICache;
+    typedef std::map< std::pair<IRI,IRI>, IRIList> RelationCache;
+    typedef std::map< std::pair<IRI,IRI>, bool> RelationPredicateCache;
 
     /**
      * Constructor to create an OrganizationModel from an existing description file
      * \param filename File name to an rdf/xml formatted ontology description file
      */
-    OrganizationModel(const std::string& filename);
+    OrganizationModel(const std::string& filename = "");
 
     /**
      * Update the organization model
@@ -127,7 +124,7 @@ public:
      * \param requirementModel Optional label for requirement model that the requirements originate from
      * \return corresponding grounding, which need to be check on completness
      */
-    Grounding resolveRequirements(const IRIList& resourceRequirements, const IRIList& availableResources, const IRI& resourceProvider = IRI(), const IRI& requirementModel = IRI());
+    Grounding resolveRequirements(const IRIList& resourceRequirements, const IRIList& availableResources, const IRI& resourceProvider = IRI(), const IRI& requirementModel = IRI()) const;
 
     // PREDICATES
     /**
@@ -139,8 +136,10 @@ public:
 
     /**
      * Run inference to identify service that are 'provided'
+     * by a set of actor
+     * \param actors
      */
-    void runInferenceEngine();
+    void runInferenceEngine(const IRIList& actors);
 
     /**
      * Reduce list of actor to unique individuals, i.e. removing
@@ -170,7 +169,7 @@ public:
      * Check if both instance use the same resource model
      * \return True upon success, false otherwise
      */
-    bool isSameResourceModel(const IRI& instance, const IRI& otherInstance);
+    bool isSameResourceModel(const IRI& instance, const IRI& otherInstance) const;
 
     /**
      * Create new instance (ABox from existing model (model is also in ABox))
@@ -200,7 +199,28 @@ public:
      */
     Statistics getStatistics() { return mStats; }
 
+    void setMaximumNumberOfLinks(uint32_t n) { mMaximumNumberOfLinks = n; }
+    uint32_t getMaximumNumberOfLinks() { return mMaximumNumberOfLinks; }
+
+
 private:
+
+    void addProvider(const IRI& actor, const IRI& model);
+
+    /**
+     * Check if model is provider for a given model, i.e.
+     * remaps requirements of actorModel as availableResources
+     * and check whether this is sufficient for the given model
+     * \return True upon success, false otherwise
+     */
+    bool isModelProvider(const IRI& actorModel, const IRI& model) const;
+
+    /**
+     * Cached version
+     *
+     * Checks if the associated actor model is providing the given model
+     */
+    bool isProviding(const IRI& actor, const IRI& model) const;
 
     /**
      * Cached version
@@ -218,6 +238,8 @@ private:
     /**
      * Infer new instance of a given class type, base on checking whether a given model
      * is fulfilled
+     *
+     * Will associate the given actor with each model
      * \param actor Actor to perform inference for, actor will in effect have two types of relationships:
      *     (a) provides model
      *     (b) has instance of the class type  (where instance is modelledBy the given model)
@@ -230,8 +252,13 @@ private:
 
     Statistics mStats;
 
-    mutable IRICache mModelRequirementsCache;
-    mutable IRIRelationCache mRelationsCache;
+    mutable IRI2IRIListCache mModelRequirementsCache;
+    mutable RelationCache mRelationsCache;
+    mutable IRI2IRICache mResourceModelCache;
+    mutable RelationPredicateCache mProviderCache;
+    mutable RelationPredicateCache mCompatibilityCache;
+
+    uint32_t mMaximumNumberOfLinks;
 };
 
 } // end namespace owl_om
