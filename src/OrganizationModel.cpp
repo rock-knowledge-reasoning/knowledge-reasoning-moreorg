@@ -185,6 +185,8 @@ void OrganizationModel::refresh()
         LOG_INFO_S << "OrganizationModel: no interface combinations available, so no actors inferred";
     }
 
+    IRIList atomicActors = mpOntology->allInstancesOf(OM::Actor(), true);
+    runInferenceEngine(atomicActors);
     runInferenceEngine(newActors);
 
     mStats.timeElapsed = base::Time::now() - mStats.timeElapsed;
@@ -396,9 +398,11 @@ bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& model)
 
     try {
         Grounding grounding = resolveRequirements(requirements, availableResources, model, actorModel);
+        LOG_WARN_S << "actorModel: " << actorModel << " provides " << model << ": " << grounding.isComplete();
         return grounding.isComplete();
     } catch(const std::invalid_argument& e)
     {
+        LOG_WARN_S << "actorModel: " << actorModel << " provides " << model << ": false";
         return false;
     }
 }
