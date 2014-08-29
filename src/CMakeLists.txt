@@ -36,6 +36,7 @@ rock_library(owl_om
         vocabularies/OWL.hpp
         vocabularies/RDF.hpp
         vocabularies/RDFS.hpp
+        ccf/CCF.hpp
         db/FileBackend.hpp
         db/rdf/SopranoDB.hpp
         db/rdf/Sparql.hpp
