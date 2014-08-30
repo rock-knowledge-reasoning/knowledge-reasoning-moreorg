@@ -31,42 +31,10 @@ BOOST_AUTO_TEST_CASE(it_should_handle_sets)
 
 }
 
-BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
+
+BOOST_AUTO_TEST_CASE(it_should_handle_reference_ccf)
 {
     CCF<IRI> ccf;
-
-    {
-        CCF<IRI>::Atoms atoms;
-
-        IRI a("1"); 
-        IRI b("2"); 
-        IRI c("3"); 
-        IRI d("4"); 
-        IRI e("5"); 
-        IRI f("6"); 
-        IRI g("7"); 
-        IRI h("8"); 
-
-        atoms.insert(a);
-        atoms.insert(b);
-        atoms.insert(c);
-        atoms.insert(d);
-        atoms.insert(e);
-        atoms.insert(f);
-        atoms.insert(g);
-        atoms.insert(g);
-
-        CCF<IRI>::Constraints positiveConstraints;
-        CCF<IRI>::Constraints negativeConstraints;
-        CCF<IRI>::Coalitions coalitions;
-
-        positiveConstraints = atoms;
-
-        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions);
-        BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
-        BOOST_TEST_MESSAGE("Constraints: " << positiveConstraints.toString() );
-        BOOST_TEST_MESSAGE("Coalitions: " << coalitions.toString());
-    }
 
     { // Scenario form Rahwan et. al.
 
@@ -88,7 +56,7 @@ BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
         atoms.insert(e);
         atoms.insert(f);
         atoms.insert(g);
-        atoms.insert(g);
+        atoms.insert(h);
 
         CCF<IRI>::Constraints positiveConstraints;
         CCF<IRI>::Constraints negativeConstraints;
@@ -111,7 +79,7 @@ BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
         {
             CCF<IRI>::Constraint constraint;
             constraint.insert(e);
-            constraint.insert(h);
+            constraint.insert(g);
             constraint.insert(h);
             positiveConstraints.insert(constraint);
         }
@@ -130,12 +98,209 @@ BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
             negativeConstraints.insert(constraint);
         }
 
-        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions);
+        IRIList aStar;
+        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions, aStar);
         BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
-        BOOST_TEST_MESSAGE("Constraints: " << positiveConstraints.toString() );
+        BOOST_TEST_MESSAGE("Positive constraints: " << positiveConstraints.toString() );
+        BOOST_TEST_MESSAGE("Negative constraints: " << negativeConstraints.toString() );
         BOOST_TEST_MESSAGE("Coalitions: " << coalitions.toString());
-    }
+        BOOST_TEST_MESSAGE("AStar: " << aStar);
 
+        CCF<IRI>::CoalitionsList list = ccf.createLists(aStar, coalitions);
+        BOOST_FOREACH(CCF<IRI>::Coalitions c, list)
+        {
+            BOOST_TEST_MESSAGE("Coalitions: " << c.toString());
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
+{
+    CCF<IRI> ccf;
+
+//    {
+//        CCF<IRI>::Atoms atoms;
+//
+//        IRI a("1"); 
+//        IRI b("2"); 
+//        IRI c("3"); 
+//        IRI d("4"); 
+//        IRI e("5"); 
+//        IRI f("6"); 
+//        IRI g("7"); 
+//        IRI h("8"); 
+//
+//        atoms.insert(a);
+//        atoms.insert(b);
+//        atoms.insert(c);
+//        atoms.insert(d);
+//        atoms.insert(e);
+//        atoms.insert(f);
+//        atoms.insert(g);
+//        atoms.insert(g);
+//
+//        CCF<IRI>::Constraints positiveConstraints;
+//        CCF<IRI>::Constraints negativeConstraints;
+//        CCF<IRI>::Coalitions coalitions;
+//
+//        positiveConstraints = atoms;
+//
+//        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions);
+//        BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
+//        BOOST_TEST_MESSAGE("Positive constraints: " << positiveConstraints.toString() );
+//        BOOST_TEST_MESSAGE("Negative constraints: " << negativeConstraints.toString() );
+//        BOOST_TEST_MESSAGE("Coalitions: " << coalitions.toString());
+//    }
+//
+//
+//    {
+//        CCF<IRI>::Atoms atoms;
+//
+//        IRI a("1"); 
+//        IRI b("2"); 
+//        IRI c("3"); 
+//        IRI d("4"); 
+//        IRI e("5"); 
+//        IRI f("6"); 
+//        IRI g("7"); 
+//        IRI h("8"); 
+//
+//        atoms.insert(a);
+//        atoms.insert(b);
+//        atoms.insert(c);
+//        atoms.insert(d);
+//        atoms.insert(e);
+//        //atoms.insert(f);
+//        //atoms.insert(g);
+//        //atoms.insert(g);
+//
+//        CCF<IRI>::Constraints positiveConstraints;
+//        CCF<IRI>::Constraints negativeConstraints;
+//        CCF<IRI>::Coalitions coalitions;
+//    
+//        BOOST_FOREACH(CCF<IRI>::Atom atom, atoms)
+//        {
+//            CCF<IRI>::Constraint constraint;
+//            constraint.insert(atom);
+//            positiveConstraints.insert(constraint);
+//        }
+//        //BOOST_FOREACH(CCF<IRI>::Atom atom, atoms)
+//        //{
+//            CCF<IRI>::Constraint constraint;
+//            constraint.insert(a);
+//            constraint.insert(b);
+//            negativeConstraints.insert(constraint);
+//        //}
+//       // {
+//       //     CCF<IRI>::Constraint constraint;
+//       //     constraint.insert(b);
+//       //     constraint.insert(e);
+//       //     constraint.insert(g);
+//       //     positiveConstraints.insert(constraint);
+//       // }
+//       // {
+//       //     CCF<IRI>::Constraint constraint;
+//       //     constraint.insert(e);
+//       //     constraint.insert(h);
+//       //     constraint.insert(h);
+//       //     positiveConstraints.insert(constraint);
+//       // }
+//       // {
+//       //     CCF<IRI>::Constraint constraint;
+//       //     constraint.insert(a);
+//       //     constraint.insert(b);
+//       //     constraint.insert(c);
+//       //     negativeConstraints.insert(constraint);
+//       // }
+//       // {
+//       //     CCF<IRI>::Constraint constraint;
+//       //     constraint.insert(b);
+//       //     constraint.insert(c);
+//       //     constraint.insert(e);
+//       //     negativeConstraints.insert(constraint);
+//       // }
+//
+//        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions);
+//        BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
+//        BOOST_TEST_MESSAGE("Positive constraints: " << positiveConstraints.toString() );
+//        BOOST_TEST_MESSAGE("Negative constraints: " << negativeConstraints.toString() );
+//        BOOST_TEST_MESSAGE("Coalitions: " << coalitions.toString());
+//    }
+//    {
+//        CCF<IRI>::Atoms atoms;
+//
+//        IRI a("1"); 
+//        IRI b("2"); 
+//        IRI c("3"); 
+//        IRI d("4"); 
+//        IRI e("5"); 
+//        IRI f("6"); 
+//        IRI g("7"); 
+//        IRI h("8"); 
+//
+//        atoms.insert(a);
+//        atoms.insert(b);
+//        atoms.insert(c);
+//        atoms.insert(d);
+//        atoms.insert(e);
+//        //atoms.insert(f);
+//        //atoms.insert(g);
+//        //atoms.insert(g);
+//
+//        CCF<IRI>::Constraints positiveConstraints;
+//        CCF<IRI>::Constraints negativeConstraints;
+//        CCF<IRI>::Coalitions coalitions;
+//   
+//        {
+//            CCF<IRI>::Constraint constraint;
+//            BOOST_FOREACH(CCF<IRI>::Atom atom, atoms)
+//            {
+//                constraint.insert(atom);
+//            }
+//            positiveConstraints.insert(constraint);
+//        }
+//        //BOOST_FOREACH(CCF<IRI>::Atom atom, atoms)
+//        //{
+//            CCF<IRI>::Constraint constraint;
+//            constraint.insert(a);
+//            constraint.insert(b);
+//            negativeConstraints.insert(constraint);
+//        //}
+//       // {
+//       //     CCF<IRI>::Constraint constraint;
+//       //     constraint.insert(b);
+//       //     constraint.insert(e);
+//       //     constraint.insert(g);
+//       //     positiveConstraints.insert(constraint);
+//       // }
+//       // {
+//       //     CCF<IRI>::Constraint constraint;
+//       //     constraint.insert(e);
+//       //     constraint.insert(h);
+//       //     constraint.insert(h);
+//       //     positiveConstraints.insert(constraint);
+//       // }
+//       // {
+//       //     CCF<IRI>::Constraint constraint;
+//       //     constraint.insert(a);
+//       //     constraint.insert(b);
+//       //     constraint.insert(c);
+//       //     negativeConstraints.insert(constraint);
+//       // }
+//       // {
+//       //     CCF<IRI>::Constraint constraint;
+//       //     constraint.insert(b);
+//       //     constraint.insert(c);
+//       //     constraint.insert(e);
+//       //     negativeConstraints.insert(constraint);
+//       // }
+//
+//        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions);
+//        BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
+//        BOOST_TEST_MESSAGE("Positive constraints: " << positiveConstraints.toString() );
+//        BOOST_TEST_MESSAGE("Negative constraints: " << negativeConstraints.toString() );
+//        BOOST_TEST_MESSAGE("Coalitions: " << coalitions.toString());
+//    }
     {
         CCF<IRI>::Atoms atoms;
 
@@ -160,53 +325,68 @@ BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
         CCF<IRI>::Constraints positiveConstraints;
         CCF<IRI>::Constraints negativeConstraints;
         CCF<IRI>::Coalitions coalitions;
-    
-        BOOST_FOREACH(CCF<IRI>::Atom atom, atoms)
+   
         {
-            CCF<IRI>::Constraint constraint;
-            constraint.insert(atom);
-            positiveConstraints.insert(constraint);
-        }
-        //BOOST_FOREACH(CCF<IRI>::Atom atom, atoms)
-        //{
             CCF<IRI>::Constraint constraint;
             constraint.insert(a);
             constraint.insert(b);
+            positiveConstraints.insert(constraint);
+        }
+        {
+            CCF<IRI>::Constraint constraint;
+            constraint.insert(b);
+            constraint.insert(c);
+            positiveConstraints.insert(constraint);
+        }
+        {
+            CCF<IRI>::Constraint constraint;
+            constraint.insert(c);
+            constraint.insert(d);
+            positiveConstraints.insert(constraint);
+        }
+        {
+            CCF<IRI>::Constraint constraint;
+            constraint.insert(d);
+            constraint.insert(e);
+            positiveConstraints.insert(constraint);
+        }
+        {
+            CCF<IRI>::Constraint constraint;
+            constraint.insert(a);
+            constraint.insert(c);
             negativeConstraints.insert(constraint);
-        //}
-       // {
-       //     CCF<IRI>::Constraint constraint;
-       //     constraint.insert(b);
-       //     constraint.insert(e);
-       //     constraint.insert(g);
-       //     positiveConstraints.insert(constraint);
-       // }
-       // {
-       //     CCF<IRI>::Constraint constraint;
-       //     constraint.insert(e);
-       //     constraint.insert(h);
-       //     constraint.insert(h);
-       //     positiveConstraints.insert(constraint);
-       // }
-       // {
-       //     CCF<IRI>::Constraint constraint;
-       //     constraint.insert(a);
-       //     constraint.insert(b);
-       //     constraint.insert(c);
-       //     negativeConstraints.insert(constraint);
-       // }
-       // {
-       //     CCF<IRI>::Constraint constraint;
-       //     constraint.insert(b);
-       //     constraint.insert(c);
-       //     constraint.insert(e);
-       //     negativeConstraints.insert(constraint);
-       // }
+        }
+        {
+            CCF<IRI>::Constraint constraint;
+            constraint.insert(a);
+            constraint.insert(e);
+            negativeConstraints.insert(constraint);
+        }
+        {
+            CCF<IRI>::Constraint constraint;
+            constraint.insert(b);
+            constraint.insert(d);
+            negativeConstraints.insert(constraint);
+        }
+        {
+            CCF<IRI>::Constraint constraint;
+            constraint.insert(c);
+            constraint.insert(e);
+            negativeConstraints.insert(constraint);
+        }
 
-        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions);
+        IRIList aStar;
+        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions, aStar);
         BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
         BOOST_TEST_MESSAGE("Positive constraints: " << positiveConstraints.toString() );
         BOOST_TEST_MESSAGE("Negative constraints: " << negativeConstraints.toString() );
         BOOST_TEST_MESSAGE("Coalitions: " << coalitions.toString());
+        BOOST_TEST_MESSAGE("AStar: " << aStar);
+
+        CCF<IRI>::CoalitionsList list = ccf.createLists(aStar, coalitions);
+        BOOST_FOREACH(CCF<IRI>::Coalitions c, list)
+        {
+            BOOST_TEST_MESSAGE("Coalitions: " << c.toString());
+        }
     }
 }

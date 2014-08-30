@@ -8,7 +8,7 @@
 #include <boost/foreach.hpp>
 #include <base/Logging.hpp>
 
-namespace owl_om 
+namespace owl_om
 {
 
 template<typename T>
@@ -51,7 +51,10 @@ public:
     Set<T> createUnion(const Set<T>& s) const
     {
         Set<T> tmpSet = *this;
-        tmpSet.mSet.insert(tmpSet.begin(), s.begin(), s.end());
+        BOOST_FOREACH(const T& item, s)
+        {
+            tmpSet.insert(item);
+        }
         return tmpSet;
     }
 
@@ -71,9 +74,12 @@ public:
     bool empty() const { return mSet.empty(); }
     size_t size() const { return mSet.size(); }
 
-    void insert(const T& item) { mSet.insert(item); }
+    void insert(const T& item)
+    {
+        mSet.insert(item);
+    }
 
-    T first() { return *mSet.begin(); }
+    const T& first() const { assert(!empty()); return *mSet.begin(); }
     void clear() { mSet.clear(); }
 
     bool operator<( const Set<T>& other) const
@@ -81,9 +87,9 @@ public:
         return mSet < other.mSet;
     }
 
-    bool contains(const T& item) { return mSet.count(item); }
+    bool contains(const T& item) const { return mSet.count(item); }
 
-    std::string toString() const 
+    std::string toString() const
     {
         std::stringstream ss;
         ss << "{";
@@ -189,14 +195,62 @@ public:
 };
 
 
-/**   
+template<typename T>
+struct Coalition
+{
+    typedef SetOfSets<T> Constraints;
+
+    Constraints positive;
+    Constraints negative;
+
+    Coalition()
+    {}
+
+    Coalition(Constraints positive, Constraints negative)
+        : positive(positive)
+        , negative(negative)
+    {}
+
+    std::string toString() const
+    {
+        std::stringstream ss;
+        ss << "(p:";
+        ss << positive.toString();
+        ss << "; n:";
+        ss << negative.toString();
+        ss << ")";
+        return ss.str();
+    }
+
+    bool operator<(const Coalition& other) const
+    {
+        if(positive < other.positive)
+        {
+            return true;
+        } else if(negative < other.negative)
+        {
+            return true;
+        }
+        return false;
+    }
+};
+
+template<class T>
+inline std::ostream& operator<<(std::ostream& out, const Coalition<T>& val)
+{
+    out << val.toString();
+    return out;
+}
+
+
+/**
  *    NegativeConstraint == atomSet == Coalition
  *    PositiveConstraint == atomSet == Coalition
  *
  *    p -> Set of Sets
  *    pStar -> Set of sets
  */
-template<typename T>
+template<typename T, template<class> class C = Coalition>
 class CCF
 {
 public:
@@ -204,26 +258,71 @@ public:
     typedef Set<T> Atoms;
     typedef Set<T> Constraint;
     typedef SetOfSets<T> Constraints;
-    typedef SetOfSets<T> Coalitions;
+    typedef C<T> Coalition;
+    typedef Set< C<T> > Coalitions;
+    typedef std::vector<Coalitions> CoalitionsList;
     typedef Constraints PositiveConstraints;
     typedef Constraints NegativeConstraints;
+    typedef std::vector<T> AStar;
 
-    void computeConstrainedCoalitions(Atoms atoms, PositiveConstraints p, NegativeConstraints n, Coalitions& coalitions)
+    Atom selectAtom(const Atoms& atoms, const Constraints& constraints) const
     {
-        Constraints constraints;
-        computeConstrainedCoalitions(atoms, p, n, constraints, constraints, coalitions);
+        // find biggest in list and pick first item
+        Constraint largestConstraint;
+        size_t largestConstraintSize = 0;
+        BOOST_FOREACH(const Constraint& c, constraints)
+        {
+            size_t constraintSize = c.size();
+            if(constraintSize > largestConstraintSize)
+            {
+                largestConstraintSize = constraintSize;
+                largestConstraint = c;
+            }
+        }
+
+        // Make sure we are using only constraints that are relevant
+        BOOST_FOREACH(Atom a, largestConstraint)
+        {
+            if(atoms.contains(a))
+            {
+                return a;
+            }
+        }
+
+        throw std::runtime_error("No atoms left");
     }
 
-    void computeConstrainedCoalitions(Atoms atoms, PositiveConstraints p, NegativeConstraints n, 
-            PositiveConstraints pStar, NegativeConstraints nStar, Coalitions& coalitions)
+    void computeConstrainedCoalitions(Atoms atoms, PositiveConstraints p, NegativeConstraints n, Coalitions& coalitions, AStar& aStar)
     {
-
-        LOG_DEBUG_S << "Compute constrained coalitions: " << std::endl
+        LOG_DEBUG_S << "Init compute constrained coalitions: " << std::endl
             << "    atoms:        " << atoms.toString() << std::endl
-            << "    n:            " << n.toString() << std::endl
             << "    p:            " << p.toString() << std::endl
-            << "    n*:           " << nStar.toString() << std::endl
+            << "    n:            " << n.toString() << std::endl;
+
+        Constraints constraints;
+        computeConstrainedCoalitions(atoms, p, n, constraints, constraints, coalitions, aStar);
+
+        LOG_DEBUG_S << "End of algorithm: Coalitions: " << coalitions.toString();
+    }
+
+    void computeConstrainedCoalitions(Atoms atoms, PositiveConstraints p, NegativeConstraints n,
+            PositiveConstraints pStar, NegativeConstraints nStar, Coalitions& coalitions, AStar& aStar, bool positiveBranch = true, Atom a = Atom())
+    {
+        std::string label;
+        if(positiveBranch)
+        {
+            label = "with ";
+        } else {
+            label = "without ";
+        }
+        label += a.toString();
+
+        LOG_DEBUG_S << "compute constrained coalitions [" << label << "]: " << std::endl
+            << "    atoms:        " << atoms.toString() << std::endl
+            << "    p:            " << p.toString() << std::endl
+            << "    n:            " << n.toString() << std::endl
             << "    p*:           " << pStar.toString() << std::endl
+            << "    n*:           " << nStar.toString() << std::endl
             << "    coalitions:   " << coalitions.toString() << std::endl;
 
         // Remove redundant constraints
@@ -259,12 +358,12 @@ public:
 
         LOG_DEBUG_S << "Removed redunant: " << std::endl
             << "    atoms:        " << atoms.toString() << std::endl
-            << "    n:            " << n.toString() << std::endl
             << "    p:            " << p.toString() << std::endl
-            << "    n*:           " << nStar.toString() << std::endl
+            << "    n:            " << n.toString() << std::endl
             << "    p*:           " << pStar.toString() << std::endl
+            << "    n*:           " << nStar.toString() << std::endl
             << "    coalitions:   " << coalitions.toString() << std::endl;
-        
+
 
         // Dealing with special cases
         {
@@ -283,7 +382,7 @@ public:
 
         if(p.containsEmptySet() && n.size() == 1)
         {
-            LOG_DEBUG_S << "P constains empty set and one negative constraint only" << p.toString();
+            LOG_DEBUG_S << "P contains empty set and one negative constraint only" << p.toString();
             nStar = nStar.createUnion(n);
             n.clear();
         }
@@ -302,22 +401,24 @@ public:
 
         LOG_DEBUG_S << "Processed special cases: " << std::endl
             << "    atoms:        " << atoms.toString() << std::endl
-            << "    n:            " << n.toString() << std::endl
             << "    p:            " << p.toString() << std::endl
-            << "    n*:           " << nStar.toString() << std::endl
+            << "    n:            " << n.toString() << std::endl
             << "    p*:           " << pStar.toString() << std::endl
+            << "    n*:           " << nStar.toString() << std::endl
             << "    coalitions:   " << coalitions.toString() << std::endl;
 
         // Check termination criteria
         if( p.containsEmptySet() && n.empty())
         {
+            Coalition coalition(pStar, nStar);
             LOG_DEBUG_S << "Termination: p contains empty set and n is empty";
-            //coalitions.createUnion( Coalition(pStar, nStar) );
-            coalitions = coalitions.createUnion( Coalitions(pStar) );
-            LOG_DEBUG_S << "Termination: coalition " << coalitions.toString();
-            LOG_DEBUG_S << "Termination: contraints " << nStar.toString();
+            LOG_DEBUG_S << "Termination: existing coalition " << coalitions.toString();
+            LOG_DEBUG_S << "Termination: adding coalition " << coalition.toString();
+            coalitions.insert(coalition);
+            LOG_DEBUG_S << "Termination: resulting coalitions " << coalitions.toString();
+            LOG_DEBUG_S << "Termination: negative constraints " << nStar.toString();
             // all membership contraints satisfied
-            return; 
+            return;
         }
         if( p.empty() || n.containsEmptySet())
         {
@@ -326,20 +427,31 @@ public:
         }
 
         // if ... size constraints. Not important for us
+        if( atoms.empty())
+        {
+            return;
+        }
 
 
 
         // Initialize divide and conquer
         // select an atom
-        Atom atom = atoms.first();
-        if( pStar.empty())
+
+        Atom atom;
+        if(positiveBranch)
         {
-            // !!??? really
-            pStar.createUnion( Constraint(atom) );
+            atom = selectAtom(atoms, p);
+        } else {
+            atom = selectAtom(atoms, n);
         }
 
-        NegativeConstraints ncs_not_ai;
-        NegativeConstraints ncs_ai;
+        if( pStar.empty())
+        {
+            aStar.push_back(atom);
+        }
+
+        NegativeConstraints ncs_not_ai; // N Not ai
+        NegativeConstraints ncs_ai; //N Tilde ai
 
         BOOST_FOREACH(Constraint nc, n)
         {
@@ -368,18 +480,63 @@ public:
 
         LOG_DEBUG_S << "Prepare divide and conquer: " << std::endl
             << "    atoms:        " << atoms.toString() << std::endl
-            << "    n:            " << n.toString() << std::endl
             << "    p:            " << p.toString() << std::endl
-            << "    n*:           " << nStar.toString() << std::endl
+            << "    n:            " << n.toString() << std::endl
             << "    p*:           " << pStar.toString() << std::endl
+            << "    n*:           " << nStar.toString() << std::endl
             << "    coalitions:   " << coalitions.toString() << std::endl;
 
 
         // apply divide and conquer
         Atoms remainingAtoms = atoms.without(atom);
-        computeConstrainedCoalitions( remainingAtoms , pcs_not_ai.createUnion(pcs_ai), ncs_not_ai.createUnion(ncs_ai), newPStar, nStar, coalitions);
-        computeConstrainedCoalitions( remainingAtoms, pcs_not_ai, ncs_not_ai, pStar, nStar.createUnion(atom), coalitions);
+        computeConstrainedCoalitions( remainingAtoms , pcs_not_ai.createUnion(pcs_ai), ncs_not_ai.createUnion(ncs_ai), newPStar, nStar, coalitions, aStar, true, atom);
+        computeConstrainedCoalitions( remainingAtoms, pcs_not_ai, ncs_not_ai, pStar, nStar.createUnion(atom), coalitions, aStar, false, atom);
     }
+
+    CoalitionsList createLists(AStar aStar, Coalitions coalitions)
+    {
+        LOG_DEBUG_S << "Create " << aStar.size() << " lists";
+        CoalitionsList list(aStar.size());
+
+        BOOST_FOREACH(const Coalition& coalition, coalitions)
+        {
+            bool foundList = false;
+            for(size_t i = 0; i < aStar.size(); ++i)
+            {
+                Atom a = aStar[i];
+                if( coalition.positive.first().contains(a) )
+                {
+                    list[i].insert(coalition);
+
+                    foundList = true;
+                    break;
+                } else {
+                    LOG_DEBUG_S << a << " not in " << coalition.positive.toString();
+                }
+            }
+
+            if(!foundList)
+            {
+                LOG_DEBUG_S << "Extra list for: " << coalition;
+                size_t extraListPosition = list.size() + 1;
+                list.resize(extraListPosition);
+                list[extraListPosition - 1].insert(coalition);
+            }
+        }
+
+        return list;
+    }
+
+   // void feasibleCoalitions(int level = 0, const CoalitionsList& list, Coalitions& coalitions)
+   // {
+   //     BOOST_FOREACH(const Coalition& c, list[level])
+   //     {
+   //         BOOST_FOREACH(
+
+   //     }
+
+
+   // }
 };
 
 } // end namespace owl_om
