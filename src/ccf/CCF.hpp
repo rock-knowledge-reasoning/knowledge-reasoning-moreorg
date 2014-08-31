@@ -647,9 +647,12 @@ public:
                     LOG_DEBUG_S << "Check feasibility: is feasible";
                     coalitions.insert(c);
                     // eval and update
-                } else {
-                    if(level - 1 < list.size())
+                } 
+
+
+                    if(level < list.size() - 1)
                     {
+                        LOG_DEBUG_S << "Check feasibility: on level: " << level;
                         level = level + 1;
                         Coalitions nextLevelCoalitions = list[level];
 
@@ -663,8 +666,9 @@ public:
 
                         LOG_DEBUG_S << "Check feasibility: on level: " << level;
                         feasibleCoalitions(list, coalitions, coalitionStructure, level);
+                    } else {
+                        LOG_DEBUG_S << "Level " << level << " vs. " << list.size();
                     }
-                }
             }
         }
     }
