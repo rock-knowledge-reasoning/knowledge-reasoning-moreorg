@@ -324,10 +324,11 @@ BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
 
         CCF<IRI>::Constraints positiveConstraints;
         CCF<IRI>::Constraints negativeConstraints;
-        //BOOST_FOREACH(CCF<IRI>::Atom atom, atoms)
-        //{
-        //    positiveConstraints.insert(atom);
-        //}
+        BOOST_FOREACH(CCF<IRI>::Atom atom, atoms)
+        {
+            positiveConstraints.insert(atom);
+        }
+
         {
             CCF<IRI>::Constraint constraint;
             constraint.insert(a);

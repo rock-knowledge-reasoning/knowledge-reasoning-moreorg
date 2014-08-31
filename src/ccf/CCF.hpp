@@ -332,6 +332,9 @@ public:
             }
         }
 
+        if(!atoms.empty())
+                return atoms.first();
+
         throw std::runtime_error("No atoms left");
     }
 
@@ -638,7 +641,8 @@ public:
             if(!c.constraintsApply(c.negative))
             {
                 // not in algo
-                //coalitions.insert(c)
+                coalitionStructure.positive = coalitionStructure.positive.createUnion(c.positive);
+                coalitionStructure.negative = coalitionStructure.negative.createUnion(c.negative);
 
                 // if(checkFeasibility(coalitionStructure))
                 LOG_DEBUG_S << "Check feasibility: " << coalitionStructure.toString() << " vs. " << c.toString();
@@ -664,7 +668,7 @@ public:
                             }
                         }
 
-                        LOG_DEBUG_S << "Check feasibility: on level: " << level;
+                        LOG_DEBUG_S << "Check feasibility: on level: " << level << " with coalition struct: " << coalitionStructure;
                         feasibleCoalitions(list, coalitions, coalitionStructure, level);
                     } else {
                         LOG_DEBUG_S << "Level " << level << " vs. " << list.size();
