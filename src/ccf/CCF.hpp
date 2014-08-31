@@ -48,6 +48,11 @@ public:
         return true;
     }
 
+    bool includes(const Set<T>& other) const
+    {
+        return std::includes(this->begin(), this->end(), other.begin(), other.end());
+    }
+
     Set<T> createUnion(const Set<T>& s) const
     {
         Set<T> tmpSet = *this;
@@ -175,6 +180,27 @@ public:
         return newSet;
     }
 
+    bool includes(const SetOfSets<T>& other) const
+    {
+        bool includes = false;
+        BOOST_FOREACH(const Set<T>& thisSubset, Set< Set<T> >::mSet)
+        {
+            BOOST_FOREACH(const Set<T>& otherSubset, other)
+            {
+                if(thisSubset.includes(otherSubset))
+                {
+                    includes = true;
+                    break;
+                }
+            }
+            if(!includes)
+            {
+                return false;
+            }
+        }
+        return includes;
+    }
+
     std::string toString() const
     {
         std::stringstream ss;
@@ -211,13 +237,16 @@ struct Coalition
         , negative(negative)
     {}
 
-    std::string toString() const
+    std::string toString(bool positiveOnly = true) const
     {
         std::stringstream ss;
         ss << "(p:";
         ss << positive.toString();
-        ss << "; n:";
-        ss << negative.toString();
+        if(!positiveOnly)
+        {
+            ss << "; n:";
+            ss << negative.toString();
+        }
         ss << ")";
         return ss.str();
     }
@@ -231,6 +260,20 @@ struct Coalition
         {
             return true;
         }
+        return false;
+    }
+
+    bool constraintsApply(const Constraints& constraints) const
+    {
+        BOOST_FOREACH(const Set<T>& c, constraints)
+        {
+            if(positive.includes(c))
+            {
+                LOG_DEBUG_S << "Positive " << positive.toString() << " includes " << c.toString();
+                return true;
+            }
+        }
+
         return false;
     }
 };
@@ -438,11 +481,17 @@ public:
         // select an atom
 
         Atom atom;
-        if(positiveBranch)
+        try {
+            if(positiveBranch)
+            {
+                atom = selectAtom(atoms, p);
+            } else {
+                atom = selectAtom(atoms, n);
+            }
+        } catch(const std::runtime_error& e)
         {
-            atom = selectAtom(atoms, p);
-        } else {
-            atom = selectAtom(atoms, n);
+            LOG_DEBUG_S << e.what();
+            return;
         }
 
         if( pStar.empty())
@@ -453,16 +502,25 @@ public:
         NegativeConstraints ncs_not_ai; // N Not ai
         NegativeConstraints ncs_ai; //N Tilde ai
 
+        // Here we filter out the selected atom and create 
+        // two sets: 
+        // ncs_ai -> finally contains all subset when substracting 'atom'
+        // ncs_not_ai -> finally all subsets that never related to atom
         BOOST_FOREACH(Constraint nc, n)
         {
             if( nc.contains(atom) )
-            {
-                ncs_ai = ncs_ai.createUnion( nc.without(atom) );
+            { 
+                Constraint constraint = nc.without(atom);
+                //if(!constraint.empty())
+                //{
+                    ncs_ai = ncs_ai.createUnion(constraint);
+                //}
             } else {
                 ncs_not_ai = ncs_not_ai.createUnion( nc );
             }
         }
 
+        // Respectively for the set of positive constraints
         PositiveConstraints pcs_not_ai;
         PositiveConstraints pcs_ai;
 
@@ -470,7 +528,11 @@ public:
         {
             if( pc.contains(atom) )
             {
-                pcs_ai = pcs_ai.createUnion( pc.without(atom) );
+                Constraint constraint = pc.without(atom);
+                //if(!constraint.empty())
+                //{
+                    pcs_ai = pcs_ai.createUnion(constraint);
+                //}
             } else {
                 pcs_not_ai = pcs_not_ai.createUnion(pc);
             }
@@ -478,12 +540,16 @@ public:
 
         PositiveConstraints newPStar = PositiveConstraints( pStar.createUnion( PositiveConstraints( atom ) ).flatten() );
 
-        LOG_DEBUG_S << "Prepare divide and conquer: " << std::endl
+        LOG_DEBUG_S << "Prepare divide and conquer for: " << atom << std::endl
             << "    atoms:        " << atoms.toString() << std::endl
             << "    p:            " << p.toString() << std::endl
             << "    n:            " << n.toString() << std::endl
             << "    p*:           " << pStar.toString() << std::endl
             << "    n*:           " << nStar.toString() << std::endl
+            << "    pcs_ai~:      " << pcs_ai.toString() << std::endl
+            << "    pcs_not_ai:   " << pcs_not_ai.toString() << std::endl
+            << "    ncs_ai~:      " << ncs_ai.toString() << std::endl
+            << "    ncs_not_ai:   " << ncs_not_ai.toString() << std::endl
             << "    coalitions:   " << coalitions.toString() << std::endl;
 
 
@@ -498,9 +564,11 @@ public:
         LOG_DEBUG_S << "Create " << aStar.size() << " lists";
         CoalitionsList list(aStar.size());
 
+        // Iterate through base cases
         BOOST_FOREACH(const Coalition& coalition, coalitions)
         {
             bool foundList = false;
+            // Picking a feasible coaltion -- in our case they should be feasible by default
             for(size_t i = 0; i < aStar.size(); ++i)
             {
                 Atom a = aStar[i];
@@ -527,16 +595,79 @@ public:
         return list;
     }
 
-   // void feasibleCoalitions(int level = 0, const CoalitionsList& list, Coalitions& coalitions)
-   // {
-   //     BOOST_FOREACH(const Coalition& c, list[level])
-   //     {
-   //         BOOST_FOREACH(
+    bool checkFeasibility(Coalition c)
+    {
+        return true;
+    }
 
-   //     }
+    void feasibleCoalitions(const CoalitionsList& list, Coalitions& coalitions, const Coalition& baseCoalition = Coalition(), size_t level = 0)
+    {
+        //if(level >= list.size())
+        //{
+        //    return;
+        //} else if(level > 0)
+        //{
+        //    coalitions.insert(baseCoalition);
+        //}
 
+        //Coalition coalitionStructure = baseCoalition;
+        //// At level 0 with require exactly one coalition
+        //BOOST_FOREACH(const Coalition& c, list[level])
+        //{
+        //    LOG_DEBUG_S << "Check to merge " << baseCoalition << "with " << c;
+        //    // if c feasible && level = 0
+        //    // return
+        //    if(! c.constraintsApply( coalitionStructure.negative ) && ! coalitionStructure.constraintsApply(c.negative) )
+        //    {
+        //        coalitionStructure.positive = coalitionStructure.positive.createUnion(c.positive);
+        //        coalitionStructure.negative = coalitionStructure.negative.createUnion(c.negative);
+        //        LOG_DEBUG_S << "success";
 
-   // }
+        //    } else {
+        //        coalitionStructure.negative = coalitionStructure.negative.createUnion(c.positive);
+        //        LOG_DEBUG_S << "fail";
+        //    }
+
+        //    feasibleCoalitions(list, coalitions, coalitionStructure, level + 1);
+        //}
+
+        // Pick coalition
+        BOOST_FOREACH(const Coalition& c, list[level])
+        {
+            Coalition coalitionStructure = baseCoalition;
+            if(!c.constraintsApply(c.negative))
+            {
+                // not in algo
+                //coalitions.insert(c)
+
+                // if(checkFeasibility(coalitionStructure))
+                LOG_DEBUG_S << "Check feasibility: " << coalitionStructure.toString() << " vs. " << c.toString();
+                if(!coalitionStructure.constraintsApply(c.negative) && !c.constraintsApply(coalitionStructure.negative))
+                {
+                    LOG_DEBUG_S << "Check feasibility: is feasible";
+                    coalitions.insert(c);
+                    // eval and update
+                } else {
+                    if(level - 1 < list.size())
+                    {
+                        level = level + 1;
+                        Coalitions nextLevelCoalitions = list[level];
+
+                        BOOST_FOREACH(Coalition nextLevelCoalition, nextLevelCoalitions)
+                        {
+                            BOOST_FOREACH(const Constraint& atom, coalitionStructure.positive)
+                            {
+                                nextLevelCoalition.negative.insert( Constraint(atom) );
+                            }
+                        }
+
+                        LOG_DEBUG_S << "Check feasibility: on level: " << level;
+                        feasibleCoalitions(list, coalitions, coalitionStructure, level);
+                    }
+                }
+            }
+        }
+    }
 };
 
 } // end namespace owl_om
