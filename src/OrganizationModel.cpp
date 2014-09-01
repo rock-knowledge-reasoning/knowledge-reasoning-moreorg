@@ -7,6 +7,7 @@
 #include <owl_om/Vocabulary.hpp>
 #include <owl_om/Combinatorics.hpp>
 #include <math.h>
+#include <set>
 
 using namespace owl_om::vocabulary;
 
@@ -39,7 +40,7 @@ bool InterfaceConnection::operator<(const InterfaceConnection& other) const
 
 std::string InterfaceConnection::toString() const
 {
-    return "InterfaceConnection from: " + begin.toQuotedString() + " to: " + end.toQuotedString();
+    return "InterfaceConnection from: " + begin.getFragment()+ " to: " + end.getFragment() + "\n        parents: " + parents[0].getFragment() + " to " + parents[1].getFragment();
 }
 
 std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection)
@@ -726,30 +727,52 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
     InterfaceCombinationList validCombinations;
     Combination<InterfaceConnection> connectionCombination( validConnections, maximumNumberOfConnections, MAX);
     do {
-        InterfaceConnectionList connectionList = connectionCombination.current();
-        InterfaceConnectionList::const_iterator cit = connectionList.begin();
-        bool valid = true;
-
         // 1. Make sure only one(!) connection exists between two systems
         // 2. Make sure each interface is used only once
-        //
-        // Validate by caching all interfaces that are used by previous connections
-        InterfaceConnectionList usedInterfaceConnections;
+        std::set<IRI> interfaces;
+        std::set<IRI> parents;
+        size_t linkCount = 0;
+        bool valid = false;
+
+        InterfaceConnectionList connectionList = connectionCombination.current();
+        InterfaceConnectionList::const_iterator cit = connectionList.begin();
         for(; cit != connectionList.end(); ++cit)
         {
-            InterfaceConnection connection = *cit;
+            parents.insert(cit->parents[0]);
+            parents.insert(cit->parents[1]);
+            linkCount++;
 
-            // check constraints
-            InterfaceConnectionList::const_iterator uit = std::find_if(usedInterfaceConnections.begin(), usedInterfaceConnections.end(), boost::bind(&InterfaceConnection::sameParents, &connection, boost::lambda::_1) || boost::bind(&InterfaceConnection::useSameInterface, &connection, boost::lambda::_1));
-            if(uit != usedInterfaceConnections.end())
+            // Check if # involved actors == linkCount + 1, i.e. exactly one connection
+            // per pair
+            // Makes sure there are no double connections + all nodes are connected to each other
+            if( !(parents.size() - 1 == linkCount) )
             {
                 valid = false;
                 break;
-            } else {
-                // Cache conn
-                usedInterfaceConnections.push_back(*cit);
             }
+
+            {
+                // Check if this interface has already been used
+                std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->begin);
+                if(!result.second)
+                {
+                    valid = false;
+                    break;
+                }
+            }
+            {
+                // Check if this interface has already been used
+                std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->end);
+                if(!result.second)
+                {
+                    valid = false;
+                    break;
+                }
+            }
+
+            valid = true;
         }
+
         if(valid)
         {
             validCombinations.push_back(connectionList);
