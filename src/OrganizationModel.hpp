@@ -48,7 +48,11 @@ struct Statistics
     uint32_t numberOfInferenceEpochs;
     base::Time timeElapsed;
 
-    InterfaceCombinationList interfaceCombinations;
+    IRIList interfaces;
+    InterfaceConnectionList links;
+    InterfaceCombinationList linkCombinations;
+
+    uint32_t constraintsChecked;
 
     IRIList actorsKnown;
     IRIList actorsInferred;

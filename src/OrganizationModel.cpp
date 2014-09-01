@@ -56,7 +56,10 @@ std::string Statistics::toString() const
         << "    upper bound for combinations:    " << upperCombinationBound << std::endl
         << "    number of inference epochs:      " << numberOfInferenceEpochs << std::endl
         << "    time elapsed in s:               " << timeElapsed.toSeconds() << std::endl
-        << "    # of interface combinations:     " << interfaceCombinations.size() << std::endl
+        << "    # of interfaces:                 " << interfaces.size() << std::endl
+        << "    # of links:                      " << links.size() << std::endl
+        << "    # of link combinations:          " << linkCombinations.size() << std::endl
+        << "    # of constraints checked:        " << constraintsChecked << std::endl
         << "    # of known actors:               " << actorsKnown.size() << std::endl
         << "    # of inferred actors:            " << actorsInferred.size() << std::endl
         << "    # of composite actors pre:       " << actorsCompositePrevious.size() << std::endl
@@ -153,7 +156,7 @@ void OrganizationModel::refresh()
     mStats.actorsKnown = mpOntology->allInstancesOf(OM::Actor(), false);
     mStats.actorsCompositePrevious = mpOntology->allInstancesOf(OM::CompositeActor(), true);
     mStats.actorsCompositeModelPrevious = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
-    mStats.interfaceCombinations = interfaceCombinations;
+    mStats.linkCombinations = interfaceCombinations;
 
     IRIList newActors;
     if(!interfaceCombinations.empty())
@@ -188,6 +191,9 @@ void OrganizationModel::refresh()
 
     IRIList atomicActors = mpOntology->allInstancesOf(OM::Actor(), true);
     runInferenceEngine(atomicActors);
+    runInferenceEngine(atomicActors);
+    runInferenceEngine(atomicActors);
+
     runInferenceEngine(newActors);
 
     mStats.timeElapsed = base::Time::now() - mStats.timeElapsed;
@@ -716,6 +722,8 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
         validConnections.push_back(connection);
     } while( interfaceCombinations.next() );
 
+    mStats.interfaces = interfaces;
+    mStats.links = validConnections;
     LOG_DEBUG_S << "Valid connections: " << validConnections;
 
 
@@ -736,6 +744,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
 
         InterfaceConnectionList connectionList = connectionCombination.current();
         InterfaceConnectionList::const_iterator cit = connectionList.begin();
+
         for(; cit != connectionList.end(); ++cit)
         {
             parents.insert(cit->parents[0]);
@@ -745,12 +754,14 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
             // Check if # involved actors == linkCount + 1, i.e. exactly one connection
             // per pair
             // Makes sure there are no double connections + all nodes are connected to each other
+            mStats.constraintsChecked++;
             if( !(parents.size() - 1 == linkCount) )
             {
                 valid = false;
                 break;
             }
 
+            mStats.constraintsChecked++;
             {
                 // Check if this interface has already been used
                 std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->begin);
@@ -760,6 +771,8 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
                     break;
                 }
             }
+
+            mStats.constraintsChecked++;
             {
                 // Check if this interface has already been used
                 std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->end);
@@ -778,6 +791,8 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
             validCombinations.push_back(connectionList);
         }
     } while( connectionCombination.next() );
+
+    mStats.linkCombinations = validCombinations;
 
     LOG_DEBUG_S << "Valid combinations: " << validCombinations;
     return validCombinations;
