@@ -79,9 +79,10 @@ public:
     bool empty() const { return mSet.empty(); }
     size_t size() const { return mSet.size(); }
 
-    void insert(const T& item)
+    bool insert(const T& item)
     {
-        mSet.insert(item);
+        std::pair< typename std::set<T>::iterator, bool> it = mSet.insert(item);
+        return it.second;
     }
 
     const T& first() const { assert(!empty()); return *mSet.begin(); }
@@ -317,7 +318,6 @@ inline std::ostream& operator<<(std::ostream& out, const Coalition<T>& val)
     return out;
 }
 
-
 /**
  *    NegativeConstraint == atomSet == Coalition
  *    PositiveConstraint == atomSet == Coalition
@@ -331,6 +331,7 @@ class CCF
 public:
     typedef T Atom;
     typedef Set<T> Atoms;
+    typedef std::vector<T> AtomsVector;
     typedef Set<T> Constraint;
     typedef SetOfSets<T> Constraints;
     typedef C<T> Coalition;
@@ -342,13 +343,29 @@ public:
 
 private: 
     Atoms mAtoms;
+    Constraints mPositiveConstraints;
+    Constraints mNegativeConstraints;
 
 public:
 
-    CCF(Atoms& atoms)
+    CCF(const AtomsVector& atoms)
+    {
+        BOOST_FOREACH(const Atom& atom, atoms)
+        {
+            mAtoms.insert(atom);
+        }
+    }
+
+    CCF(const Atoms& atoms)
         : mAtoms(atoms)
     {
     }
+
+    bool addNegativeConstraint(const Constraint& c) { return mNegativeConstraints.insert(c); }
+    bool addPositiveConstraint(const Constraint& c) { return mPositiveConstraints.insert(c); }
+
+    Constraints getNegativeConstraints() const { return mNegativeConstraints; }
+    Constraints getPositiveConstraints() const { return mPositiveConstraints; }
 
     Atom selectAtom(const Atoms& atoms, const Constraints& constraints) const
     {
@@ -380,17 +397,19 @@ public:
         throw std::runtime_error("No atoms left");
     }
 
-    void computeConstrainedCoalitions(PositiveConstraints p, NegativeConstraints n, Coalitions& coalitions, AStar& aStar)
+    AStar computeConstrainedCoalitions(Coalitions& coalitions)
     {
         LOG_DEBUG_S << "Init compute constrained coalitions: " << std::endl
             << "    atoms:        " << mAtoms.toString() << std::endl
-            << "    p:            " << p.toString() << std::endl
-            << "    n:            " << n.toString() << std::endl;
+            << "    p:            " << mPositiveConstraints.toString() << std::endl
+            << "    n:            " << mNegativeConstraints.toString() << std::endl;
 
+        AStar aStar;
         Constraints constraints;
-        computeConstrainedCoalitions(mAtoms, p, n, constraints, constraints, coalitions, aStar);
+        computeConstrainedCoalitions(mAtoms, mPositiveConstraints, mNegativeConstraints, constraints, constraints, coalitions, aStar);
 
         LOG_DEBUG_S << "End of algorithm: Coalitions: " << coalitions.toString();
+        return aStar;
     }
 
     void computeConstrainedCoalitions(Atoms atoms, PositiveConstraints p, NegativeConstraints n,
@@ -645,37 +664,8 @@ public:
         return true;
     }
 
-    void computeFeasibleCoalitions(const CoalitionsList& list, Coalitions& coalitions, const Coalitions& baseCoalition = Coalition(), size_t level = 0)
+    void computeFeasibleCoalitions(const CoalitionsList& list, std::vector<Coalitions>& coalitions, const Coalitions& baseCoalition = Coalition(), size_t level = 0)
     {
-        //if(level >= list.size())
-        //{
-        //    return;
-        //} else if(level > 0)
-        //{
-        //    coalitions.insert(baseCoalition);
-        //}
-
-        //Coalition coalitionStructure = baseCoalition;
-        //// At level 0 with require exactly one coalition
-        //BOOST_FOREACH(const Coalition& c, list[level])
-        //{
-        //    LOG_DEBUG_S << "Check to merge " << baseCoalition << "with " << c;
-        //    // if c feasible && level = 0
-        //    // return
-        //    if(! c.constraintsApply( coalitionStructure.negative ) && ! coalitionStructure.constraintsApply(c.negative) )
-        //    {
-        //        coalitionStructure.positive = coalitionStructure.positive.createUnion(c.positive);
-        //        coalitionStructure.negative = coalitionStructure.negative.createUnion(c.negative);
-        //        LOG_DEBUG_S << "success";
-
-        //    } else {
-        //        coalitionStructure.negative = coalitionStructure.negative.createUnion(c.positive);
-        //        LOG_DEBUG_S << "fail";
-        //    }
-
-        //    feasibleCoalitions(list, coalitions, coalitionStructure, level + 1);
-        //}
-
         // Pick coalition
         Coalitions coalitionStructure = baseCoalition;
         BOOST_FOREACH(const Coalition& listCoalition, list[level])
@@ -689,6 +679,7 @@ public:
                 if(Coalition::getUniqueElements(coalitionStructure).size() == mAtoms.size())
                 {
                     LOG_DEBUG_S << "Check all atoms used in coalition structure, i.e. structure complete: " << coalitionStructure.toString() << " unique elements: " << Coalition::getUniqueElements(coalitionStructure).size() << " atoms: " << mAtoms.size();
+                    coalitions.push_back(coalitionStructure);
                     // eval and update
                 } else { 
                     if(level < list.size() - 1)

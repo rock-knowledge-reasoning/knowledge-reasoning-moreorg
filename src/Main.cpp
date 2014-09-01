@@ -22,26 +22,27 @@ int main(int argc, char** argv)
         using namespace owl_om;
         using namespace owl_om::vocabulary;
 
+        om.createNewFromModel(OM::resolve("Sherpa"), true);
 //        om.createNewFromModel(OM::resolve("Sherpa"), true);
 //        om.createNewFromModel(OM::resolve("Sherpa"), true);
 //        om.createNewFromModel(OM::resolve("Sherpa"), true);
-//        om.createNewFromModel(OM::resolve("Sherpa"), true);
-//        om.createNewFromModel(OM::resolve("CREX"), true);
+        om.createNewFromModel(OM::resolve("CREX"), true);
         om.createNewFromModel(OM::resolve("CREX"), true);
         om.createNewFromModel(OM::resolve("PayloadCamera"), true);
-//        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
-//        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
-//        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
-//        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
-//        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
-//        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
-//        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
-//        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
-//        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
 //        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
 
-        om.refresh();
-        //InterfaceCombinationList d = om.generateInterfaceCombinations();
+//        om.refresh();
+//        InterfaceCombinationList d = om.generateInterfaceCombinationsCCF();
+        InterfaceCombinationList d = om.generateInterfaceCombinations();
 
         //BOOST_FOREACH(const std::vector<InterfaceConnection>& composite, d)
         //{

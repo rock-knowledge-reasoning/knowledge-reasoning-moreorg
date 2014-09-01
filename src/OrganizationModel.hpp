@@ -32,6 +32,7 @@ struct InterfaceConnection
     bool useSameInterface(const InterfaceConnection& other) const;
 
     bool operator<(const InterfaceConnection& other) const;
+    bool operator==(const InterfaceConnection& other) const;
 
     std::string toString() const;
 };
@@ -202,6 +203,7 @@ public:
      * \return List of interface combinations
      */
     InterfaceCombinationList generateInterfaceCombinations();
+    InterfaceCombinationList generateInterfaceCombinationsCCF();
 
     /**
      * Compute upper bound for actor combinations

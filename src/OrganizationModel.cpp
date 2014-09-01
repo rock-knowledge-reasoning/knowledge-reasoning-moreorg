@@ -9,6 +9,8 @@
 #include <math.h>
 #include <set>
 
+#include <owl_om/ccf/CCF.hpp>
+
 using namespace owl_om::vocabulary;
 
 namespace owl_om {
@@ -34,13 +36,29 @@ bool InterfaceConnection::useSameInterface(const InterfaceConnection& other) con
 
 bool InterfaceConnection::operator<(const InterfaceConnection& other) const
 {
-    return begin < other.begin && end < other.end;
+    if(begin < other.begin)
+    {
+        return true;
+    } else if(end < other.end)
+    {
+        return true;
+    }
+    return false;
 
+}
+
+bool InterfaceConnection::operator==(const InterfaceConnection& other) const
+{
+    return end == other.end && begin == other.begin;
 }
 
 std::string InterfaceConnection::toString() const
 {
-    return "InterfaceConnection from: " + begin.getFragment()+ " to: " + end.getFragment() + "\n        parents: " + parents[0].getFragment() + " to " + parents[1].getFragment();
+    //return "InterfaceConnection from: " + begin.getFragment() + " to: " + end.getFragment() + "\n        parents: " + parents[0].getFragment() + " to " + parents[1].getFragment();
+    std::stringstream ss;
+    ss << "InterfaceConnection from: " << begin.toString() << " to: " << end.toString();
+    //ss << std::endl << "        parents: " << parents[0].getFragment() << " to " << parents[1].getFragment();
+    return ss.str();
 }
 
 std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection)
@@ -699,6 +717,178 @@ IRI OrganizationModel::createNewFromModel(const IRI& model, bool createDependant
 bool OrganizationModel::isSameResourceModel(const IRI& instance, const IRI& otherInstance) const
 {
     return getResourceModel(instance) == getResourceModel(otherInstance);
+}
+
+InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
+{
+    using namespace base::combinatorics;
+
+    // 1. permute through all interfaces and create 'links'/connections
+    //    - make sure constraints hold:
+    //        - no self-connection (starting at pointing at same actor)
+    //        - compatible interface models
+    //        - bidirectional (i.e. A-B equals B-A)
+    // 2. use connections to compute combinations of order 1 to N-1, where N is the number of actors
+    //    - N-1 since two actors can have only 1 connection
+    //
+
+    // Get all basic actors to get number of actors, associated interface and maximum number of connections
+    // we have to account for
+    IRIList actors = mpOntology->allInstancesOf( OM::Actor(), true );
+    if(actors.size() < 2)
+    {
+        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
+    }
+
+    IRIList interfaces = mpOntology->allInstancesOf( OM::Interface(), true);
+    InterfaceConnectionList validConnections;
+    if(interfaces.size() < 2)
+    {
+        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough interfaces available, i.e. no more than 1");
+    }
+
+    if(actors.size() < 2)
+    {
+        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors available, i.e. no more than 1");
+    }
+
+    LOG_DEBUG_S << "INTERFACES " << interfaces;
+    Combination<IRI> interfaceCombinations(interfaces, 2, EXACT);
+    do {
+
+        IRIList match = interfaceCombinations.current();
+        if(match.size() != 2)
+        {
+            throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: no two interfaces available to create connection");
+        }
+
+        IRIList parents0 = mpOntology->allInverseRelatedInstances(match[0], OM::has());
+        IRIList parents1 = mpOntology->allInverseRelatedInstances(match[1], OM::has());
+
+        if(parents0 == parents1)
+        {
+            // Reject: self connection since start/end belong to the same actor
+            continue;
+        }
+
+        if( ! checkIfCompatible( getResourceModel(match[0]), getResourceModel(match[1])) )
+        {
+            // Reject: interfaces are not compatible with each other
+            continue;
+        }
+        // Add connection
+        InterfaceConnection connection(match[0], match[1]);
+        connection.addParent(parents0.front());
+        connection.addParent(parents1.front());
+
+        validConnections.push_back(connection);
+    } while( interfaceCombinations.next() );
+
+    mStats.interfaces = interfaces;
+    mStats.links = validConnections;
+    LOG_DEBUG_S << "Valid connections: " << validConnections;
+
+
+    // Maximum number of connections for a composite actor
+    size_t maximumNumberOfConnections =  fmin(actors.size() - 1, mMaximumNumberOfLinks);
+
+    CCF<InterfaceConnection> ccf(validConnections);
+
+    Combination<InterfaceConnection> connectionCombination( validConnections, 2, EXACT);
+    do {
+        InterfaceConnectionList connectionList = connectionCombination.current();
+        LOG_DEBUG_S << "Add p: " << connectionList[0];
+        LOG_DEBUG_S << "Add p: " << connectionList[1];
+        if( ! ccf.addPositiveConstraint( CCF<InterfaceConnection>::Constraint( connectionList[0] ) ) )
+        {
+            LOG_DEBUG_S << "Failed to add " << connectionList[0] << "test: " << (connectionList[0] == connectionList[1]) << "size " << ccf.getPositiveConstraints().size();
+        }
+        if( ! ccf.addPositiveConstraint( CCF<InterfaceConnection>::Constraint( connectionList[1] ) ) )
+        {
+            LOG_DEBUG_S << "Failed to add " << connectionList[1] << "test: " << (connectionList[0] == connectionList[1]) << "size " << ccf.getPositiveConstraints().size();
+        }
+
+        InterfaceConnectionList::const_iterator cit = connectionList.begin();
+
+        uint32_t linkCount = 0;
+        std::set<IRI> interfaces;
+        std::set<IRI> parents;
+
+        for(; cit != connectionList.end(); ++cit)
+        {
+            parents.insert(cit->parents[0]);
+            parents.insert(cit->parents[1]);
+            linkCount++;
+
+            // Check if # involved actors == linkCount + 1, i.e. exactly one connection
+            // per pair
+            // Makes sure there are no double connections + all nodes are connected to each other
+            mStats.constraintsChecked++;
+
+            // Two links between same parents
+            if( parents.size() <= linkCount)
+            {
+                CCF<InterfaceConnection>::Constraint c;
+                c.insert(connectionList[0]);
+                c.insert(connectionList[1]);
+                ccf.addNegativeConstraint(c);
+            }
+
+            mStats.constraintsChecked++;
+            {
+                // Check if this interface has already been used
+                std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->begin);
+                if(!result.second)
+                {
+                    CCF<InterfaceConnection>::Constraint c;
+                    c.insert(connectionList[0]);
+                    c.insert(connectionList[1]);
+                    ccf.addNegativeConstraint(c);
+                    break;
+                }
+            }
+
+            mStats.constraintsChecked++;
+            {
+                // Check if this interface has already been used
+                std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->end);
+                if(!result.second)
+                {
+                    CCF<InterfaceConnection>::Constraint c;
+                    c.insert(connectionList[0]);
+                    c.insert(connectionList[1]);
+                    ccf.addNegativeConstraint(c);
+                    break;
+                }
+            }
+        }
+    } while(connectionCombination.next());
+
+    CCF<InterfaceConnection>::Coalitions coalitions;
+    //InterfaceConnectionList aStar = ccf.computeConstrainedCoalitions(coalitions);
+    LOG_DEBUG_S << "Atoms: " << validConnections;
+    LOG_DEBUG_S << "Positive constraints: " << ccf.getPositiveConstraints().toString();
+    LOG_DEBUG_S << "Positive constraints #: " << ccf.getPositiveConstraints().size();
+    LOG_DEBUG_S << "Negative constraints: " << ccf.getNegativeConstraints().toString();
+    LOG_DEBUG_S << "Negative constraints #: " << ccf.getNegativeConstraints().size();
+    LOG_DEBUG_S << "Coalitions: " << coalitions.toString();
+    //LOG_DEBUG_S << "AStar: " << aStar;
+
+    //CCF<InterfaceConnection>::CoalitionsList list = ccf.createLists(aStar, coalitions);
+    //BOOST_FOREACH(CCF<InterfaceConnection>::Coalitions c, list)
+    //{
+    //    LOG_DEBUG_S << "Coalitions: " << c.toString();
+    //}
+
+    //std::vector< CCF<InterfaceConnection>::Coalitions > feasibleCoalitionStructures;
+    //ccf.computeFeasibleCoalitions(list, feasibleCoalitionStructures);
+    //BOOST_FOREACH( CCF<InterfaceConnection>::Coalitions& structure, feasibleCoalitionStructures)
+    //{
+    //    LOG_DEBUG_S << "Feasible coalition structure: " << structure.toString();
+    //}
+
+    InterfaceCombinationList validCombinations;
+    return validCombinations;
 }
 
 InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
