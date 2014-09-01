@@ -84,6 +84,10 @@ public:
 
     bool isComplete() const;
 
+    /**
+     */
+    IRIList ungroundedRequirements() const;
+
     static IRI ungrounded() { static IRI iri("?"); return iri; }
 
     std::string toString() const;
@@ -175,6 +179,13 @@ public:
      */
     bool isSameResourceModel(const IRI& instance, const IRI& otherInstance) const;
 
+
+    /**
+     * Create requirement from an existing one.
+     * Marker serves to make it unique
+     */
+    IRI createNewRequirement(const IRI& requirement, uint32_t marker);
+
     /**
      * Create new instance (ABox from existing model (model is also in ABox))
      * Model will be associated via modelledBy relation and subclassed from
@@ -234,10 +245,11 @@ private:
     IRIList getModelRequirements(const IRI& model) const;
 
     /**
-     * Creates a new clas of actor from the given set of actor
+     * Creates an instance of this actor from the given set of actors
+     * Registers a new class of actor if necessary for this actor
      * \return IRI of new actor, or empty IRI if the actor already exists
      */
-    IRI createNewActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id);
+    IRI createNewCompositeActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id);
 
     /**
      * Infer new instance of a given class type, base on checking whether a given model

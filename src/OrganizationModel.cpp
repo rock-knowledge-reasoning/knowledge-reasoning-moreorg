@@ -113,6 +113,20 @@ bool Grounding::isComplete() const
     return true;
 }
 
+IRIList Grounding::ungroundedRequirements() const
+{
+    IRIList requirements;
+    RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
+    for(; mip != mRequirementToResourceMap.end(); ++mip)
+    {
+        if(mip->second == Grounding::ungrounded())
+        {
+            requirements.push_back( mip->second );
+        }
+    }
+    return requirements;
+}
+
 std::string Grounding::toString() const
 {
     std::stringstream ss;
@@ -173,7 +187,7 @@ void OrganizationModel::refresh()
             }
             uint32_t count = actorTypes[actorCombination] + 1;
             actorTypes[actorCombination] = count;
-            IRI newActor = createNewActor(actorCombination, *cit, count);
+            IRI newActor = createNewCompositeActor(actorCombination, *cit, count);
             if(!newActor.empty())
             {
                 newActors.push_back(newActor);
@@ -191,8 +205,6 @@ void OrganizationModel::refresh()
 
     IRIList atomicActors = mpOntology->allInstancesOf(OM::Actor(), true);
     runInferenceEngine(atomicActors);
-    runInferenceEngine(atomicActors);
-    runInferenceEngine(atomicActors);
 
     runInferenceEngine(newActors);
 
@@ -201,7 +213,7 @@ void OrganizationModel::refresh()
     mStats.actorsCompositeModelPost = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
 }
 
-IRI OrganizationModel::createNewActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id)
+IRI OrganizationModel::createNewCompositeActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id)
 {
     // create new actor name from fragment, using the first IRI as base
     // add an id, since multiple actor can be combined in different ways
@@ -244,16 +256,27 @@ IRI OrganizationModel::createNewActor(const IRISet& actorSet, const InterfaceCon
     mpOntology->instanceOf(actorName, OM::CompositeActor());
     mpOntology->relatedTo(actorName, OM::modelledBy(), actorModelName);
 
-    // Register set of actor with this
+    IRIList allNewRequirements;
+    // Register set of actors which are associate with this actor
     {
+        // maker for the set of requirements, since requirement will be all added
+        // at this actors level, i.e. per actor a suffix is added
+        uint32_t marker = 0;
         IRISet::const_iterator ait = actorSet.begin();
         for(; ait != actorSet.end(); ++ait)
         {
             LOG_DEBUG_S << "New actor '" << actorName << "' has '" << *ait << " with count " << actorSet.size();
             mpOntology->relatedTo(actorName, OM::has(), *ait);
 
-            // ActorModel dependsOn the 'requirement instances of the modelled resources
-            //mpOntology->relatedTo(actorModelName, OM::dependsOn(), getResourceModelRequirement(*ait));
+            // ActorModel dependsOn the same requirement instances of the modelled resources, i.e.
+            IRIList requirements = allRelatedInstances( getResourceModel(*ait), OM::dependsOn() );
+            BOOST_FOREACH(const IRI& requirement, requirements)
+            {
+                IRI newRequirement = createNewRequirement( requirement, marker);
+                mpOntology->relatedTo(actorModelName, OM::dependsOn(), newRequirement );
+                allNewRequirements.push_back(newRequirement);
+            }
+            marker++;
         }
     }
 
@@ -276,6 +299,7 @@ IRI OrganizationModel::createNewActor(const IRISet& actorSet, const InterfaceCon
     LOG_INFO_S << "New actor: '" << actorName << std::endl
         << "     new actor model:    " << actorModelName << std::endl
         << "     involved actors:    " << actorSet << std::endl
+        << "     requirements:       " << allNewRequirements << std::endl
         << "     used interfaces:    " << usedInterfaces;
 
     return actorName;
@@ -314,6 +338,7 @@ void OrganizationModel::runInferenceEngine(const IRIList& actors)
             {
                 if( !isProviding(actor, service) && isModelProvider(actorModel, service) )
                 {
+                    updated = true;
                     addProvider(actor, service);
                 }
             }
@@ -322,6 +347,7 @@ void OrganizationModel::runInferenceEngine(const IRIList& actors)
             {
                 if( !isProviding(actor, capability) && isModelProvider(actorModel, capability) )
                 {
+                    updated = true;
                     addProvider(actor, capability);
                 }
             }
@@ -349,6 +375,7 @@ void OrganizationModel::runInferenceEngine(const IRIList& actors)
 void OrganizationModel::addProvider(const IRI& actor, const IRI& model)
 {
     mpOntology->relatedTo(actor, OM::provides(), model);
+    mpOntology->relatedTo(getResourceModel(actor), OM::provides(), model);
     std::pair<IRI, IRI> key(actor, model);
     mProviderCache[key] = true;
 }
@@ -400,6 +427,9 @@ bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& model)
 {
     // actorModels define the requirements (that will be fulfilled by instances of this actor model
     IRIList availableResources = getModelRequirements(actorModel);
+    IRIList provisioned = mpOntology->allRelatedInstances(actorModel, OM::provides());
+    availableResources.insert(availableResources.begin(), provisioned.begin(), provisioned.end());
+
     // model (service/capability/...) define the set of requirements
     IRIList requirements = getModelRequirements(model);
 
@@ -595,6 +625,19 @@ IRI OrganizationModel::getResourceModelInstanceType(const IRI& model) const
     {
         throw std::invalid_argument("OrganizationModel::createResourceModelInstanceType: '" + modelType.toString() + "' does not specify 'models' relation, thus cannot infer type for new model instances of " + model.toString());
     }
+}
+
+IRI OrganizationModel::createNewRequirement(const IRI& requirement, uint32_t marker)
+{
+    IRI resourceModel = getResourceModel(requirement);
+
+    std::stringstream ss;
+    ss << requirement.toString() << marker;
+
+    IRI newRequirement( ss.str() );
+    mpOntology->instanceOf( newRequirement, OM::Requirement());
+    mpOntology->relatedTo( newRequirement, OM::modelledBy(), resourceModel );
+    return newRequirement;
 }
 
 IRI OrganizationModel::createNewFromModel(const IRI& model, bool createDependants) const
