@@ -224,7 +224,11 @@ public:
 template<typename T>
 struct Coalition
 {
+    typedef T Atom;
+    typedef Set<T> Constraint;
     typedef SetOfSets<T> Constraints;
+
+    typedef Set< Coalition<T> > Coalitions;
 
     Constraints positive;
     Constraints negative;
@@ -276,6 +280,34 @@ struct Coalition
 
         return false;
     }
+
+    Set< Coalition<T> > getFeasibleCoalitions() const
+    {
+        Set< Coalition<T> > coalitions; 
+        BOOST_FOREACH(const Constraint& p, positive)
+        {
+            coalitions.insert( Coalition(p, Constraints()) );
+        }
+
+        return coalitions;
+    }
+
+    static Set<T> getUniqueElements(Coalitions& coalitions)
+    {
+        Set<T> atoms;
+        BOOST_FOREACH(const Coalition& coalition, coalitions)
+        {
+            BOOST_FOREACH(const Constraint& constraint, coalition.positive)
+            {
+                BOOST_FOREACH(const Atom& a, constraint)
+                {
+                    atoms.insert(a);
+                }
+            }
+        }
+
+        return atoms;
+    }
 };
 
 template<class T>
@@ -308,6 +340,16 @@ public:
     typedef Constraints NegativeConstraints;
     typedef std::vector<T> AStar;
 
+private: 
+    Atoms mAtoms;
+
+public:
+
+    CCF(Atoms& atoms)
+        : mAtoms(atoms)
+    {
+    }
+
     Atom selectAtom(const Atoms& atoms, const Constraints& constraints) const
     {
         // find biggest in list and pick first item
@@ -338,15 +380,15 @@ public:
         throw std::runtime_error("No atoms left");
     }
 
-    void computeConstrainedCoalitions(Atoms atoms, PositiveConstraints p, NegativeConstraints n, Coalitions& coalitions, AStar& aStar)
+    void computeConstrainedCoalitions(PositiveConstraints p, NegativeConstraints n, Coalitions& coalitions, AStar& aStar)
     {
         LOG_DEBUG_S << "Init compute constrained coalitions: " << std::endl
-            << "    atoms:        " << atoms.toString() << std::endl
+            << "    atoms:        " << mAtoms.toString() << std::endl
             << "    p:            " << p.toString() << std::endl
             << "    n:            " << n.toString() << std::endl;
 
         Constraints constraints;
-        computeConstrainedCoalitions(atoms, p, n, constraints, constraints, coalitions, aStar);
+        computeConstrainedCoalitions(mAtoms, p, n, constraints, constraints, coalitions, aStar);
 
         LOG_DEBUG_S << "End of algorithm: Coalitions: " << coalitions.toString();
     }
@@ -603,7 +645,7 @@ public:
         return true;
     }
 
-    void feasibleCoalitions(const CoalitionsList& list, Coalitions& coalitions, const Coalition& baseCoalition = Coalition(), size_t level = 0)
+    void computeFeasibleCoalitions(const CoalitionsList& list, Coalitions& coalitions, const Coalitions& baseCoalition = Coalition(), size_t level = 0)
     {
         //if(level >= list.size())
         //{
@@ -635,47 +677,50 @@ public:
         //}
 
         // Pick coalition
-        BOOST_FOREACH(const Coalition& c, list[level])
+        Coalitions coalitionStructure = baseCoalition;
+        BOOST_FOREACH(const Coalition& listCoalition, list[level])
         {
-            Coalition coalitionStructure = baseCoalition;
-            if(!c.constraintsApply(c.negative))
+            Coalitions feasibleCoalitions = listCoalition.getFeasibleCoalitions();
+            BOOST_FOREACH(Coalition c, feasibleCoalitions)
             {
-                // not in algo
-                coalitionStructure.positive = coalitionStructure.positive.createUnion(c.positive);
-                coalitionStructure.negative = coalitionStructure.negative.createUnion(c.negative);
+                coalitionStructure.insert(c);
 
                 // if(checkFeasibility(coalitionStructure))
-                LOG_DEBUG_S << "Check feasibility: " << coalitionStructure.toString() << " vs. " << c.toString();
-                if(!coalitionStructure.constraintsApply(c.negative) && !c.constraintsApply(coalitionStructure.negative))
+                if(Coalition::getUniqueElements(coalitionStructure).size() == mAtoms.size())
                 {
-                    LOG_DEBUG_S << "Check feasibility: is feasible";
-                    coalitions.insert(c);
+                    LOG_DEBUG_S << "Check all atoms used in coalition structure, i.e. structure complete: " << coalitionStructure.toString() << " unique elements: " << Coalition::getUniqueElements(coalitionStructure).size() << " atoms: " << mAtoms.size();
                     // eval and update
-                } 
-
-
+                } else { 
                     if(level < list.size() - 1)
                     {
-                        LOG_DEBUG_S << "Check feasibility: on level: " << level;
+                        LOG_DEBUG_S << "Use list: " << level;
                         level = level + 1;
                         Coalitions nextLevelCoalitions = list[level];
 
                         BOOST_FOREACH(Coalition nextLevelCoalition, nextLevelCoalitions)
                         {
-                            BOOST_FOREACH(const Constraint& atom, coalitionStructure.positive)
+                            BOOST_FOREACH(const Coalition& coalition, coalitionStructure)
                             {
-                                nextLevelCoalition.negative.insert( Constraint(atom) );
+                                BOOST_FOREACH(const Constraint& constraint, coalition.positive)
+                                {
+                                    BOOST_FOREACH(const Atom& atom, constraint)
+                                    {
+                                        nextLevelCoalition.negative.insert( Constraint(atom) );
+                                    }
+                                }
                             }
                         }
 
-                        LOG_DEBUG_S << "Check feasibility: on level: " << level << " with coalition struct: " << coalitionStructure;
-                        feasibleCoalitions(list, coalitions, coalitionStructure, level);
+                        LOG_DEBUG_S << "Check feasibility: on level: " << level << " with coalition struct: " << coalitionStructure.toString();
+                        computeFeasibleCoalitions(list, coalitions, coalitionStructure, level);
                     } else {
                         LOG_DEBUG_S << "Level " << level << " vs. " << list.size();
                     }
+                }
             }
         }
     }
+
 };
 
 } // end namespace owl_om

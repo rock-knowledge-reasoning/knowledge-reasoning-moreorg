@@ -34,7 +34,6 @@ BOOST_AUTO_TEST_CASE(it_should_handle_sets)
 
 BOOST_AUTO_TEST_CASE(it_should_handle_reference_ccf)
 {
-    CCF<IRI> ccf;
 
     { // Scenario form Rahwan et. al.
 
@@ -99,7 +98,9 @@ BOOST_AUTO_TEST_CASE(it_should_handle_reference_ccf)
         }
 
         IRIList aStar;
-        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions, aStar);
+        CCF<IRI> ccf(atoms);
+        ccf.computeConstrainedCoalitions(positiveConstraints, negativeConstraints, coalitions, aStar);
+
         BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
         BOOST_TEST_MESSAGE("Positive constraints: " << positiveConstraints.toString() );
         BOOST_TEST_MESSAGE("Negative constraints: " << negativeConstraints.toString() );
@@ -116,8 +117,6 @@ BOOST_AUTO_TEST_CASE(it_should_handle_reference_ccf)
 
 BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
 {
-    CCF<IRI> ccf;
-
 //    {
 //        CCF<IRI>::Atoms atoms;
 //
@@ -145,7 +144,8 @@ BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
 //
 //        positiveConstraints = atoms;
 //
-//        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions);
+//        CCF<IRI> ccf(atoms);
+//        ccf.computeConstrainedCoalitions(positiveConstraints, negativeConstraints, coalitions);
 //        BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
 //        BOOST_TEST_MESSAGE("Positive constraints: " << positiveConstraints.toString() );
 //        BOOST_TEST_MESSAGE("Negative constraints: " << negativeConstraints.toString() );
@@ -406,7 +406,8 @@ BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
 
         IRIList aStar;
         CCF<IRI>::Coalitions coalitions;
-        ccf.computeConstrainedCoalitions(atoms, positiveConstraints, negativeConstraints, coalitions, aStar);
+        CCF<IRI> ccf(atoms);
+        ccf.computeConstrainedCoalitions(positiveConstraints, negativeConstraints, coalitions, aStar);
         BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
         BOOST_TEST_MESSAGE("Positive constraints: " << positiveConstraints.toString() );
         BOOST_TEST_MESSAGE("Negative constraints: " << negativeConstraints.toString() );
@@ -420,7 +421,7 @@ BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
         }
 
         CCF<IRI>::Coalitions feasibleCoalitions;
-        ccf.feasibleCoalitions(list, feasibleCoalitions);
+        ccf.computeFeasibleCoalitions(list, feasibleCoalitions);
         BOOST_TEST_MESSAGE("Feasible coalitions: " << feasibleCoalitions.toString());
     }
 }
