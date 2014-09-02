@@ -47,6 +47,9 @@ struct Statistics
 {
     uint32_t upperCombinationBound;
     uint32_t numberOfInferenceEpochs;
+    base::Time timeCompositeSystemGeneration;
+    base::Time timeRegisterCompositeSystems;
+    base::Time timeInference;
     base::Time timeElapsed;
 
     IRIList interfaces;
@@ -55,6 +58,7 @@ struct Statistics
 
     uint32_t constraintsChecked;
 
+    IRIList actorsAtomic;
     IRIList actorsKnown;
     IRIList actorsInferred;
 
@@ -104,6 +108,7 @@ public:
     typedef std::map< IRI, IRI> IRI2IRICache;
     typedef std::map< std::pair<IRI,IRI>, IRIList> RelationCache;
     typedef std::map< std::pair<IRI,IRI>, bool> RelationPredicateCache;
+    typedef std::map< IRI, IRISet> IRI2IRISetCache;
 
     /**
      * Constructor to create an OrganizationModel from an existing description file
@@ -114,7 +119,7 @@ public:
     /**
      * Update the organization model
      */
-    void refresh();
+    void refresh(bool performInference = true);
 
     Ontology::Ptr ontology() { return mpOntology; }
 
@@ -144,11 +149,10 @@ public:
     bool checkIfCompatible(const IRI& instance, const IRI& otherInstance);
 
     /**
-     * Run inference to identify service that are 'provided'
-     * by a set of actor
-     * \param actors
+     * Run inference to identify services and capabilites that are provided
+     * by actors
      */
-    void runInferenceEngine(const IRIList& actors);
+    void runInferenceEngine();
 
     /**
      * Reduce list of actor to unique individuals, i.e. removing
@@ -214,7 +218,9 @@ public:
     /**
      * Statistics
      */
-    Statistics getStatistics() { return mStats; }
+    std::vector<Statistics> getStatistics() { return mStatistics; }
+
+    Statistics getCurrentStatistics() { return mCurrentStats; }
 
     void setMaximumNumberOfLinks(uint32_t n) { mMaximumNumberOfLinks = n; }
     uint32_t getMaximumNumberOfLinks() { return mMaximumNumberOfLinks; }
@@ -227,7 +233,11 @@ private:
     /**
      * Check if model is provider for a given model, i.e.
      * remaps requirements of actorModel as availableResources
-     * and check whether this is sufficient for the given model
+     * and checks whether this is sufficient for the given model
+     *
+     * Make sure service and capabilies that depend on other are check AFTER
+     * their dependencies -- since this model provider creates cache from 
+     * this values
      * \return True upon success, false otherwise
      */
     bool isModelProvider(const IRI& actorModel, const IRI& model) const;
@@ -245,6 +255,19 @@ private:
     IRIList allRelatedInstances(const IRI& actor, const IRI& relation) const;
 
     IRIList getModelRequirements(const IRI& model) const;
+
+    /**
+     * Sort the list so that items with dependencies
+     * are listed after their dependencies
+     */
+    IRIList sortByDependency(const IRIList& list);
+
+    /**
+     * Check if item has a dependency on other model
+     * i.e. main -> Service
+     * other -> Service
+     */
+    bool hasModelDependency(const IRI& main, const IRI& other);
 
     /**
      * Creates an instance of this actor from the given set of actors
@@ -268,7 +291,8 @@ private:
 
     Ontology::Ptr mpOntology;
 
-    Statistics mStats;
+    Statistics mCurrentStats;
+    std::vector<Statistics> mStatistics;
 
     mutable IRI2IRIListCache mModelRequirementsCache;
     mutable RelationCache mRelationsCache;
@@ -276,8 +300,19 @@ private:
     mutable RelationPredicateCache mProviderCache;
     mutable RelationPredicateCache mCompatibilityCache;
 
+    // Tell if model is a provider of a given service
+    mutable RelationPredicateCache mModelProviderCache;
+    // Get list of provided service per model
+    mutable IRI2IRISetCache mModelProviderSetCache;
+
+    IRIList mServices;
+    IRIList mCapabilities;
+
     uint32_t mMaximumNumberOfLinks;
 };
+
+std::ostream& operator<<(std::ostream& os, const Statistics& statistics);
+std::ostream& operator<<(std::ostream& os, const std::vector<Statistics>& statisticsList);
 
 } // end namespace owl_om
 #endif // OWL_OM_ORGANIZATION_MODEL_HPP

@@ -71,9 +71,13 @@ std::string Statistics::toString() const
 {
     std::stringstream txt;
     txt << "Organization Model Statistics" << std::endl
+        << "    atomic actors:                   " << actorsAtomic << std::endl
         << "    upper bound for combinations:    " << upperCombinationBound << std::endl
         << "    number of inference epochs:      " << numberOfInferenceEpochs << std::endl
         << "    time elapsed in s:               " << timeElapsed.toSeconds() << std::endl
+        << "    time composite system gen in s:  " << timeCompositeSystemGeneration.toSeconds() << std::endl
+        << "    time registration of comp sys:   " << timeRegisterCompositeSystems.toSeconds() << std::endl
+        << "    time for inference:              " << timeInference.toSeconds() << std::endl
         << "    # of interfaces:                 " << interfaces.size() << std::endl
         << "    # of links:                      " << links.size() << std::endl
         << "    # of link combinations:          " << linkCombinations.size() << std::endl
@@ -169,12 +173,14 @@ OrganizationModel::OrganizationModel(const std::string& filename)
     }
 }
 
-void OrganizationModel::refresh()
+void OrganizationModel::refresh(bool performInference)
 {
+    mCurrentStats = Statistics();
+    mCurrentStats.timeElapsed = base::Time::now();
+
     mpOntology->refresh();
 
-    mStats.upperCombinationBound = upperCombinationBound();
-    mStats.timeElapsed = base::Time::now();
+    mCurrentStats.upperCombinationBound = upperCombinationBound();
 
     InterfaceCombinationList interfaceCombinations;
     try {
@@ -185,10 +191,13 @@ void OrganizationModel::refresh()
         LOG_WARN_S << e.what();
     }
 
-    mStats.actorsKnown = mpOntology->allInstancesOf(OM::Actor(), false);
-    mStats.actorsCompositePrevious = mpOntology->allInstancesOf(OM::CompositeActor(), true);
-    mStats.actorsCompositeModelPrevious = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
-    mStats.linkCombinations = interfaceCombinations;
+    mCurrentStats.actorsAtomic = mpOntology->allInstancesOf(OM::Actor(), true);
+    mCurrentStats.actorsKnown = mpOntology->allInstancesOf(OM::Actor(), false);
+    mCurrentStats.actorsCompositePrevious = mpOntology->allInstancesOf(OM::CompositeActor(), true);
+    mCurrentStats.actorsCompositeModelPrevious = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
+    mCurrentStats.linkCombinations = interfaceCombinations;
+
+    mCurrentStats.timeRegisterCompositeSystems = base::Time::now();
 
     IRIList newActors;
     if(!interfaceCombinations.empty())
@@ -215,20 +224,28 @@ void OrganizationModel::refresh()
         mpOntology->refresh();
         LOG_INFO_S << "OrganizationModel: with inferred actors: " << newActors;
 
-        mStats.actorsInferred = newActors;
+        mCurrentStats.actorsInferred = newActors;
 
     } else {
         LOG_INFO_S << "OrganizationModel: no interface combinations available, so no actors inferred";
     }
 
+    mCurrentStats.timeRegisterCompositeSystems = base::Time::now() - mCurrentStats.timeRegisterCompositeSystems;
+
     IRIList atomicActors = mpOntology->allInstancesOf(OM::Actor(), true);
-    runInferenceEngine(atomicActors);
 
-    runInferenceEngine(newActors);
+    if(performInference)
+    {
+        mCurrentStats.timeInference = base::Time::now();
+        runInferenceEngine();
+        mCurrentStats.timeInference = base::Time::now() - mCurrentStats.timeInference;
+    }
 
-    mStats.timeElapsed = base::Time::now() - mStats.timeElapsed;
-    mStats.actorsCompositePost = mpOntology->allInstancesOf(OM::CompositeActor(), true);
-    mStats.actorsCompositeModelPost = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
+    mCurrentStats.timeElapsed = base::Time::now() - mCurrentStats.timeElapsed;
+    mCurrentStats.actorsCompositePost = mpOntology->allInstancesOf(OM::CompositeActor(), true);
+    mCurrentStats.actorsCompositeModelPost = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
+
+    mStatistics.push_back(mCurrentStats);
 }
 
 IRI OrganizationModel::createNewCompositeActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id)
@@ -297,6 +314,8 @@ IRI OrganizationModel::createNewCompositeActor(const IRISet& actorSet, const Int
             marker++;
         }
     }
+    // allow fast retrieval
+    mModelRequirementsCache[actorModelName] = allNewRequirements;
 
     IRIList usedInterfaces;
     {
@@ -329,73 +348,74 @@ void OrganizationModel::createInstance(const IRI& instanceName, const IRI& klass
     mpOntology->relatedTo(instanceName, OM::modelledBy(), model);
 }
 
-void OrganizationModel::runInferenceEngine(const IRIList& actors)
+void OrganizationModel::runInferenceEngine()
 {
-    // Infer services
-    IRIList services = mpOntology->allInstancesOf( OM::ServiceModel() );
-    LOG_DEBUG_S << "Validate known services: " << services;
+    IRIList actorModels = mpOntology->allInstancesOf( OM::ActorModel(), false);
 
-    IRIList capabilities = mpOntology->allInstancesOf( OM::CapabilityModel() );
-    LOG_DEBUG_S << "Validate known capabilities: " << capabilities;
+    // Load service and capabilities and make sure
+    // dependant services end up later in the list
+    mServices = mpOntology->allInstancesOf( OM::ServiceModel() );
+    mServices = sortByDependency(mServices);
 
-    bool updated = true;
-    uint32_t count = 0;
+    LOG_WARN_S << "Validate known services: " << mServices;
 
-    // Since some service migh depend on other services we run the
-    // inference engine until no changes can be seen
-    while(updated)
+    mCapabilities = mpOntology->allInstancesOf( OM::CapabilityModel() );
+    mCapabilities = sortByDependency(mCapabilities);
+
+    LOG_WARN_S << "Validate known capabilities: " << mCapabilities;
+    int count=0;
+    int max = actorModels.size();
+
+    BOOST_FOREACH(const IRI& actorModel, actorModels)
     {
-        LOG_DEBUG_S << "Run inference engine for actors: " << actors;
-
-        updated = false;
-        BOOST_FOREACH(const IRI& actor, actors)
+        BOOST_FOREACH(const IRI& capability, mCapabilities)
         {
-            IRI actorModel = getResourceModel(actor);
-
-            BOOST_FOREACH(const IRI& service, services)
+            if( isModelProvider(actorModel, capability) )
             {
-                if( !isProviding(actor, service) && isModelProvider(actorModel, service) )
-                {
-                    updated = true;
-                    addProvider(actor, service);
-                }
+                addProvider(actorModel, capability);
             }
-
-            BOOST_FOREACH(const IRI& capability, capabilities)
-            {
-                if( !isProviding(actor, capability) && isModelProvider(actorModel, capability) )
-                {
-                    updated = true;
-                    addProvider(actor, capability);
-                }
-            }
-
-            //{
-            //    IRIList inferred = infer(actor, services);
-            //    if(!inferred.empty())
-            //    {
-            //        updated = true;
-            //    }
-            //}
-            //{
-            //    IRIList inferred = infer(actor, capabilities);
-            //    if(!inferred.empty())
-            //    {
-            //        updated = true;
-            //    }
-            //}
         }
+
+        // Check capabilities first, since services might depend upon capabilities
+        BOOST_FOREACH(const IRI& service, mServices)
+        {
+            if( isModelProvider(actorModel, service) )
+            {
+                addProvider(actorModel, service);
+            }
+        }
+
+
     }
 
-    mStats.numberOfInferenceEpochs = count;
+    // Add provides to actors
+    IRIList actors = mpOntology->allInstancesOf( OM::Actor(), false);
+    BOOST_FOREACH(const IRI& actor, actors)
+    {
+        IRI model = getResourceModel(actor);
+
+        BOOST_FOREACH(const IRI& capability, mCapabilities)
+        {
+            if( isModelProvider(model, capability) )
+            {
+                addProvider(actor, capability);
+            }
+        }
+
+        BOOST_FOREACH(const IRI& service, mServices)
+        {
+            if( isModelProvider(model, service) )
+            {
+                addProvider(actor, service);
+            }
+        }
+
+    }
 }
 
-void OrganizationModel::addProvider(const IRI& actor, const IRI& model)
+void OrganizationModel::addProvider(const IRI& actorOrModel, const IRI& model)
 {
-    mpOntology->relatedTo(actor, OM::provides(), model);
-    mpOntology->relatedTo(getResourceModel(actor), OM::provides(), model);
-    std::pair<IRI, IRI> key(actor, model);
-    mProviderCache[key] = true;
+    mpOntology->relatedTo(actorOrModel, OM::provides(), model);
 }
 
 bool OrganizationModel::isProviding(const IRI& actor, const IRI& model) const
@@ -436,30 +456,50 @@ IRIList OrganizationModel::getModelRequirements(const IRI& model) const
     }
 
     IRI requirementModel = getResourceModel(model);
-    IRIList requirements = mpOntology->allRelatedInstances( requirementModel, OM::dependsOn(), OM::Requirement());
+    IRIList requirements = allRelatedInstances( requirementModel, OM::dependsOn());
     mModelRequirementsCache[model] = requirements;
     return requirements;
 }
 
 bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& model) const
 {
+    std::pair<IRI, IRI> key(actorModel, model);
+    RelationPredicateCache::const_iterator cit = mModelProviderCache.find(key);
+    if(cit != mModelProviderCache.end())
+    {
+        return cit->second;
+    }
+
     // actorModels define the requirements (that will be fulfilled by instances of this actor model
     IRIList availableResources = getModelRequirements(actorModel);
-    IRIList provisioned = mpOntology->allRelatedInstances(actorModel, OM::provides());
+    IRISet provisioned = mModelProviderSetCache[actorModel];
     availableResources.insert(availableResources.begin(), provisioned.begin(), provisioned.end());
 
     // model (service/capability/...) define the set of requirements
     IRIList requirements = getModelRequirements(model);
 
+    bool result;
     try {
         Grounding grounding = resolveRequirements(requirements, availableResources, model, actorModel);
-        LOG_WARN_S << "actorModel: " << actorModel << " provides " << model << ": " << grounding.isComplete();
-        return grounding.isComplete();
+        result = grounding.isComplete();
+
+        LOG_DEBUG_S << "Is " << actorModel << " provider for " << model << ": " << grounding.toString();
+
     } catch(const std::invalid_argument& e)
     {
-        LOG_WARN_S << "actorModel: " << actorModel << " provides " << model << ": false";
-        return false;
+        result = false;
     }
+
+    mModelProviderCache[key] = result;
+    if(result)
+    {
+        mModelProviderSetCache[actorModel].insert(model);
+        LOG_DEBUG_S << "actorModel: " << actorModel << " provides " << model; 
+    } else {
+        LOG_DEBUG_S << "actorModel: " << actorModel << " does not provide " << model;
+    }
+
+    return result;
 }
 
 //IRIList OrganizationModel::infer(const IRI& actor, const IRIList& models)
@@ -784,8 +824,8 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
         validConnections.push_back(connection);
     } while( interfaceCombinations.next() );
 
-    mStats.interfaces = interfaces;
-    mStats.links = validConnections;
+    mCurrentStats.interfaces = interfaces;
+    mCurrentStats.links = validConnections;
     LOG_DEBUG_S << "Valid connections: " << validConnections;
 
 
@@ -823,7 +863,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
             // Check if # involved actors == linkCount + 1, i.e. exactly one connection
             // per pair
             // Makes sure there are no double connections + all nodes are connected to each other
-            mStats.constraintsChecked++;
+            mCurrentStats.constraintsChecked++;
 
             // Two links between same parents
             if( parents.size() <= linkCount)
@@ -834,7 +874,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
                 ccf.addNegativeConstraint(c);
             }
 
-            mStats.constraintsChecked++;
+            mCurrentStats.constraintsChecked++;
             {
                 // Check if this interface has already been used
                 std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->begin);
@@ -848,7 +888,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
                 }
             }
 
-            mStats.constraintsChecked++;
+            mCurrentStats.constraintsChecked++;
             {
                 // Check if this interface has already been used
                 std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->end);
@@ -924,6 +964,9 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
         throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors available, i.e. no more than 1");
     }
 
+    mCurrentStats.timeCompositeSystemGeneration = base::Time::now();
+    LOG_DEBUG_S << "Current comp: " << mCurrentStats.timeCompositeSystemGeneration;
+
     Combination<IRI> interfaceCombinations(interfaces, 2, EXACT);
     do {
 
@@ -955,8 +998,8 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
         validConnections.push_back(connection);
     } while( interfaceCombinations.next() );
 
-    mStats.interfaces = interfaces;
-    mStats.links = validConnections;
+    mCurrentStats.interfaces = interfaces;
+    mCurrentStats.links = validConnections;
     LOG_DEBUG_S << "Valid connections: " << validConnections;
 
 
@@ -987,14 +1030,14 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
             // Check if # involved actors == linkCount + 1, i.e. exactly one connection
             // per pair
             // Makes sure there are no double connections + all nodes are connected to each other
-            mStats.constraintsChecked++;
+            mCurrentStats.constraintsChecked++;
             if( !(parents.size() - 1 == linkCount) )
             {
                 valid = false;
                 break;
             }
 
-            mStats.constraintsChecked++;
+            mCurrentStats.constraintsChecked++;
             {
                 // Check if this interface has already been used
                 std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->begin);
@@ -1005,7 +1048,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
                 }
             }
 
-            mStats.constraintsChecked++;
+            mCurrentStats.constraintsChecked++;
             {
                 // Check if this interface has already been used
                 std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->end);
@@ -1025,7 +1068,9 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
         }
     } while( connectionCombination.next() );
 
-    mStats.linkCombinations = validCombinations;
+    mCurrentStats.linkCombinations = validCombinations;
+    LOG_DEBUG_S << "Current comp: " << mCurrentStats.timeCompositeSystemGeneration;
+    mCurrentStats.timeCompositeSystemGeneration = base::Time::now() - mCurrentStats.timeCompositeSystemGeneration;
 
     LOG_DEBUG_S << "Valid combinations: " << validCombinations;
     return validCombinations;
@@ -1057,4 +1102,60 @@ uint32_t OrganizationModel::upperCombinationBound()
     return connectionCombination.numberOfCombinations();
 }
 
+IRIList OrganizationModel::sortByDependency(const IRIList& list)
+{
+    IRIList sortedList;
+    BOOST_FOREACH(const IRI& insertItem, list)
+    {
+        bool inserted = false;
+        IRIList::iterator it = sortedList.begin();
+        for(; it != sortedList.end(); ++it)
+        {
+            if( hasModelDependency(*it, insertItem) )
+            {
+                bool inserted = true;
+                sortedList.insert(it, insertItem);
+                break;
+            }
+        }
+        if(!inserted)
+        {
+            sortedList.push_back(insertItem);
+        }
+    }
+    return sortedList;
 }
+
+bool OrganizationModel::hasModelDependency(const IRI& main, const IRI& other)
+{
+    // Check if 'main' has 'other' as dependency, if so return false 
+    IRIList mainDependencies = allRelatedInstances(main, OM::dependsOn());
+    BOOST_FOREACH(const IRI& dependency, mainDependencies)
+    {
+        IRI resourceModel = getResourceModel(dependency);
+        if(resourceModel == other)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+std::ostream& operator<<(std::ostream& os, const Statistics& statistics)
+{
+    os << statistics.toString();
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<Statistics>& statisticsList)
+{
+    os << "StatisticsList: " << std::endl;
+    BOOST_FOREACH(const Statistics& s, statisticsList)
+    {
+        os << s;
+    }
+    return os;
+}
+
+} // end namespace owl_om
