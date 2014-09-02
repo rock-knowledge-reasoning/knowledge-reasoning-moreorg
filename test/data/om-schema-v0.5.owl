@@ -246,6 +246,20 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#BaseCamp -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#BaseCamp">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ActorModel"/>
+        <rdfs:comment>Base camps have 4 bays and one central interface for transport</rdfs:comment>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-1"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-2"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-3"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-4"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#CREX -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#CREX">
@@ -399,6 +413,15 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
     <!-- http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-3 -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-3">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Requirement"/>
+        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-4 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-4">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Requirement"/>
         <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
     </owl:NamedIndividual>
