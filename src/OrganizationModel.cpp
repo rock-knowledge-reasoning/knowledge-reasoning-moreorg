@@ -79,6 +79,7 @@ std::string Statistics::toString() const
         << "    time registration of comp sys:   " << timeRegisterCompositeSystems.toSeconds() << std::endl
         << "    time for inference:              " << timeInference.toSeconds() << std::endl
         << "    # of interfaces:                 " << interfaces.size() << std::endl
+        << "    # of allowed links for comps sys:" << maxAllowedLinks << std::endl
         << "    # of links:                      " << links.size() << std::endl
         << "    # of link combinations:          " << linkCombinations.size() << std::endl
         << "    # of constraints checked:        " << constraintsChecked << std::endl
@@ -1005,6 +1006,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
 
     // Maximum number of connections for a composite actor
     size_t maximumNumberOfConnections =  fmin(actors.size() - 1, mMaximumNumberOfLinks);
+    mCurrentStats.maxAllowedLinks = mMaximumNumberOfLinks;
 
     // Compute valid combinations, i.e.
     //    - each interface is only used once in a combination
@@ -1100,6 +1102,29 @@ uint32_t OrganizationModel::upperCombinationBound()
     std::vector<InterfaceConnection> validConnections( numberOfInterfaceCombinations );
     Combination<InterfaceConnection> connectionCombination( validConnections, maximumNumberOfConnections, MAX);
     return connectionCombination.numberOfCombinations();
+}
+
+IRI OrganizationModel::getRelatedProviderInstance(const IRI& actor, const IRI& model)
+{
+   IRIList providers = allRelatedInstances(actor, OM::provides());
+   BOOST_FOREACH(const IRI& provider, providers)
+   {
+       if(getResourceModel(provider) == model)
+       {
+           LOG_DEBUG_S << "Get related: " << provider << " isModelledBy " << model;
+           return provider;
+       }
+   }
+
+   throw std::invalid_argument("OrganizationModel::getRelatedProviderInstance: " + model.toString() + " is not related to " + actor.toString());
+}
+
+void OrganizationModel::setDouble(const IRI& iri, const IRI& dataProperty, double value)
+{
+    std::stringstream ss;
+    ss << value;
+    DataValue dataValue = mpOntology->dataValue(ss.str(), "double");
+    mpOntology->valueOf(iri, dataProperty, dataValue);
 }
 
 IRIList OrganizationModel::sortByDependency(const IRIList& list)

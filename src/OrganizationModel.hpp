@@ -26,6 +26,8 @@ struct InterfaceConnection
     void addParent(const IRI& parent);
     bool sameParents(const InterfaceConnection& other) const;
 
+    bool selfReferencing() { return parents.size() == 2 && parents[0] != parents[1]; }
+
     /**
      * Test if the two interface connections use the same interface
      */
@@ -53,6 +55,7 @@ struct Statistics
     base::Time timeElapsed;
 
     IRIList interfaces;
+    uint32_t maxAllowedLinks;
     InterfaceConnectionList links;
     InterfaceCombinationList linkCombinations;
 
@@ -224,6 +227,10 @@ public:
 
     void setMaximumNumberOfLinks(uint32_t n) { mMaximumNumberOfLinks = n; }
     uint32_t getMaximumNumberOfLinks() { return mMaximumNumberOfLinks; }
+
+    IRI getRelatedProviderInstance(const IRI& actor, const IRI& model);
+
+    void setDouble(const IRI& iri, const IRI& dataProperty, double val);
 
 
 private:

@@ -45,8 +45,16 @@ double Redundancy::computeProbabilityOfSurvival(const IRI& resource, const IRI& 
         availableResourceMap[ resourceModel ].push_back( availableResource );
     }
 
+    // The instance for the requested resource (model) which can be updated
+    availableResources = mOrganizationModel.ontology()->allRelatedInstances( actor, OM::provides() );
+    BOOST_FOREACH(const IRI& availableResource, availableResources)
+    {
+        IRI resourceModel = mOrganizationModel.getResourceModel( availableResource );
+        availableResourceMap[ resourceModel ].push_back( availableResource );
+    }
+
     std::map<IRI, uint32_t>::const_iterator cit = resourceRequirementCount.begin();
-    double probabilityOfFailure = 1;
+    double probabilityOfSurvival = 1;
     for(; cit != resourceRequirementCount.end(); ++cit)
     {
         IRIList components = availableResourceMap[ cit->first ];
@@ -73,20 +81,23 @@ double Redundancy::computeProbabilityOfSurvival(const IRI& resource, const IRI& 
         {
             try {
                 DataValue value = mOrganizationModel.ontology()->getDataValue(component, OM::probabilityOfFailure());
-                pSum += value.toDouble();
+                LOG_DEBUG_S << "Retrieved probability of failure for '" << component << ": " << value.toDouble();
+                pSum += 1 - value.toDouble();
             } catch(...)
             {
+                LOG_DEBUG_S << "Default probability of failure for '" << component << ": 0.5";
                 pSum += 0.5;
             }
         }
 
         double p = pSum / (1.0*components.size());
 
-        // Serial chain of parallel components
-        probabilityOfFailure *= pow(p,redundancy);
+        // Serial chain of parallel components thus multiplication of R(t)
+        // Zuverlässigkeitstechnik, Meyna and Pauli, 2 Ed p.175
+        probabilityOfSurvival *= 1 - pow(1 - p,redundancy);
     }
 
-    return 1 - probabilityOfFailure;
+    return probabilityOfSurvival;
 }
 
 IRIMetricMap Redundancy::compute()
@@ -110,19 +121,28 @@ IRIMetricMap Redundancy::compute()
             << "    metric:   " << metric.toString();
     }
 
-    IRIList services = mOrganizationModel.ontology()->allInstancesOf( OM::Service() );
+    IRIList services = mOrganizationModel.ontology()->allInstancesOf( OM::ServiceModel() );
     IRIList actors = mOrganizationModel.ontology()->allInstancesOf( OM::Actor() );
+    LOG_DEBUG_S << "Compute probabilityOfSurvival for: " << services;
 
     BOOST_FOREACH(const IRI& actor, actors)
     {
         BOOST_FOREACH(const IRI& service, services)
         {
-            double probabilityOfSurvival = computeProbabilityOfSurvival(service ,actor);
+            try {
+                double probabilityOfSurvival = computeProbabilityOfSurvival(service ,actor);
 
-            LOG_DEBUG_S << "Probability of survival:" << std::endl
-                << "    actor :  " << actor << std::endl
-                << "    service: " << service << std::endl
-                << "    value:   " << probabilityOfSurvival;
+                IRI instance = mOrganizationModel.getRelatedProviderInstance(actor, service);
+//                mOrganizationModel.setDouble(instance, OM::probabilityOfFailure(), 1 - probabilityOfSurvival);
+
+                LOG_DEBUG_S << "Probability of survival:" << std::endl
+                    << "    actor :  " << actor << std::endl
+                    << "    service: " << service << std::endl
+                    << "    value:   " << probabilityOfSurvival;
+            } catch(const std::invalid_argument& e)
+            {
+                LOG_DEBUG_S << "Redundancy: computing probability failed: " << e.what();
+            }
         }
     }
 
