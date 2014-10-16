@@ -35,6 +35,7 @@ public:
     VOCABULARY_ADD_WORD(models);
     VOCABULARY_ADD_WORD(provides);
     VOCABULARY_ADD_WORD(uses);
+    VOCABULARY_ADD_WORD(fulfills);
 
     VOCABULARY_ADD_WORD(probabilityOfFailure);
 };

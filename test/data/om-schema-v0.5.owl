@@ -46,6 +46,12 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#fulfills -->
+
+    <owl:ObjectProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#fulfills"/>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#has -->
 
     <owl:ObjectProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#has">
