@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <set>
 #include <string>
 #include <stdexcept>
 #include <stdint.h>
@@ -100,10 +101,8 @@ private:
     Mode mMode;
 
     std::vector<T> mCurrentDraw;
-    // Keep record of last draw -- and prevent duplicates
-    // This assumes a corresponding ordered output of the underlying
-    // algorithm to compute the combinations
-    std::vector<T> mLastDraw;
+    // Keep record of items per draw -- and prevent duplicates
+    std::set< ItemList > mExistingDraws;
 
     int x, y, z;
     int* p;
@@ -202,6 +201,9 @@ public:
             mCurrentDraw.push_back( mItems[i]);
             b[i++] = 1;
         }
+
+        mExistingDraws.clear();
+        mExistingDraws.insert(mCurrentDraw);
     }
 
     bool next()
@@ -219,16 +221,13 @@ public:
                     mCurrentDraw.push_back(mItems[i]);
                 }
             }
-            // Assume lexicographical order so that we can handle
-            // multiple and same items
-            if(!mLastDraw.empty() && mCurrentDraw == mLastDraw)
+
+            typename std::pair< typename std::set< std::vector<T> >::iterator, bool > result = mExistingDraws.insert(mCurrentDraw);
+            if(result.second)
             {
-                // duplicate found
-                continue;
-            } else {
-                mLastDraw = mCurrentDraw;
                 return true;
             }
+            continue;
         }
 
         delete[] p;
@@ -245,7 +244,6 @@ public:
         {
             ++mCurrentDrawList;
             createStartDraw(mItems.size(), *mCurrentDrawList);
-            mLastDraw = mCurrentDraw;
             return true;
         }
 
