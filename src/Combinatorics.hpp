@@ -100,12 +100,23 @@ private:
     Mode mMode;
 
     std::vector<T> mCurrentDraw;
+    // Keep record of last draw -- and prevent duplicates
+    // This assumes a corresponding ordered output of the underlying
+    // algorithm to compute the combinations
+    std::vector<T> mLastDraw;
 
     int x, y, z;
     int* p;
     int* b;
     int mCurrentDrawSize;
 
+    // In order to compute the power set we have to maintain a list
+    // of the draw for a corresponding combination size
+    //
+    // [a,a,b]
+    // First draw list: a b
+    // Second draw list: aa ab
+    // Third draw list: aab
     DrawList mDrawList;
     DrawList::const_iterator mCurrentDrawList;
 
@@ -195,7 +206,7 @@ public:
 
     bool next()
     {
-        if(!twiddle(&x, &y, &z, p))
+        while(!twiddle(&x, &y, &z, p))
         {
             b[x] = 1;
             b[y] = 0;
@@ -208,19 +219,34 @@ public:
                     mCurrentDraw.push_back(mItems[i]);
                 }
             }
-            return true;
-        } else {
-            delete[] p;
-            delete[] b;
-
-            if(mCurrentDrawList + 1 != mDrawList.end())
+            // Assume lexicographical order so that we can handle
+            // multiple and same items
+            if(!mLastDraw.empty() && mCurrentDraw == mLastDraw)
             {
-                ++mCurrentDrawList;
-                createStartDraw(mItems.size(), *mCurrentDrawList);
+                // duplicate found
+                continue;
+            } else {
+                mLastDraw = mCurrentDraw;
                 return true;
             }
+        }
 
-            return false;
+        delete[] p;
+        delete[] b;
+
+        // Check if we have to increase the combination size, i.e.
+        // try the next draw list
+        //
+        // [a,a,b]
+        // First draw list: a b
+        // Second draw list: aa ab
+        // Third draw list: aab
+        if(mCurrentDrawList + 1 != mDrawList.end())
+        {
+            ++mCurrentDrawList;
+            createStartDraw(mItems.size(), *mCurrentDrawList);
+            mLastDraw = mCurrentDraw;
+            return true;
         }
 
         return false;
