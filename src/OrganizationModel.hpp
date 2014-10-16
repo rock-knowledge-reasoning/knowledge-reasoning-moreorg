@@ -3,104 +3,14 @@
 
 #include <stdint.h>
 #include <owl_om/Ontology.hpp>
-#include <base/Time.hpp>
+#include <owl_om/organization_model/ActorModelLink.hpp>
+#include <owl_om/organization_model/InterfaceConnection.hpp>
+#include <owl_om/organization_model/Grounding.hpp>
+#include <owl_om/organization_model/Statistics.hpp>
 
 namespace owl_om {
 
 typedef std::vector<IRIList> CandidatesList;
-
-struct InterfaceConnection
-{
-    InterfaceConnection() {}
-
-    InterfaceConnection(const IRI& interface0, const IRI& interface1)
-        : begin(interface0)
-        , end(interface1)
-    {}
-
-    IRI begin;
-    IRI end;
-
-    IRIList parents;
-
-    void addParent(const IRI& parent);
-    bool sameParents(const InterfaceConnection& other) const;
-
-    bool selfReferencing() { return parents.size() == 2 && parents[0] != parents[1]; }
-
-    /**
-     * Test if the two interface connections use the same interface
-     */
-    bool useSameInterface(const InterfaceConnection& other) const;
-
-    bool operator<(const InterfaceConnection& other) const;
-    bool operator==(const InterfaceConnection& other) const;
-
-    std::string toString() const;
-};
-
-typedef std::vector< InterfaceConnection > InterfaceConnectionList;
-typedef std::vector< InterfaceConnectionList > InterfaceCombinationList;
-
-/**
- * Statistic of the organization model engine
- */
-struct Statistics
-{
-    uint32_t upperCombinationBound;
-    uint32_t numberOfInferenceEpochs;
-    base::Time timeCompositeSystemGeneration;
-    base::Time timeRegisterCompositeSystems;
-    base::Time timeInference;
-    base::Time timeElapsed;
-
-    IRIList interfaces;
-    uint32_t maxAllowedLinks;
-    InterfaceConnectionList links;
-    InterfaceCombinationList linkCombinations;
-
-    uint32_t constraintsChecked;
-
-    IRIList actorsAtomic;
-    IRIList actorsKnown;
-    IRIList actorsInferred;
-
-    IRIList actorsCompositePrevious;
-    IRIList actorsCompositePost;
-
-    IRIList actorsCompositeModelPrevious;
-    IRIList actorsCompositeModelPost;
-
-    std::string toString() const;
-};
-
-std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection);
-std::ostream& operator<<(std::ostream& os, const InterfaceConnectionList& list);
-std::ostream& operator<<(std::ostream& os, const InterfaceCombinationList& list);
-
-typedef std::map<IRI,IRI> RequirementsGrounding;
-
-class Grounding
-{
-    RequirementsGrounding mRequirementToResourceMap;
-public:
-    Grounding(const RequirementsGrounding& grounding)
-        : mRequirementToResourceMap(grounding)
-    {}
-
-    const RequirementsGrounding& getRequirementsGrounding() { return mRequirementToResourceMap; }
-
-    bool isComplete() const;
-
-    /**
-     */
-    IRIList ungroundedRequirements() const;
-
-    static IRI ungrounded() { static IRI iri("?"); return iri; }
-
-    std::string toString() const;
-};
-
 
 class OrganizationModel
 {
@@ -141,7 +51,7 @@ public:
      * \param requirementModel Optional label for requirement model that the requirements originate from
      * \return corresponding grounding, which need to be check on completness
      */
-    Grounding resolveRequirements(const IRIList& resourceRequirements, const IRIList& availableResources, const IRI& resourceProvider = IRI(), const IRI& requirementModel = IRI()) const;
+    organization_model::Grounding resolveRequirements(const IRIList& resourceRequirements, const IRIList& availableResources, const IRI& resourceProvider = IRI(), const IRI& requirementModel = IRI()) const;
 
     // PREDICATES
     /**
@@ -209,8 +119,8 @@ public:
      * Generate a combination list based on actor interface
      * \return List of interface combinations
      */
-    InterfaceCombinationList generateInterfaceCombinations();
-    InterfaceCombinationList generateInterfaceCombinationsCCF();
+    organization_model::InterfaceCombinationList generateInterfaceCombinations();
+    organization_model::InterfaceCombinationList generateInterfaceCombinationsCCF();
 
     /**
      * Compute upper bound for actor combinations
@@ -221,9 +131,9 @@ public:
     /**
      * Statistics
      */
-    std::vector<Statistics> getStatistics() { return mStatistics; }
+    std::vector<organization_model::Statistics> getStatistics() { return mStatistics; }
 
-    Statistics getCurrentStatistics() { return mCurrentStats; }
+    organization_model::Statistics getCurrentStatistics() { return mCurrentStats; }
 
     void setMaximumNumberOfLinks(uint32_t n) { mMaximumNumberOfLinks = n; }
     uint32_t getMaximumNumberOfLinks() { return mMaximumNumberOfLinks; }
@@ -281,7 +191,7 @@ private:
      * Registers a new class of actor if necessary for this actor
      * \return IRI of new actor, or empty IRI if the actor already exists
      */
-    IRI createNewCompositeActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id);
+    IRI createNewCompositeActor(const IRISet& actorSet, const organization_model::InterfaceConnectionList& interfaceConnections, uint32_t id);
 
     /**
      * Infer new instance of a given class type, base on checking whether a given model
@@ -298,8 +208,8 @@ private:
 
     Ontology::Ptr mpOntology;
 
-    Statistics mCurrentStats;
-    std::vector<Statistics> mStatistics;
+    organization_model::Statistics mCurrentStats;
+    std::vector<organization_model::Statistics> mStatistics;
 
     mutable IRI2IRIListCache mModelRequirementsCache;
     mutable RelationCache mRelationsCache;
@@ -315,11 +225,13 @@ private:
     IRIList mServices;
     IRIList mCapabilities;
 
-    uint32_t mMaximumNumberOfLinks;
-};
+    uint32_t mCompositeActorModelsCount;
+    uint32_t mCompositeActorsCount;
 
-std::ostream& operator<<(std::ostream& os, const Statistics& statistics);
-std::ostream& operator<<(std::ostream& os, const std::vector<Statistics>& statisticsList);
+    uint32_t mMaximumNumberOfLinks;
+
+    std::vector< std::vector<organization_model::ActorModelLink> > mCompositeActorModels;
+};
 
 } // end namespace owl_om
 #endif // OWL_OM_ORGANIZATION_MODEL_HPP

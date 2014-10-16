@@ -12,156 +12,9 @@
 #include <owl_om/ccf/CCF.hpp>
 
 using namespace owl_om::vocabulary;
+using namespace owl_om::organization_model;
 
 namespace owl_om {
-
-void InterfaceConnection::addParent(const IRI& parent)
-{
-    parents.push_back(parent);
-    if(parents.size() >= 2)
-    {
-        std::sort(parents.begin(), parents.end());
-    }
-}
-
-bool InterfaceConnection::sameParents(const InterfaceConnection& other) const
-{
-    return other.parents == this->parents;
-}
-
-bool InterfaceConnection::useSameInterface(const InterfaceConnection& other) const
-{
-    return other.begin == this->begin || other.begin == this->end || other.end == this->begin || other.end == this->end;
-}
-
-bool InterfaceConnection::operator<(const InterfaceConnection& other) const
-{
-    if(begin < other.begin)
-    {
-        return true;
-    } else if(end < other.end)
-    {
-        return true;
-    }
-    return false;
-
-}
-
-bool InterfaceConnection::operator==(const InterfaceConnection& other) const
-{
-    return end == other.end && begin == other.begin;
-}
-
-std::string InterfaceConnection::toString() const
-{
-    //return "InterfaceConnection from: " + begin.getFragment() + " to: " + end.getFragment() + "\n        parents: " + parents[0].getFragment() + " to " + parents[1].getFragment();
-    std::stringstream ss;
-    ss << "InterfaceConnection from: " << begin.toString() << " to: " << end.toString();
-    //ss << std::endl << "        parents: " << parents[0].getFragment() << " to " << parents[1].getFragment();
-    return ss.str();
-}
-
-std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection)
-{
-    os << connection.toString();
-    return os;
-}
-
-std::string Statistics::toString() const
-{
-    std::stringstream txt;
-    txt << "Organization Model Statistics" << std::endl
-        << "    atomic actors:                   " << actorsAtomic << std::endl
-        << "    upper bound for combinations:    " << upperCombinationBound << std::endl
-        << "    number of inference epochs:      " << numberOfInferenceEpochs << std::endl
-        << "    time elapsed in s:               " << timeElapsed.toSeconds() << std::endl
-        << "    time composite system gen in s:  " << timeCompositeSystemGeneration.toSeconds() << std::endl
-        << "    time registration of comp sys:   " << timeRegisterCompositeSystems.toSeconds() << std::endl
-        << "    time for inference:              " << timeInference.toSeconds() << std::endl
-        << "    # of interfaces:                 " << interfaces.size() << std::endl
-        << "    # of allowed links for comps sys:" << maxAllowedLinks << std::endl
-        << "    # of links:                      " << links.size() << std::endl
-        << "    # of link combinations:          " << linkCombinations.size() << std::endl
-        << "    # of constraints checked:        " << constraintsChecked << std::endl
-        << "    # of known actors:               " << actorsKnown.size() << std::endl
-        << "    # of inferred actors:            " << actorsInferred.size() << std::endl
-        << "    # of composite actors pre:       " << actorsCompositePrevious.size() << std::endl
-        << "    # of composite actors post:      " << actorsCompositePost.size() << std::endl
-        << "    # of composite actor model pre:  " << actorsCompositeModelPrevious.size() << std::endl
-        << "    # of composite actor model post: " << actorsCompositeModelPost.size() << std::endl
-        << "    composite actor models post: " << actorsCompositeModelPost << std::endl;
-
-    return txt.str();
-}
-
-std::ostream& operator<<(std::ostream& os, const InterfaceConnectionList& list)
-{
-    InterfaceConnectionList::const_iterator cit = list.begin();
-    os << "[" << std::endl;
-    for(; cit != list.end(); ++cit)
-    {
-        os << *cit;
-        if(cit + 1 != list.end())
-        {
-            os << "," << std::endl;
-        }
-    }
-    os << "]";
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const InterfaceCombinationList& list)
-{
-    InterfaceCombinationList::const_iterator cit = list.begin();
-    os << "[" << std::endl;
-    uint32_t count = 0;
-    for(; cit != list.end(); ++cit)
-    {
-        os << "#" << ++count << ": " << *cit << std::endl;
-    }
-    os << "]" << std::endl;
-    return os;
-}
-
-bool Grounding::isComplete() const
-{
-    RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
-    for(; mip != mRequirementToResourceMap.end(); ++mip)
-    {
-        if(mip->second == Grounding::ungrounded())
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-IRIList Grounding::ungroundedRequirements() const
-{
-    IRIList requirements;
-    RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
-    for(; mip != mRequirementToResourceMap.end(); ++mip)
-    {
-        if(mip->second == Grounding::ungrounded())
-        {
-            requirements.push_back( mip->second );
-        }
-    }
-    return requirements;
-}
-
-std::string Grounding::toString() const
-{
-    std::stringstream ss;
-    ss << "Grounding:" << std::endl;
-
-    RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
-    for(; mip != mRequirementToResourceMap.end(); ++mip)
-    {
-        ss << "    " << mip->first  << " -> " << mip->second << std::endl;
-    }
-    return ss.str();
-}
 
 OrganizationModel::OrganizationModel(const std::string& filename)
     : mpOntology( new Ontology())
@@ -176,6 +29,9 @@ OrganizationModel::OrganizationModel(const std::string& filename)
 
 void OrganizationModel::refresh(bool performInference)
 {
+    mCompositeActorsCount = 0;
+    mCompositeActorModelsCount = 0;
+
     mCurrentStats = Statistics();
     mCurrentStats.timeElapsed = base::Time::now();
 
@@ -208,21 +64,33 @@ void OrganizationModel::refresh(bool performInference)
         for(; cit != interfaceCombinations.end(); ++cit)
         {
             IRISet actorCombination;
+            std::vector<ActorModelLink> actorModelCombination;
             InterfaceConnectionList::const_iterator iit = cit->begin();
             for(; iit != cit->end(); ++iit)
             {
                 actorCombination.insert(iit->parents.begin(), iit->parents.end());
+                actorModelCombination.push_back(iit->actorModelLink);
             }
+            std::sort(actorModelCombination.begin(), actorModelCombination.end());
+
+            std::vector< std::vector<ActorModelLink> >::const_iterator eit = std::find(mCompositeActorModels.begin(), mCompositeActorModels.end(), actorModelCombination);
+            if(eit == mCompositeActorModels.end())
+            {
+                mCompositeActorModels.push_back(actorModelCombination);
+            }
+
+
             uint32_t count = actorTypes[actorCombination] + 1;
             actorTypes[actorCombination] = count;
             IRI newActor = createNewCompositeActor(actorCombination, *cit, count);
             if(!newActor.empty())
             {
+                ++mCompositeActorsCount;
                 newActors.push_back(newActor);
             }
         }
 
-        mpOntology->refresh();
+        //mpOntology->refresh();
         LOG_INFO_S << "OrganizationModel: with inferred actors: " << newActors;
 
         mCurrentStats.actorsInferred = newActors;
@@ -233,18 +101,20 @@ void OrganizationModel::refresh(bool performInference)
 
     mCurrentStats.timeRegisterCompositeSystems = base::Time::now() - mCurrentStats.timeRegisterCompositeSystems;
 
-    IRIList atomicActors = mpOntology->allInstancesOf(OM::Actor(), true);
+    //IRIList atomicActors = mpOntology->allInstancesOf(OM::Actor(), true);
 
-    if(performInference)
-    {
-        mCurrentStats.timeInference = base::Time::now();
-        runInferenceEngine();
-        mCurrentStats.timeInference = base::Time::now() - mCurrentStats.timeInference;
-    }
+    //if(performInference)
+    //{
+    //    mCurrentStats.timeInference = base::Time::now();
+    //    runInferenceEngine();
+    //    mCurrentStats.timeInference = base::Time::now() - mCurrentStats.timeInference;
+    //}
 
     mCurrentStats.timeElapsed = base::Time::now() - mCurrentStats.timeElapsed;
-    mCurrentStats.actorsCompositePost = mpOntology->allInstancesOf(OM::CompositeActor(), true);
-    mCurrentStats.actorsCompositeModelPost = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
+    mCurrentStats.actorsCompositePost = mCompositeActorsCount;//mpOntology->allInstancesOf(OM::CompositeActor(), true);
+    //mCurrentStats.actorsCompositeModelPost = mCompositeActorModelsCount;
+    //mCurrentStats.actorsCompositeModelPost = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
+    mCurrentStats.actorsCompositeModelPost = mCompositeActorModels;
 
     mStatistics.push_back(mCurrentStats);
 }
@@ -275,7 +145,7 @@ IRI OrganizationModel::createNewCompositeActor(const IRISet& actorSet, const Int
     }
 
     try {
-        if(mpOntology->isInstanceOf(actorName, OM::CompositeActorModel()))
+        if(mpOntology->isInstanceOf(actorName, OM::CompositeActor()))
         {
             // this instance does already exist
             return IRI();
@@ -285,8 +155,18 @@ IRI OrganizationModel::createNewCompositeActor(const IRISet& actorSet, const Int
         // actor does not exist
     }
 
+
     // Create ActorModel
-    mpOntology->instanceOf(actorModelName, OM::CompositeActorModel());
+    bool newModel = false;
+    try {
+        mpOntology->instanceOf(actorModelName, OM::CompositeActorModel());
+        newModel = true;
+        ++mCompositeActorModelsCount;
+    } catch(const std::invalid_argument& e)
+    {
+        throw;
+        // model does already exist
+    }
 
     // Create Instance
     mpOntology->instanceOf(actorName, OM::CompositeActor());
@@ -315,8 +195,11 @@ IRI OrganizationModel::createNewCompositeActor(const IRISet& actorSet, const Int
             marker++;
         }
     }
-    // allow fast retrieval
-    mModelRequirementsCache[actorModelName] = allNewRequirements;
+    if(newModel)
+    {
+        // allow fast retrieval
+        mModelRequirementsCache[actorModelName] = allNewRequirements;
+    }
 
     IRIList usedInterfaces;
     {
@@ -335,7 +218,7 @@ IRI OrganizationModel::createNewCompositeActor(const IRISet& actorSet, const Int
 
 
     LOG_INFO_S << "New actor: '" << actorName << std::endl
-        << "     new actor model:    " << actorModelName << std::endl
+        << "     new actor model:    " << actorModelName << " [" << newModel << "]" << std::endl
         << "     involved actors:    " << actorSet << std::endl
         << "     requirements:       " << allNewRequirements << std::endl
         << "     used interfaces:    " << usedInterfaces;
@@ -364,9 +247,6 @@ void OrganizationModel::runInferenceEngine()
     mCapabilities = sortByDependency(mCapabilities);
 
     LOG_WARN_S << "Validate known capabilities: " << mCapabilities;
-    int count=0;
-    int max = actorModels.size();
-
     BOOST_FOREACH(const IRI& actorModel, actorModels)
     {
         BOOST_FOREACH(const IRI& capability, mCapabilities)
@@ -385,8 +265,6 @@ void OrganizationModel::runInferenceEngine()
                 addProvider(actorModel, service);
             }
         }
-
-
     }
 
     // Add provides to actors
@@ -701,6 +579,8 @@ IRI OrganizationModel::createNewRequirement(const IRI& requirement, uint32_t mar
 
 IRI OrganizationModel::createNewFromModel(const IRI& model, bool createDependants) const
 {
+
+    // Retrieve the class type this model instances have
     IRI classType = getResourceModelInstanceType(model);
 
     LOG_DEBUG_S << "CreateNewFromModel: " << std::endl
@@ -745,6 +625,9 @@ IRI OrganizationModel::createNewFromModel(const IRI& model, bool createDependant
         IRI dependant = createNewFromModel(resourceModel, true );
         mpOntology->relatedTo(newInstanceName, OM::has(), dependant);
 
+        // Add reverse mapping, so that we can indentify which dependant
+        // fulfills a given requirement (role)
+        mpOntology->relatedTo(dependant, OM::fulfills(), dependency);
         newDependants.push_back(dependant);
     }
 
@@ -770,92 +653,19 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
         throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
     }
 
-    IRI2IRIListCache actorInterfaces;
-    IRI2IRIListCache interfaces2RestrictedInterfaces;
-    BOOST_FOREACH(const IRI& actor, actors)
-    {
-        IRIList interfaces = mpOntology->allRelatedInstances(actor, OM::has(), OM::Interface());
-        actorInterfaces[actor] = interfaces;
-
-        BOOST_FOREACH(const IRI& interface, interfaces)
-        {
-            IRIList restrictedInterfaces = interfaces;
-
-            IRIList::iterator it = std::find(restrictedInterfaces.begin(), restrictedInterfaces.end(), interface);
-            restrictedInterfaces.erase(it);
-            interfaces2RestrictedInterfaces[interface] = restrictedInterfaces;
-        }
-    }
-
-    InterfaceConnectionList validConnections;
-    IRIList interfaces = mpOntology->allInstancesOf( OM::Interface(), true );
-    Combination<IRI> interfaceCombinations(interfaces, 2, EXACT);
-    do {
-
-        IRIList match = interfaceCombinations.current();
-        if(match.size() != 2)
-        {
-            throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: no two interfaces available to create connection");
-        }
-
-        IRIList parents0 = mpOntology->allInverseRelatedInstances(match[0], OM::has());
-        IRIList parents1 = mpOntology->allInverseRelatedInstances(match[1], OM::has());
-
-        if(parents0 == parents1)
-        {
-            // Reject: self connection since start/end belong to the same actor
-            continue;
-        }
-
-        if( ! checkIfCompatible( getResourceModel(match[0]), getResourceModel(match[1])) )
-        {
-            // Reject: interfaces are not compatible with each other
-            continue;
-        }
-
-        // Add connection
-        InterfaceConnection connection(match[0], match[1]);
-        connection.addParent(parents0.front());
-        connection.addParent(parents1.front());
-
-        validConnections.push_back(connection);
-    } while( interfaceCombinations.next() );
-
-    mCurrentStats.interfaces = interfaces;
-    mCurrentStats.links = validConnections;
-
-
-
-    CCF<IRI> ccf(interfaces);
-    BOOST_FOREACH(const InterfaceConnection& link, validConnections)
-    {
-        CCF<IRI>::Constraint constraint;
-        constraint.insert(link.begin);
-        constraint.insert(link.end);
-        ccf.addPositiveConstraint(constraint);
-    }
-
-    BOOST_FOREACH(const IRI& interface, interfaces)
-    {
-        IRIList restrictedLinks = interfaces2RestrictedInterfaces[interface];
-        BOOST_FOREACH(IRI restrictedLink, restrictedLinks)
-        {
-            CCF<IRI>::Constraint constraint;
-            constraint.insert(interface);
-            constraint.insert(restrictedLink);
-            ccf.addNegativeConstraint(constraint);
-        }
-    }
-
-    CCF<IRI>::Coalitions coalitions;
-    IRIList aStar = ccf.computeConstrainedCoalitions(coalitions);
-    std::cout << "Atoms: " << interfaces;
-    std::cout << "Positive constraints: " << ccf.getPositiveConstraints().toString() << std::endl;
-    std::cout << "Positive constraints #: " << ccf.getPositiveConstraints().size() << std::endl;
-    std::cout << "Negative constraints: " << ccf.getNegativeConstraints().toString() << std::endl;
-    std::cout << "Negative constraints #: " << ccf.getNegativeConstraints().size() << std::endl;
-    std::cout << "Coalitions: " << coalitions.toString() << std::endl;
-    std::cout << "AStar: " << aStar << std::endl;
+    // Foreach each ActorModel
+    // Retrieve maximum number of actors, e.g. PayloadItems = 10
+    // Do recombination up to 10 actors, e.g. by trying to replace structure
+    //
+    // So we characterise a model solely by the interface we see -- not the label it's got, e.g. 
+    // 1 male + 1 female = PayloadItem
+    // 1 male = CREX
+    // 5 male = BaseCamp
+    // 4 male + 2 female Sherpa
+    //
+    // That approach is insufficient, beacause we have to account for 'roles' of interfaces --
+    // -- best way still, abstract again from interfaces to infer model type
+    
 
     InterfaceCombinationList interfaceCombinationList;
     return interfaceCombinationList;
@@ -1059,11 +869,13 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
 
     mCurrentStats.timeCompositeSystemGeneration = base::Time::now();
     LOG_DEBUG_S << "Current comp: " << mCurrentStats.timeCompositeSystemGeneration;
+    LOG_DEBUG_S << "Current interfaces: " << interfaces;
 
     Combination<IRI> interfaceCombinations(interfaces, 2, EXACT);
     do {
 
         IRIList match = interfaceCombinations.current();
+        LOG_DEBUG_S << "MATCH: " << match[0] << " -- " << match[1];
         if(match.size() != 2)
         {
             throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: no two interfaces available to create connection");
@@ -1084,9 +896,23 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
             continue;
         }
         // Add connection
+        IRI resourceModel0 = getResourceModel(parents0.front());
+        IRI resourceModel1 = getResourceModel(parents1.front());
+
+        // Role of this interface
+        IRIList role0 = mpOntology->allRelatedInstances(match[0], OM::fulfills());
+        IRIList role1 = mpOntology->allRelatedInstances(match[1], OM::fulfills());
+
+        EndpointModel endpoint0(resourceModel0, role0[0]);
+        EndpointModel endpoint1(resourceModel1, role1[0]);
+        ActorModelLink link(endpoint0, endpoint1);
+
+
         InterfaceConnection connection(match[0], match[1]);
         connection.addParent(parents0.front());
         connection.addParent(parents1.front());
+
+        connection.setActorModelLink(link);
 
         validConnections.push_back(connection);
     } while( interfaceCombinations.next() );
@@ -1104,7 +930,17 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
     //    - each interface is only used once in a combination
     InterfaceCombinationList validCombinations;
     Combination<InterfaceConnection> connectionCombination( validConnections, maximumNumberOfConnections, MAX);
+    LOG_WARN_S << "Number of combinations: " << connectionCombination.numberOfCombinations();
+    int mcount = 0;
+    int count = 0;
     do {
+        if(count >= 1000000)
+        {
+            mcount++;
+            std::cout << mcount << " x " << count++ << std::endl;
+            count = 0;
+        }
+
         // 1. Make sure only one(!) connection exists between two systems
         // 2. Make sure each interface is used only once
         std::set<IRI> interfaces;
@@ -1230,7 +1066,7 @@ IRIList OrganizationModel::sortByDependency(const IRIList& list)
         {
             if( hasModelDependency(*it, insertItem) )
             {
-                bool inserted = true;
+                inserted = true;
                 sortedList.insert(it, insertItem);
                 break;
             }
@@ -1257,22 +1093,6 @@ bool OrganizationModel::hasModelDependency(const IRI& main, const IRI& other)
     }
 
     return false;
-}
-
-std::ostream& operator<<(std::ostream& os, const Statistics& statistics)
-{
-    os << statistics.toString();
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::vector<Statistics>& statisticsList)
-{
-    os << "StatisticsList: " << std::endl;
-    BOOST_FOREACH(const Statistics& s, statisticsList)
-    {
-        os << s;
-    }
-    return os;
 }
 
 } // end namespace owl_om

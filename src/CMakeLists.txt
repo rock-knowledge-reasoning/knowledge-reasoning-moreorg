@@ -19,6 +19,11 @@ rock_library(owl_om
         db/rdf/Sparql.cpp
         db/rdf/SparqlInterface.cpp
         db/rdf/Variable.cpp
+        organization_model/ActorModelLink.cpp
+        organization_model/EndpointModel.cpp
+        organization_model/Grounding.cpp
+        organization_model/InterfaceConnection.cpp
+        organization_model/Statistics.cpp
         owlapi/io/XMLUtils.cpp
         owlapi/model/IRI.cpp
         owlapi/model/URI.cpp
@@ -44,6 +49,11 @@ rock_library(owl_om
         db/rdf/Variable.hpp
         exporter/PDDLExporter.hpp
         metrics/Redundancy.hpp
+        organization_model/ActorModelLink.hpp
+        organization_model/EndpointModel.hpp
+        organization_model/Grounding.hpp
+        organization_model/InterfaceConnection.hpp
+        organization_model/Statistics.hpp
         owlapi/io/XMLUtils.hpp
         #owlapi/model/AnonymousIndividual.hpp
         owlapi/model/HasIRI.hpp
