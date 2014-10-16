@@ -14,9 +14,8 @@ namespace organization_model {
  */
 struct Statistics
 {
-    Statistics()
-    {
-    }
+    Statistics();
+
     uint32_t upperCombinationBound;
     uint32_t numberOfInferenceEpochs;
     base::Time timeCompositeSystemGeneration;
