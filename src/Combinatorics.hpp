@@ -1,5 +1,5 @@
-#ifndef BASE_NUMERIC_COMBINATORICS
-#define BASE_NUMERIC_COMBINATORICS
+#ifndef BASE_NUMERIC_COMBINATORICS_HPP
+#define BASE_NUMERIC_COMBINATORICS_HPP
 
 #include <algorithm>
 #include <vector>
@@ -191,12 +191,6 @@ public:
             mCurrentDraw.push_back( mItems[i]);
             b[i++] = 1;
         }
-        //std::cout << "Created start draw: " << k  << " out of " << n << std::endl;
-        //BOOST_FOREACH(T item, mCurrentDraw)
-        //{
-        //   std::cout << item << std::endl;
-        //}
-        // First draw is ready to be read!
     }
 
     bool next()
@@ -214,12 +208,6 @@ public:
                     mCurrentDraw.push_back(mItems[i]);
                 }
             }
-            //std::cout << "Created next draw: " << std::endl;;
-            //BOOST_FOREACH(T item, mCurrentDraw)
-            //{
-            //   std::cout << item << std::endl;
-            //}
-            //putchar('\n');
             return true;
         } else {
             delete[] p;
@@ -275,7 +263,9 @@ public:
         } // end switch
     }
 
-    /*twiddle.c - generate all combinations of M elements drawn without replacement
+    /*
+      The implementation uses: twiddle.c -- retrieved from http://www.netlib.no/netlib/toms/382
+      Twiddle generates all combinations of M elements drawn without replacement
       from a set of N elements.  This routine may be used in two ways:
       (0) To generate all combinations of M out of N objects, let a[0..N-1]
           contain the objects, and let c[0..M-1] initially be the combination
@@ -441,13 +431,11 @@ public:
       }
     ************************/
 
-
-
+    // end of twiddle.c
 };
 
 
 
 } // end namepsace combinatorics
 } // end namespace base
-#endif // BASE_NUMERIC_COMBINATORICS__
-
+#endif // BASE_NUMERIC_COMBINATORICS_HPP
