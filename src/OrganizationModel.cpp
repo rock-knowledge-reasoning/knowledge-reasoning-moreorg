@@ -899,14 +899,16 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
         IRI resourceModel0 = getResourceModel(parents0.front());
         IRI resourceModel1 = getResourceModel(parents1.front());
 
-        // Role of this interface
+        // Since we are working with instances to compute the connection, 
+        // we still have to compute the model for this connection, in the following
+
+        // Retrieve the role of each interface
         IRIList role0 = mpOntology->allRelatedInstances(match[0], OM::fulfills());
         IRIList role1 = mpOntology->allRelatedInstances(match[1], OM::fulfills());
 
         EndpointModel endpoint0(resourceModel0, role0[0]);
         EndpointModel endpoint1(resourceModel1, role1[0]);
         ActorModelLink link(endpoint0, endpoint1);
-
 
         InterfaceConnection connection(match[0], match[1]);
         connection.addParent(parents0.front());
@@ -930,14 +932,16 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
     //    - each interface is only used once in a combination
     InterfaceCombinationList validCombinations;
     Combination<InterfaceConnection> connectionCombination( validConnections, maximumNumberOfConnections, MAX);
-    LOG_WARN_S << "Number of combinations: " << connectionCombination.numberOfCombinations();
+
+    LOG_DEBUG_S << "Number of combinations: " << connectionCombination.numberOfCombinations();
     int mcount = 0;
     int count = 0;
     do {
+        // progress counter
         if(count >= 1000000)
         {
             mcount++;
-            std::cout << mcount << " x " << count++ << std::endl;
+            LOG_DEBUG_S << "Progress: " << mcount << " x 1.0E06" << std::endl;
             count = 0;
         }
 
@@ -948,9 +952,11 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
         size_t linkCount = 0;
         bool valid = false;
 
+        // Current combination
         InterfaceConnectionList connectionList = connectionCombination.current();
         InterfaceConnectionList::const_iterator cit = connectionList.begin();
 
+        // Iterator of the link combination == composite actor
         for(; cit != connectionList.end(); ++cit)
         {
             parents.insert(cit->parents[0]);
@@ -969,7 +975,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
 
             mCurrentStats.constraintsChecked++;
             {
-                // Check if this interface has already been used
+                // Check if this link's (*cit) first interface has already been used
                 std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->begin);
                 if(!result.second)
                 {
@@ -980,7 +986,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
 
             mCurrentStats.constraintsChecked++;
             {
-                // Check if this interface has already been used
+                // Check if this link's (*cit) second (and last) interface has already been used
                 std::pair< std::set<IRI>::iterator, bool> result = interfaces.insert(cit->end);
                 if(!result.second)
                 {
@@ -997,9 +1003,10 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
             validCombinations.push_back(connectionList);
         }
     } while( connectionCombination.next() );
+    LOG_DEBUG_S << "Connection combinations: " << mcount << "*1.0E06 + " << count << " constraints: " << mCurrentStats.constraintsChecked;
 
     mCurrentStats.linkCombinations = validCombinations;
-    LOG_DEBUG_S << "Current comp: " << mCurrentStats.timeCompositeSystemGeneration;
+    LOG_DEBUG_S << "Current comp: " << mCurrentStats.timeCompositeSystemGeneration.toSeconds();
     mCurrentStats.timeCompositeSystemGeneration = base::Time::now() - mCurrentStats.timeCompositeSystemGeneration;
 
     LOG_DEBUG_S << "Valid combinations: " << validCombinations;

@@ -116,10 +116,14 @@ public:
     IRI createNewFromModel(const IRI& model, bool createDependantResources = false) const;
 
     /**
-     * Generate a combination list based on actor interface
-     * \return List of interface combinations
+     * Generate a combination list based on actor link combination, i.e. here the 
+     * link list for combined actor is constructed
+     *
+     * \return List of interface combinations, where each interface combination represents
+     * a combined actor
      */
     organization_model::InterfaceCombinationList generateInterfaceCombinations();
+
     organization_model::InterfaceCombinationList generateInterfaceCombinationsCCF();
 
     /**
