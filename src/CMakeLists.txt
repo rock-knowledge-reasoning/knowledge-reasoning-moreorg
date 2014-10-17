@@ -84,3 +84,6 @@ target_link_libraries(owl_om ${Boost_LIBRARIES} ${ICU_LIBS})
 rock_executable(owl_om_bin Main.cpp
     DEPS owl_om)
 
+rock_executable(multiagent_caf ccf/CAF.cpp
+    DEPS owl_om)
+
