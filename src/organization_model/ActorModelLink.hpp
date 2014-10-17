@@ -6,6 +6,10 @@
 namespace owl_om {
 namespace organization_model {
 
+/**
+ * An ActorModelLink describes the combination of two actors via 
+ * a unique tuple of (electro-mechanical) interfaces
+ */
 class ActorModelLink
 {
     // Mhm, how to map from instance back to the model,
@@ -17,6 +21,9 @@ class ActorModelLink
 public:
     ActorModelLink();
 
+    /**
+     * Construct an ActorModelLink from two Endpoints
+     */
     ActorModelLink(const EndpointModel& endpoint0, const EndpointModel& endpoint1);
 
     bool operator==(const ActorModelLink& other) const;
