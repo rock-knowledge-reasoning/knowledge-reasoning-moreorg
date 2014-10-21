@@ -122,7 +122,7 @@ public:
 
     SetOfSets(const Set<T>& initial)
     {
-        insert( initial );
+        this->insert( initial );
         assert( Set< Set<T> >::size() == 1 );
     }
 
