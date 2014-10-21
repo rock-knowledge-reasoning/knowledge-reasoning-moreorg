@@ -12,5 +12,6 @@
   <depend package="external/factpp" />
   <depend package="planning/pddl_planner" />
   <depend package="uriparser" />
+  <depend package="soprano" />
   <!-- <depend package="ctemplate" /> -->
 </package>
