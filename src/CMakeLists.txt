@@ -87,3 +87,6 @@ rock_executable(owl_om_bin Main.cpp
 rock_executable(multiagent_caf ccf/CAF.cpp
     DEPS owl_om)
 
+rock_executable(limited_combinations utils/LimitedCombination.cpp
+    DEPS owl_om)
+
