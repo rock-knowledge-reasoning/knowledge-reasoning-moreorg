@@ -1,6 +1,7 @@
 #include "CAF.hpp"
 #include <set>
 #include <iostream>
+#include <math.h>
 
 void append(std::vector<char>& v, char c, size_t n)
 {
@@ -17,8 +18,8 @@ int main()
     std::vector<Actor> actors;
 
     // Lets assume we have actor and interfaces that are all compatible
-    uint8_t numberOfActorInstances = 3;
-    uint8_t numberOfActorInterfaces = 2;
+    uint8_t numberOfActorInstances = 4;
+    uint8_t numberOfActorInterfaces = 3;
 
     // Initialize actors
     for(uint8_t a = 'a'; a < 'a' + numberOfActorInstances; ++a)
@@ -118,11 +119,13 @@ int main()
     uint32_t combinationCount = 0;
     // Create valid combinations of links, i.e. valid actors ( limited to the number of actor available )
     // Pick one link per link group
-    std::cout << "Computing combinations per link count" << std::endl;
-    for(size_t linkCount = 1; linkCount < numberOfActorInstances; ++linkCount)
+    size_t maxCount = std::min((size_t) numberOfActorInstances - 1, (size_t) 10);
+    std::cout << "Computing combinations per link count up to " << maxCount << std::endl;
+    for(size_t linkCount = 1; linkCount <= maxCount; ++linkCount)
     {
         if(allCombinedActors.size() == linkCount)
         {
+            std::cout << "Combined same as linkCount" << std::endl;
             // no need to recompute combined actors for given link count
             continue;
         } else {
@@ -151,6 +154,7 @@ int main()
                     newActor.addLink(*cit);
                     combinedActors.insert(newActor);
                     combinationCount++;
+                    std::cout << newActor;
                 }
             }
             allCombinedActors.push_back(combinedActors);

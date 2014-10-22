@@ -21,6 +21,7 @@ class Interface
 {
     Actor mActor;
     LocalInterfaceId mLocalInterfaceId;
+    InterfaceId mId;
     
 public:
     Interface() {}
@@ -28,7 +29,11 @@ public:
     Interface(Actor actor, LocalInterfaceId interfaceId)
         : mActor(actor)
         , mLocalInterfaceId(interfaceId)
-    {}
+    {
+        mId = mActor;
+        mId <<=8;
+        mId += mLocalInterfaceId;
+    }
 
     Actor getActor() const { return mActor; }
     LocalInterfaceId getLocalId() const { return mLocalInterfaceId; } 
@@ -51,12 +56,7 @@ public:
         return mActor == other.mActor && mLocalInterfaceId == other.mLocalInterfaceId;
     }
 
-    InterfaceId getId() const
-    {
-        InterfaceId id = mActor;
-        id <<=8;
-        return id + mLocalInterfaceId;
-    }
+    InterfaceId getId() const { return mId; }
 };
 
 std::ostream& operator<<(std::ostream& os, const Interface& i)
@@ -70,6 +70,8 @@ class LinkGroup
 {
     Actor mFirstActor;
     Actor mSecondActor;
+
+    LinkGroupId mId;
 
 public:
     LinkGroup() {}
@@ -86,15 +88,23 @@ public:
             mFirstActor = actor1;
             mSecondActor = actor0;
         }
+
+        mId = mFirstActor;
+        mId <<= 8; 
+        mId += mSecondActor;
     }
 
-    LinkGroupId getId() const 
-    { 
-        LinkGroupId id = mFirstActor;
-        id <<= 8; 
-        return id + mSecondActor;
-    }
+    LinkGroupId getId() const { return mId; }
 };
+
+std::string stringifyLinkGroupId(const LinkGroupId& id)
+{
+    std::stringstream ss;
+    uint8_t secondActor = id & 0xFF;
+    uint8_t firstActor = (id >> 8) & 0xFF;
+    ss << firstActor << ":" << secondActor;
+    return ss.str();
+}
 
 class Link
 {
@@ -156,8 +166,24 @@ std::ostream& operator<<(std::ostream& os, const Link& link)
     return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const std::vector<Link>& links)
+{
+    BOOST_FOREACH(const Link& link, links)
+    {
+        os << link;
+        os << ",";
+    }
+    return os;
+}
+
+
+
 class CombinedActor
 {
+
+    friend std::ostream& operator<<(std::ostream& os, const CombinedActor& actor);
+
+protected:
     std::set<Link> mLinks;
 
     typedef std::map<LinkGroupId, std::set<Link> > LinkGroupMap;
@@ -206,6 +232,8 @@ public:
                 whitelistLinks.insert(whitelistLinks.begin(), linkSet.begin(), linkSet.end());
             }
         }
+        std::sort(whitelistLinks.begin(), whitelistLinks.end());
+
         std::vector<Link> blacklistLinks;
         {
             std::set<Interface>::const_iterator cit = mBlackListInterface.begin();
@@ -215,12 +243,17 @@ public:
                 blacklistLinks.insert(blacklistLinks.begin(), linkSet.begin(), linkSet.end());
             }
         }
+        std::sort(blacklistLinks.begin(), blacklistLinks.end());
 
         std::vector<Link> result(whitelistLinks.size());
         std::vector<Link>::iterator it;
         it = std::set_difference(whitelistLinks.begin(), whitelistLinks.end(), blacklistLinks.begin(), blacklistLinks.end(), result.begin());
         result.resize(it - result.begin());
         LOG_DEBUG_S << (base::Time::now() - start).toSeconds();
+        //std::cout << "GetWhiteLinks" << std::endl;
+        //std::cout << "    white: " << whitelistLinks << std::endl;
+        //std::cout << "    black: " << blacklistLinks << std::endl;
+        //std::cout << "    diff: " << result << std::endl;
         return result;
 
 //        LOG_DEBUG_S << "a: " << (base::Time::now() - start).toSeconds() << " size: " << mWhiteListLinkGroup.size();
@@ -349,16 +382,59 @@ public:
     std::set<Link> getLinks() const { return mLinks; } 
 };
 
+
 std::ostream& operator<<(std::ostream& os, const CombinedActor& actor)
 {
     std::set<Link> links = actor.getLinks();
-    os << "[";
+    os << "Links: [";
     BOOST_FOREACH(const Link& link, links)
     {
         os << link;
         os << ",";
     }
-    os << "]";
+    os << "]" << std::endl;
+    os << "     Constraints: " << std::endl;
+    os << "         link group:" << std::endl;
+    os << "             blacklist: [";
+    BOOST_FOREACH(const LinkGroupId& id, actor.mBlackListLinkGroup)
+    {
+        os << stringifyLinkGroupId(id);
+        os << ",";
+    }
+    os << "]" << std::endl;
+    os << "             whitelist: [";
+    BOOST_FOREACH(const LinkGroupId& id, actor.mWhiteListLinkGroup)
+    {
+        os << stringifyLinkGroupId(id);
+        os << ",";
+    }
+    os << "]" << std::endl;
+
+    os << "         interface:" << std::endl;
+    os << "             blacklist: [";
+    BOOST_FOREACH(const Interface& interface, actor.mBlackListInterface)
+    {
+        os << interface;
+        os << ",";
+    }
+    os << "]" << std::endl;
+    os << "             whitelist: [";
+    BOOST_FOREACH(const Interface& interface, actor.mWhiteListInterface)
+    {
+        os << interface;
+        os << ",";
+    }
+    os << "]" << std::endl;
+
+    std::vector<Link> whitelistLinks = actor.getWhitelistLinks();
+    os << "    Whitelist links: [";
+    BOOST_FOREACH(const Link& link, whitelistLinks)
+    {
+        os << link;
+        os << ",";
+    }
+    os << "]" << std::endl;
+
     return os;
 }
 
