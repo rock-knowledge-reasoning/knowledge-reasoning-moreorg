@@ -14,6 +14,12 @@ rock_library(owl_om
         KnowledgeBase.cpp
         OrganizationModel.cpp
         Ontology.cpp
+        ccf/Actor.cpp
+        ccf/CombinedActor.cpp
+        ccf/Interface.cpp
+        ccf/Link.cpp
+        ccf/Scenario.cpp
+        ccf/LinkGroup.cpp
         db/FileBackend.cpp
         db/rdf/SopranoDB.cpp
         db/rdf/Sparql.cpp
@@ -41,7 +47,12 @@ rock_library(owl_om
         vocabularies/OWL.hpp
         vocabularies/RDF.hpp
         vocabularies/RDFS.hpp
-        ccf/CCF.hpp
+        ccf/Actor.hpp
+        ccf/CombinedActor.hpp
+        ccf/Interface.hpp
+        ccf/Link.hpp
+        ccf/LinkGroup.hpp
+        ccf/Scenario.hpp
         db/FileBackend.hpp
         db/rdf/SopranoDB.hpp
         db/rdf/Sparql.hpp
@@ -85,6 +96,9 @@ rock_executable(owl_om_bin Main.cpp
     DEPS owl_om)
 
 rock_executable(multiagent_caf ccf/CAF.cpp
+    DEPS owl_om)
+
+rock_executable(multiagent_scenario_analysis utils/ScenarioAnalysis.cpp
     DEPS owl_om)
 
 rock_executable(limited_combinations utils/LimitedCombination.cpp

@@ -5,7 +5,6 @@
 #include <vector>
 #include <map>
 #include <owl_om/ccf/Link.hpp>
-#include <owl_om/ccf/LinkGroup.hpp>
 
 namespace multiagent {
 namespace ccf {

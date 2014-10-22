@@ -10,6 +10,11 @@ void append(std::vector<char>& v, char c, size_t n)
         }
 }
 
+// Compute the 'simple' number of combination or a set of types with limited occurrence per type, vs.
+// the occurrence of up to a given number for all types (which is the standard formula using the 
+// binomialcoefficent of
+// |n + k -1 |
+// | k       |
 int main()
 {
     size_t numberOfTypes;
