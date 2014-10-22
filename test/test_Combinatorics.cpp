@@ -139,8 +139,51 @@ BOOST_AUTO_TEST_CASE(it_should_generate_combinations_iri)
             BOOST_REQUIRE_MESSAGE( count == combination.numberOfCombinations(), "Number of expected combinations: " << combination.numberOfCombinations() << " vs. actual " << count );
         }
     }
+}
 
-    
+BOOST_AUTO_TEST_CASE(it_should_generate_combinations)
+{
+    {
+        std::vector<char> input;
+        char currentType = 'a';
 
+        for(; currentType <= 'a' + 5; ++currentType)
+        {
+            input.push_back(currentType);
+        }
+
+        Combination<char> combination(input, 2, EXACT);
+        int count = 0;
+        do
+        {
+            std::vector<char> current = combination.current();
+            std::string currentCombination(current.begin(), current.end());
+            BOOST_TEST_MESSAGE("Current combination is: " << currentCombination);
+            count++;
+        } while(combination.next());
+
+        BOOST_REQUIRE_MESSAGE(count == combination.numberOfCombinations(), "Expected number of combination is " << combination.numberOfCombinations() << " but received: " << count);
+    }
+    {
+        std::vector<char> input;
+        char currentType = 'a';
+
+        for(; currentType <= 'a' + 10; ++currentType)
+        {
+            input.push_back(currentType);
+        }
+
+        Combination<char> combination(input, 2, EXACT);
+        int count = 0;
+        do
+        {
+            std::vector<char> current = combination.current();
+            std::string currentCombination(current.begin(), current.end());
+            BOOST_TEST_MESSAGE("Current combination is: " << currentCombination);
+            count++;
+        } while(combination.next());
+
+        BOOST_REQUIRE_MESSAGE(count == combination.numberOfCombinations(), "Expected number of combination is " << combination.numberOfCombinations() << " but received: " << count);
+    }
 
 }

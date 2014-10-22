@@ -13,39 +13,82 @@
 namespace multiagent {
 namespace caf {
 
-typedef uint8_t Actor;
+typedef uint8_t ActorType;
+typedef uint8_t LocalActorId;
+typedef uint16_t ActorId;
+
+typedef uint8_t InterfaceType;
 typedef uint8_t LocalInterfaceId;
-typedef uint16_t InterfaceId;
+typedef uint32_t InterfaceId;
+
+class Actor
+{
+    ActorType mType;
+    LocalActorId mLocalId;
+
+public:
+    Actor() {}
+
+    Actor(ActorType type, LocalActorId id)
+        : mType(type)
+        , mLocalId(id)
+    {}
+
+    bool operator<(const Actor& other) const
+    {
+        if(mType < other.mType)
+        {
+            return true;
+        } else if(mType == other.mType)
+        {
+            return mLocalId < other.mLocalId;
+        } else {
+            return false;
+        }
+    }
+
+    bool operator==(const Actor& other) const
+    {
+        return mType == other.mType && mLocalId == other.mLocalId;
+    }
+
+    ActorType getType() const { return mType; }
+    LocalActorId getLocalId() const { return mLocalId; }
+};
+
+std::ostream& operator<<(std::ostream& os, const Actor& a)
+{
+    os << a.getType() << (char) (a.getLocalId() + 48);
+    return os;
+}
 
 class Interface
 {
     Actor mActor;
-    LocalInterfaceId mLocalInterfaceId;
-    InterfaceId mId;
+    LocalInterfaceId mLocalId;
+    InterfaceType mType;
     
 public:
     Interface() {}
 
-    Interface(Actor actor, LocalInterfaceId interfaceId)
+    Interface(Actor actor, LocalInterfaceId interfaceId, InterfaceType type)
         : mActor(actor)
-        , mLocalInterfaceId(interfaceId)
-    {
-        mId = mActor;
-        mId <<=8;
-        mId += mLocalInterfaceId;
-    }
+        , mLocalId(interfaceId)
+        , mType(type)
+    {}
 
     Actor getActor() const { return mActor; }
-    LocalInterfaceId getLocalId() const { return mLocalInterfaceId; } 
+    LocalInterfaceId getLocalId() const { return mLocalId; } 
+    InterfaceType getType() const { return mType; }
 
     bool operator<(const Interface& other) const
     {
-        if(other.mActor < mActor)
+        if(mActor < other.mActor)
         {
             return true;
-        } else if(other.mActor == mActor)
+        } else if(mActor == other.mActor)
         {
-            return other.mLocalInterfaceId < mLocalInterfaceId;
+            return mLocalId < other.mLocalId;
         } else {
             return false;
         }
@@ -53,25 +96,21 @@ public:
 
     bool operator==(const Interface& other) const
     {
-        return mActor == other.mActor && mLocalInterfaceId == other.mLocalInterfaceId;
+        return mActor == other.mActor && mLocalId == other.mLocalId;
     }
 
-    InterfaceId getId() const { return mId; }
 };
 
 std::ostream& operator<<(std::ostream& os, const Interface& i)
 {
-    os << i.getActor() << ":" << (char) (i.getLocalId() + 48);
+    os << i.getActor() << ":" << (char) (i.getLocalId() + 48) << "[" << (char) (i.getType()) << "]";
     return os;
 }
 
-typedef uint16_t LinkGroupId;
 class LinkGroup
 {
     Actor mFirstActor;
     Actor mSecondActor;
-
-    LinkGroupId mId;
 
 public:
     LinkGroup() {}
@@ -88,22 +127,33 @@ public:
             mFirstActor = actor1;
             mSecondActor = actor0;
         }
-
-        mId = mFirstActor;
-        mId <<= 8; 
-        mId += mSecondActor;
     }
 
-    LinkGroupId getId() const { return mId; }
+    bool operator<(const LinkGroup& other) const
+    {
+        if(mFirstActor < other.mFirstActor)
+        {
+            return true;
+        } else if(mFirstActor == other.mFirstActor)
+        {
+            return mSecondActor < other.mSecondActor;
+        } else {
+            return false;
+        }
+    }
+    bool operator==(const LinkGroup& other) const
+    {
+        return mFirstActor == other.mFirstActor && mSecondActor == other.mSecondActor;
+    }
+
+    Actor getFirstActor() const { return mFirstActor; }
+    Actor getSecondActor() const { return mSecondActor; }
 };
 
-std::string stringifyLinkGroupId(const LinkGroupId& id)
+std::ostream& operator<<(std::ostream& os, const LinkGroup& linkGroup)
 {
-    std::stringstream ss;
-    uint8_t secondActor = id & 0xFF;
-    uint8_t firstActor = (id >> 8) & 0xFF;
-    ss << firstActor << ":" << secondActor;
-    return ss.str();
+    os << linkGroup.getFirstActor() << "--" << linkGroup.getSecondActor();
+    return os;
 }
 
 class Link
@@ -134,10 +184,9 @@ public:
     Interface getFirstInterface() const { return mFirst; }
     Interface getSecondInterface() const  { return mSecond; }
 
-    LinkGroupId getLinkGroupId() const 
+    LinkGroup getLinkGroup() const 
     {    
-        LinkGroup linkGroup(mFirst.getActor(), mSecond.getActor());
-        return linkGroup.getId();
+        return LinkGroup(mFirst.getActor(), mSecond.getActor());
     }
 
     bool operator<(const Link& other) const
@@ -147,12 +196,7 @@ public:
             return true;
         } else if(other.mFirst == mFirst)
         {
-            if(other.mSecond == mSecond)
-            {
-                return false;
-            } else {
-                return other.mSecond < mSecond;
-            }
+            return other.mSecond < mSecond;
         } else {
             return false;
         }
@@ -186,13 +230,13 @@ class CombinedActor
 protected:
     std::set<Link> mLinks;
 
-    typedef std::map<LinkGroupId, std::set<Link> > LinkGroupMap;
+    typedef std::map<LinkGroup, std::set<Link> > LinkGroupMap;
     LinkGroupMap* mLinkGroupMap;
-    typedef std::map<InterfaceId, std::set<Link> > InterfaceLinkMap;
+    typedef std::map<Interface, std::set<Link> > InterfaceLinkMap;
     InterfaceLinkMap* mInterfaceLinkMap;
 
-    std::set<LinkGroupId> mBlackListLinkGroup;
-    std::set<LinkGroupId> mWhiteListLinkGroup;
+    std::set<LinkGroup> mBlackListLinkGroup;
+    std::set<LinkGroup> mWhiteListLinkGroup;
 
     std::set<Interface> mBlackListInterface;
     std::set<Interface> mWhiteListInterface;
@@ -200,7 +244,7 @@ protected:
 public:
     CombinedActor();
 
-    CombinedActor(const Link& link, const std::set<LinkGroupId>& linkGroups, LinkGroupMap* linkGroupMap, InterfaceLinkMap* interfaceLinkMap)
+    CombinedActor(const Link& link, const std::set<LinkGroup>& linkGroups, LinkGroupMap* linkGroupMap, InterfaceLinkMap* interfaceLinkMap)
         : mLinks()
         , mWhiteListLinkGroup(linkGroups)
         , mLinkGroupMap(linkGroupMap)
@@ -211,7 +255,12 @@ public:
 
     void addLink(const Link& link)
     {
-        mLinks.insert(link);
+        std::pair< std::set<Link>::const_iterator, bool> result = mLinks.insert(link);
+        if(!result.second)
+        {
+            throw std::runtime_error("Link already exists");
+        }
+
         blacklist(link);
     }
 
@@ -220,158 +269,82 @@ public:
         return mLinks < other.mLinks;
     }
 
-    std::vector<Link> getWhitelistLinks() const
+    /**
+     * Return a set of probably valid links -- does not remove the blacklist here, but
+     * when trying to add the link
+     */
+    std::set<Link> getWhitelistLinks() const
     {
-        std::vector<Link> whitelistLinks;
+        std::set<Link> whitelistLinks;
         base::Time start = base::Time::now();
         {
-            std::set<LinkGroupId>::const_iterator cit = mWhiteListLinkGroup.begin();
+            std::set<LinkGroup>::const_iterator cit = mWhiteListLinkGroup.begin();
             for(; cit != mWhiteListLinkGroup.end(); ++cit)
             {
                 const std::set<Link>& linkSet = (*mLinkGroupMap)[*cit];
-                whitelistLinks.insert(whitelistLinks.begin(), linkSet.begin(), linkSet.end());
+                std::set<Link>::const_iterator linkSetIt = linkSet.begin();
+                for(; linkSetIt != linkSet.end(); ++linkSetIt)
+                {
+                    whitelistLinks.insert(*linkSetIt);
+                }
             }
         }
-        std::sort(whitelistLinks.begin(), whitelistLinks.end());
-
-        std::vector<Link> blacklistLinks;
-        {
-            std::set<Interface>::const_iterator cit = mBlackListInterface.begin();
-            for(; cit != mBlackListInterface.end(); ++cit)
-            {
-                const std::set<Link>& linkSet = (*mInterfaceLinkMap)[cit->getId()];
-                blacklistLinks.insert(blacklistLinks.begin(), linkSet.begin(), linkSet.end());
-            }
-        }
-        std::sort(blacklistLinks.begin(), blacklistLinks.end());
-
-        std::vector<Link> result(whitelistLinks.size());
-        std::vector<Link>::iterator it;
-        it = std::set_difference(whitelistLinks.begin(), whitelistLinks.end(), blacklistLinks.begin(), blacklistLinks.end(), result.begin());
-        result.resize(it - result.begin());
-        LOG_DEBUG_S << (base::Time::now() - start).toSeconds();
-        //std::cout << "GetWhiteLinks" << std::endl;
-        //std::cout << "    white: " << whitelistLinks << std::endl;
-        //std::cout << "    black: " << blacklistLinks << std::endl;
-        //std::cout << "    diff: " << result << std::endl;
-        return result;
-
-//        LOG_DEBUG_S << "a: " << (base::Time::now() - start).toSeconds() << " size: " << mWhiteListLinkGroup.size();
-//        whitelistLinks.clear();
-//
-//        BOOST_FOREACH(const LinkGroupId& id, mWhiteListLinkGroup)
-//        {
-//            const std::set<Link>& linkSet = (*mLinkGroupMap)[id];
-//            whitelistLinks.insert(whitelistLinks.begin(), linkSet.begin(), linkSet.end());
-//        }
-//        LOG_DEBUG_S << "a: " << (base::Time::now() - start).toSeconds() << " size: " << mWhiteListLinkGroup.size();
-//
-//
-//        std::vector<Link> blacklistLinks;
-//        BOOST_FOREACH(const Interface& interface, mBlackListInterface)
-//        {
-//            const std::set<Link>& linkSet = (*mInterfaceLinkMap)[interface.getId()];
-//            blacklistLinks.insert(blacklistLinks.begin(), linkSet.begin(), linkSet.end());
-//        }
-//        LOG_DEBUG_S << "b: " << (base::Time::now() - start).toSeconds() << " size: " << mBlackListLinkGroup.size();
-//
-//        std::vector<Link> result(whitelistLinks.size());
-//        std::vector<Link>::iterator it;
-//        it = std::set_difference(whitelistLinks.begin(), whitelistLinks.end(), blacklistLinks.begin(), blacklistLinks.end(), result.begin());
-//        result.resize(it - result.begin());
-//        LOG_DEBUG_S << "c: " << (base::Time::now() - start).toSeconds();
-//
-//        //LOG_DEBUG("Difference");
-//        //BOOST_FOREACH(Link link, result)
-//        //{
-//        //    LOG_DEBUG_S << link;
-//        //}
-//        LOG_DEBUG_S << (base::Time::now() - start).toSeconds();
-//        return result;
-
-        //// Backlist all interfaces that are of the same interface groups
-        //std::vector<Link> blacklistLinks;
-        //BOOST_FOREACH(const Link& link, mLinks)
-        //{
-        //    {
-        //        std::map<InterfaceId, std::set<Link> >::const_iterator cit = interfaceLinkMap.find(link.getFirstInterface().getId());
-        //        assert( cit != interfaceLinkMap.end());
-        //        const std::set<Link>& interfaceGroupLinks = cit->second;
-        //        blacklistLinks.insert(blacklistLinks.end(), interfaceGroupLinks.begin(), interfaceGroupLinks.end());
-        //    }
-        //    {
-        //        std::map<InterfaceId, std::set<Link> >::const_iterator cit = interfaceLinkMap.find(link.getSecondInterface().getId());
-        //        assert( cit != interfaceLinkMap.end());
-        //        const std::set<Link>& interfaceGroupLinks = cit->second;
-        //        blacklistLinks.insert(blacklistLinks.end(), interfaceGroupLinks.begin(), interfaceGroupLinks.end());
-        //    }
-        //}
-        //std::sort(blacklistLinks.begin(), blacklistLinks.end());
-        ////LOG_DEBUG("Blacklist: %d", blacklistLinks.size());
-
-        //// Get the whitelist based on the linkgroups
-        //std::vector<Link> whitelistLinks;
-        //std::map<LinkGroupId, std::set<Link> >::const_iterator lit = linkGroupMap.begin();
-
-        //for(; lit != linkGroupMap.end(); ++lit)
-        //{
-        //    std::set<Link> linkGroupLinks = lit->second;
-        //    whitelistLinks.insert(whitelistLinks.end(), linkGroupLinks.begin(), linkGroupLinks.end());
-        //}
         //std::sort(whitelistLinks.begin(), whitelistLinks.end());
-        ////LOG_DEBUG("Whitelist: %d", whitelistLinks.size());
+        return whitelistLinks;
 
-        //// The difference of two sets is formed by the elements that are present in the first set, but not in the second one. The elements copied by the function come always from the first range, in the same order.
-        //std::vector<Link> result(whitelistLinks.size());
-        //if(whitelistLinks.empty())
-        //{
-        //    return result;
-        //} else if(blacklistLinks.empty())
-        //{
-        //    return whitelistLinks;
-        //} else {
-        //    //LOG_DEBUG("Compute Difference");
-        //    //LOG_DEBUG("Whitelist");
-        //    //BOOST_FOREACH(Link link, whitelistLinks)
-        //    //{
-        //    //    LOG_DEBUG_S << link;
-        //    //}
-        //    //LOG_DEBUG("Blacklist");
-        //    //BOOST_FOREACH(Link link, blacklistLinks)
-        //    //{
-        //    //    LOG_DEBUG_S << link;
-        //    //}
+    //    std::vector<Link> blacklistLinks;
+    //    {
+    //        std::set<Interface>::const_iterator cit = mBlackListInterface.begin();
+    //        for(; cit != mBlackListInterface.end(); ++cit)
+    //        {
+    //            const std::set<Link>& linkSet = (*mInterfaceLinkMap)[cit->getId()];
+    //            blacklistLinks.insert(blacklistLinks.begin(), linkSet.begin(), linkSet.end());
+    //        }
+    //    }
+    //    std::sort(blacklistLinks.begin(), blacklistLinks.end());
 
-        //    std::vector<Link>::iterator it;
-        //    it = std::set_difference(whitelistLinks.begin(), whitelistLinks.end(), blacklistLinks.begin(), blacklistLinks.end(), result.begin());
-        //    result.resize(it - result.begin());
-        //    //LOG_DEBUG("Difference");
-        //    //BOOST_FOREACH(Link link, result)
-        //    //{
-        //    //    LOG_DEBUG_S << link;
-        //    //}
-        //    return result;
-        //}
+    //    std::vector<Link> result(whitelistLinks.size());
+    //    std::vector<Link>::iterator it;
+    //    it = std::set_difference(whitelistLinks.begin(), whitelistLinks.end(), blacklistLinks.begin(), blacklistLinks.end(), result.begin());
+    //    result.resize(it - result.begin());
+    //    LOG_DEBUG_S << (base::Time::now() - start).toSeconds();
+    //    //std::cout << "GetWhiteLinks" << std::endl;
+    //    //std::cout << "    white: " << whitelistLinks << std::endl;
+    //    //std::cout << "    black: " << blacklistLinks << std::endl;
+    //    //std::cout << "    diff: " << result << std::endl;
+    //    return result;
     }
 
     void blacklist(const Link& link)
     {
         {
-            LinkGroupId id = link.getLinkGroupId();
+            LinkGroup group = link.getLinkGroup();
 
             // Actors / LinkGroup
-            mBlackListLinkGroup.insert(id);
-            mWhiteListLinkGroup.erase(id);
+            mBlackListLinkGroup.insert(group);
+            mWhiteListLinkGroup.erase(group);
 
             // Interfaces
-            mBlackListInterface.insert(link.getFirstInterface());
-            mBlackListInterface.insert(link.getSecondInterface());
+            {
+                std::pair< std::set<Interface>::const_iterator, bool> result = mBlackListInterface.insert(link.getFirstInterface());
+                if(!result.second)
+                {
+                    throw std::runtime_error("Link invalid: first interface already blacklisted");
+                }
+            }
+            {
+                std::pair< std::set<Interface>::const_iterator, bool> result = mBlackListInterface.insert(link.getSecondInterface());
+                if(!result.second)
+                {
+                    throw std::runtime_error("Link invalid: second interface already blacklisted");
+                }
+            }
             mWhiteListInterface.erase(link.getFirstInterface());
             mWhiteListInterface.erase(link.getSecondInterface());
         }
     }
 
-    std::set<LinkGroupId> getWhiteListLinkGroup() const { return mWhiteListLinkGroup; }
+    std::set<LinkGroup> getWhiteListLinkGroup() const { return mWhiteListLinkGroup; }
 
 
 
@@ -396,16 +369,16 @@ std::ostream& operator<<(std::ostream& os, const CombinedActor& actor)
     os << "     Constraints: " << std::endl;
     os << "         link group:" << std::endl;
     os << "             blacklist: [";
-    BOOST_FOREACH(const LinkGroupId& id, actor.mBlackListLinkGroup)
+    BOOST_FOREACH(const LinkGroup& group, actor.mBlackListLinkGroup)
     {
-        os << stringifyLinkGroupId(id);
+        os << group;
         os << ",";
     }
     os << "]" << std::endl;
     os << "             whitelist: [";
-    BOOST_FOREACH(const LinkGroupId& id, actor.mWhiteListLinkGroup)
+    BOOST_FOREACH(const LinkGroup& group, actor.mWhiteListLinkGroup)
     {
-        os << stringifyLinkGroupId(id);
+        os << group;
         os << ",";
     }
     os << "]" << std::endl;
@@ -426,7 +399,7 @@ std::ostream& operator<<(std::ostream& os, const CombinedActor& actor)
     }
     os << "]" << std::endl;
 
-    std::vector<Link> whitelistLinks = actor.getWhitelistLinks();
+    std::set<Link> whitelistLinks = actor.getWhitelistLinks();
     os << "    Whitelist links: [";
     BOOST_FOREACH(const Link& link, whitelistLinks)
     {
