@@ -18,9 +18,14 @@ Link::Link(Interface first, Interface second)
     }
 } 
 
-LinkGroup Link::getLinkGroup() const 
+LinkGroup Link::getGroup() const 
 {    
     return LinkGroup(mFirst.getActor(), mSecond.getActor());
+}
+
+LinkType Link::getType() const
+{
+    return LinkType(mFirst.getType(), mSecond.getType());
 }
 
 bool Link::operator<(const Link& other) const

@@ -5,20 +5,24 @@
 #include <base/Time.hpp>
 #include <base/Logging.hpp>
 #include "CombinedActor.hpp"
+#include "Scenario.hpp"
 
 using namespace multiagent::ccf;
 
 int main()
 {
-    // Required input parameters
-    std::vector<Link> validLinks;
-    // All links that connect the same actors
-    std::map<LinkGroup, std::set<Link> > linkGroupMap;
-    std::set<LinkGroup> availableLinkGroups;
-    std::map<Actor, std::set<Link> > actorLinkMap;
-    std::map<Interface, std::set<Link> > interfaceLinkMap;
+    Scenario scenario = Scenario::fromConsole();
 
-    uint8_t numberOfActorInstances;
+    // Required input parameters
+    std::vector<Link> validLinks = scenario.getValidLinks();
+
+    // All links that connect the same actors
+    std::map<LinkGroup, std::set<Link> > linkGroupMap = scenario.getLinkGroupMap();
+    std::set<LinkGroup> availableLinkGroups = scenario.getAvailableLinkGroups();
+    std::map<Actor, std::set<Link> > actorLinkMap = scenario.getActorLinkMap();
+    std::map<Interface, std::set<Link> > interfaceLinkMap = scenario.getInterfaceLinkMap();
+
+    uint8_t numberOfActorInstances = scenario.getNumberOfActors();
     // End required input parameters
 
     // Create seed, i.e. initialize combined actors for link count 0

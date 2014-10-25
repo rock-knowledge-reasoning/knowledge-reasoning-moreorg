@@ -1,13 +1,15 @@
 #include "Scenario.hpp"
 #include <owl_om/Combinatorics.hpp>
 
+using namespace base::combinatorics;
+
 namespace multiagent {
 namespace ccf {
 
 Scenario::Scenario()
 {
-    mInterfaceTypes.push_back('m');
-    mInterfaceTypes.push_back('f');
+    mInterfaceCompatibilityTypes.push_back('m');
+    mInterfaceCompatibilityTypes.push_back('f');
 }
 
 
@@ -22,7 +24,7 @@ Scenario Scenario::fromConsole()
     char currentActorType = 'a';
     std::cout << "Please provide information about the actor types: " << std::endl;
 
-    for(int i = 0; i < numberOfActorTypes; ++i)
+    for(size_t i = 0; i < numberOfActorTypes; ++i)
     { 
         std::cout << "The available number of items per type:" << std::endl;
 
@@ -71,16 +73,16 @@ void Scenario::compute()
         LocalInterfaceId localInterfaceId = 0;
 
         // Add interfaces per actor
-        std::vector<InterfaceType>::const_iterator iit = mInterfaceTypes.begin();
-        for(; iit != mInterfaceTypes.end(); ++iit)
+        std::vector<CompatibilityType>::const_iterator iit = mInterfaceCompatibilityTypes.begin();
+        for(; iit != mInterfaceCompatibilityTypes.end(); ++iit)
         {
             // Initialize interfaces
-            InterfaceType interfaceType = *iit;
+            CompatibilityType interfaceType = *iit;
             for(uint8_t i = 0; i < actorDescription.getInterfaceCount(interfaceType); ++i)
             {
                 Interface interface(actor,localInterfaceId++, *iit);
                 mInterfaces.push_back(interface);
-                std::cout << "Add interface: " << interface << std::endl;
+                LOG_DEBUG_S << "Add interface: " << interface << std::endl;
             }
         }
     }
@@ -96,9 +98,10 @@ void Scenario::createLinks()
     do {
         std::vector<Interface> interfaceCombination = combinations.current();
         Link link(interfaceCombination[0], interfaceCombination[1] );
-        if(interfaceCombination[0].getType() == interfaceCombination[1].getType())
+        if(interfaceCombination[0].getCompatibilityType() == interfaceCombination[1].getCompatibilityType())
         {
             mInvalidLinks.push_back(link);
+            mInvalidLinkTypes.insert(link.getType());
         } else {
             links.push_back( link );
         }
@@ -110,13 +113,15 @@ void Scenario::createLinks()
         if(link.getFirstActor() == link.getSecondActor())
         {
             mInvalidLinks.push_back(link);
+            mInvalidLinkTypes.insert(link.getType());
             continue;
         }
         mValidLinks.push_back(link);
+        mValidLinkTypes[link.getType()]++;
 
         // Create link groups
-        mLinkGroupMap[link.getLinkGroup()].insert(link);
-        mAvailableLinkGroups.insert(link.getLinkGroup());
+        mLinkGroupMap[link.getGroup()].insert(link);
+        mAvailableLinkGroups.insert(link.getGroup());
 
         // Create interface mapping
         mInterfaceLinkMap[link.getFirstInterface()].insert(link);
@@ -128,12 +133,30 @@ void Scenario::createLinks()
     }   
 }
 
+void Scenario::createCompositeActorTypes()
+{
+    std::vector<LinkType> validLinkTypes;
+    Combination<LinkType> linkCombinations(validLinkTypes, mActors.size()-1, MAX);
+    do
+    {
+        //
+    } while(linkCombinations.next());
+}
+
 std::ostream& operator<<(std::ostream& os, const Scenario& scenario)
 {
-    os << "# actors:           " << scenario.mActors.size() << std::endl;
-    os << "# interfaces:       " << scenario.mInterfaces.size() << std::endl;
-    os << "# valid links:      " << scenario.mValidLinks.size() << std::endl;
-    os << "# invalid links:    " << scenario.mInvalidLinks.size() << std::endl;
+    os << "# actors:             " << scenario.mActors.size() << std::endl;
+    os << "# interfaces:         " << scenario.mInterfaces.size() << std::endl;
+    os << "# valid links:        " << scenario.mValidLinks.size() << std::endl;
+    os << "# invalid links:      " << scenario.mInvalidLinks.size() << std::endl;
+    os << "# valid link types:   " << scenario.mValidLinkTypes.size() << std::endl;
+
+    std::map<LinkType, size_t>::const_iterator cit = scenario.mValidLinkTypes.begin();
+    for(; cit != scenario.mValidLinkTypes.end(); ++cit)
+    {
+        os << "    " << cit->first << " -- " << cit->second << std::endl;
+    }
+    os << "# invalid link types: " << scenario.mInvalidLinkTypes.size() << std::endl;
     return os;
 }
 

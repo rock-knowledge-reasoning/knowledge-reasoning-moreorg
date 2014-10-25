@@ -84,7 +84,7 @@ std::set<Link> CombinedActor::getWhitelistLinks() const
 void CombinedActor::blacklist(const Link& link)
 {
     {
-        LinkGroup group = link.getLinkGroup();
+        LinkGroup group = link.getGroup();
 
         // Actors / LinkGroup
         mBlackListLinkGroup.insert(group);

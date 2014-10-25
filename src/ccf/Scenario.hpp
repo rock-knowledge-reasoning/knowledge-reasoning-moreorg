@@ -11,10 +11,10 @@ namespace ccf {
 
 class ActorDescription
 {
-    std::map<InterfaceType,size_t> mInterfaceCount;
+    std::map<CompatibilityType,size_t> mInterfaceCount;
 public:
-    void setInterfaceCount(InterfaceType type, size_t count) { mInterfaceCount[type] = count; }
-    size_t getInterfaceCount(InterfaceType type) { return mInterfaceCount[type]; }
+    void setInterfaceCount(CompatibilityType type, size_t count) { mInterfaceCount[type] = count; }
+    size_t getInterfaceCount(CompatibilityType type) { return mInterfaceCount[type]; }
 };
 
 class Scenario
@@ -22,14 +22,17 @@ class Scenario
     friend std::ostream& operator<<(std::ostream& os, const Scenario& scenario);
 
     std::vector<ActorType> mActorTypes;
-    std::vector<InterfaceType> mInterfaceTypes;
-    std::map<InterfaceType, std::vector<InterfaceType> > mInterfaceCompatibility;
+    std::vector<CompatibilityType> mInterfaceCompatibilityTypes;
+    std::map<CompatibilityType, std::vector<CompatibilityType> > mInterfaceCompatibility;
 
     std::map<Actor, ActorDescription> mActors;
     std::vector<Interface> mInterfaces;
 
     std::vector<Link> mValidLinks;
     std::vector<Link> mInvalidLinks;
+
+    std::map<LinkType, size_t> mValidLinkTypes;
+    std::set<LinkType> mInvalidLinkTypes;
 
     // All links that connect the same actors
     std::map<LinkGroup, std::set<Link> > mLinkGroupMap;
@@ -44,12 +47,21 @@ protected:
 
 public:
     Scenario();
+    void createCompositeActorTypes();
 
-    std::map<LinkGroup, std::set<Link> > getLinkGroupMap();
-    std::set<LinkGroup> getAvailableLinkGroups();
-    std::map<Actor, std::set<Link> > getActorLinkMap();
-    std::map<Interface, std::set<Link> > getInterfaceLinkMap();
+    std::vector<Link> getValidLinks() { return mValidLinks; }
+    std::vector<Link> getInvalidLinks() { return mInvalidLinks; }
 
+    std::map<LinkType, size_t> getValidLinkTypes() { return mValidLinkTypes; }
+    std::set<LinkType> getInvalidLinkTypes() { return mInvalidLinkTypes; }
+
+
+    std::map<LinkGroup, std::set<Link> > getLinkGroupMap() const { return mLinkGroupMap; }
+    std::set<LinkGroup> getAvailableLinkGroups() const { return mAvailableLinkGroups; }
+    std::map<Actor, std::set<Link> > getActorLinkMap() const { return mActorLinkMap; }
+    std::map<Interface, std::set<Link> > getInterfaceLinkMap() const { return mInterfaceLinkMap; }
+
+    size_t getNumberOfActors() const { return mActors.size(); }
     static Scenario fromConsole();
 };
 

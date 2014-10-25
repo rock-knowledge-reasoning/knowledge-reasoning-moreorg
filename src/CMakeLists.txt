@@ -17,9 +17,11 @@ rock_library(owl_om
         ccf/Actor.cpp
         ccf/CombinedActor.cpp
         ccf/Interface.cpp
+        ccf/InterfaceType.cpp
         ccf/Link.cpp
-        ccf/Scenario.cpp
         ccf/LinkGroup.cpp
+        ccf/LinkType.cpp
+        ccf/Scenario.cpp
         db/FileBackend.cpp
         db/rdf/SopranoDB.cpp
         db/rdf/Sparql.cpp
@@ -50,8 +52,10 @@ rock_library(owl_om
         ccf/Actor.hpp
         ccf/CombinedActor.hpp
         ccf/Interface.hpp
+        ccf/InterfaceType.hpp
         ccf/Link.hpp
         ccf/LinkGroup.hpp
+        ccf/LinkType.hpp
         ccf/Scenario.hpp
         db/FileBackend.hpp
         db/rdf/SopranoDB.hpp

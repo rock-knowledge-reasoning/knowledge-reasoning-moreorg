@@ -6,6 +6,7 @@
 #include <owl_om/ccf/Actor.hpp>
 #include <owl_om/ccf/Interface.hpp>
 #include <owl_om/ccf/LinkGroup.hpp>
+#include <owl_om/ccf/LinkType.hpp>
 
 namespace multiagent {
 namespace ccf {
@@ -27,7 +28,8 @@ public:
     Interface getFirstInterface() const { return mFirst; }
     Interface getSecondInterface() const  { return mSecond; }
 
-    LinkGroup getLinkGroup() const;
+    LinkGroup getGroup() const;
+    LinkType getType() const;
 
     bool operator<(const Link& other) const;
 };
