@@ -38,6 +38,7 @@ rock_library(owl_om
         exporter/PDDLExporter.cpp
         metrics/Redundancy.cpp
         reasoner/factpp/Types.cpp
+        utils/IntegerPartitioning.cpp
     HEADERS Combinatorics.hpp
         Exceptions.hpp
         KnowledgeBase.hpp
@@ -91,6 +92,7 @@ rock_library(owl_om
         owlapi/model/entities/OWLNamedIndividual.hpp
         owlapi/model/entities/OWLObjectProperty.hpp
         reasoner/factpp/Types.hpp
+        utils/IntegerPartitioning.hpp
     DEPS_PKGCONFIG base-lib soprano factpp pddl_planner liburiparser
 )
 include_directories(${Boost_INCLUDE_DIR})
@@ -107,4 +109,3 @@ rock_executable(multiagent_scenario_analysis utils/ScenarioAnalysis.cpp
 
 rock_executable(limited_combinations utils/LimitedCombination.cpp
     DEPS owl_om)
-
