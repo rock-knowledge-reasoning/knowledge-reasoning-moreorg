@@ -38,6 +38,7 @@ int main(int argc, char** argv)
         om.createNewFromModel(OM::resolve("PayloadCamera"), true);
         om.createNewFromModel(OM::resolve("PayloadCamera"), true);
         om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
 
         om.refresh(true);
         std::cout << om.getStatistics();
