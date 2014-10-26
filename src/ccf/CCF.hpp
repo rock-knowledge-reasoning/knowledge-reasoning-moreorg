@@ -5,8 +5,14 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <stdint.h>
 #include <boost/foreach.hpp>
 #include <base/Logging.hpp>
+
+/**
+ * This is an implementation of the Constrained Coalition Formation algorithm 
+ * as suggested by Rahwan et. al "Constrained Coalition Formation",2011
+ */
 
 namespace owl_om
 {
@@ -29,7 +35,7 @@ public:
         insert(initial);
     }
 
-    bool supersetOf(const Set<T>& other) const
+    bool isSupersetOf(const Set<T>& other) const
     {
         // this set can only be a superset of other
         // if it has more items
@@ -45,6 +51,7 @@ public:
                 return false;
             }
         }
+
         return true;
     }
 
@@ -242,7 +249,7 @@ struct Coalition
         , negative(negative)
     {}
 
-    std::string toString(bool positiveOnly = true) const
+    std::string toString(bool positiveOnly = false) const
     {
         std::stringstream ss;
         ss << "(p:";
@@ -345,6 +352,7 @@ private:
     Atoms mAtoms;
     Constraints mPositiveConstraints;
     Constraints mNegativeConstraints;
+    uint32_t mMaximumCoalitionSize;
 
 public:
 
@@ -354,12 +362,17 @@ public:
         {
             mAtoms.insert(atom);
         }
+
+        mMaximumCoalitionSize = mAtoms.size();
     }
 
     CCF(const Atoms& atoms)
         : mAtoms(atoms)
     {
+        mMaximumCoalitionSize = mAtoms.size();
     }
+
+    void setMaximumCoalitionSize(uint32_t size) { mMaximumCoalitionSize = size; }
 
     bool addNegativeConstraint(const Constraint& c) { return mNegativeConstraints.insert(c); }
     bool addPositiveConstraint(const Constraint& c) { return mPositiveConstraints.insert(c); }
@@ -433,6 +446,8 @@ public:
             << "    coalitions:   " << coalitions.toString() << std::endl;
 
         // Remove redundant constraints
+        // i.e. find the 'smallest' constrained by removing
+        // all superset of an existing constraint
         {
             NegativeConstraints tmpN = n;
 
@@ -440,7 +455,7 @@ public:
             {
                 BOOST_FOREACH(Constraint nc_s, tmpN)
                 {
-                    if(nc_s.supersetOf(nc))
+                    if(nc_s.isSupersetOf(nc))
                     {
                         n = n.without(nc_s);
                     }
@@ -455,7 +470,7 @@ public:
             {
                 BOOST_FOREACH(Constraint pc_s, tmpP)
                 {
-                    if(pc_s.supersetOf(pc))
+                    if(pc_s.isSupersetOf(pc))
                     {
                         p = p.without(pc_s);
                     }
@@ -473,6 +488,8 @@ public:
 
 
         // Dealing with special cases
+        // "Only one constraint, either positive or negative is left to be satisfied", i.e.
+        // if there is a constraint in N with exactly one agent
         {
             NegativeConstraints tmpSet = n;
             BOOST_FOREACH(Constraint nc, tmpSet)
@@ -487,6 +504,7 @@ public:
             }
         }
 
+        // By definition if p contains the empty set, all constraints in P are satisfied
         if(p.containsEmptySet() && n.size() == 1)
         {
             LOG_DEBUG_S << "P contains empty set and one negative constraint only" << p.toString();
@@ -515,6 +533,9 @@ public:
             << "    coalitions:   " << coalitions.toString() << std::endl;
 
         // Check termination criteria
+        // By definition if p contains the empty set, all constraints in P are satisfied
+        // By definition if n contains the empty set, all constraints in n are satisfied
+        // Thus we can terminate and add the found coalition
         if( p.containsEmptySet() && n.empty())
         {
             Coalition coalition(pStar, nStar);
@@ -527,23 +548,30 @@ public:
             // all membership contraints satisfied
             return;
         }
+
+        // By definition if P is an empty set and N containts an empty Set the constraints cannot be satisfied
         if( p.empty() || n.containsEmptySet())
         {
+            // Termination because the membership constraints cannot be satisfied
             LOG_DEBUG_S << "Termination: p is empty or n contains empty set: p " << p.toString() << ", n " << n.toString();
             return;
         }
 
-        // if ... size constraints. Not important for us
-        if( atoms.empty())
+        // if ... size constraints. Not important for us right now
+        if( pStar.flatten().size() > mMaximumCoalitionSize)
         {
+            LOG_DEBUG_S << "Termination: maximum coalition size exceeded: " << mMaximumCoalitionSize;
             return;
         }
 
-
+        if( mAtoms.empty())
+        {
+            LOG_DEBUG_S << "Termination: no atoms left";
+            return;
+        }
 
         // Initialize divide and conquer
         // select an atom
-
         Atom atom;
         try {
             if(positiveBranch)
@@ -560,10 +588,15 @@ public:
 
         if( pStar.empty())
         {
+            // Record this for the latter generation of coalitions
             aStar.push_back(atom);
         }
 
+        // Initialize negative constraint sets
+        // All negative constraints that do not involve ai
         NegativeConstraints ncs_not_ai; // N Not ai
+        // All coalitions that do not involve ai, but when joined with
+        // ai are part of the prohibited set
         NegativeConstraints ncs_ai; //N Tilde ai
 
         // Here we filter out the selected atom and create 
@@ -585,7 +618,10 @@ public:
         }
 
         // Respectively for the set of positive constraints
+        // Set of allowed coalitions that do not contain ai
         PositiveConstraints pcs_not_ai;
+        // Set of all coalitions that do not contain ai, but lead
+        // to permitted coalitions, when merged with ai
         PositiveConstraints pcs_ai;
 
         BOOST_FOREACH(Constraint pc, p)
@@ -619,14 +655,20 @@ public:
 
         // apply divide and conquer
         Atoms remainingAtoms = atoms.without(atom);
+        // Positive constraints: pcs_not_ai and pcs_ai -> all coalitions that are allowed joined with those that lead to permitted combinations with ai
+        // Negative constraints: ncs_not_ai and ncs_ai -> all coalitions that are not allowed joined with those that lead to prohibited combinations with ai
         computeConstrainedCoalitions( remainingAtoms , pcs_not_ai.createUnion(pcs_ai), ncs_not_ai.createUnion(ncs_ai), newPStar, nStar, coalitions, aStar, true, atom);
         computeConstrainedCoalitions( remainingAtoms, pcs_not_ai, ncs_not_ai, pStar, nStar.createUnion(atom), coalitions, aStar, false, atom);
     }
 
+    /**
+     * Based on the information on aStar, i.e. the structure of the base cases, we create the necessary set of coalitions
+     */
     CoalitionsList createLists(AStar aStar, Coalitions coalitions)
     {
         LOG_DEBUG_S << "Create " << aStar.size() << " lists";
-        CoalitionsList list(aStar.size());
+        CoalitionsList list(aStar.size() + 1);
+        size_t extraListPosition = aStar.size();
 
         // Iterate through base cases
         BOOST_FOREACH(const Coalition& coalition, coalitions)
@@ -650,9 +692,7 @@ public:
             if(!foundList)
             {
                 LOG_DEBUG_S << "Extra list for: " << coalition;
-                size_t extraListPosition = list.size() + 1;
-                list.resize(extraListPosition);
-                list[extraListPosition - 1].insert(coalition);
+                list[extraListPosition].insert(coalition);
             }
         }
 
