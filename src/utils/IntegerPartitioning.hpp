@@ -11,6 +11,8 @@
 namespace multiagent {
 namespace utils {
 
+typedef std::vector<int> IntegerPartition;
+
 /**
  * Utitility class that allows to compute all integer partitions of a given integer
  * It uses the existing algorithm a Jerome Kelleher
@@ -18,7 +20,7 @@ namespace utils {
 class IntegerPartitioning
 {
 public:
-    typedef std::map<size_t, std::set< std::vector<int> > > PartitionsMap;
+    typedef std::map<size_t, std::set< IntegerPartition > > PartitionsMap;
 
     PartitionsMap mPartitionsMap;
 
@@ -37,9 +39,14 @@ public:
      */    
     std::string toString() const;
 
+    /**
+     * Retrieve the partitions map
+     */
+    PartitionsMap getPartitionsMap() const { return mPartitionsMap; }
+
 };
 
-std::ostream& operator<<(std::ostream& os, const std::vector<int>& list);
+std::ostream& operator<<(std::ostream& os, const IntegerPartition& list);
 
 } // end namespace utils
 } // end namespace multiagent
