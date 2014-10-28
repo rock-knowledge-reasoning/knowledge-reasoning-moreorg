@@ -26,11 +26,16 @@ class Scenario
     std::map<CompatibilityType, std::vector<CompatibilityType> > mInterfaceCompatibility;
 
     std::map<Actor, ActorDescription> mActors;
+    uint32_t mNumberOfActorCombinations;
     std::vector<Interface> mInterfaces;
 
     std::vector<Link> mValidLinks;
     std::vector<Link> mInvalidLinks;
+    uint32_t mNumberOfLinkTypeCombinations;
+    uint32_t mNumberOfLinkCombinations;
 
+    // Record how many link of a type do actually exist, i.e.
+    // the distribution
     std::map<LinkType, size_t> mValidLinkTypes;
     std::set<LinkType> mInvalidLinkTypes;
 
@@ -44,6 +49,8 @@ class Scenario
 protected:
     void createLinks();
     void compute();
+
+    std::vector<LinkType> getValidLinkTypeList() const;
 
 public:
     Scenario();

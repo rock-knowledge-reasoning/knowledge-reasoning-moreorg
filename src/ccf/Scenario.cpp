@@ -64,6 +64,7 @@ Scenario Scenario::fromConsole()
 
 void Scenario::compute()
 {
+    std::vector<Actor> actorList;
     std::map<Actor, ActorDescription>::const_iterator ait = mActors.begin();
     for(; ait != mActors.end(); ++ait)
     {
@@ -85,7 +86,13 @@ void Scenario::compute()
                 LOG_DEBUG_S << "Add interface: " << interface << std::endl;
             }
         }
+
+        actorList.push_back(actor);
     }
+
+    
+    Combination<Actor> combination(actorList, actorList.size(), MAX);
+    mNumberOfActorCombinations = combination.numberOfCombinations();
 
     createLinks();
 }
@@ -131,12 +138,28 @@ void Scenario::createLinks()
         mActorLinkMap[link.getFirstActor()].insert(link);
         mActorLinkMap[link.getSecondActor()].insert(link);
     }   
+
+    Combination<LinkType> linkTypeCombinations( getValidLinkTypeList(), mActors.size()-1, MAX);
+    mNumberOfLinkTypeCombinations = linkTypeCombinations.numberOfCombinations();
+
+    Combination<Link> linkCombinations( mValidLinks, mActors.size()-1, MAX);
+    mNumberOfLinkCombinations = linkCombinations.numberOfCombinations();
+}
+
+std::vector<LinkType> Scenario::getValidLinkTypeList() const
+{
+    std::map<LinkType, size_t>::const_iterator cit = mValidLinkTypes.begin();
+    std::vector<LinkType> linkTypes;
+    for(; cit != mValidLinkTypes.end(); ++cit)
+    {
+        linkTypes.push_back(cit->first);
+    }
+    return linkTypes;
 }
 
 void Scenario::createCompositeActorTypes()
 {
-    std::vector<LinkType> validLinkTypes;
-    Combination<LinkType> linkCombinations(validLinkTypes, mActors.size()-1, MAX);
+    Combination<LinkType> linkCombinations(getValidLinkTypeList(), mActors.size()-1, MAX);
     do
     {
         //
@@ -145,11 +168,14 @@ void Scenario::createCompositeActorTypes()
 
 std::ostream& operator<<(std::ostream& os, const Scenario& scenario)
 {
-    os << "# actors:             " << scenario.mActors.size() << std::endl;
-    os << "# interfaces:         " << scenario.mInterfaces.size() << std::endl;
-    os << "# valid links:        " << scenario.mValidLinks.size() << std::endl;
-    os << "# invalid links:      " << scenario.mInvalidLinks.size() << std::endl;
-    os << "# valid link types:   " << scenario.mValidLinkTypes.size() << std::endl;
+    os << "# actors:                  " << scenario.mActors.size() << std::endl;
+    os << "# max actor combos:        " << scenario.mNumberOfActorCombinations << std::endl;
+    os << "# interfaces:              " << scenario.mInterfaces.size() << std::endl;
+    os << "# valid links:             " << scenario.mValidLinks.size() << std::endl;
+    os << "# invalid links:           " << scenario.mInvalidLinks.size() << std::endl;
+    os << "# valid link combos:       " << scenario.mNumberOfLinkCombinations << std::endl;
+    os << "# valid link types:        " << scenario.mValidLinkTypes.size() << std::endl;
+    os << "# valid link type combos:  " << scenario.mNumberOfLinkTypeCombinations << std::endl;
 
     std::map<LinkType, size_t>::const_iterator cit = scenario.mValidLinkTypes.begin();
     for(; cit != scenario.mValidLinkTypes.end(); ++cit)
