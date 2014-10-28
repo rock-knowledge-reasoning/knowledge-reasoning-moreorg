@@ -429,3 +429,76 @@ BOOST_AUTO_TEST_CASE(it_should_load_om_file)
     BOOST_TEST_MESSAGE("Loaded om");
 }
 
+BOOST_AUTO_TEST_CASE(it_should_handle_actorlinkmodel)
+{
+    using namespace owl_om::organization_model;
+
+    EndpointModel model0("http://test#P", "http://test#p0");
+    EndpointModel model1("http://test#P", "http://test#p0");
+
+    BOOST_REQUIRE_MESSAGE( model0 == model1, "Endpoints same");
+    BOOST_REQUIRE_MESSAGE( !(model0 < model1), "Endpoints less than");
+    BOOST_REQUIRE_MESSAGE( !(model1 < model0), "Endpoints less than");
+
+    ActorModelLink link0(model0, model1);
+    ActorModelLink link1(model1, model0);
+
+    BOOST_REQUIRE_MESSAGE( link0 == link1, "ActorModelLinks same");
+    BOOST_REQUIRE_MESSAGE( !(link0 < link1), "ActorModelLinks less than");
+    BOOST_REQUIRE_MESSAGE( !(link1 < link0), "ActorModelLinks less than");
+
+
+    std::vector<ActorModelLink> compositeActor0;
+    std::vector<ActorModelLink> compositeActor1;
+
+    compositeActor0.push_back(link0);
+    std::sort(compositeActor0.begin(), compositeActor0.end());
+    compositeActor1.push_back(link1);
+    std::sort(compositeActor1.begin(), compositeActor1.end());
+
+
+    std::set< std::vector<ActorModelLink> > actorSet;
+    // Extra 
+    {
+        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiActive-requirement-0");
+        EndpointModel modelB("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
+        ActorModelLink link(modelA, modelB);
+        std::vector<ActorModelLink> compositeActor;
+        compositeActor.push_back(link);
+        std::sort(compositeActor.begin(), compositeActor.end());
+        actorSet.insert(compositeActor);
+    }
+    // Extra 
+    {
+        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
+        EndpointModel modelB("http://test#Sherpa", "http://test#EmiActive-requirement-0");
+        ActorModelLink link(modelA, modelB);
+        std::vector<ActorModelLink> compositeActor;
+        compositeActor.push_back(link);
+        std::sort(compositeActor.begin(), compositeActor.end());
+        actorSet.insert(compositeActor);
+    }
+    // Extra 
+    {
+        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
+        EndpointModel modelB("http://test#Sherpa", "http://test#EmiActive-requirement-1");
+        ActorModelLink link(modelA, modelB);
+        std::vector<ActorModelLink> compositeActor;
+        compositeActor.push_back(link);
+        std::sort(compositeActor.begin(), compositeActor.end());
+        actorSet.insert(compositeActor);
+    }
+    // Extra 
+    {
+        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiActive-requirement-0");
+        EndpointModel modelB("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
+        ActorModelLink link(modelA, modelB);
+        std::vector<ActorModelLink> compositeActor;
+        compositeActor.push_back(link);
+        std::sort(compositeActor.begin(), compositeActor.end());
+        actorSet.insert(compositeActor);
+    }
+    //BOOST_TEST_MESSAGE("ActorSet\n" << actorSet);
+
+}
+
