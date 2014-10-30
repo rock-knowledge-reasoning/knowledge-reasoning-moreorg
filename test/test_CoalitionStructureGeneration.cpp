@@ -19,6 +19,8 @@ void updateCostMap(std::map<Coalition, double>& costMap, const std::string& desc
 
 double coalitionValueFunction(const Coalition& coalition)
 {
+    return coalition.size();
+
     Coalition c = coalition;
     std::sort(c.begin(), c.end());
 
@@ -37,10 +39,10 @@ double coalitionValueFunction(const Coalition& coalition)
 
     updateCostMap(costMap, "abc", 200);
     updateCostMap(costMap, "abd", 150);
-    updateCostMap(costMap, "acd", 300);
+    updateCostMap(costMap, "acd", 220);
     updateCostMap(costMap, "bcd", 150);
 
-    updateCostMap(costMap, "abcd", 425);
+    updateCostMap(costMap, "abcd", 325);
 
    // std::map<Coalition, double>::const_iterator cit = costMap.begin();
    // for(; cit != costMap.end(); ++cit)
@@ -65,7 +67,7 @@ double coalitionStructureValueFunction(const CoalitionStructure& c)
     double value = 0.0;
     for(int i = 0; i < c.size(); ++i)
     {
-        value += coalitionValueFunction( c[i] );
+        value += coalitionValueFunction( c[i] )*coalitionValueFunction( c[i] );
     }
     return value;
 }
@@ -73,12 +75,13 @@ double coalitionStructureValueFunction(const CoalitionStructure& c)
 BOOST_AUTO_TEST_CASE(it_should_compute_csg)
 {
     AgentList agents;
-    agents.push_back("a");
-    agents.push_back("b");
-    agents.push_back("c");
-    agents.push_back("d");
+    for(char a = 'a'; a < 'a' + 20; ++a)
+    {
+        std::stringstream ss;
+        ss << a;
+        agents.push_back(ss.str());
+    }
     CoalitionStructureGeneration csg(agents, coalitionValueFunction, coalitionStructureValueFunction);
-    csg.prepare();
     BOOST_TEST_MESSAGE("Preparation done: " << csg.toString());
-    csg.findBest();
+    csg.findBest(1.0);
 }
