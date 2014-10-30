@@ -44,6 +44,11 @@ public:
      */
     PartitionsMap getPartitionsMap() const { return mPartitionsMap; }
 
+    /**
+     * Compute the multiplicity of a value in a given integer partition
+     */
+    static size_t multiplicity(const IntegerPartition& partition, int value);
+
 };
 
 std::ostream& operator<<(std::ostream& os, const IntegerPartition& list);

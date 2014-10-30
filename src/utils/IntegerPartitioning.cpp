@@ -3,6 +3,20 @@
 namespace multiagent {
 namespace utils {
 
+size_t IntegerPartitioning::multiplicity(const IntegerPartition& partition, int value)
+{
+    size_t count = 0;
+    IntegerPartition::const_iterator cit = partition.begin();
+    for(; cit != partition.end(); ++cit)
+    {
+        if(*cit == value)
+        {
+            ++count;
+        }
+    }
+    return count;
+}
+
 std::ostream& operator<<(std::ostream& os, const std::vector<int>& list)
 {
     os << "["; 
