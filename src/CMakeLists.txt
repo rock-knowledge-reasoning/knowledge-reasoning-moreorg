@@ -38,7 +38,7 @@ rock_library(owl_om
         exporter/PDDLExporter.cpp
         metrics/Redundancy.cpp
         reasoner/factpp/Types.cpp
-        #utils/CoalitionStructureGeneration.cpp
+        utils/CoalitionStructureGeneration.cpp
         utils/IntegerPartitioning.cpp
     HEADERS Combinatorics.hpp
         Exceptions.hpp
