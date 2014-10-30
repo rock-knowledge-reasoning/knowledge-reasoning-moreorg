@@ -17,11 +17,6 @@ void updateCostMap(std::map<Coalition, double>& costMap, const std::string& desc
     costMap[c] = cost;
 }
 
-double coalitionStructureValueFunction(const CoalitionStructure& c)
-{
-    return 0;
-}
-
 double coalitionValueFunction(const Coalition& coalition)
 {
     Coalition c = coalition;
@@ -62,6 +57,16 @@ double coalitionValueFunction(const Coalition& coalition)
     double value = costMap[c];
     BOOST_TEST_MESSAGE("Return value: " << value);
 
+    return value;
+}
+
+double coalitionStructureValueFunction(const CoalitionStructure& c)
+{
+    double value = 0.0;
+    for(int i = 0; i < c.size(); ++i)
+    {
+        value += coalitionValueFunction( c[i] );
+    }
     return value;
 }
 

@@ -13,10 +13,48 @@ namespace utils {
 typedef std::string Agent;
 typedef std::vector<Agent> AgentList;
 typedef AgentList Coalition;
-typedef std::set< Coalition > CoalitionStructure;
+typedef std::vector< Coalition > CoalitionStructure;
+
+std::ostream& operator<<(std::ostream& os, const AgentList& list)
+{
+    AgentList::const_iterator cit = list.begin();
+    os << "[";
+    for(; cit != list.end(); ++cit)
+    {
+        os << *cit;
+        if(list.end() != cit + 1)
+        {
+            os << ",";
+        }
+    }
+    os << "]";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const CoalitionStructure& list)
+{
+    CoalitionStructure::const_iterator cit = list.begin();
+    os << "[";
+    for(; cit != list.end(); ++cit)
+    {
+        os << *cit;
+        if(list.end() != cit + 1)
+        {
+            os << ",";
+        }
+    }
+    os << "]";
+    return os;
+}
 
 struct Bounds
 {
+    Bounds(double exact)
+        : maximum(exact)
+        , average(exact)
+        , minimum(exact)
+    {}
+
     Bounds()
         : maximum(std::numeric_limits<double>::min())
         , average(0.0)
@@ -181,6 +219,21 @@ public:
         return lowerBound;
     }
 
+    double bestUpperBound(const IntegerPartitionBoundsMap& boundMap)
+    {
+        double upperBound = std::numeric_limits<double>::min();
+        IntegerPartitionBoundsMap::const_iterator cit = boundMap.begin();
+        for(; cit != boundMap.end(); ++cit)
+        {
+            Bounds bounds = cit->second;
+            if(bounds.maximum > upperBound)
+            {
+                upperBound = bounds.maximum;
+            }
+        }
+        return upperBound;
+    }
+
     Bounds computeIntegerPartitionBounds(const IntegerPartition& partition)
     {
         IntegerPartition::const_iterator cit = partition.begin(); 
@@ -242,24 +295,90 @@ public:
 
     void findBest()
     {
+        LOG_DEBUG_S << "Pruning integer partition space";
+        IntegerPartitionBoundsMap boundMap = prune(mIntegerPartitionBoundsMap);
+        double globalUpperBound = bestUpperBound(boundMap);
+        CoalitionStructure bestCoalitionStructure;
+        double bestCoalitionStructureValue = 0.0;
+
         //// prune space where a partitions upper bound is smaller than global lower bound
         //CoalitionBoundMap boundMap = prune(mCoalitionBoundMap);
-        IntegerPartitionBoundsMap boundMap = prune(mIntegerPartitionBoundsMap);
-         
-        // search next one
-        if(boundMap.size() == 1)
+        while(true)
         {
-            LOG_DEBUG_S << "Best partition found: " << boundMap.begin()->first;
-        } else {
-            LOG_DEBUG_S << "Best partitions found: " << boundMap.size() << " left from " << mIntegerPartitionBoundsMap.size();
+            LOG_DEBUG_S << "Select currently best integer partition";
+            IntegerPartition partition;
+            try {
+                partition = selectIntegerPartition(boundMap, globalUpperBound);
+            } catch(const std::runtime_error& e)
+            {
+                LOG_DEBUG_S << "No better partition found";
+                break;
+            }
+
+            LOG_DEBUG_S << "Compute best coalition structure for this subspace: " << partition;
+            CoalitionStructure coalitionStructure = searchSubspace(partition, 0, 0, mAgents, bestCoalitionStructure, bestCoalitionStructureValue, CoalitionStructure(), 0, globalUpperBound);
+
+            // No improvement of the results
+            if(coalitionStructure == bestCoalitionStructure)
+            {
+                boundMap.erase(partition);
+                globalUpperBound = bestUpperBound(boundMap);
+            } else {
+                bestCoalitionStructure = coalitionStructure;
+                bestCoalitionStructureValue = mCoalitionStructureValueFunction(bestCoalitionStructure);
+
+                Bounds bounds(bestCoalitionStructureValue);
+                mIntegerPartitionBoundsMap[partition] = bounds;
+
+                LOG_DEBUG_S << "Best coalition found so far: " << bestCoalitionStructure << ", " << bounds;
+
+                // TODO: pick the next one for evaluation and repeat until satified with 
+                // the solution
+                //
+                boundMap = prune(boundMap);
+                globalUpperBound = bestUpperBound(boundMap);
+                boundMap.erase(partition);
+            }
+
+            if(boundMap.empty())
+            {
+                break;
+            }
         }
+
+        LOG_DEBUG_S << "Best coalition found: " << bestCoalitionStructure << ", " << mCoalitionStructureValueFunction(bestCoalitionStructure);
+         
+        //// search next one
+        //if(boundMap.size() == 1)
+        //{
+        //    LOG_DEBUG_S << "Best partition found: " << boundMap.begin()->first;
+        //} else {
+        //    LOG_DEBUG_S << "Best partitions found: " << boundMap.size() << " left from " << mIntegerPartitionBoundsMap.size();
+        //}
     }
 
-    IntegerPartition selectSubspace()
+    IntegerPartition selectIntegerPartition(const IntegerPartitionBoundsMap& boundMap, double maximumBound)
     {
         // heuristic one
         // pick space with highest upper bound
-        
+        IntegerPartitionBoundsMap::const_iterator it = boundMap.begin();
+        double value = 0.0;
+        IntegerPartition partition;
+        for(; it != boundMap.end(); ++it)
+        {
+            if(it->second.maximum > value)
+            {
+                partition = it->first;
+                value = it->second.maximum;
+            }
+        }
+        if(value == 0.0)
+        {
+            throw std::runtime_error("No integer partition found greater than the given maximum bound");
+        } else {
+            return partition;
+        }
+
         // when optimality shall be traded
         // consider betaStar > 1, where betaStar = 1.05 "means that the solution sought
         // needs to hava a value that is at least 95% of the optimal one"
@@ -271,11 +390,128 @@ public:
         //
         // |P_{G}| -> is the size of the number of coalition structures / integer partitions for
         // the given number of coalitions
+    }
 
+    /**
+     *
+     * \param globalUpperBound
+     * \param bestStar Quality of the solution, i.e. 1.05 means 95% percent of the optimal solution
+     */
+    CoalitionStructure searchSubspace(const IntegerPartition& partition, size_t k, size_t alpha, const AgentList& agents, CoalitionStructure bestStructure, double bestStructureValue, const CoalitionStructure& currentStructure, double globalUpperBound = std::numeric_limits<double>::max(), double betaStar = 1.0)
+    {
+        LOG_DEBUG_S << "Search subspace of current structure: " << currentStructure;
+        if(k > 0 && partition[k] != partition[k-1])
+        {
+            LOG_DEBUG_S << "Search subspace for " << k << "partition[k]: " << partition[k] << " != " << partition[k-1];
+            // resetting alpha when the size is not repeated
+            alpha = 1;
+        }
 
+        // Initialize index list
+        std::vector<int> indexList;
+        for(size_t i = 0; i < agents.size(); ++i)
+        {
+            indexList.push_back(i);
+        }
+        LOG_DEBUG_S << "Indexlist initialized: " << indexList << " agents: " << agents.size();
 
-        IntegerPartition partition;
-        return partition;
+        // Compute upper bound for M_{k,0} to avaoid redundant computations
+        size_t upperBoundM_k = mAgents.size() + 1;
+        for(size_t i = 0; i < k; ++i)
+        {
+            upperBoundM_k += partition[i]*IntegerPartitioning::multiplicity(partition, partition[i]);
+        }
+        LOG_DEBUG_S << "UpperBound M_k: " << upperBoundM_k;
+
+        // Compute upper bound of subspace, so that we can stop computation when this maximum has
+        // been found
+        double upperBoundOfSubspace = mIntegerPartitionBoundsMap[partition].maximum;
+        LOG_DEBUG_S << "UpperBound of subspace " << partition << ": " << upperBoundOfSubspace;
+
+        using namespace base::combinatorics;
+        Combination<int> combinations(indexList, partition[k], EXACT);
+        do {
+            std::vector<int> m_k = combinations.current();
+            LOG_DEBUG_S << "Current combination m_k=" << m_k << ", alpha=" << alpha;
+            if(alpha <= m_k[0] && m_k[0] <= upperBoundM_k)
+            {
+                LOG_DEBUG_S << "Computing combination";
+                // Map combination of indices to current coalition, i.e. an agent (sub)set
+                AgentList remainingAgents = agents;
+                std::vector<Agent> coalition;
+                for(size_t i = 0; i < m_k.size(); ++i)
+                {
+                    Agent agent = agents[ m_k[i] ];
+                    coalition.push_back(agent);
+                    std::vector<Agent>::iterator it = std::find(remainingAgents.begin(), remainingAgents.end(), agent);
+                    remainingAgents.erase(it);
+                }
+                CoalitionStructure coalitionStructure = currentStructure;
+                coalitionStructure.push_back(coalition);
+
+                LOG_DEBUG_S << "Partial coalition structure: " << coalitionStructure << " , remaining agents " << remainingAgents;
+
+                double currentStructureValue = mCoalitionStructureValueFunction( coalitionStructure );
+
+                // Check if we reached the end
+                if(k == partition.size() - 1)
+                {
+                    LOG_DEBUG_S << "Reached the end at k: " << k << " -- bestValue: " << bestStructureValue << " vs. " << currentStructureValue;
+                    if(currentStructureValue > bestStructureValue) 
+                    {
+                        // update the currently best coalition structure
+                        bestStructure = coalitionStructure;
+                        bestStructureValue = currentStructureValue;
+
+                        LOG_DEBUG_S << "Update current best: " << bestStructure << ", value " << bestStructureValue;
+                    }
+                } else {
+                    LOG_DEBUG_S << "Computing subspace potential";
+                    // Estimate the potential of this subspace using
+                    // know value for the already found coalitions
+                    // and existing upper bounds for the coalitions still
+                    // to look at
+                    double subspacePotentialValue = 0;
+
+                    // Estimate value of current (partial) coalition structure
+                    for( size_t i = 0; i < coalitionStructure.size(); ++i)
+                    {
+                        double valueOfCoalition = mCoalitionValueFunction( coalitionStructure[i] );
+                        LOG_DEBUG_S << "Coalition: " << coalitionStructure[i] << " value: " << valueOfCoalition;
+                        subspacePotentialValue += valueOfCoalition;
+                    }
+
+                    // Estimate value for the rest of the partition based on the bounds computed
+                    // on coalition sizes, i.e.
+                    // looking at the integer partition's yet uninvestigate range
+                    for( size_t i = coalitionStructure.size(); i < partition.size(); ++i)
+                    {
+                        double max_s = mCoalitionBoundMap[ partition[i] ].maximum;
+                        LOG_DEBUG_S << "Potential for coalition size: " << partition[i] << ": " << max_s;
+                        subspacePotentialValue += max_s;
+                    }
+                    LOG_DEBUG_S << "Subspace potential: " << subspacePotentialValue;
+
+                    // Check if it is worth to enter this subspace
+                    if(bestStructureValue < subspacePotentialValue)
+                    {
+                        LOG_DEBUG_S << "Continue search: best: " << bestStructureValue << " vs. subspace potential: " <<  subspacePotentialValue;
+                        bestStructure = searchSubspace(partition, k+1, m_k[0], remainingAgents, bestStructure, bestStructureValue, coalitionStructure, globalUpperBound, betaStar);
+                    } else {
+                        LOG_DEBUG_S << "Pruning: insufficient subspace potential: best: " << bestStructureValue << " vs. " <<  subspacePotentialValue;
+                    }
+                }
+
+                // Stop if the required solution has been found or if the current best 
+                // is equal to the upper bound of this sub-space
+                if( globalUpperBound / bestStructureValue <= betaStar || bestStructureValue == upperBoundOfSubspace )
+                {
+                    return bestStructure;
+                }
+            }
+        } while(combinations.next());
+
+        return bestStructure;
     }
 
     std::string toString()
