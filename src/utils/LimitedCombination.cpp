@@ -1,6 +1,6 @@
 #include <set>
 #include <iostream>
-#include <numeric/Combinatorics.hpp>
+#include <owl_om/utils/LimitedCombination.hpp>
 
 void append(std::vector<char>& v, char c, size_t n)
 {
@@ -11,7 +11,7 @@ void append(std::vector<char>& v, char c, size_t n)
 }
 
 // Compute the 'simple' number of combination or a set of types with limited occurrence per type, vs.
-// the occurrence of up to a given number for all types (which is the standard formula using the 
+// the occurrence of up to a given number for all types (which is the standard formula using the
 // binomialcoefficent of
 // |n + k -1 |
 // | k       |
@@ -24,47 +24,43 @@ int main()
 
     std::cin >> numberOfTypes;
 
+    std::map<char, size_t> availabilityMap;
     char currentType = 'a';
     std::cout << "Please provide the available number of items per type:" << std::endl;
-    for(int i = 0; i < numberOfTypes; ++i)
+    for(size_t i = 0; i < numberOfTypes; ++i)
     {
         size_t numberPerType;
         std::cout << currentType << ": ";
         std::cin >> numberPerType;
         append(input, currentType, numberPerType);
+        availabilityMap[currentType] = numberPerType;
         ++currentType;
     }
 
-    std::string startString(input.begin(), input.end());
-    std::cout << "Computing combinations for: " << startString << std::endl;
-    std::cout << "Total size: " << startString.size() << std::endl;
+    size_t numberOfAtoms = numeric::LimitedCombination<char>::totalNumberOfAtoms(availabilityMap);
 
+    std::cout << "#SizeOfDraw   #Combinations" << std::endl;
+    for(int i=1; i <= numberOfAtoms; ++i)
     {
-        std::cout << "#SizeOfDraw   #Combinations" << std::endl;
-        for(int i=1; i <= input.size();++i)
-        {
-            numeric::Combination<char> combinations( input, i, numeric::EXACT);
-            size_t count = 0;
-            do {
-                std::vector<char> characterCombo = combinations.current();
-                //std::cout << std::string(characterCombo.begin(), characterCombo.end()) << std::endl;
-                ++count;
-            } while(combinations.next());
-            std::cout << i << " " << count << std::endl;
-        }
+        int count = 0;
+        numeric::LimitedCombination<char> combinations(availabilityMap, i, numeric::EXACT);
+        do {
+            std::vector<char> charactorCombo = combinations.current();
+            count++;
+        } while(combinations.next());
+        std::cout << i << " " << count << std::endl;
+    }
 
-        std::cout << "#MaxSizeOfDraw   #Combinations" << std::endl;
-        for(int i=1; i <= input.size();++i)
-        {
-            numeric::Combination<char> combinations( input, i , numeric::MAX);
-            size_t count = 0;
-            do {
-                std::vector<char> characterCombo = combinations.current();
-                //std::cout << std::string(characterCombo.begin(), characterCombo.end()) << std::endl;
-                ++count;
-            } while(combinations.next());
-            std::cout << i << " " << count << std::endl;
-        }
+    std::cout << "#MaxSizeOfDraw   #Combinations" << std::endl;
+    for(int i=1; i <= numberOfAtoms; ++i)
+    {
+        int count = 0;
+        numeric::LimitedCombination<char> combinations(availabilityMap, i, numeric::MAX);
+        do {
+            std::vector<char> charactorCombo = combinations.current();
+            count++;
+        } while(combinations.next());
+        std::cout << i << " " << count << std::endl;
     }
 
     return 0;
