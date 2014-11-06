@@ -4,7 +4,7 @@
 #include <boost/foreach.hpp>
 #include <owl_om/OrganizationModel.hpp>
 #include <owl_om/exporter/PDDLExporter.hpp>
-#include <owl_om/Combinatorics.hpp>
+#include <numeric/Combinatorics.hpp>
 #include <owl_om/metrics/Redundancy.hpp>
 
 #include <factpp/Kernel.h>
@@ -407,7 +407,7 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
     }
 
     std::string distance = "10";
-    using namespace base::combinatorics;
+    using namespace numeric;
     Combination< std::string > combination(distances, 2, EXACT);
     do
     {

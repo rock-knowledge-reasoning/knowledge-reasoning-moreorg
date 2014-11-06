@@ -1,4 +1,7 @@
 #include "CoalitionStructureGeneration.hpp"
+#include <numeric/Combinatorics.hpp>
+
+using namespace numeric;
 
 namespace multiagent {
 namespace utils {
@@ -71,7 +74,7 @@ CoalitionStructureGeneration::CoalitionStructureGeneration(const AgentList& agen
 
 void CoalitionStructureGeneration::prepare()
 {
-    using namespace base::combinatorics;
+    using namespace numeric;
     Combination<std::string> combinations(mAgents, mAgents.size(), MAX);
     do {
 
@@ -215,7 +218,7 @@ CoalitionStructureGeneration::IntegerPartitionBoundsMap CoalitionStructureGenera
         Bounds bounds = cit->second;
         if(bounds.maximum < globalLowerBound)
         {
-            LOG_DEBUG_S << "Removing partition: " << cit->first << " -- max: " << bounds.maximum << " < global min: " << globalLowerBound;
+            LOG_DEBUG_S << "Removing partition: " << IntegerPartitioning::toString(cit->first) << " -- max: " << bounds.maximum << " < global min: " << globalLowerBound;
             updatedBoundsMap.erase(cit->first);
         }
     }
@@ -264,7 +267,7 @@ CoalitionStructure CoalitionStructureGeneration::findBest(double quality)
             break;
         }
 
-        LOG_DEBUG_S << "Compute best coalition structure for this subspace: " << partition;
+        LOG_DEBUG_S << "Compute best coalition structure for this subspace: " << IntegerPartitioning::toString(partition);
         CoalitionStructure coalitionStructure = searchSubspace(partition, 0, 0, mAgents, bestCoalitionStructure, bestCoalitionStructureValue, CoalitionStructure(), globalUpperBound, quality);
 
         // No improvement of the results
@@ -364,7 +367,7 @@ CoalitionStructure CoalitionStructureGeneration::searchSubspace(const IntegerPar
     {
         indexList.push_back(i);
     }
-    LOG_DEBUG_S << indent << " indexlist initialized: " << indexList << " agents: " << agents.size();
+    LOG_DEBUG_S << indent << " indexlist initialized: " << IntegerPartitioning::toString(indexList) << " agents: " << agents.size();
 
     // Compute upper bound for M_{k,0} to avaoid redundant computations
     size_t upperBoundM_k = mAgents.size() + 1;
@@ -377,13 +380,13 @@ CoalitionStructure CoalitionStructureGeneration::searchSubspace(const IntegerPar
     // Compute upper bound of subspace, so that we can stop computation when this maximum has
     // been found
     double upperBoundOfSubspace = mIntegerPartitionBoundsMap[partition].maximum;
-    LOG_DEBUG_S << indent << " upperBound of subspace " << partition << ": " << upperBoundOfSubspace;
+    LOG_DEBUG_S << indent << " upperBound of subspace " << IntegerPartitioning::toString(partition) << ": " << upperBoundOfSubspace;
 
-    using namespace base::combinatorics;
+    using namespace numeric;
     Combination<int> combinations(indexList, partition[k], EXACT);
     do {
         std::vector<int> m_k = combinations.current();
-        LOG_DEBUG_S << indent << " current combination m_k=" << m_k << ", alpha=" << alpha;
+        LOG_DEBUG_S << indent << " current combination m_k=" << IntegerPartitioning::toString(m_k) << ", alpha=" << alpha;
         // m_k[0] + 1: we start with index 0
         if(alpha <= m_k[0] + 1 && m_k[0] + 1 <= upperBoundM_k)
         {

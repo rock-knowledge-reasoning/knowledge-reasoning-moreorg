@@ -1,7 +1,7 @@
 #include "CombinedActor.hpp"
 
 #include <algorithm>
-#include <owl_om/Combinatorics.hpp>
+#include <numeric/Combinatorics.hpp>
 #include <base/Logging.hpp>
 #include <base/Time.hpp>
 

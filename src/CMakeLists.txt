@@ -10,8 +10,7 @@ set(ICU_LIBS icutu
 )
 
 rock_library(owl_om
-    SOURCES Combinatorics.cpp
-        KnowledgeBase.cpp
+    SOURCES KnowledgeBase.cpp
         OrganizationModel.cpp
         Ontology.cpp
         ccf/Actor.cpp
@@ -39,9 +38,7 @@ rock_library(owl_om
         metrics/Redundancy.cpp
         reasoner/factpp/Types.cpp
         utils/CoalitionStructureGeneration.cpp
-        utils/IntegerPartitioning.cpp
-    HEADERS Combinatorics.hpp
-        Exceptions.hpp
+    HEADERS Exceptions.hpp
         KnowledgeBase.hpp
         Ontology.hpp
         OrganizationModel.hpp
@@ -94,8 +91,7 @@ rock_library(owl_om
         owlapi/model/entities/OWLObjectProperty.hpp
         reasoner/factpp/Types.hpp
         utils/CoalitionStructureGeneration.hpp
-        utils/IntegerPartitioning.hpp
-    DEPS_PKGCONFIG base-lib soprano factpp pddl_planner liburiparser
+    DEPS_PKGCONFIG numeric soprano factpp pddl_planner liburiparser
 )
 include_directories(${Boost_INCLUDE_DIR})
 target_link_libraries(owl_om ${Boost_LIBRARIES} ${ICU_LIBS})

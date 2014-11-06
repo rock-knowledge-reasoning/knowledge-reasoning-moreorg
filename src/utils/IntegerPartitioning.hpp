@@ -15,7 +15,15 @@ typedef std::vector<int> IntegerPartition;
 
 /**
  * Utitility class that allows to compute all integer partitions of a given integer
- * It uses the existing algorithm a Jerome Kelleher
+ * It uses the existing algorithm a Jerome Kelleher: 
+ * "Generating All Partitions: A Comparison Of Two Encodings", (Kelleher and O'Sullivan, 2009)
+ *
+ \beginverbatim
+ IntegerPartitioning ip;
+ // compute all partitions: [1,1,1,1,1],[2,1,1,1], ... [5]
+ ip.compute(5);
+ PartitionsMap partitionsMap = ip.getPartitionsMap();
+ \endverbatim
  */
 class IntegerPartitioning
 {
@@ -27,6 +35,7 @@ public:
 public:
 
     /**
+     * Compute all integer partitions
      * Generating All Partitions: A Comparison Of Two Encodings
      * Jerome Kelleher, Barry O'Sullivan
      * 
@@ -36,16 +45,19 @@ public:
 
     /**
      * Print all generated partitions
+     * \return String representation of all generated integer partition
      */    
     std::string toString() const;
 
     /**
      * Retrieve the partitions map
+     * \return partition map
      */
     PartitionsMap getPartitionsMap() const { return mPartitionsMap; }
 
     /**
      * Compute the multiplicity of a value in a given integer partition
+     * \return number of occurence of a single value in a given integer partition
      */
     static size_t multiplicity(const IntegerPartition& partition, int value);
 

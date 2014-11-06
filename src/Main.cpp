@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <owl_om/OrganizationModel.hpp>
 #include <boost/foreach.hpp>
+#include <owl_om/ccf/CCF.hpp>
 
 int main(int argc, char** argv)
 {
@@ -45,5 +46,4 @@ int main(int argc, char** argv)
     } else {
         fprintf(stderr, "usage: %s <filename>\n", argv[0]);
     }
-
 }

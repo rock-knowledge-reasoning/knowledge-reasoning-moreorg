@@ -1,7 +1,7 @@
 #include "Scenario.hpp"
-#include <owl_om/Combinatorics.hpp>
+#include <numeric/Combinatorics.hpp>
 
-using namespace base::combinatorics;
+using namespace numeric; 
 
 namespace multiagent {
 namespace ccf {
@@ -100,7 +100,7 @@ void Scenario::compute()
 void Scenario::createLinks()
 {
     std::vector<Link> links;
-    base::combinatorics::Combination<Interface> combinations(mInterfaces, 2, base::combinatorics::EXACT);
+    Combination<Interface> combinations(mInterfaces, 2, numeric::EXACT);
 
     do {
         std::vector<Interface> interfaceCombination = combinations.current();

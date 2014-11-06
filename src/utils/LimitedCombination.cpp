@@ -1,6 +1,6 @@
 #include <set>
 #include <iostream>
-#include <owl_om/Combinatorics.hpp>
+#include <numeric/Combinatorics.hpp>
 
 void append(std::vector<char>& v, char c, size_t n)
 {
@@ -43,7 +43,7 @@ int main()
         std::cout << "#SizeOfDraw   #Combinations" << std::endl;
         for(int i=1; i <= input.size();++i)
         {
-            base::combinatorics::Combination<char> combinations( input, i, base::combinatorics::EXACT);
+            numeric::Combination<char> combinations( input, i, numeric::EXACT);
             size_t count = 0;
             do {
                 std::vector<char> characterCombo = combinations.current();
@@ -56,7 +56,7 @@ int main()
         std::cout << "#MaxSizeOfDraw   #Combinations" << std::endl;
         for(int i=1; i <= input.size();++i)
         {
-            base::combinatorics::Combination<char> combinations( input, i , base::combinatorics::MAX);
+            numeric::Combination<char> combinations( input, i , numeric::MAX);
             size_t count = 0;
             do {
                 std::vector<char> characterCombo = combinations.current();

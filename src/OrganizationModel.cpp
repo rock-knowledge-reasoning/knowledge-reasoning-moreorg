@@ -5,7 +5,7 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #include <owl_om/Vocabulary.hpp>
-#include <owl_om/Combinatorics.hpp>
+#include <numeric/Combinatorics.hpp>
 #include <math.h>
 #include <set>
 
@@ -645,7 +645,7 @@ bool OrganizationModel::isSameResourceModel(const IRI& instance, const IRI& othe
 
 InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
 {
-    using namespace base::combinatorics;
+    using namespace numeric;
 
     IRIList actors = mpOntology->allInstancesOf( OM::Actor(), true );
     if(actors.size() < 2)
@@ -673,7 +673,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
 
 //InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
 //{
-//    using namespace base::combinatorics;
+//    using namespace numeric;
 //
 //    // 1. permute through all interfaces and create 'links'/connections
 //    //    - make sure constraints hold:
@@ -841,7 +841,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
 
 InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
 {
-    using namespace base::combinatorics;
+    using namespace numeric;
 
     // 1. permute through all interfaces and create 'links'/connections
     //    - make sure constraints hold:
@@ -1015,7 +1015,7 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
 
 uint32_t OrganizationModel::upperCombinationBound()
 {
-    using namespace base::combinatorics;
+    using namespace numeric;
 
     IRIList interfaces = mpOntology->allInstancesOf( OM::Interface(), true);
     if(interfaces.size() < 2)

@@ -2,10 +2,9 @@
 #define MULTIAGENT_UTILS_COALITION_STRUCTURE_GENERATION_HPP
 
 #include <limits>
-#include <owl_om/utils/IntegerPartitioning.hpp>
-#include <owl_om/Combinatorics.hpp>
 #include <boost/function.hpp>
 #include <base/Logging.hpp>
+#include <numeric/IntegerPartitioning.hpp>
 
 namespace multiagent {
 namespace utils {
@@ -51,7 +50,7 @@ private:
     CoalitionValueFunction mCoalitionValueFunction;
     CoalitionStructureValueFunction mCoalitionStructureValueFunction;
 
-    typedef std::map<IntegerPartition, Bounds> IntegerPartitionBoundsMap;
+    typedef std::map<numeric::IntegerPartition, Bounds> IntegerPartitionBoundsMap;
     IntegerPartitionBoundsMap mIntegerPartitionBoundsMap;
 
 
@@ -65,18 +64,18 @@ private:
     double bestLowerBound(const IntegerPartitionBoundsMap& boundMap);
     double bestUpperBound(const IntegerPartitionBoundsMap& boundMap);
 
-    Bounds computeIntegerPartitionBounds(const IntegerPartition& partition);
+    Bounds computeIntegerPartitionBounds(const numeric::IntegerPartition& partition);
     IntegerPartitionBoundsMap prune(const IntegerPartitionBoundsMap& boundsMap);
     CoalitionBoundMap prune(const CoalitionBoundMap& boundMap);
 
-    IntegerPartition selectIntegerPartition(const IntegerPartitionBoundsMap& boundMap, double maximumBound) const;
+    numeric::IntegerPartition selectIntegerPartition(const IntegerPartitionBoundsMap& boundMap, double maximumBound) const;
 
     /**
      *
      * \param globalUpperBound
      * \param bestStar Quality of the solution, i.e. 1.05 means 95% percent of the optimal solution
      */
-    CoalitionStructure searchSubspace(const IntegerPartition& partition, size_t k, size_t alpha, const AgentList& agents, CoalitionStructure bestStructure, double bestStructureValue, const CoalitionStructure& currentStructure, double globalUpperBound, double betaStar);
+    CoalitionStructure searchSubspace(const numeric::IntegerPartition& partition, size_t k, size_t alpha, const AgentList& agents, CoalitionStructure bestStructure, double bestStructureValue, const CoalitionStructure& currentStructure, double globalUpperBound, double betaStar);
 
 public:
 
