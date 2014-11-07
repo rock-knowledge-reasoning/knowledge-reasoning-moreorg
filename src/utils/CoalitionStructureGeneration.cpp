@@ -64,6 +64,44 @@ std::ostream& operator<<(std::ostream& os, const Bounds& bounds)
     return os;
 }
 
+std::vector<numeric::IntegerPartition> CoalitionStructureGeneration::Statistics::remainingIntegerPartitions() const
+{
+    // Copy since we want to maintain order in the actual object to
+    // see search and pruning order
+    std::vector<numeric::IntegerPartition> all = allIntegerPartitions;
+    std::vector<numeric::IntegerPartition> pruned = prunedIntegerPartitions;
+    std::vector<numeric::IntegerPartition> searched = searchedIntegerPartitions;
+
+    std::sort(all.begin(), all.end());
+    std::sort(pruned.begin(), pruned.end());
+    std::sort(searched.begin(), searched.end());
+
+    std::vector<numeric::IntegerPartition>::iterator it;
+
+    std::vector<numeric::IntegerPartition> blacklist(pruned.size() + searched.size());
+    it = std::set_union(pruned.begin(), pruned.end(), searched.begin(), searched.end(), blacklist.begin());
+    blacklist.resize(it - blacklist.begin());
+
+    std::vector<numeric::IntegerPartition> remaining(all.size() + blacklist.size());
+    it = std::set_difference(all.begin(), all.end(), blacklist.begin(), blacklist.end(), remaining.begin());
+    remaining.resize(it - remaining.begin());
+
+    return remaining;
+}
+
+std::string CoalitionStructureGeneration::Statistics::toString() const
+{
+    std::stringstream ss;
+    ss << "Statistics:" << std::endl;
+    ss << "    integer partitions:" << std::endl;
+    ss << "        all: " << IntegerPartitioning::toString(allIntegerPartitions) << std::endl;
+    ss << "        pruned: " << IntegerPartitioning::toString(prunedIntegerPartitions) << std::endl;
+    ss << "        searched: " << IntegerPartitioning::toString(searchedIntegerPartitions) << std::endl;
+    std::vector<numeric::IntegerPartition> remain = remainingIntegerPartitions();
+    ss << "        remaining: " << IntegerPartitioning::toString(remain) << std::endl;
+    return ss.str();
+}
+
 CoalitionStructureGeneration::CoalitionStructureGeneration(const AgentList& agents, CoalitionValueFunction coalitionValueFunction, CoalitionStructureValueFunction coalitionStructureValueFunction)
     : mAgents(agents)
     , mCoalitionValueFunction(coalitionValueFunction)
@@ -136,6 +174,7 @@ void CoalitionStructureGeneration::prepare()
         {
             Bounds bounds = computeIntegerPartitionBounds(*pit);
             mIntegerPartitionBoundsMap[*pit] = bounds;
+            mStatistics.allIntegerPartitions.push_back( *pit );
         }
     }
 
@@ -221,6 +260,9 @@ CoalitionStructureGeneration::IntegerPartitionBoundsMap CoalitionStructureGenera
         {
             LOG_DEBUG_S << "Removing partition: " << IntegerPartitioning::toString(cit->first) << " -- max: " << bounds.maximum << " < global min: " << globalLowerBound;
             updatedBoundsMap.erase(cit->first);
+
+            boost::unique_lock<boost::mutex> lock(mStatisticsMutex);
+            mStatistics.prunedIntegerPartitions.push_back(cit->first);
         }
     }
     return updatedBoundsMap;
@@ -248,6 +290,7 @@ CoalitionStructureGeneration::CoalitionBoundMap CoalitionStructureGeneration::pr
 
 void CoalitionStructureGeneration::reset()
 {
+    mStatistics = Statistics();
     mCurrentBestCoalitionStructure = CoalitionStructure();
     mCurrentBestCoalitionStructureValue = 0;
     mGlobalUpperBound = std::numeric_limits<double>::max();
@@ -274,6 +317,10 @@ CoalitionStructure CoalitionStructureGeneration::findBest(double quality)
         }
 
         LOG_INFO_S << "Compute best coalition structure for this subspace: " << IntegerPartitioning::toString(partition);
+        {
+            boost::unique_lock<boost::mutex> lock(mStatisticsMutex);
+            mStatistics.searchedIntegerPartitions.push_back(partition);
+        }
         bool improvedResult = searchSubspace(partition, 0, 0, mAgents, CoalitionStructure(), quality);
 
         // No improvement of the results
@@ -565,6 +612,12 @@ std::string CoalitionStructureGeneration::toString(const CoalitionStructure& c)
     std::stringstream ss;
     ss << c;
     return ss.str();
+}
+
+CoalitionStructureGeneration::Statistics CoalitionStructureGeneration::getStatistics() const
+{
+    boost::unique_lock<boost::mutex> lock(mStatisticsMutex);
+    return mStatistics;
 }
 
 } // end namespace utils

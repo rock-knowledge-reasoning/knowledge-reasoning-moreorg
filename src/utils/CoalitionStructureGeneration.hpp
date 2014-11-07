@@ -46,8 +46,20 @@ public:
     typedef boost::function1<double, const Coalition&> CoalitionValueFunction;
     typedef boost::function1<double, const CoalitionStructure&> CoalitionStructureValueFunction;
 
+    struct Statistics
+    {
+        std::vector<numeric::IntegerPartition> allIntegerPartitions;
+        std::vector<numeric::IntegerPartition> prunedIntegerPartitions;
+        std::vector<numeric::IntegerPartition> searchedIntegerPartitions;
+
+        std::vector<numeric::IntegerPartition> remainingIntegerPartitions() const;
+
+        std::string toString() const;
+    };
+
 private:
     AgentList mAgents;
+    Statistics mStatistics;
 
     // Agents listed by size of the coalition
     typedef std::map<size_t, std::set< Coalition > > AgentCoalitionMap;
@@ -63,6 +75,7 @@ private:
     IntegerPartitionBoundsMap mIntegerPartitionBoundsMap;
 
     mutable boost::mutex mSolutionMutex;
+    mutable boost::mutex mStatisticsMutex;
     boost::thread mThread;
     base::Time mStartTime;
     base::Time mCompletionTime;
@@ -159,6 +172,8 @@ public:
      * \return stringified instance of CoalitionStructure
      */
     static std::string toString(const CoalitionStructure& c);
+
+    Statistics getStatistics() const;
 };
 
 } // end namespace utils
