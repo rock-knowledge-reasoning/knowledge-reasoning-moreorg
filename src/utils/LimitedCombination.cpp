@@ -1,6 +1,6 @@
 #include <set>
 #include <iostream>
-#include <owl_om/utils/LimitedCombination.hpp>
+#include <numeric/LimitedCombination.hpp>
 
 void append(std::vector<char>& v, char c, size_t n)
 {
