@@ -2,14 +2,6 @@
 #include <iostream>
 #include <numeric/LimitedCombination.hpp>
 
-void append(std::vector<char>& v, char c, size_t n)
-{
-        for(size_t i = 0; i < n; ++i)
-        {
-            v.push_back(c);
-        }
-}
-
 // Compute the 'simple' number of combination or a set of types with limited occurrence per type, vs.
 // the occurrence of up to a given number for all types (which is the standard formula using the
 // binomialcoefficent of
@@ -32,7 +24,7 @@ int main()
         size_t numberPerType;
         std::cout << currentType << ": ";
         std::cin >> numberPerType;
-        append(input, currentType, numberPerType);
+        input.insert(input.begin(), numberPerType, currentType);
         availabilityMap[currentType] = numberPerType;
         ++currentType;
     }
