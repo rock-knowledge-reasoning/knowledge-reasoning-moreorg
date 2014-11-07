@@ -3,8 +3,10 @@
 
 #include <limits>
 #include <boost/function.hpp>
-#include <base/Logging.hpp>
+#include <boost/thread.hpp>
 #include <numeric/IntegerPartitioning.hpp>
+#include <base/Time.hpp>
+#include <base/Logging.hpp>
 
 namespace multiagent {
 namespace utils {
@@ -31,6 +33,12 @@ struct Bounds
 
 std::ostream& operator<<(std::ostream& os, const Bounds& bounds);
 
+/**
+ * This is an implementation of the coalition structure generation as described in:
+ * "An Anytime Algorithm for Optimal Coalition Structure Generation", (Rahwan et al., 2009)
+ *
+ * Please not that the current implementation uses recursion, but that will be subject to change.
+ */
 class CoalitionStructureGeneration
 {
 public:
@@ -53,6 +61,11 @@ private:
     typedef std::map<numeric::IntegerPartition, Bounds> IntegerPartitionBoundsMap;
     IntegerPartitionBoundsMap mIntegerPartitionBoundsMap;
 
+    boost::mutex mSolutionMutex;
+    boost::thread mThread;
+    base::Time mStartTime;
+    base::Time mCompletionTime;
+    CoalitionStructure mCurrentBestCoalitionStructure;
 
     /**
      * Compute the integer partitions and the agent coalition map for coalition size up to
@@ -78,6 +91,44 @@ private:
     CoalitionStructure searchSubspace(const numeric::IntegerPartition& partition, size_t k, size_t alpha, const AgentList& agents, CoalitionStructure bestStructure, double bestStructureValue, const CoalitionStructure& currentStructure, double globalUpperBound, double betaStar);
 
 public:
+    /**
+     * Find best coalitionstructure -- will block until coalition structure is found
+     */ 
+    CoalitionStructure findBest(double quality = 1.0);
+
+    /**
+     * Reset in order to restart a new search
+     */
+    void reset();
+
+    /**
+     * Search for a solution and allow retrieval of intermediate results via currentBestSolution
+     */
+    void anytimeSearch(double quality = 1.0);
+
+    /**
+     * Check if anytimeSearch completed
+     * \return true, upon completition, false otherwise -- if search has not been started at all, it will return false
+     */
+    bool anytimeSearchCompleted() const { return mCompletionTime != base::Time(); }
+
+    /**
+     * Compute total elapsed time since last search start
+     * \return time object representing the elapsed time, i.e. use toSeconds() or corresponding function to retrieve detailled value
+     */
+    base::Time elapsed() const { return base::Time::now() - mStartTime; }
+
+    /**
+     * Stop the search before completion
+     */
+    void stopSearch();
+
+    /**
+     * Retrieve the current best solution
+     * return the current best solution, if none has been found it will return an empty CoalitionStructure
+     */
+    CoalitionStructure currentBestSolution();
+
 
     /**
      * \params agents List of agents that are available
@@ -86,9 +137,18 @@ public:
      */
     CoalitionStructureGeneration(const AgentList& agents, CoalitionValueFunction coalitionValueFunction, CoalitionStructureValueFunction coalitionStructureValueFunction);
 
-    CoalitionStructure findBest(double quality = 1.0);
 
+    /**
+     * Stringify status of this CoalitionStructureGeneration object
+     * \return stringified instance
+     */
     std::string toString() const;
+
+    /**
+     * Stringify a CoalitionStructure
+     * \return stringified instance of CoalitionStructure
+     */
+    static std::string toString(const CoalitionStructure& c);
 };
 
 } // end namespace utils

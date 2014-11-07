@@ -1,4 +1,4 @@
-find_package(Boost REQUIRED regex)
+find_package(Boost REQUIRED regex thread system)
 set(ICU_LIBS icutu
     icutest
     icudata

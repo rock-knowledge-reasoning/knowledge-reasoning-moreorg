@@ -69,7 +69,7 @@ CoalitionStructureGeneration::CoalitionStructureGeneration(const AgentList& agen
     , mCoalitionValueFunction(coalitionValueFunction)
     , mCoalitionStructureValueFunction(coalitionStructureValueFunction)
 {
-    prepare();
+    reset();
 }
 
 void CoalitionStructureGeneration::prepare()
@@ -245,6 +245,12 @@ CoalitionStructureGeneration::CoalitionBoundMap CoalitionStructureGeneration::pr
     return updatedCoalitionBoundMap;
 }
 
+void CoalitionStructureGeneration::reset()
+{
+    mCurrentBestCoalitionStructure = CoalitionStructure();
+    prepare();
+}
+
 CoalitionStructure CoalitionStructureGeneration::findBest(double quality)
 {
     LOG_DEBUG_S << "Pruning integer partition space";
@@ -276,9 +282,13 @@ CoalitionStructure CoalitionStructureGeneration::findBest(double quality)
             boundMap.erase(partition);
             globalUpperBound = bestUpperBound(boundMap);
         } else {
-
             bestCoalitionStructure = coalitionStructure;
             bestCoalitionStructureValue = mCoalitionStructureValueFunction(bestCoalitionStructure);
+
+            {
+                boost::unique_lock<boost::mutex> lock(mSolutionMutex);
+                mCurrentBestCoalitionStructure = bestCoalitionStructure;
+            }
 
             if(globalUpperBound / bestCoalitionStructureValue <= quality)
             {
@@ -304,9 +314,28 @@ CoalitionStructure CoalitionStructureGeneration::findBest(double quality)
             break;
         }
     }
+    mCompletionTime = base::Time::now();
 
     LOG_DEBUG_S << "Best coalition found: " << bestCoalitionStructure << ", " << mCoalitionStructureValueFunction(bestCoalitionStructure);
     return bestCoalitionStructure;
+}
+
+void CoalitionStructureGeneration::anytimeSearch(double quality)
+{
+    mStartTime = base::Time::now();
+    mCompletionTime = base::Time();
+    mThread = boost::thread(&CoalitionStructureGeneration::findBest, this, quality);
+}
+
+void CoalitionStructureGeneration::stopSearch()
+{
+    mThread.interrupt();
+}
+
+CoalitionStructure CoalitionStructureGeneration::currentBestSolution()
+{
+    boost::unique_lock<boost::mutex> lock(mSolutionMutex);
+    return mCurrentBestCoalitionStructure;
 }
 
 IntegerPartition CoalitionStructureGeneration::selectIntegerPartition(const CoalitionStructureGeneration::IntegerPartitionBoundsMap& boundMap, double maximumBound) const
@@ -507,6 +536,16 @@ std::string CoalitionStructureGeneration::toString() const
     {
         ss << cit->first << " -- " << cit->second << std::endl;
     }
+
+    ss << "Current best solution: " << std::endl;
+    ss << toString(mCurrentBestCoalitionStructure);
+    return ss.str();
+}
+
+std::string CoalitionStructureGeneration::toString(const CoalitionStructure& c)
+{
+    std::stringstream ss;
+    ss << c;
     return ss.str();
 }
 
