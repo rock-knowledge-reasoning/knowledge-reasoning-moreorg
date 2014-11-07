@@ -40,6 +40,7 @@ double coalitionValueFunction(const Coalition& coalition)
     updateCostMap(costMap, "bc", 150);
     updateCostMap(costMap, "bd", 200);
     updateCostMap(costMap, "cd", 125);
+    updateCostMap(costMap, "de", 425);
 
     updateCostMap(costMap, "abc", 200);
     updateCostMap(costMap, "abd", 150);
@@ -86,6 +87,32 @@ double coalitionStructureValueFunction(const CoalitionStructure& c)
 BOOST_AUTO_TEST_CASE(it_should_compute_csg)
 {
     AgentList agents;
+    char numberOfAgents = 3;
+    for(char a = 'a'; a < 'a' + numberOfAgents; ++a)
+    {
+        std::stringstream ss;
+        ss << a;
+        agents.push_back(ss.str());
+    }
+    CoalitionStructureGeneration csg(agents, coalitionValueFunction, coalitionStructureValueFunction);
+    BOOST_TEST_MESSAGE("Preparation done: " << csg.toString());
+    csg.anytimeSearch(1.0);
+    while(!csg.anytimeSearchCompleted())
+    {
+        sleep(1);
+        BOOST_TEST_MESSAGE("Intermediate result: " << CoalitionStructureGeneration::toString( csg.currentBestSolution()) << ", value: " << coalitionStructureValueFunction(csg.currentBestSolution()) << ", quality: " << csg.currentBestSolutionQuality() );
+    }
+    BOOST_TEST_MESSAGE("Final result: " << CoalitionStructureGeneration::toString(csg.currentBestSolution()) << ", value: " << coalitionStructureValueFunction(csg.currentBestSolution()) );
+
+    csg.reset();
+    BOOST_TEST_MESSAGE("Reset done: " << csg.toString());
+    CoalitionStructure cs = csg.findBest(1.0);
+    BOOST_TEST_MESSAGE("Found best: " << CoalitionStructureGeneration::toString(cs) << ", value: " << coalitionStructureValueFunction(cs));
+}
+
+BOOST_AUTO_TEST_CASE(it_should_compute_csg_anytime)
+{
+    AgentList agents;
     char numberOfAgents = 8;
     for(char a = 'a'; a < 'a' + numberOfAgents; ++a)
     {
@@ -95,16 +122,12 @@ BOOST_AUTO_TEST_CASE(it_should_compute_csg)
     }
     CoalitionStructureGeneration csg(agents, coalitionValueFunction, coalitionStructureValueFunction);
     BOOST_TEST_MESSAGE("Preparation done: " << csg.toString());
-    CoalitionStructure cs = csg.findBest(1.0);
-    BOOST_TEST_MESSAGE("Found best: " << CoalitionStructureGeneration::toString(cs) << ", value: " << coalitionStructureValueFunction(cs));
-
-    csg.reset();
-    BOOST_TEST_MESSAGE("Reset done: " << csg.toString());
     csg.anytimeSearch(1.0);
-    while(!csg.completed())
+    while(!csg.anytimeSearchCompleted())
     {
         sleep(1);
-        BOOST_TEST_MESSAGE("Intermediate result: " << CoalitionStructureGeneration::toString( csg.currentBestSolution()) << ", value: " << coalitionStructureValueFunction(csg.currentBestSolution()) );
+        BOOST_TEST_MESSAGE("Intermediate result: " << CoalitionStructureGeneration::toString( csg.currentBestSolution()) << ", value: " << coalitionStructureValueFunction(csg.currentBestSolution()) << ", quality: " << csg.currentBestSolutionQuality() );
+        BOOST_TEST_MESSAGE("      " << csg.getStatistics().toString());
     }
     BOOST_TEST_MESSAGE("Final result: " << CoalitionStructureGeneration::toString(csg.currentBestSolution()) << ", value: " << coalitionStructureValueFunction(csg.currentBestSolution()) );
 }

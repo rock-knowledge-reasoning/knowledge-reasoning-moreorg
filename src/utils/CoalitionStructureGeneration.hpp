@@ -31,6 +31,7 @@ struct Bounds
     std::string toString() const;
 };
 
+
 std::ostream& operator<<(std::ostream& os, const Bounds& bounds);
 
 /**
@@ -61,11 +62,14 @@ private:
     typedef std::map<numeric::IntegerPartition, Bounds> IntegerPartitionBoundsMap;
     IntegerPartitionBoundsMap mIntegerPartitionBoundsMap;
 
-    boost::mutex mSolutionMutex;
+    mutable boost::mutex mSolutionMutex;
     boost::thread mThread;
     base::Time mStartTime;
     base::Time mCompletionTime;
     CoalitionStructure mCurrentBestCoalitionStructure;
+    double mCurrentBestCoalitionStructureValue;
+    double mCurrentSolutionQuality;
+    double mGlobalUpperBound;
 
     /**
      * Compute the integer partitions and the agent coalition map for coalition size up to
@@ -87,8 +91,11 @@ private:
      *
      * \param globalUpperBound
      * \param bestStar Quality of the solution, i.e. 1.05 means 95% percent of the optimal solution
+     * \return true if this subspace contained a better solution than already existed
      */
-    CoalitionStructure searchSubspace(const numeric::IntegerPartition& partition, size_t k, size_t alpha, const AgentList& agents, CoalitionStructure bestStructure, double bestStructureValue, const CoalitionStructure& currentStructure, double globalUpperBound, double betaStar);
+    bool searchSubspace(const numeric::IntegerPartition& partition, size_t k, size_t alpha, const AgentList& agents, const CoalitionStructure& currentStructure, double betaStar);
+
+    bool updateCurrentBestCoalitionStructure(const CoalitionStructure& coalitionStructure, double value);
 
 public:
     /**
@@ -127,7 +134,10 @@ public:
      * Retrieve the current best solution
      * return the current best solution, if none has been found it will return an empty CoalitionStructure
      */
-    CoalitionStructure currentBestSolution();
+    CoalitionStructure currentBestSolution() const;
+
+    double currentBestSolutionValue() const;
+    double currentBestSolutionQuality() const;
 
 
     /**
