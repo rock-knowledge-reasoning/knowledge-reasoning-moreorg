@@ -208,6 +208,12 @@ double CoalitionStructureGeneration::bestLowerBound(const CoalitionStructureGene
             lowerBound = bounds.average;
         }
     }
+    // Upper bound is minimum the current best solution value
+    double best = currentBestSolutionValue();
+    if(lowerBound < best)
+    {
+        return best;
+    }
     return lowerBound;
 }
 
@@ -222,6 +228,13 @@ double CoalitionStructureGeneration::bestUpperBound(const IntegerPartitionBounds
         {
             upperBound = bounds.maximum;
         }
+    }
+
+    // Upper bound is minimum the current best solution value
+    double best = currentBestSolutionValue();
+    if(upperBound < best)
+    {
+        return best;
     }
     return upperBound;
 }
