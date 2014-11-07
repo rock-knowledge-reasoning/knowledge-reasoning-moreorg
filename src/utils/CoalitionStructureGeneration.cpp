@@ -464,8 +464,8 @@ bool CoalitionStructureGeneration::searchSubspace(const IntegerPartition& partit
     }
     LOG_DEBUG_S << indent << " indexlist initialized: " << IntegerPartitioning::toString(indexList) << " agents: " << agents.size();
 
-    // Compute upper bound for M_{k,0} to avaoid redundant computations
-    size_t upperBoundM_k = mAgents.size() + 1;
+    // Compute upper bound for M_{k,0} to avoid redundant computations
+    int upperBoundM_k = mAgents.size() + 1;
     for(size_t i = 0; i < k; ++i)
     {
         upperBoundM_k += partition[i]*IntegerPartitioning::multiplicity(partition, partition[i]);
@@ -473,17 +473,18 @@ bool CoalitionStructureGeneration::searchSubspace(const IntegerPartition& partit
     LOG_DEBUG_S << indent << " upperBound M_k: " << upperBoundM_k;
 
     // Compute upper bound of subspace, so that we can stop computation when this maximum has
-    // been found
+    // been reached
     double upperBoundOfSubspace = mIntegerPartitionBoundsMap[partition].maximum;
     LOG_DEBUG_S << indent << " upperBound of subspace " << IntegerPartitioning::toString(partition) << ": " << upperBoundOfSubspace;
 
     using namespace numeric;
     Combination<int> combinations(indexList, partition[k], EXACT);
     do {
+        // m_k represent the an array of indices
         std::vector<int> m_k = combinations.current();
         LOG_DEBUG_S << indent << " current combination m_k=" << IntegerPartitioning::toString(m_k) << ", alpha=" << alpha;
-        // m_k[0] + 1: we start with index 0
-        if(alpha <= m_k[0] + 1 && m_k[0] + 1 <= upperBoundM_k)
+        // m_k[0] + 1: we start with index 0, but the algorithmic description uses 1 as first index
+        if(((int) alpha) <= m_k[0] + 1 && m_k[0] + 1 <= upperBoundM_k)
         {
             LOG_DEBUG_S << indent << " computing combination";
             // Map combination of indices to current coalition, i.e. an agent (sub)set
@@ -502,11 +503,11 @@ bool CoalitionStructureGeneration::searchSubspace(const IntegerPartition& partit
             LOG_DEBUG_S << indent << " current coalition structure: " << currentStructure;
             LOG_DEBUG_S << indent << " partial coalition structure: " << coalitionStructure << " , remaining agents " << remainingAgents;
 
-            double currentStructureValue = mCoalitionStructureValueFunction( coalitionStructure );
 
-            // Check if we reached the end
+            // Check if we reached the end, i.e. when we have a complete coalition structure
             if(k == partition.size() - 1)
             {
+                double currentStructureValue = mCoalitionStructureValueFunction( coalitionStructure );
                 LOG_DEBUG_S << indent << " reached the end at k: " << k << " -- bestValue: " << currentBestSolution() << " vs. " << currentStructureValue;
                 if(currentStructureValue > currentBestSolutionValue())
                 {
@@ -532,7 +533,7 @@ bool CoalitionStructureGeneration::searchSubspace(const IntegerPartition& partit
 
                 // Estimate value for the rest of the partition based on the bounds computed
                 // on coalition sizes, i.e.
-                // looking at the integer partition's yet uninvestigate range
+                // looking at the integer partition's yet uninvestigated range
                 for( size_t i = coalitionStructure.size(); i < partition.size(); ++i)
                 {
                     double max_s = mCoalitionBoundMap[ partition[i] ].maximum;
