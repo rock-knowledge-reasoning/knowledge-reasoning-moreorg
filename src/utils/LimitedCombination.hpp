@@ -12,9 +12,19 @@ namespace numeric {
  *
  * Use integers to compute the core combinatorics, i.e. avoiding the 
  * computational effort for comparison of custom objects
- * mapping the object for each combination can be done in O(n) since
- * we are using a type maplist that maps in O(1) for each of the n 
- * items
+ *
+ \beginverbatim
+ using namespace numeric;
+ std::map<std::string, size_t> items;
+ items["item-1"] = 2;
+ items["item-2"] = 2;
+ items["item-3"] = 2;
+
+ LimitedCombination<std::string> combinations(items, LimitedCombination<std::string>::totalNumberOfAtoms(items), MAX);
+ do {
+    std::vector<std::string> currentCombination = combinations.current();
+ } while(combinations.next());
+ \endverbatim
  */
 template<typename AtomType>
 class LimitedCombination
@@ -35,7 +45,8 @@ class LimitedCombination
     numeric::Mode mMode;
 
     /**
-     * Prepare limite combinations
+     * Prepare limited combinations, i.e. setup the internal
+     * item vector which will be used to determine the combination
      */
     void prepare()
     {
@@ -52,6 +63,10 @@ class LimitedCombination
         mpItemCombinationGenerator = new numeric::Combination<CoreType>(mItems, mSize, mMode);
     }
 
+    /**
+     * Map the internal combination to external types
+     * \ŗeturn Combination of custom types
+     */
     std::vector<AtomType> mapToAtomTypes(const std::vector<CoreType>& combination)
     {
         std::vector<AtomType> atomTypeList;
@@ -64,6 +79,12 @@ class LimitedCombination
     }
 
 public:
+    /**
+     * Construct limited combination generator
+     * \param countMap Mapping a item (type) to the maximum possible number of occurence
+     * \param size In combination with mode, define the combination size 
+     * \param mode Interpretation of the combination size, i.e. can be exact, min or max
+     */
     LimitedCombination(const AtomType2CountMap& countMap, size_t size, numeric::Mode mode)
         : mAtomTypeAvailablilityMap(countMap)
         , mpItemCombinationGenerator(0)
@@ -79,6 +100,10 @@ public:
         prepare();
     }
 
+    /**
+     * Get the totalNumberOfAtoms, i.e. the sum of occurrence
+     * \return total number of atoms defined by the given map
+     */
     static size_t totalNumberOfAtoms(const AtomType2CountMap& countMap)
     {
         typename AtomType2CountMap::const_iterator cit = countMap.begin();
@@ -90,6 +115,10 @@ public:
         return count;
     }
 
+    /**
+     * Get the current custom combination
+     * \return current custom combination
+     */
     std::vector<AtomType> current()
     {
         std::vector<CoreType> current = mpItemCombinationGenerator->current();
@@ -98,6 +127,12 @@ public:
         return atomTypeList;
     }
 
+    /**
+     * Check if there is a next combination and 
+     * forward internal iterator, so that current allows
+     * to retrieve this combination
+     * \return true if there is another valid combination
+     */
     bool next()
     {
        return mpItemCombinationGenerator->next(); 
