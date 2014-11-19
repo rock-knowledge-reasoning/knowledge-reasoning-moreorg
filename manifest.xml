@@ -13,5 +13,6 @@
   <depend package="planning/pddl_planner" />
   <depend package="uriparser" />
   <depend package="soprano" />
+  <depend package="glpk" />
   <!-- <depend package="ctemplate" /> -->
 </package>

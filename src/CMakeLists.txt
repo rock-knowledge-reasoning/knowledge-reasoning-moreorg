@@ -91,10 +91,11 @@ rock_library(owl_om
         owlapi/model/entities/OWLObjectProperty.hpp
         reasoner/factpp/Types.hpp
         utils/CoalitionStructureGeneration.hpp
+        utils/CorrelationClustering.hpp
     DEPS_PKGCONFIG numeric soprano factpp pddl_planner liburiparser
 )
 include_directories(${Boost_INCLUDE_DIR})
-target_link_libraries(owl_om ${Boost_LIBRARIES} ${ICU_LIBS})
+target_link_libraries(owl_om ${Boost_LIBRARIES} ${ICU_LIBS} glpk)
 
 rock_executable(owl_om_bin Main.cpp
     DEPS owl_om)
