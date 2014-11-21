@@ -189,6 +189,12 @@ void Ontology::reload()
                 }
             }
         }
+
+        // TODO: add ObjectCardinalityRestriction
+        // allow to search for cardinality restrictions
+        // per model
+        // show change: add UnvailableResource
+        // --> compute the missing fulfillment based on given cardinalities
     }
 
     loadObjectProperties();

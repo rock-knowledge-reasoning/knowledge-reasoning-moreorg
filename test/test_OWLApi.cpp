@@ -5,9 +5,10 @@
 #include <owl_om/Vocabulary.hpp>
 #include <boost/regex.hpp>
 
+using namespace owlapi::model;
+
 BOOST_AUTO_TEST_CASE(it_should_handle_iris)
 {
-    using namespace owlapi::model;
     {
         IRI iri;
         BOOST_REQUIRE_THROW(iri.getScheme(), std::invalid_argument);
@@ -91,4 +92,16 @@ BOOST_AUTO_TEST_CASE(it_should_handle_iris)
         BOOST_REQUIRE_MESSAGE(regex_match(iri.toString(), r), "IRI correctly escaped -- positive test: regex is: " << r.str());
         BOOST_REQUIRE_MESSAGE(!regex_match(iriFail.toString(), r), "IRI correctly escaped -- negative test");
     }
+}
+
+BOOST_AUTO_TEST_CASE(it_should_handle_property_expressions)
+{
+    OWLObjectPropertyExpression::Ptr oProperty( new OWLObjectProperty("http://www.w3.org/2002/07/custom#has"));
+    OWLInverseObjectProperty inverseProperty(oProperty);
+
+    BOOST_REQUIRE_EQUAL( inverseProperty.getInverse() == oProperty)
+}
+
+BOOST_AUTO_TEST_CASE(it_should_handle_restrictions)
+{
 }

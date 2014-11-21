@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_ENTITY_HPP
-#define OWL_API_MODEL_ENTITY_HPP
+#ifndef OWL_API_MODEL_OWL_ENTITY_HPP
+#define OWL_API_MODEL_OWL_ENTITY_HPP
 
 #include <owl_om/owlapi/model/OWLNamedObject.hpp>
 
@@ -21,4 +21,4 @@ public:
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_ENTITY_HPP
+#endif // OWL_API_MODEL_OWL_ENTITY_HPP

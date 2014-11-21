@@ -6,5 +6,7 @@
 #include <owl_om/owlapi/model/OWLNamedObject.hpp>
 #include <owl_om/owlapi/model/OWLAxiom.hpp>
 #include <owl_om/owlapi/model/OWLEntity.hpp>
+#include <owl_om/owlapi/model/OWLObjectProperty.hpp>
+#include <owl_om/owlapi/model/OWLInverseObjectProperty.hpp>
 
 #endif // OWL_OM_OWL_API_HPP
