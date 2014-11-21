@@ -38,7 +38,13 @@ class CorrelationClustering
         // Defining the general optimization mpProblem as
         //
         // w = SUM_{E-}(c_e(1-x_e)) + SUM_{E+}(c_e*x_e)
-        // w = SUM_{E-}c_e - SUM_{E-}c_e*x_e + SUM_{E+}(c_e*x_e)
+        // allow us to reduce the optimization problem to
+        // w = SUM_{E-}c_e - SUM_{E-}(c_e*x_e) + SUM_{E+}(c_e*x_e)
+        // and minimizing
+        // w = - SUM_{E-}(c_e*x_e) + SUM_{E+}(c_e*x_e)
+        // and considering that negative weights belong to E- and positive to E+, we
+        // can minimize the following function:
+        // w = SUM_{E-}(c_e*x_e) + SUM_{E+}(c_e*x_e}) = SUM_{E}(c_e*x_e)
         size_t totalNumberOfColumns = mEdgeWeights.size();
         glp_add_cols(mpProblem, totalNumberOfColumns); 
         // GLP_DB: double bounded variable
