@@ -14,6 +14,8 @@ class OrganizationModel;
 /**
  * @class KnowledgeBase
  * @brief KnowledgeBase serves as main layer of abstraction for the underlying database
+ *
+ * @see http://www.w3.org/TR/owl-parsing/#sec-implementation
  */
 class Ontology : public owl_om::KnowledgeBase
 {

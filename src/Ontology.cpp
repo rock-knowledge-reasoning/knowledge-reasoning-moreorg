@@ -49,6 +49,7 @@ void Ontology::reload()
         }
     }
 
+    std::vector<owlapi::model::IRI> restrictions;
     {
         db::query::Results results = findAll(Subject(), Predicate(), Object());
         ResultsIterator it(results);
@@ -104,7 +105,8 @@ void Ontology::reload()
                     LOG_DEBUG_S << "Annotation property '" << subject << "' ignored for reasoning";
                 } else if ( object == vocabulary::OWL::Restriction() )
                 {
-                    LOG_DEBUG_S << "Found restriction";
+                    LOG_DEBUG_S << "Found restriction" << subject;
+                    restrictions.push_back(subject);
                 }
             } else if(predicate == vocabulary::RDFS::subClassOf())
             {
@@ -130,6 +132,61 @@ void Ontology::reload()
                 functionalProperty(subject, DATA);
             } else {
                 throw std::invalid_argument("Property '" + subject.toString() + "' is not a known object or data property");
+            }
+        }
+    }
+
+    // Restrictions
+    {
+        std::vector<owlapi::model::IRI>::const_iterator it = restrictions.begin();
+        for(; it != restrictions.end(); ++it)
+        {
+            owlapi::model::IRI restriction = *it;
+            Results results = findAll(restriction, Predicate(), Object());
+
+            // Get onProperty
+            ResultsIterator it(results);
+            bool foundProperty = false;
+            owlapi::model::IRI property;
+            while(it.next())
+            {
+                owlapi::model::IRI predicate = it[Predicate()];
+                if(predicate == vocabulary::OWL::onProperty())
+                {
+                    if(foundProperty)
+                    {
+                        std::stringstream ss;
+                        ss << "Restriction '" << restriction << "' applies to more than one property, but requires to be exactly one";
+                        throw std::invalid_argument("owl_om::Ontology: " + ss.str() );
+                    }
+
+                    property = it[Object()];
+                    foundProperty = true;
+
+                    LOG_DEBUG_S << "Restriction '" << restriction << "' applies to: " << property;
+                    continue;
+                }
+                if(!foundProperty)
+                {
+                    std::stringstream ss;
+                    ss << "Restriction '" << restriction << "' applies not apply to any property, but requires to be exactly one";
+                    throw std::invalid_argument("owl_om::Ontology: " + ss.str() );
+                }
+
+                if(predicate == vocabulary::OWL::minCardinality())
+                {
+                } else if(predicate == vocabulary::OWL::maxCardinality())
+                {
+                } else if(predicate == vocabulary::OWL::cardinality())
+                {
+                    // create cardinality
+                } else if(predicate == vocabulary::OWL::someValuesFrom())
+                {
+                } else if(predicate == vocabulary::OWL::allValuesFrom())
+                {
+                } else if(predicate == vocabulary::OWL::hasValue())
+                {
+                }
             }
         }
     }
