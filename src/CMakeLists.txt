@@ -69,18 +69,25 @@ rock_library(owl_om
         organization_model/InterfaceConnection.hpp
         organization_model/Statistics.hpp
         owlapi/io/XMLUtils.hpp
-        #owlapi/model/AnonymousIndividual.hpp
-        owlapi/model/HasIRI.hpp
         owlapi/model/HasAnnotations.hpp
+        owlapi/model/HasIRI.hpp
         owlapi/model/IRI.hpp
         owlapi/model/OWLAnnotation.hpp
+        owlapi/model/OWLAnonymousIndividual.hpp
         owlapi/model/OWLAxiom.hpp
+        owlapi/model/OWLCardinalityRestriction.hpp
         owlapi/model/OWLClassExpression.hpp
         owlapi/model/OWLDataRange.hpp
         owlapi/model/OWLEntity.hpp
+        owlapi/model/OWLExactCardinalityRestriction.hpp
+        owlapi/model/OWLIndividual.hpp
+        owlapi/model/OWLMaxCardinalityRestriction.hpp
+        owlapi/model/OWLMinCardinalityRestriction.hpp
         owlapi/model/OWLNamedObject.hpp
         owlapi/model/OWLObject.hpp
         owlapi/model/OWLPropertyRange.hpp
+        owlapi/model/OWLQualifiedRestriction.hpp
+        owlapi/model/OWLRestriction.hpp
         owlapi/model/URI.hpp
         owlapi/model/entities/OWLAnnotationProperty.hpp
         owlapi/model/entities/OWLClass.hpp
