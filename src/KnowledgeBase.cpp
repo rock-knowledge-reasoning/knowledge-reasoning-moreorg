@@ -38,7 +38,7 @@ ClassExpression KnowledgeBase::getClass(const IRI& klass) const
     IRIClassExpressionMap::const_iterator cit = mClasses.find(klass);
     if(cit == mClasses.end())
     {
-        throw std::invalid_argument("Class '" + klass.toString() + "' does not exist");
+        throw std::invalid_argument("KnowledgeBase::getClass: Class '" + klass.toString() + "' does not exist");
     }
 
     return cit->second;
@@ -62,7 +62,7 @@ InstanceExpression KnowledgeBase::getInstance(const IRI& instance) const
     IRIInstanceExpressionMap::const_iterator cit = mInstances.find(instance);
     if(cit == mInstances.end())
     {
-        throw std::invalid_argument("Instance '" + instance.toString() + "' does not exist");
+        throw std::invalid_argument("KnowledgeBase::getInstance: Instance '" + instance.toString() + "' does not exist");
     }
 
     return cit->second;
@@ -86,7 +86,7 @@ ObjectPropertyExpression KnowledgeBase::getObjectProperty(const IRI& property) c
     IRIObjectPropertyExpressionMap::const_iterator cit = mObjectProperties.find(property);
     if(cit == mObjectProperties.end())
     {
-        throw std::invalid_argument("ObjectProperty '" + property.toString() + "' does not exist");
+        throw std::invalid_argument("KnowledgeBase::getObjectProperty: ObjectProperty '" + property.toString() + "' does not exist");
     }
     return cit->second;
 }
@@ -146,7 +146,7 @@ DataPropertyExpression KnowledgeBase::getDataProperty(const IRI& property) const
     IRIDataPropertyExpressionMap::const_iterator cit = mDataProperties.find(property);
     if(cit == mDataProperties.end())
     {
-        throw std::invalid_argument("DataProperty '" + property.toString() + "' does not exist");
+        throw std::invalid_argument("KnowledgeBase::getDataProperty: DataProperty '" + property.toString() + "' does not exist");
     }
     return cit->second;
 }
@@ -198,6 +198,33 @@ void KnowledgeBase::refresh()
     mKernel->realiseKB();
 }
 
+bool KnowledgeBase::isConsistent()
+{
+    return mKernel->isKBConsistent();
+}
+
+void KnowledgeBase::classify()
+{
+    mKernel->classifyKB();
+}
+
+void KnowledgeBase::realize()
+{
+    mKernel->realiseKB();
+}
+
+bool KnowledgeBase::isRealized()
+{
+    return mKernel->isKBRealised();
+}
+
+bool KnowledgeBase::isClassSatifiable(const IRI& klass)
+{
+    ClassExpression e_klass = getClass(klass);
+    return mKernel->isSatisfiable(e_klass.get());
+}
+
+
 ObjectPropertyExpression KnowledgeBase::objectProperty(const IRI& property)
 {
     return getObjectPropertyLazy(property);
@@ -212,6 +239,12 @@ Axiom KnowledgeBase::transitiveProperty(const IRI& property)
 {
     ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
     return Axiom( mKernel->setTransitive(e_property.get()) );
+}
+
+bool KnowledgeBase::isTransitiveProperty(const IRI& property)
+{
+    ObjectPropertyExpression e_property = getObjectProperty(property);
+    return mKernel->isTransitive(e_property.get());
 }
 
 Axiom KnowledgeBase::functionalProperty(const IRI& property, PropertyType type)
@@ -229,8 +262,25 @@ Axiom KnowledgeBase::functionalProperty(const IRI& property, PropertyType type)
             return Axiom( mKernel->setDFunctional(e_property.get()) );
         }
         default:
-            throw std::invalid_argument("Functional property can only be created for object or data property");
+            throw std::invalid_argument("KnowledgeBase::functionalProperty: Functional property can only be created for object or data property");
     }
+}
+
+bool KnowledgeBase::isFunctionalProperty(const IRI& property)
+{
+    try {
+        ObjectPropertyExpression e_property = getObjectProperty(property);
+        return mKernel->isFunctional(e_property.get());
+    } catch(...)
+    {}
+
+    try {
+        DataPropertyExpression e_property = getDataProperty(property);
+        return mKernel->isFunctional(e_property.get());
+    } catch(...)
+    {}
+
+    throw std::invalid_argument("KnowledgeBase::isFunctionalProperty: Property '" + property.toString() + "' is not a known data or object property");
 }
 
 Axiom KnowledgeBase::inverseFunctionalProperty(const IRI& property)
@@ -239,10 +289,22 @@ Axiom KnowledgeBase::inverseFunctionalProperty(const IRI& property)
     return Axiom( mKernel->setInverseFunctional(e_property.get()) );
 }
 
+bool KnowledgeBase::isInverseFunctionalProperty(const IRI& property)
+{
+    ObjectPropertyExpression e_property = getObjectProperty(property);
+    return mKernel->isInverseFunctional(e_property.get());
+}
+
 Axiom KnowledgeBase::reflexiveProperty(const IRI& property)
 {
     ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
     return Axiom( mKernel->setReflexive(e_property.get()) );
+}
+
+bool KnowledgeBase::isReflexiveProperty(const IRI& property)
+{
+    ObjectPropertyExpression e_property = getObjectProperty(property);
+    return mKernel->isReflexive(e_property.get());
 }
 
 Axiom KnowledgeBase::irreflexiveProperty(const IRI& property)
@@ -251,16 +313,34 @@ Axiom KnowledgeBase::irreflexiveProperty(const IRI& property)
     return Axiom( mKernel->setIrreflexive(e_property.get()) );
 }
 
+bool KnowledgeBase::isIrreflexiveProperty(const IRI& property)
+{
+    ObjectPropertyExpression e_property = getObjectProperty(property);
+    return mKernel->isIrreflexive(e_property.get());
+}
+
 Axiom KnowledgeBase::symmetricProperty(const IRI& property)
 {
     ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
     return Axiom( mKernel->setSymmetric(e_property.get()) );
 }
 
+bool KnowledgeBase::isSymmetricProperty(const IRI& property)
+{
+    ObjectPropertyExpression e_property = getObjectProperty(property);
+    return mKernel->isSymmetric(e_property.get());
+}
+
 Axiom KnowledgeBase::asymmetricProperty(const IRI& property)
 {
     ObjectPropertyExpression e_property = getObjectPropertyLazy(property);
     return Axiom( mKernel->setAsymmetric(e_property.get()) );
+}
+
+bool KnowledgeBase::isAsymmetricProperty(const IRI& property)
+{
+    ObjectPropertyExpression e_property = getObjectProperty(property);
+    return mKernel->isAsymmetric(e_property.get());
 }
 
 Axiom KnowledgeBase::subclassOf(const IRI& subclass, const IRI& parentClass)
@@ -355,7 +435,7 @@ Axiom KnowledgeBase::alias(const IRI& aliasName, const IRI& iri, EntityType type
             return alias(aliasName, e_class);
         }
         default:
-            throw std::invalid_argument("Alias for entity type '" + EntityTypeTxt[type] + "' not supported");
+            throw std::invalid_argument("KnowledgeBase::alias: Alias for entity type '" + EntityTypeTxt[type] + "' not supported");
     }
 }
 
@@ -565,6 +645,23 @@ bool KnowledgeBase::isSubclassOf(const ClassExpression& subclass, const IRI& par
     return mKernel->isSubsumedBy(subclass.get(), e_class.get());
 }
 
+
+bool KnowledgeBase::isEquivalentClass(const IRI& klass0, const IRI& klass1)
+{
+    ClassExpression e_class0 = getClass(klass0);
+    ClassExpression e_class1 = getClass(klass1);
+
+    return mKernel->isEquivalent( e_class0.get(), e_class1.get() );
+}
+
+bool KnowledgeBase::isDisjointClass(const IRI& klass0, const IRI& klass1)
+{
+    ClassExpression e_class0 = getClass(klass0);
+    ClassExpression e_class1 = getClass(klass1);
+
+    return mKernel->isDisjoint( e_class0.get(), e_class1.get() );
+}
+
 bool KnowledgeBase::isInstanceOf(const IRI& instance, const IRI& klass)
 {
     InstanceExpression e_instance = getInstance(instance);
@@ -631,6 +728,43 @@ IRIList KnowledgeBase::allAncestorsOf(const IRI& klass, bool direct)
     }
     delete[] result;
     return superclasses;
+}
+
+IRIList KnowledgeBase::allEquivalentClasses(const IRI& klass)
+{
+    ClassExpression e_class = getClass(klass);
+    IRIList equivalentclasses;
+
+    Actor actor;
+    actor.needConcepts();
+    mKernel->getEquivalentConcepts(e_class.get(), actor);
+    // getSynonyms: 1D NULL terminated array
+    const char** result = actor.getSynonyms();
+    for(size_t i = 0; result[i] != NULL; ++i)
+    {
+        equivalentclasses.push_back( IRI::create(result[i]) );
+    }
+    delete[] result;
+    return equivalentclasses;
+}
+
+IRIList KnowledgeBase::allDisjointClasses(const IRI& klass)
+{
+    ClassExpression e_class = getClass(klass);
+    IRIList disjointclasses;
+
+    Actor actor;
+    actor.needConcepts();
+    mKernel->getDisjointConcepts(e_class.get(), actor);
+    // getSynonyms: 1D NULL terminated array
+    const char** result = actor.getElements1D();
+    for(size_t i = 0; result[i] != NULL; ++i)
+    {
+        disjointclasses.push_back( IRI::create(result[i]) );
+    }
+    delete[] result;
+    return disjointclasses;
+
 }
 
 IRIList KnowledgeBase::allInstances() const
@@ -749,6 +883,98 @@ IRIList KnowledgeBase::allObjectProperties() const
     return properties;
 }
 
+IRIList KnowledgeBase::allSubObjectProperties(const IRI& propertyRelation, bool direct)
+{
+    ObjectPropertyExpression e_relation = getObjectProperty(propertyRelation);
+    IRIList relations;
+
+    Actor actor;
+    actor.needConcepts();
+    mKernel->getSubRoles(e_relation.get(), direct, actor);
+    const char** result = actor.getElements1D();
+    for(size_t i = 0; result[i] != NULL; ++i)
+    {
+        relations.push_back( IRI::create(result[i]) );
+    }
+    delete[] result;
+    return relations;
+}
+
+IRIList KnowledgeBase::allEquivalentObjectProperties(const IRI& propertyRelation)
+{
+    ObjectPropertyExpression e_relation = getObjectProperty(propertyRelation);
+    IRIList relations;
+
+    Actor actor;
+    actor.needConcepts();
+    mKernel->getEquivalentRoles(e_relation.get(), actor);
+    const char** result = actor.getSynonyms();
+    for(size_t i = 0; result[i] != NULL; ++i)
+    {
+        relations.push_back( IRI::create(result[i]) );
+    }
+    delete[] result;
+    return relations;
+}
+
+bool KnowledgeBase::isSubProperty(const IRI& relationProperty, const IRI& parentRelationProperty)
+{
+    try {
+        return isSubObjectProperty(relationProperty, parentRelationProperty);
+    } catch(...)
+    {}
+
+    try {
+        return isSubDataProperty(relationProperty, parentRelationProperty);
+    } catch(...)
+    {}
+
+    throw std::invalid_argument("KnowledgeBase::isSubObjectProperty: Property '" + relationProperty.toString() + "' is not a known data or object property");
+}
+
+bool KnowledgeBase::isSubObjectProperty(const IRI& relationProperty, const IRI& parentRelationProperty)
+{
+    ObjectPropertyExpression e_child = getObjectProperty(relationProperty);
+    ObjectPropertyExpression e_parent = getObjectProperty(parentRelationProperty);
+    return mKernel->isSubRoles(e_child.get(), e_parent.get());
+}
+
+bool KnowledgeBase::isSubDataProperty(const IRI& relationProperty, const IRI& parentRelationProperty)
+{
+    DataPropertyExpression e_child = getDataProperty(relationProperty);
+    DataPropertyExpression e_parent = getDataProperty(parentRelationProperty);
+    return mKernel->isSubRoles(e_child.get(), e_parent.get());
+}
+
+bool KnowledgeBase::isDisjointProperties(const IRI& relationProperty0, const IRI& relationProperty1)
+{
+    try {
+        return isDisjointObjectProperties(relationProperty0, relationProperty1);
+    } catch(...)
+    {}
+
+    try {
+        return isDisjointDataProperties(relationProperty0, relationProperty1);
+    } catch(...)
+    {}
+
+    throw std::invalid_argument("KnowledgeBase::isDisjointProperties: Property '" + relationProperty0.toString() + "/" + relationProperty1.toString() + "' is not a known data or object property");
+}
+
+bool KnowledgeBase::isDisjointObjectProperties(const IRI& relationProperty0, const IRI& relationProperty1)
+{
+    ObjectPropertyExpression e_child = getObjectProperty(relationProperty0);
+    ObjectPropertyExpression e_parent = getObjectProperty(relationProperty1);
+    return mKernel->isDisjointRoles(e_child.get(), e_parent.get());
+}
+
+bool KnowledgeBase::isDisjointDataProperties(const IRI& relationProperty0, const IRI& relationProperty1)
+{
+    DataPropertyExpression e_child = getDataProperty(relationProperty0);
+    DataPropertyExpression e_parent = getDataProperty(relationProperty1);
+    return mKernel->isDisjointRoles(e_child.get(), e_parent.get());
+}
+
 IRIList KnowledgeBase::allDataProperties() const
 {
     IRIList properties;
@@ -758,6 +984,73 @@ IRIList KnowledgeBase::allDataProperties() const
         properties.push_back(cit->first);
     }
     return properties;
+}
+
+IRIList KnowledgeBase::allSubDataProperties(const IRI& propertyRelation, bool direct)
+{
+    DataPropertyExpression e_relation = getDataProperty(propertyRelation);
+    IRIList relations;
+
+    Actor actor;
+    actor.needConcepts();
+    mKernel->getSubRoles(e_relation.get(), direct, actor);
+    const char** result = actor.getElements1D();
+    for(size_t i = 0; result[i] != NULL; ++i)
+    {
+        relations.push_back( IRI::create(result[i]) );
+    }
+    delete[] result;
+    return relations;
+}
+
+IRIList KnowledgeBase::allEquivalentDataProperties(const IRI& propertyRelation)
+{
+    DataPropertyExpression e_relation = getDataProperty(propertyRelation);
+    IRIList relations;
+
+    Actor actor;
+    actor.needConcepts();
+    mKernel->getEquivalentRoles(e_relation.get(), actor);
+    const char** result = actor.getSynonyms();
+    for(size_t i = 0; result[i] != NULL; ++i)
+    {
+        relations.push_back( IRI::create(result[i]) );
+    }
+    delete[] result;
+    return relations;
+}
+
+IRIList KnowledgeBase::getPropertyDomain(const IRI& property, bool direct) const
+{
+    try {
+        return getObjectPropertyDomain(property, direct);
+    } catch(...)
+    {}
+
+    try {
+        return getDataPropertyDomain(property, direct);
+    } catch(...)
+    {}
+
+    throw std::invalid_argument("KnowledgeBase::isPropertyDomain: Property '" + property.toString() + "' is not a known data or object property");
+}
+
+IRIList KnowledgeBase::getDataPropertyDomain(const IRI& property, bool direct) const
+{
+    DataPropertyExpression e_property = getDataProperty(property);
+    IRIList classes;
+
+    Actor actor;
+    actor.needConcepts();
+    mKernel->getDRoleDomain( e_property.get(), direct, actor);
+
+    const char** result = actor.getElements1D();
+    for(size_t i = 0; result[i] != NULL; ++i)
+    {
+        classes.push_back( IRI::create(result[i]) );
+    }
+    delete[] result;
+    return classes;
 }
 
 IRIList KnowledgeBase::typesOf(const IRI& instance, bool direct) const
@@ -886,7 +1179,7 @@ DataValue KnowledgeBase::getDataValue(const IRI& instance, const IRI& dataProper
         }
     }
 
-    throw std::runtime_error("owl_om::KnowledgeBase::getDataValue: instance " + instance.toQuotedString() + " has no value related via " + dataProperty.toQuotedString());
+    throw std::runtime_error("KnowledgeBase::getDataValue: instance " + instance.toQuotedString() + " has no value related via " + dataProperty.toQuotedString());
 
 }
 
@@ -905,7 +1198,7 @@ std::string KnowledgeBase::toString(representation::Type representation) const
             return ss.str();
         }
         default:
-            throw NotSupported("Representation is not supported");
+            throw NotSupported("KnowledgeBase::toString: Representation is not supported");
     }
 
     //TOntology::iterator axiom = getOntology().begin();
@@ -913,6 +1206,55 @@ std::string KnowledgeBase::toString(representation::Type representation) const
     //{
     //    axiom->accept(
     //}
+}
+
+ExplorationNode KnowledgeBase::getExplorationNode(const IRI& klass)
+{
+    ClassExpression e_klass = getClass(klass);
+    ExplorationNode e( mKernel->buildCompletionTree(e_klass.get()));
+    return e;
+}
+
+ObjectPropertyExpressionList KnowledgeBase::getRelatedObjectProperties(const IRI& klass)
+{
+    ExplorationNode e_node = getExplorationNode(klass);
+    ReasoningKernel::TCGRoleSet result;
+    bool onlyDeterministicInfo = false;
+    bool needIncoming = false;
+
+    mKernel->getObjectRoles(e_node.get(), result, onlyDeterministicInfo, needIncoming);
+
+    ObjectPropertyExpressionList relatedObjectProperties;
+    ReasoningKernel::TCGRoleSet::const_iterator cit = result.begin();
+    for(; cit != result.end(); ++cit)
+    {
+        TDLRoleExpression* role = const_cast<TDLRoleExpression*>(*cit);
+        const ObjectPropertyExpression e_property(dynamic_cast<TDLObjectRoleExpression*>(role));
+        relatedObjectProperties.push_back(e_property);
+    }
+
+    return relatedObjectProperties;
+}
+
+DataPropertyExpressionList KnowledgeBase::getRelatedDataProperties(const IRI& klass)
+{
+    ExplorationNode e_node = getExplorationNode(klass);
+    ReasoningKernel::TCGRoleSet result;
+    bool onlyDeterministicInfo = false;
+    bool needIncoming = false;
+
+    mKernel->getDataRoles(e_node.get(), result, onlyDeterministicInfo);
+
+    DataPropertyExpressionList relatedDataProperties;
+    ReasoningKernel::TCGRoleSet::const_iterator cit = result.begin();
+    for(; cit != result.end(); ++cit)
+    {
+        TDLRoleExpression* role = const_cast<TDLRoleExpression*>(*cit);
+        const DataPropertyExpression e_property(dynamic_cast<TDLDataRoleExpression*>(role));
+        relatedDataProperties.push_back(e_property);
+    }
+
+    return relatedDataProperties;
 }
 
 } // namespace owl_om

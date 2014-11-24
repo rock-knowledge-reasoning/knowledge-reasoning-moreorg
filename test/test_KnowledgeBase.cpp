@@ -12,6 +12,34 @@
 
 using namespace owl_om;
 
+BOOST_AUTO_TEST_CASE(it_should_tell_and_ask)
+{
+    {
+        using namespace owlapi::model;
+        KnowledgeBase kb;
+        kb.setVerbose();
+
+        IRI derived("Derived");
+        IRI has("has");
+
+        kb.subclassOf("Base", "Test");
+        kb.subclassOf(derived, "Base");
+        kb.objectProperty(has);
+        kb.functionalProperty(has, KnowledgeBase::OBJECT);
+        BOOST_REQUIRE(kb.isFunctionalProperty(has));
+
+        IRI instance("instance");
+        kb.instanceOf(instance, derived);
+
+        kb.rangeOf(has, derived, KnowledgeBase::OBJECT);
+        kb.domainOf(has, derived, KnowledgeBase::OBJECT);
+
+        ObjectPropertyExpressionList list = kb.getRelatedObjectProperties(derived);
+        kb.classify();
+        BOOST_REQUIRE_MESSAGE(!list.empty(), "Related properties: " << list.size());
+    }
+}
+
 BOOST_AUTO_TEST_CASE(it_should_create_class_hierarchy)
 {
     using namespace owlapi::model;

@@ -78,4 +78,8 @@ DataTypeName::DataTypeName(TDLDataTypeName* expression)
     : mExpression(expression)
 {}
 
+ExplorationNode::ExplorationNode(const DlCompletionTree* expression)
+    : mExpression(expression)
+{}
+
 } // end namespace owl_om

@@ -74,6 +74,16 @@ public:
      */
     void refresh();
 
+    bool isConsistent();
+
+    void classify();
+
+    void realize();
+
+    bool isRealized();
+
+    bool isClassSatifiable(const IRI& klass);
+
     // ROLES (PROPERTIES)
     /**
      * Make an object property known
@@ -88,29 +98,57 @@ public:
      */
     Axiom transitiveProperty(const IRI& property);
     /**
+     * Test if object property is transitive
+     */
+    bool isTransitiveProperty(const IRI& property);
+    /**
      * Define a functional object/data property
      */
     Axiom functionalProperty(const IRI& property, PropertyType type = OBJECT);
+    /**
+     * Test if property is functional (can be either data or object property)
+     */
+    bool isFunctionalProperty(const IRI& property);
     /**
      * Define an inverse functional object/data property
      */
     Axiom inverseFunctionalProperty(const IRI& property);
     /**
+     * Test if property is inverse functional
+     */
+    bool isInverseFunctionalProperty(const IRI& property);
+    /**
      * Define a reflexive object property
      */
     Axiom reflexiveProperty(const IRI& property);
+    /**
+     * Test if property is reflexive
+     */
+    bool isReflexiveProperty(const IRI& property);
     /**
      * Define an irreflexive object property 
      */
     Axiom irreflexiveProperty(const IRI& property);
     /**
+     * Test if property is irreflexive
+     */
+    bool isIrreflexiveProperty(const IRI& property);
+    /**
      * Define a symmetric object property
      */
     Axiom symmetricProperty(const IRI& property);
+    /**
+     * Test if property is symmetric
+     */
+    bool isSymmetricProperty(const IRI& property);
     /*
      * Define an asymmetric object property
      */
     Axiom asymmetricProperty(const IRI& property);
+    /**
+     * Test if property is symmetric
+     */
+    bool isAsymmetricProperty(const IRI& property);
 
     // CONCEPTS
     /**
@@ -306,6 +344,16 @@ public:
     bool isSameClass(const IRI& instance, const IRI& otherInstance) { return typeOf(instance) == typeOf(otherInstance); }
 
     /**
+     * Test if class is equivalent to another
+     */
+    bool isEquivalentClass(const IRI& klass0, const IRI& klass1);
+
+    /**
+     * Test if class is disjoint with another
+     */
+    bool isDisjointClass(const IRI& klass0, const IRI& klass1);
+
+    /**
      * Test if instance is type of a class
      * \param instance Instance identifier
      * \param klass Class identifier
@@ -360,6 +408,20 @@ public:
     IRIList allAncestorsOf(const IRI& klass, bool direct = false);
 
     /**
+     * Retrieve all equivalent classes
+     * \param klass
+     * \return list of all equivalent classes
+     */
+    IRIList allEquivalentClasses(const IRI& klass);
+
+    /**
+     * Retrieve all disjoint class
+     * \param klass Reference class for this query
+     * \return list of classes that are disjoint with the given one
+     */
+    IRIList allDisjointClasses(const IRI& klass);
+
+    /**
      * Retrieve instance  and perform lazy initialization if requested
      * \param instance
      * \param lazyInitialization If set to true will initialized the instance
@@ -392,7 +454,7 @@ public:
      * \param direct If direct is true, an exact range is retrieved if available, otherwise the most specific concept set
      * default is true
      */
-    IRIList getObjectPropertyRange(const IRI& property, bool direct = false) const;
+    IRIList getObjectPropertyRange(const IRI& property, bool direct = true) const;
 
     DataPropertyExpression getDataProperty(const IRI& property) const;
     DataPropertyExpression getDataPropertyLazy(const IRI& property);
@@ -441,14 +503,65 @@ public:
     IRIList allInverseRelatedInstances(const IRI& instance, const IRI& relationProperty, const IRI& klass = IRI());
 
     /**
+     * Test if given property is a subproperty of a given parent property
+     * \return True upon sucess, false otherwise
+     */
+    bool isSubProperty(const IRI& relationProperty, const IRI& parentRelationProperty);
+    /**
+     * Test if given properties are disjoint
+     */
+    bool isDisjointProperties(const IRI& relationProperty0, const IRI& relationProperty1);
+
+    /**
+     * Retrieve property domain
+     */
+    IRIList getPropertyDomain(const IRI& property, bool direct = true) const;
+
+    /**
      * Retrieve all object properties
      */
     IRIList allObjectProperties() const;
 
     /**
+     * Retrieve all sub object properties
+     */
+    IRIList allSubObjectProperties(const IRI& relationProperty, bool direct = false );
+
+    /**
+     * Retrieve all equivalent object properties
+     */
+    IRIList allEquivalentObjectProperties(const IRI& propertyRelation);
+
+    bool isSubObjectProperty(const IRI& relationProperty, const IRI& parentRelationProperty);
+    bool isDisjointObjectProperties(const IRI& relationProperty0, const IRI& relationProperty1);
+
+    /**
      * Retrieve all data properties
      */
     IRIList allDataProperties() const;
+    /**
+     * Retrieve all sub data properties
+     */
+    IRIList allSubDataProperties(const IRI& relationProperty, bool direct = false );
+
+    /**
+     * Retrieve all equivalent data properties
+     */
+    IRIList allEquivalentDataProperties(const IRI& propertyRelation);
+
+    bool isSubDataProperty(const IRI& relationProperty, const IRI& parentRelationProperty);
+    bool isDisjointDataProperties(const IRI& relationProperty0, const IRI& relationProperty1);
+
+    /**
+     * Get property domain
+     * \param property Name of property
+     * \param direct If direct is true, an exact domain is retrieved if available, otherwise the most specific concept set
+     * default is true
+     */
+    IRIList getDataPropertyDomain(const IRI& property, bool direct = true) const;
+
+    // TODO: isSubPropertyChainOf
+    // mKernel->isSubChain( objectproperty ) --> with reference to given argument list
 
     /**
      * Get all types of a given instance
@@ -497,6 +610,18 @@ public:
      * \return 
      */
     std::string toString(representation::Type representation = representation::LISP) const;
+
+    //
+    // Exploration
+    //
+    /**
+     * Get node for exploration
+     */
+    ExplorationNode getExplorationNode(const IRI& klass);
+
+    ObjectPropertyExpressionList getRelatedObjectProperties(const IRI& klass);
+    DataPropertyExpressionList getRelatedDataProperties(const IRI& klass);
+
 };
 
 } // namespace owl_om

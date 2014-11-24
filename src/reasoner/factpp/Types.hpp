@@ -3,6 +3,7 @@
 
 #include <string>
 #include <cstdlib>
+#include <vector>
 
 class TExpressionManager;
 class TDLAxiom;
@@ -14,6 +15,7 @@ class TDLDataValue;
 class TDLDataExpression;
 class TDLDataTypeName;
 class ReasoningKernel;
+class DlCompletionTree;
 
 namespace owl_om {
 
@@ -108,6 +110,18 @@ public:
     TDLDataTypeName* get() { return mExpression; }
 };
 
+class ExplorationNode
+{
+    const DlCompletionTree* mExpression;
+
+public:
+    ExplorationNode(const DlCompletionTree* expression = NULL);
+
+    const DlCompletionTree* get() const { return mExpression; }
+};
+
+typedef std::vector<ObjectPropertyExpression> ObjectPropertyExpressionList;
+typedef std::vector<DataPropertyExpression> DataPropertyExpressionList;
 
 
 } // end namespace owl_om
