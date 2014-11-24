@@ -15,6 +15,8 @@ public:
         : OWLEntity(iri)
     {}
 
+    bool isDataPropertyExpression() const { return false; }
+    bool isObjectPropertyExpression() const { return true; }
 };
 
 } // end namespace model

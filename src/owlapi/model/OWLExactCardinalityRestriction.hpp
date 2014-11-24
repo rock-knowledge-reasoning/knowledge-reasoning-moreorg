@@ -9,11 +9,9 @@ namespace model {
 class OWLExactCardinalityRestriction : public OWLCardinalityRestriction
 {
 public:
-    OWLExactCardinalityRestriction(const OWLPropertyExpression& property, uint32_t cardinality, const OWLQualification& qualification)
-        : OWLCardinalityRestriction(property, cardinality, qualification)
+    OWLExactCardinalityRestriction(OWLPropertyExpression::Ptr property, uint32_t cardinality, const OWLQualification& qualification)
+        : OWLCardinalityRestriction(property, cardinality, qualification, OWLCardinalityRestriction::EXACT)
     {}
-
-    CardinalityType getCardinalityType() const { return OWLCardinalityRestriction::EXACT; }
 };
 
 } // end namespace model

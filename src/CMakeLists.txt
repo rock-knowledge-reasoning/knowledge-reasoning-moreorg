@@ -32,6 +32,7 @@ rock_library(owl_om
         organization_model/InterfaceConnection.cpp
         organization_model/Statistics.cpp
         owlapi/io/XMLUtils.cpp
+        owlapi/model/OWLClassExpression.cpp
         owlapi/model/IRI.cpp
         owlapi/model/URI.cpp
         exporter/PDDLExporter.cpp
@@ -77,6 +78,7 @@ rock_library(owl_om
         owlapi/model/OWLAxiom.hpp
         owlapi/model/OWLCardinalityRestriction.hpp
         owlapi/model/OWLClassExpression.hpp
+        owlapi/model/OWLClass.hpp
         owlapi/model/OWLDataRange.hpp
         owlapi/model/OWLEntity.hpp
         owlapi/model/OWLExactCardinalityRestriction.hpp

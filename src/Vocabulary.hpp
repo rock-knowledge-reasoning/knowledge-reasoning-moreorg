@@ -2,7 +2,7 @@
 #define OWL_OM_VOCABULARY_HPP
 
 #include <string>
-#include <owl_om/OWLApi.hpp>
+#include <owl_om/owlapi/model/IRI.hpp>
 
 #define VOCABULARY_BASE_IRI(X) \
     static owlapi::model::IRI IRIPrefix() { static owlapi::model::IRI iri(X); return iri;}

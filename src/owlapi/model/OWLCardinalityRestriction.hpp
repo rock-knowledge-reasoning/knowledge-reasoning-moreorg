@@ -1,22 +1,22 @@
 #ifndef OWL_API_MODEL_CARDINALITY_RESTRICTION_HPP
 #define OWL_API_MODEL_CARDINALITY_RESTRICTION_HPP
 
-#include <owl_om/owlapi/model/OWLQuantifiedRestriction.hpp>
+#include <stdint.h>
+#include <owl_om/owlapi/model/OWLQualifiedRestriction.hpp>
 
 namespace owlapi {
 namespace model {
 
-class OWLCardinalityRestriction : OWLQualifiedRestriction
+class OWLCardinalityRestriction : public OWLQualifiedRestriction
 {
-    uint32_t mCardinality;
-
 public:
 
-    enum CardinalityType { MIN, MAX, EXACT };
+    enum CardinalityRestrictionType { MIN, MAX, EXACT };
 
-    OWLCardinalityRestriction(const OWLPropertyExpression& property, uint32_t cardinality, const OWLQualification& qualification = IRI())
+    OWLCardinalityRestriction(OWLPropertyExpression::Ptr property, uint32_t cardinality, const OWLQualification& qualification, CardinalityRestrictionType restrictionType)
         : OWLQualifiedRestriction(property, qualification)
         , mCardinality(cardinality)
+        , mCardinalityRestrictionType(restrictionType)
     {}
 
     uint32_t getCardinality() const { return mCardinality; }
@@ -24,8 +24,11 @@ public:
     /**
      * Get the restriction type
      */
-    virtual CardinalityType getCardinalityType() const = 0;
+    virtual CardinalityRestrictionType getCardinalityRestrictionType() const { return mCardinalityRestrictionType; }
 
+private:
+    uint32_t mCardinality;
+    CardinalityRestrictionType mCardinalityRestrictionType;
 };
 
 } // end namespace model

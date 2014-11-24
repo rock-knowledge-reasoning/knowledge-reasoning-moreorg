@@ -1,6 +1,10 @@
 #ifndef OWL_OM_VOCABULARIES_OWL_HPP
 #define OWL_OM_VOCABULARIES_OWL_HPP
 
+#ifndef VOCABULARY_BASE_IRI
+#error "Direct inclusion of this header is forbidden. Use Vocabulary.hpp instead"
+#endif
+
 namespace owl_om {
 namespace vocabulary {
 

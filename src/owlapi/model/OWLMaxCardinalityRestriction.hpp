@@ -10,10 +10,8 @@ class OWLMaxCardinalityRestriction : public OWLCardinalityRestriction
 {
 public:
     OWLMaxCardinalityRestriction(const OWLPropertyExpression& property, uint32_t cardinality, const OWLQualification& qualification)
-        : OWLCardinalityRestriction(property, cardinality, qualification)
+        : OWLCardinalityRestriction(property, cardinality, qualification, OWLCardinalityRestriction::MAX)
     {}
-
-    CardinalityType getCardinalityType() const { return OWLCardinalityRestriction::MAX; }
 };
 
 } // end namespace model

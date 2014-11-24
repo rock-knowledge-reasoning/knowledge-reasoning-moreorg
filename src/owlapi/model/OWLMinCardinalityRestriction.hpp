@@ -10,10 +10,8 @@ class OWLMinCardinalityRestriction : public OWLCardinalityRestriction
 {
 public:
     OWLMinCardinalityRestriction(const OWLPropertyExpression& property, uint32_t cardinality, const OWLQualification& qualification)
-        : OWLCardinalityRestriction(property, cardinality, qualification)
+        : OWLCardinalityRestriction(property, cardinality, qualification, OWLCardinalityRestriction::MIN)
     {}
-
-    CardinalityType getCardinalityType() const { return OWLCardinalityRestriction::MIN; }
 };
 
 } // end namespace model

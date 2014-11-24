@@ -14,17 +14,17 @@ namespace model {
  */
 class OWLRestriction : public OWLClassExpression
 {
-    OWLPropertyExpression mProperty;
+    OWLPropertyExpression::Ptr mpProperty;
 
 public: 
-    OWLRestriction(const OWLPropertyExpression& property)
-        : mProperty(property)
+    OWLRestriction(OWLPropertyExpression::Ptr property)
+        : mpProperty(property)
     {}
 
-    virtual OWLPropertyExpression getProperty() const { return mProperty; }
+    virtual OWLPropertyExpression::Ptr getProperty() const { return mpProperty; }
 
-    virtual bool isDataRestriction() const { return  mProperty.isDataProperty(); }
-    virtual bool isObjectRestriction() const { return mProperty.isObjectProperty(); }
+    virtual bool isDataRestriction() const { return  mpProperty->isDataPropertyExpression(); }
+    virtual bool isObjectRestriction() const { return mpProperty->isObjectPropertyExpression(); }
 
 };
 

@@ -24,6 +24,9 @@ public:
      * Return property in its simplified form
      */
     OWLObjectPropertyExpression::Ptr getSimplified() const { throw std::runtime_error("not implemented"); }
+
+    bool isDataPropertyExpression() const { return false; }
+    bool isObjectPropertyExpression() const { return true; }
 };
 
 } // end namespace model
