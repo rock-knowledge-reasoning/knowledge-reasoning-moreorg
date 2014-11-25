@@ -32,8 +32,8 @@ rock_library(owl_om
         organization_model/InterfaceConnection.cpp
         organization_model/Statistics.cpp
         owlapi/io/XMLUtils.cpp
-        owlapi/model/OWLClassExpression.cpp
         owlapi/model/IRI.cpp
+        owlapi/model/OWLClassExpression.cpp
         owlapi/model/URI.cpp
         exporter/PDDLExporter.cpp
         metrics/Redundancy.cpp
@@ -69,35 +69,41 @@ rock_library(owl_om
         organization_model/Grounding.hpp
         organization_model/InterfaceConnection.hpp
         organization_model/Statistics.hpp
-        owlapi/io/XMLUtils.hpp
         owlapi/model/HasAnnotations.hpp
         owlapi/model/HasIRI.hpp
         owlapi/model/IRI.hpp
         owlapi/model/OWLAnnotation.hpp
+        owlapi/model/OWLAnnotationObject.hpp
+        owlapi/model/OWLAnnotationProperty.hpp
+        owlapi/model/OWLAnnotationValue.hpp
         owlapi/model/OWLAnonymousIndividual.hpp
         owlapi/model/OWLAxiom.hpp
         owlapi/model/OWLCardinalityRestriction.hpp
+        owlapi/model/OWLClassAssertionAxiom.hpp
         owlapi/model/OWLClassExpression.hpp
         owlapi/model/OWLClass.hpp
         owlapi/model/OWLDataRange.hpp
         owlapi/model/OWLEntity.hpp
         owlapi/model/OWLExactCardinalityRestriction.hpp
         owlapi/model/OWLIndividual.hpp
+        owlapi/model/OWLIndiviualAxiom.hpp
+        owlapi/model/OWLInverseObjectProperty.hpp
+        owlapi/model/OWLLogicalAxiom.hpp
+        owlapi/model/OWLLogicalEntity.hpp
         owlapi/model/OWLMaxCardinalityRestriction.hpp
         owlapi/model/OWLMinCardinalityRestriction.hpp
+        owlapi/model/OWLNamedIndividual.hpp
         owlapi/model/OWLNamedObject.hpp
+        owlapi/model/OWLObjectExactCardinality.hpp
         owlapi/model/OWLObject.hpp
+        owlapi/model/OWLObjectPropertyExpression.hpp
+        owlapi/model/OWLObjectProperty.hpp
+        owlapi/model/OWLPropertyExpression.hpp
         owlapi/model/OWLPropertyRange.hpp
         owlapi/model/OWLQualifiedRestriction.hpp
+        owlapi/model/OWLReasoner.hpp
         owlapi/model/OWLRestriction.hpp
         owlapi/model/URI.hpp
-        owlapi/model/entities/OWLAnnotationProperty.hpp
-        owlapi/model/entities/OWLClass.hpp
-        owlapi/model/entities/OWLDataProperty.hpp
-        owlapi/model/entities/OWLDatatype.hpp
-        owlapi/model/entities/OWLLogicalEntity.hpp
-        owlapi/model/entities/OWLNamedIndividual.hpp
-        owlapi/model/entities/OWLObjectProperty.hpp
         reasoner/factpp/Types.hpp
         utils/CoalitionStructureGeneration.hpp
         utils/CorrelationClustering.hpp

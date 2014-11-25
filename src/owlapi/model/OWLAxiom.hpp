@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_AXIOM_HPP
-#define OWL_API_MODEL_AXIOM_HPP
+#ifndef OWLAPI_MODEL_OWL_AXIOM_HPP
+#define OWLAPI_MODEL_OWL_AXIOM_HPP
 
 #include <owl_om/owlapi/model/OWLObject.hpp>
 #include <owl_om/owlapi/model/HasAnnotations.hpp>
@@ -8,12 +8,15 @@ namespace owlapi {
 namespace model {
 
 /**
- *
+ * \class OWLAxiom
+ * \brief Represents and Axiom in the OWL 2 Specicication
  * \see http://www.w3.org/TR/owl2-syntax/#Axioms
  */
-class OWLAxiom : public OWLObject, HasAnnotations
+class OWLAxiom : public OWLObject, public HasAnnotations
 {
-    enum Type { 
+public:
+    enum AxiomType { 
+                UNKOWN,
                 Declaration = 0,            // TDLAxiomDeclaration
                 ClassAxiom,                 // TDLConceptName
                 ObjectPropertyAxiom,        // TDLObjectRoleName
@@ -49,9 +52,9 @@ class OWLAxiom : public OWLObject, HasAnnotations
                 DataPropertyDomain,         // TDLAxiomDRoleDomain
                 DataPropertyRange,          // TDLAxiomDRoleRange
                 // Assertion
+                ClassAssertion,             // TDLAxiomInstanceOf
                 SameIndividual,             // TDLAxiomSameIndividuals
                 DifferentIndividuals,       // TDLAxiomDifferentIndividuals
-                ClassAssertion,             // TDLAxiomInstanceOf
                 ObjectPropertyAssertion,    // TDLAxiomRelatedTo
                 NegativeObjectPropertyAssertion,  // TDLAxiomRelatedToNot
                 DataPropertyAssertion,      // TDLAxiomValueOf
@@ -64,7 +67,11 @@ class OWLAxiom : public OWLObject, HasAnnotations
                 // Not explicitly stated in OWL 2 but for convenience
                 SubPropertyChainOf
     };
-public:
+
+    OWLAxiom(AxiomType type, const OWLAnnotationList annotations)
+        : HasAnnotations(annotations)
+        , mAxiomType(type)
+    {}
 //
 //    /**
 //     * @param visitor
@@ -72,17 +79,17 @@ public:
 //     */
 //    void accept(OWLAxiomVisitor visitor);
 
-    /**
-     * Gets the annotations that annotate this axiom and whose annotation
-     * property is equal to {@code annotationProperty}.
-     * 
-     * @param annotationProperty
-     *        The annotation property that will be equal to the annotation
-     *        property of each returned annotation.
-     * @return A set of annotations that annotate this axiom, each of whose
-     *         annotation properties is equals to {@code annotationProperty//     */
-    //OWLAnnotationPtrList getAnnotations(const OWLAnnotationProperty& annotationProperty) const;
-//
+//    /**
+//     * Gets the annotations that annotate this axiom and whose annotation
+//     * property is equal to {@code annotationProperty}.
+//     * 
+//     * \param annotationProperty
+//     *        The annotation property that will be equal to the annotation
+//     *        property of each returned annotation.
+//     * \return A set of annotations that annotate this axiom, each of whose
+//     *         annotation properties is equals to {\code annotationProperty//     */
+//    //OWLAnnotationPtrList getAnnotations(const OWLAnnotationProperty& annotationProperty) const;
+////
 //    /**
 //     * Gets an axiom that is structurally equivalent to this axiom without
 //     * annotations. This essentially returns a version of this axiom stripped of
@@ -123,10 +130,10 @@ public:
 //     * to be axioms other than both declaration axioms (including imports
 //     * declarations) and annotation axioms.
 //     * 
-//     * @return {@code true} if the axiom is a logical axiom, {@code false} if
+//     * \return {@code true} if the axiom is a logical axiom, {@code false} if
 //     *         the axiom is not a logical axiom.
 //     */
-//    bool isLogicalAxiom() const;
+    virtual bool isLogicalAxiom() const { throw std::runtime_error("OWLAxiom::isLogicalAxiom is not implemented"); }
 //
 //    /**
 //     * Determines if this axioms in an annotation axiom (an instance of
@@ -145,11 +152,11 @@ public:
 //     */
 //    bool isAnnotated() const;
 //
-//    /**
-//     * Gets the axiom type for this axiom.
-//     * @return The axiom type that corresponds to the type of this axiom.
-//     */
-//    AxiomType getAxiomType() const;
+    /**
+     * Gets the axiom type for this axiom.
+     * \return The axiom type that corresponds to the type of this axiom.
+     */
+    AxiomType getAxiomType() const { return mAxiomType; }
 //
 //    /**
 //     * Determines if this axiom is one of the specified types
@@ -178,9 +185,16 @@ public:
 //     * @return The axiom in negation normal form.
 //     */
 //    OWLAxiom getNNF();
+//
+//    bool isAnnotated()
+//    bool isAnnotationAxiom();
+//    bool isLogicalAxiom();
+//    isOfType()
 
+private:
+    AxiomType mAxiomType;
 };
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_AXIOM_HPP
+#endif // OWLAPI_MODEL_OWL_AXIOM_HPP

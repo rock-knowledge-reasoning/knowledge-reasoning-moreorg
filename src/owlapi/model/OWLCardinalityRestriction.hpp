@@ -10,6 +10,7 @@ namespace model {
 class OWLCardinalityRestriction : public OWLQualifiedRestriction
 {
 public:
+    typedef boost::shared_ptr<OWLCardinalityRestriction> Ptr;
 
     enum CardinalityRestrictionType { MIN, MAX, EXACT };
 

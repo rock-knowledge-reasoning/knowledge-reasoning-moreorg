@@ -1,12 +1,19 @@
-#ifndef OWL_API_MODEL_OWL_CLASS_EXPRESSION_HPP
-#define OWL_API_MODEL_OWL_CLASS_EXPRESSION_HPP
+#ifndef OWLAPI_MODEL_OWL_CLASS_EXPRESSION_HPP
+#define OWLAPI_MODEL_OWL_CLASS_EXPRESSION_HPP
 
 #include <map>
+#include <boost/shared_ptr.hpp>
 #include <owl_om/owlapi/model/OWLObject.hpp>
 
 namespace owlapi {
 namespace model {
 
+/**
+ * \brief OWLClassExpression represent a class definition in simple (Class) or complex form, e.g. using
+ * intersection definition
+ *
+ * \see http://www.w3.org/TR/owl2-syntax/#Class_Expression_Axioms
+ */
 class OWLClassExpression : public OWLObject //, OWLPropertyRange, SWRLPredicate
 {
 public:
@@ -31,6 +38,8 @@ public:
         , OWL_CLASS
         , TYPE_RANGE_END
     };
+
+    typedef boost::shared_ptr<OWLClassExpression> Ptr;
 
     static std::map<ClassExpressionType, std::string> TypeTxt;
 

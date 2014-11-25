@@ -4,20 +4,25 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
+#include <owl_om/owlapi/model/OWLAnnotation.hpp>
+
 namespace owlapi {
 namespace model {
 
 class OWLAnnotation;
-typedef boost::shared_ptr<OWLAnnotation> OWLAnnotationPtr;
-typedef std::vector<OWLAnnotationPtr> OWLAnnotationPtrList;
+typedef std::vector<OWLAnnotation> OWLAnnotationList;
 
 class HasAnnotations
 {
 protected:
-    OWLAnnotationPtrList mAnnotations;
+    OWLAnnotationList mAnnotations;
 
 public:
-    OWLAnnotationPtrList getAnnotations() const { return mAnnotations; }
+    HasAnnotations(OWLAnnotationList annotations)
+        : mAnnotations(annotations)
+    {}
+
+    OWLAnnotationList getAnnotations() const { return mAnnotations; }
 };
 
 } // end namespace model

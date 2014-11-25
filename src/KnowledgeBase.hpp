@@ -301,7 +301,7 @@ public:
     Axiom valueOf(const IRI& individual, const IRI& property, const DataValue& dataValue);
 
     /**
-     * Define a dataType
+     * Define a dataType using a value and the corresponding datatype
      */
     DataValue dataValue(const std::string& value, const std::string& dataType);
 

@@ -3,20 +3,24 @@
 
 #include <owl_om/Vocabulary.hpp>
 #include <owl_om/owlapi/model/OWLClassExpression.hpp>
+#include <owl_om/owlapi/model/OWLLogicalEntity.hpp>
 
 namespace owlapi {
 namespace model {
 
-class OWLClass : public OWLClassExpression
+/**
+ * \brief OWLClass
+ * \see http://www.w3.org/TR/owl2-syntax/#Class_Expression_Axioms
+ */
+class OWLClass : public OWLClassExpression, public OWLLogicalEntity
 {
-    IRI mIRI;
     bool isThing;
     bool isNothing;
 
 public:
     OWLClass(const IRI& iri)
         : OWLClassExpression()
-        , mIRI(iri)
+        , OWLLogicalEntity(iri)
     {
         isThing = (iri == owl_om::vocabulary::OWL::Thing());
         isNothing = (iri == owl_om::vocabulary::OWL::Nothing());
@@ -26,8 +30,6 @@ public:
     bool isBottomEntity() const { return isNothing; }
 
     OWLClassExpression::ClassExpressionType getClassExpressionType() { return OWLClassExpression::OWL_CLASS; }
-
-    IRI getIRI() const { return mIRI; }
 
     bool isAnonymous() { return false; }
 

@@ -110,10 +110,17 @@ BOOST_AUTO_TEST_CASE(it_should_handle_class_expressions)
     IRI has("has");
     OWLObjectProperty::Ptr oPropertyPtr(new OWLObjectProperty(has));
     uint32_t cardinality = 10;
-    OWLObjectExactCardinality oe(oPropertyPtr, cardinality, baseClass.getIRI());
+    OWLCardinalityRestriction::Ptr oe(new OWLObjectExactCardinality(oPropertyPtr, cardinality, baseClass.getIRI()) );
 
-    BOOST_REQUIRE( oe.getCardinality() == cardinality );
-    BOOST_REQUIRE( oe.getCardinalityRestrictionType() == OWLCardinalityRestriction::EXACT );
-    BOOST_REQUIRE( oe.isQualified() );
-    BOOST_REQUIRE( oe.getQualification() == baseClass.getIRI() );
+    BOOST_REQUIRE( oe->getCardinality() == cardinality );
+    BOOST_REQUIRE( oe->getCardinalityRestrictionType() == OWLCardinalityRestriction::EXACT );
+    BOOST_REQUIRE( oe->isQualified() );
+    BOOST_REQUIRE( oe->getQualification() == baseClass.getIRI() );
+
+    // ClassRestriction
+    IRI name("individual");
+    OWLIndividual::Ptr individualPtr(new OWLNamedIndividual( name ));
+    OWLClassAssertionAxiom ce(individualPtr, oe);
+    BOOST_REQUIRE( ce.getIndividual() == individualPtr);
+    BOOST_REQUIRE( ce.getClassExpression() == oe );
 }

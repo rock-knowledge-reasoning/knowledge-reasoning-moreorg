@@ -12,6 +12,9 @@ namespace owl_om {
 
 typedef std::vector<IRIList> CandidatesList;
 
+/**
+ * \mainpage Organization modelling with OWL
+ */
 class OrganizationModel
 {
 public:
