@@ -4,6 +4,10 @@
 #include <sstream>
 #include <base/Logging.hpp>
 
+#include <owl_om/OWLApi.hpp>
+
+using namespace owlapi::model;
+
 namespace owl_om {
 
 Ontology::Ontology()
@@ -46,6 +50,11 @@ void Ontology::reload()
         {
             owlapi::model::IRI subject = it[Subject()];
             subclassOf(subject, vocabulary::OWL::Thing());
+
+            // All classes inherit from top concept, i.e. owl:Thing
+            OWLClassExpression::Ptr e_subject(new OWLClass(subject));
+            OWLClassExpression::Ptr e_thing(new OWLClass(vocabulary::OWL::Thing()));
+            OWLClassAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_thing ));
         }
     }
 
@@ -77,6 +86,11 @@ void Ontology::reload()
                         {
                             LOG_DEBUG_S << "Registering:" << classType;
                             instanceOf(subject, classType);
+
+                            // ClassAssertion
+                            OWLIndividual::Ptr e_individual(new OWLNamedIndividual(subject));
+                            OWLClassExpression::Ptr e_class(new OWLClass(classType));
+                            OWLClassAssertionAxiom::Ptr axiom(new OWLClassAssertionAxiom(e_individual, e_class));
                         } else {
                             LOG_DEBUG_S << "Skipping NamedIndividual " << classType;
                         }
@@ -87,9 +101,11 @@ void Ontology::reload()
                 } else if (object == vocabulary::OWL::DatatypeProperty())
                 {
                     dataProperty(subject);
+                    OWLProperty::Ptr property(new OWLDataProperty(subject));
                 } else if ( object == vocabulary::OWL::ObjectProperty())
                 {
                     objectProperty(subject);
+                    OWLProperty::Ptr property(new OWLObjectProperty(subject));
 
                 } else if ( object == vocabulary::OWL::FunctionalProperty())
                 {
@@ -111,6 +127,11 @@ void Ontology::reload()
             } else if(predicate == vocabulary::RDFS::subClassOf())
             {
                 subclassOf(subject, object);
+
+                // All classes inherit from top concept, i.e. owl:Thing
+                OWLClassExpression::Ptr e_subject(new OWLClass(subject));
+                OWLClassExpression::Ptr e_object(new OWLClass(object));
+                OWLClassAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_object ));
             }
         }
     }
@@ -202,6 +223,22 @@ void Ontology::reload()
 
 void Ontology::initializeDefaultClasses()
 {
+    // http://www.w3.org/TR/2009/REC-owl2-syntax-20091027/#Entity_Declarations_and_Typing
+    // Declarations for the built-in entities of OWL 2, listed in Table 5, are implicitly present in every OWL 2 ontology. 
+    OWLClass thing(vocabulary::OWL::Thing());
+    // vocabulary::OWL::Nothing()
+    // ObjectProperty
+    // vocabulary::OWL::topObjectProperty()
+    // vocabulary::OWL::bottomObjectProperty()
+    // DataProperty
+    // vocubulary::OWL::topDataProperty()
+    // vocabulary::OWL::bottomDataProperty()
+    // Datatypes:
+    // vocabulary::RDFS::Literal()
+    // ... each datatype in OWL 2
+    // AnnotationProperty
+    // vocabulary::OWL::AnnotationProperty()
+
     // Trigger instanciation of the following classes
     getClassLazy(vocabulary::OWL::Class());
 }
@@ -320,6 +357,11 @@ std::string Ontology::toString() const
     txt << KnowledgeBase::toString();
 
     return txt.str();
+}
+
+void Ontology::addAxiom(OWLAxiom::Ptr axiom)
+{
+    mAxiomsByType[axiom->getAxiomType()].push_back( axiom ); 
 }
 
 } // end namespace owl_om

@@ -9,10 +9,19 @@
 #include <owl_om/owlapi/model/OWLObjectProperty.hpp>
 #include <owl_om/owlapi/model/OWLInverseObjectProperty.hpp>
 #include <owl_om/owlapi/model/OWLClass.hpp>
+#include <owl_om/owlapi/model/OWLDataProperty.hpp>
 #include <owl_om/owlapi/model/OWLObjectProperty.hpp>
 #include <owl_om/owlapi/model/OWLObjectExactCardinality.hpp>
-#include <owl_om/owlapi/model/OWLClassAssertionAxiom.hpp>
 #include <owl_om/owlapi/model/OWLIndividual.hpp>
 #include <owl_om/owlapi/model/OWLNamedIndividual.hpp>
+#include <owl_om/owlapi/model/OWLClassAxiom.hpp>
+#include <owl_om/owlapi/model/OWLSubClassOfAxiom.hpp>
+#include <owl_om/owlapi/model/OWLEquivalentClassesAxiom.hpp>
+#include <owl_om/owlapi/model/OWLDisjointClassesAxiom.hpp>
+#include <owl_om/owlapi/model/OWLDisjointUnionAxiom.hpp>
+#include <owl_om/owlapi/model/OWLClassAssertionAxiom.hpp>
+#include <owl_om/owlapi/model/OWLPropertyAssertionAxiom.hpp>
+#include <owl_om/owlapi/model/OWLObjectPropertyAssertionAxiom.hpp>
+#include <owl_om/owlapi/model/OWLDataPropertyAssertionAxiom.hpp>
 
 #endif // OWL_OM_OWL_API_HPP

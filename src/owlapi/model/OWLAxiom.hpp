@@ -1,6 +1,7 @@
 #ifndef OWLAPI_MODEL_OWL_AXIOM_HPP
 #define OWLAPI_MODEL_OWL_AXIOM_HPP
 
+#include <boost/shared_ptr.hpp>
 #include <owl_om/owlapi/model/OWLObject.hpp>
 #include <owl_om/owlapi/model/HasAnnotations.hpp>
 
@@ -9,21 +10,26 @@ namespace model {
 
 /**
  * \class OWLAxiom
- * \brief Represents and Axiom in the OWL 2 Specicication
+ * \brief Represents an axiom in the OWL 2 Specification
  * \see http://www.w3.org/TR/owl2-syntax/#Axioms
  */
 class OWLAxiom : public OWLObject, public HasAnnotations
 {
 public:
-    enum AxiomType { 
+    typedef boost::shared_ptr<OWLAxiom> Ptr;
+
+    /// Defines the types of axioms that can be used with OWL
+    enum AxiomType {
+                /// Unkown type -- for internal use only
                 UNKOWN,
+               /// General declaration
                 Declaration = 0,            // TDLAxiomDeclaration
                 ClassAxiom,                 // TDLConceptName
                 ObjectPropertyAxiom,        // TDLObjectRoleName
                 DataPropertyAxiom,          // TDLDataRoleName
                 DatatypeDefinition,         // n/a
                 Assertion,                  // n/a
-                HasKey, 
+                HasKey,
                 AnnotationAxiom,            // not part of the reasoner
                 // ClassAxiom:
                 SubClassOf,                 // TDLAxiomConceptInclusion
@@ -57,7 +63,10 @@ public:
                 DifferentIndividuals,       // TDLAxiomDifferentIndividuals
                 ObjectPropertyAssertion,    // TDLAxiomRelatedTo
                 NegativeObjectPropertyAssertion,  // TDLAxiomRelatedToNot
+                /// Triple to assert a data property value to an individual
                 DataPropertyAssertion,      // TDLAxiomValueOf
+                /// Triple to assert that a individual has not the given value for
+                /// a relation
                 NegativeDataPropertyAssertion,    // TDLAxiomValueOfNot
                 // AnnotationAxiom
                 SubAnnotationPropertyOf,    // n/a
@@ -82,7 +91,7 @@ public:
 //    /**
 //     * Gets the annotations that annotate this axiom and whose annotation
 //     * property is equal to {@code annotationProperty}.
-//     * 
+//     *
 //     * \param annotationProperty
 //     *        The annotation property that will be equal to the annotation
 //     *        property of each returned annotation.
@@ -94,7 +103,7 @@ public:
 //     * Gets an axiom that is structurally equivalent to this axiom without
 //     * annotations. This essentially returns a version of this axiom stripped of
 //     * any annotations
-//     * 
+//     *
 //     * @return The annotationless version of this axiom
 //     */
 //    OWLAxiom getAxiomWithoutAnnotations() const;
@@ -104,7 +113,7 @@ public:
 //     * annotations. If this axiom has any annotations on it they will be merged
 //     * with the specified set of annotations. Note that this axiom will not be
 //     * modified (or remove from any ontologies).
-//     * 
+//     *
 //     * @param annotations
 //     *        The annotations that will be added to existing annotations to
 //     *        annotate the copy of this axiom
@@ -117,7 +126,7 @@ public:
 //    /**
 //     * Determines if another axiom is equal to this axiom not taking into
 //     * consideration the annotations on the axiom
-//     * 
+//     *
 //     * @param axiom
 //     *        The axiom to test if equal
 //     * @return {@code true} if {@code axiom} without annotations is equal to
@@ -129,7 +138,7 @@ public:
 //     * Determines if this axiom is a logical axiom. Logical axioms are defined
 //     * to be axioms other than both declaration axioms (including imports
 //     * declarations) and annotation axioms.
-//     * 
+//     *
 //     * \return {@code true} if the axiom is a logical axiom, {@code false} if
 //     *         the axiom is not a logical axiom.
 //     */
@@ -138,7 +147,7 @@ public:
 //    /**
 //     * Determines if this axioms in an annotation axiom (an instance of
 //     * {@code OWLAnnotationAxiom})
-//     * 
+//     *
 //     * @return {@code true} if this axiom is an instance of
 //     *         {@code OWLAnnotationAxiom}, otherwise {@code false}.
 //     */
@@ -146,7 +155,7 @@ public:
 //
 //    /**
 //     * Determines if this axiom has any annotations on it
-//     * 
+//     *
 //     * @return {@code true} if this axiom has annotations on it, otherwise
 //     *         {@code false}
 //     */
@@ -160,7 +169,7 @@ public:
 //
 //    /**
 //     * Determines if this axiom is one of the specified types
-//     * 
+//     *
 //     * @param axiomTypes
 //     *        The axiom types to check for
 //     * @return {@code true} if this axiom is one of the specified types,
@@ -170,7 +179,7 @@ public:
 //
 //    /**
 //     * Determines if this axiom is one of the specified types
-//     * 
+//     *
 //     * @param types
 //     *        The axiom types to check for
 //     * @return {@code true} if this axioms is one of the specified types,
@@ -181,7 +190,7 @@ public:
 //    /**
 //     * Gets this axioms in negation normal form. i.e. any class expressions
 //     * involved in this axiom are converted into negation normal form.
-//     * 
+//     *
 //     * @return The axiom in negation normal form.
 //     */
 //    OWLAxiom getNNF();

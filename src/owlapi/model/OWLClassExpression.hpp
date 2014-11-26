@@ -2,6 +2,7 @@
 #define OWLAPI_MODEL_OWL_CLASS_EXPRESSION_HPP
 
 #include <map>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <owl_om/owlapi/model/OWLObject.hpp>
 
@@ -61,6 +62,8 @@ public:
      */
     virtual bool isClassExpressionLiteral() { throw std::runtime_error("OWLClassExpression::isClassExpressionLiteral: not implemented"); }
 };
+
+typedef std::vector<OWLClassExpression::Ptr> OWLClassExpressionPtrList;
 
 } // end namespace model
 } // end namespace owlapi

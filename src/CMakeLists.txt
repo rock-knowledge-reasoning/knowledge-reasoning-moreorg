@@ -33,7 +33,16 @@ rock_library(owl_om
         organization_model/Statistics.cpp
         owlapi/io/XMLUtils.cpp
         owlapi/model/IRI.cpp
+        owlapi/model/OWLClassAssertionAxiom.cpp
         owlapi/model/OWLClassExpression.cpp
+        owlapi/model/OWLDataPropertyAssertionAxiom.cpp
+        owlapi/model/OWLDeclarationAxiom.cpp
+        owlapi/model/OWLDisjointClassesAxiom.cpp
+        owlapi/model/OWLDisjointUnionAxiom.cpp
+        owlapi/model/OWLEquivalentClassesAxiom.cpp
+        owlapi/model/OWLObject.cpp
+        owlapi/model/OWLObjectPropertyAssertionAxiom.cpp
+        owlapi/model/OWLSubClassOfAxiom.cpp
         owlapi/model/URI.cpp
         exporter/PDDLExporter.cpp
         metrics/Redundancy.cpp

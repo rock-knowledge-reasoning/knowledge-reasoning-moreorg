@@ -1,6 +1,7 @@
 #ifndef OWL_API_MODEL_ANONYMOUS_INDIVIDUAL_HPP
 #define OWL_API_MODEL_ANONYMOUS_INDIVIDUAL_HPP
 
+#include <owl_om/owlapi/model/NodeID.hpp>
 #include <owl_om/owlapi/model/OWLObject.hpp>
 
 namespace owlapi {
@@ -13,6 +14,9 @@ namespace model {
  */
 class OWLAnonymousIndividual : public OWLIndividual //, OWLAnnotationValue, OWLAnnotationSubject
 {
+    NodeID mNodeID;
+public:
+    NodeID getID() const { return mNodeID; }
 };
 
 } // end namespace model

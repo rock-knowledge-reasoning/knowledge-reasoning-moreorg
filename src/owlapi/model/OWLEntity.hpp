@@ -14,6 +14,8 @@ namespace model {
 class OWLEntity : public OWLNamedObject
 {
 public:
+    typedef boost::shared_ptr<OWLEntity> Ptr;
+
     OWLEntity( const IRI& iri = IRI())
         : OWLNamedObject(iri)
     {}

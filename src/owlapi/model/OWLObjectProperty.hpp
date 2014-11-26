@@ -8,7 +8,7 @@
 namespace owlapi {
 namespace model {
 
-class OWLObjectProperty : public OWLObjectPropertyExpression, OWLProperty
+class OWLObjectProperty : public OWLObjectPropertyExpression, public OWLProperty
 {
 public:
     typedef boost::shared_ptr<OWLObjectProperty> Ptr;

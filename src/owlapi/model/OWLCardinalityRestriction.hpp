@@ -7,6 +7,9 @@
 namespace owlapi {
 namespace model {
 
+/**
+ * \class OWLCardinalityRestriction
+ */
 class OWLCardinalityRestriction : public OWLQualifiedRestriction
 {
 public:

@@ -18,6 +18,8 @@ class OWLClass : public OWLClassExpression, public OWLLogicalEntity
     bool isNothing;
 
 public:
+    typedef boost::shared_ptr<OWLClass> Ptr;
+
     OWLClass(const IRI& iri)
         : OWLClassExpression()
         , OWLLogicalEntity(iri)

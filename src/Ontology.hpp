@@ -5,6 +5,7 @@
 #include <boost/shared_ptr.hpp>
 #include <owl_om/KnowledgeBase.hpp>
 #include <owl_om/db/rdf/SparqlInterface.hpp>
+#include <owl_om/OWLApi.hpp>
 
 //! Main enclosing namespace for OWL Organization Modelling
 namespace owl_om {
@@ -20,6 +21,8 @@ class OrganizationModel;
 class Ontology : public owl_om::KnowledgeBase
 {
     friend class OrganizationModel;
+
+    std::map<owlapi::model::OWLAxiom::AxiomType, std::vector<owlapi::model::OWLAxiom::Ptr> > mAxiomsByType;
 
 public:
     /**
@@ -66,6 +69,12 @@ private:
      * Load all object properties
      */
     void loadObjectProperties();
+
+    /**
+     * Add an axiom
+     * \param axiom
+     */
+    void addAxiom(owlapi::model::OWLAxiom::Ptr axiom);
 
     db::query::SparqlInterface* mSparqlInterface;
 };

@@ -1,5 +1,6 @@
 #include "OWLClassExpression.hpp"
 #include <boost/assign/list_of.hpp>
+#include "OWLAxiomVisitor.hpp"
 
 namespace owlapi {
 namespace model {
