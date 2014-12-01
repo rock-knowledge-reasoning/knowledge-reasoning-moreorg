@@ -9,7 +9,7 @@ namespace model {
 class OWLMaxCardinalityRestriction : public OWLCardinalityRestriction
 {
 public:
-    OWLMaxCardinalityRestriction(const OWLPropertyExpression& property, uint32_t cardinality, const OWLQualification& qualification)
+    OWLMaxCardinalityRestriction(OWLPropertyExpression::Ptr property, uint32_t cardinality, const OWLQualification& qualification)
         : OWLCardinalityRestriction(property, cardinality, qualification, OWLCardinalityRestriction::MAX)
     {}
 };

@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
-std::string rdfTestFiles[] = { "test/data/om-schema-v0.1.owl", "test/data/om-schema-v0.2.owl" };
+std::string rdfTestFiles[] = { "test/data/om-schema-v0.1.owl", "test/data/om-schema-v0.2.owl", "test/data/om-schema-v0.5.owl" };
 
 std::string getRootDir()
 {

@@ -14,7 +14,7 @@ public:
     {}
 
     /**
-     * Accept a visitor to visit this object, i.e. 
+     * Accept a visitor to visit this object, i.e.
      * will call visitor->visit(*this)
      */
     virtual void accept(boost::shared_ptr<OWLAxiomVisitor> visitor);

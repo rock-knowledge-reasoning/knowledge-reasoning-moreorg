@@ -58,6 +58,10 @@ void Ontology::reload()
         }
     }
 
+    // Cache for restrictions -- will contain the id, should be anonymous
+    // Since SPARQL cannot query directly for anonymous restrictions, we do
+    // an incremental construction after querying all triple and filtering for
+    // the one that are related to the restriction
     std::vector<owlapi::model::IRI> restrictions;
     {
         db::query::Results results = findAll(Subject(), Predicate(), Object());
@@ -88,9 +92,14 @@ void Ontology::reload()
                             instanceOf(subject, classType);
 
                             // ClassAssertion
-                            OWLIndividual::Ptr e_individual(new OWLNamedIndividual(subject));
+                            OWLNamedIndividual::Ptr e_individual(new OWLNamedIndividual(subject));
                             OWLClassExpression::Ptr e_class(new OWLClass(classType));
                             OWLClassAssertionAxiom::Ptr axiom(new OWLClassAssertionAxiom(e_individual, e_class));
+
+                            // Register
+                            mClassAssertionAxiomsByClass[e_class].push_back(axiom);
+                            mClassAssertionAxiomsByIndividual[e_individual].push_back(axiom);
+                            mNamedIndividuals[e_individual].push_back(axiom);
                         } else {
                             LOG_DEBUG_S << "Skipping NamedIndividual " << classType;
                         }
@@ -121,7 +130,7 @@ void Ontology::reload()
                     LOG_DEBUG_S << "Annotation property '" << subject << "' ignored for reasoning";
                 } else if ( object == vocabulary::OWL::Restriction() )
                 {
-                    LOG_DEBUG_S << "Found restriction" << subject;
+                    LOG_WARN_S << "Found restriction: " << subject;
                     restrictions.push_back(subject);
                 }
             } else if(predicate == vocabulary::RDFS::subClassOf())
@@ -129,9 +138,12 @@ void Ontology::reload()
                 subclassOf(subject, object);
 
                 // All classes inherit from top concept, i.e. owl:Thing
-                OWLClassExpression::Ptr e_subject(new OWLClass(subject));
-                OWLClassExpression::Ptr e_object(new OWLClass(object));
-                OWLClassAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_object ));
+                OWLClass::Ptr e_subject(new OWLClass(subject));
+                OWLClass::Ptr e_object(new OWLClass(object));
+                OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_object ));
+
+                mSubClassAxiomBySubPosition[e_subject].push_back(axiom);
+                mSubClassAxiomBySuperPosition[e_object].push_back(axiom);
             }
         }
     }
@@ -158,58 +170,101 @@ void Ontology::reload()
     }
 
     // Restrictions
+    // RDF/XML Syntax
+    // <owl:Class rdf:about="Person">
+    //   <rdfs:subClassOf>
+    //     <owl:Restriction>
+    //       <owl:onProperty rdf:resource="hasParent"/>
+    //       <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">
+    //         1
+    //       </owl:qualifiedCardinality>
+    //       <owl:onClass rdf:resource="Male">
+    //     </owl:Restriction>
+    //   </rdfs:subClassOf>
+    // </owl:Class>
     {
-        std::vector<owlapi::model::IRI>::const_iterator it = restrictions.begin();
-        for(; it != restrictions.end(); ++it)
+        using namespace owlapi::model;
+        // Iterate through all restrictions
+        // _n rdf:type Restriction <- exactly one
+        // _n owl:onProperty p  <- exactly one for _n, otherwise throw
+        // _n owl:minCardinality 1
+        // _n owl:maxCardinality 2
+        Results results = findAll(Subject(), Predicate(), Object());
+        ResultsIterator it(results);
+
+        std::map<owlapi::model::IRI, OWLCardinalityRestriction> cardinalityRestrictions;
+        while(it.next())
         {
-            owlapi::model::IRI restriction = *it;
-            Results results = findAll(restriction, Predicate(), Object());
-
-            // Get onProperty
-            ResultsIterator it(results);
-            bool foundProperty = false;
-            owlapi::model::IRI property;
-            while(it.next())
+            owlapi::model::IRI restriction = it[Subject()];
+            if( restrictions.end() == std::find(restrictions.begin(), restrictions.end(), restriction))
             {
-                owlapi::model::IRI predicate = it[Predicate()];
-                if(predicate == vocabulary::OWL::onProperty())
-                {
-                    if(foundProperty)
-                    {
-                        std::stringstream ss;
-                        ss << "Restriction '" << restriction << "' applies to more than one property, but requires to be exactly one";
-                        throw std::invalid_argument("owl_om::Ontology: " + ss.str() );
-                    }
+                continue;
+            }
 
-                    property = it[Object()];
-                    foundProperty = true;
+            owlapi::model::IRI predicate = it[Predicate()];
+            if(predicate == vocabulary::OWL::onProperty())
+            {
+                OWLObjectProperty::Ptr oProperty( new OWLObjectProperty( it[Object()] ));
 
-                    LOG_DEBUG_S << "Restriction '" << restriction << "' applies to: " << property;
-                    continue;
-                }
-                if(!foundProperty)
+                OWLCardinalityRestriction* cardinalityRestrictionPtr = &cardinalityRestrictions[restriction];
+                if(cardinalityRestrictionPtr->getProperty())
                 {
                     std::stringstream ss;
-                    ss << "Restriction '" << restriction << "' applies not apply to any property, but requires to be exactly one";
+                    ss << "Restriction '" << restriction << "' applies to more than one property, but requires to be exactly one";
                     throw std::invalid_argument("owl_om::Ontology: " + ss.str() );
                 }
 
-                if(predicate == vocabulary::OWL::minCardinality())
-                {
-                } else if(predicate == vocabulary::OWL::maxCardinality())
-                {
-                } else if(predicate == vocabulary::OWL::cardinality())
-                {
-                    // create cardinality
-                } else if(predicate == vocabulary::OWL::someValuesFrom())
-                {
-                } else if(predicate == vocabulary::OWL::allValuesFrom())
-                {
-                } else if(predicate == vocabulary::OWL::hasValue())
-                {
-                }
+                cardinalityRestrictions[restriction].setProperty(boost::dynamic_pointer_cast<OWLPropertyExpression>(oProperty));
+                LOG_WARN_S << "Restriction '" << restriction << "' applies to: " << oProperty->toString();
+                continue;
+            }
+            else if(predicate == vocabulary::OWL::minCardinality() || predicate == vocabulary::OWL::minQualifiedCardinality())
+            {
+                OWLCardinalityRestriction* cardinalityRestrictionPtr = &cardinalityRestrictions[restriction];
+                assert(cardinalityRestrictionPtr);
+                uint32_t cardinality = OWLLiteral::create( it[Object()].toString() )->getInteger();
+                cardinalityRestrictionPtr->setCardinality(cardinality);
+                cardinalityRestrictionPtr->setCardinalityRestrictionType(OWLCardinalityRestriction::MIN);
+                continue;
+            } else if(predicate == vocabulary::OWL::maxCardinality() || predicate == vocabulary::OWL::qualifiedCardinality())
+            {
+                OWLCardinalityRestriction* cardinalityRestrictionPtr = &cardinalityRestrictions[restriction];
+                uint32_t cardinality = OWLLiteral::create( it[Object()].toString() )->getInteger();
+                cardinalityRestrictionPtr->setCardinality(cardinality);
+                cardinalityRestrictionPtr->setCardinalityRestrictionType(OWLCardinalityRestriction::MAX);
+                continue;
+            } else if(predicate == vocabulary::OWL::cardinality() || predicate == vocabulary::OWL::qualifiedCardinality())
+            {
+                OWLCardinalityRestriction* cardinalityRestrictionPtr = &cardinalityRestrictions[restriction];
+                uint32_t cardinality = OWLLiteral::create( it[Object()].toString() )->getInteger();
+                cardinalityRestrictionPtr->setCardinality(cardinality);
+                cardinalityRestrictionPtr->setCardinalityRestrictionType(OWLCardinalityRestriction::EXACT);
+                continue;
+            } else if(predicate == vocabulary::OWL::someValuesFrom())
+            {
+            } else if(predicate == vocabulary::OWL::allValuesFrom())
+            {
+            } else if(predicate == vocabulary::OWL::hasValue())
+            {
+            } else if(predicate == vocabulary::OWL::onClass())
+            {
+                IRI qualification = it[Object()];
+                cardinalityRestrictions[restriction].setQualification(qualification);
+                continue;
+            }
+        }  // while(it.next())
+
+        LOG_INFO_S << "Restrictions";
+        std::map<owlapi::model::IRI, OWLCardinalityRestriction>::const_iterator cit = cardinalityRestrictions.begin();
+        for(; cit != cardinalityRestrictions.end(); ++cit)
+        {
+            OWLCardinalityRestriction::Ptr cardinalityRestriction = cit->second.narrow();
+            if(cardinalityRestriction)
+            {
+                LOG_INFO_S << cardinalityRestriction->toString();
             }
         }
+
 
         // TODO: add ObjectCardinalityRestriction
         // allow to search for cardinality restrictions
@@ -224,7 +279,7 @@ void Ontology::reload()
 void Ontology::initializeDefaultClasses()
 {
     // http://www.w3.org/TR/2009/REC-owl2-syntax-20091027/#Entity_Declarations_and_Typing
-    // Declarations for the built-in entities of OWL 2, listed in Table 5, are implicitly present in every OWL 2 ontology. 
+    // Declarations for the built-in entities of OWL 2, listed in Table 5, are implicitly present in every OWL 2 ontology.
     OWLClass thing(vocabulary::OWL::Thing());
     // vocabulary::OWL::Nothing()
     // ObjectProperty
@@ -361,7 +416,7 @@ std::string Ontology::toString() const
 
 void Ontology::addAxiom(OWLAxiom::Ptr axiom)
 {
-    mAxiomsByType[axiom->getAxiomType()].push_back( axiom ); 
+    mAxiomsByType[axiom->getAxiomType()].push_back( axiom );
 }
 
 } // end namespace owl_om

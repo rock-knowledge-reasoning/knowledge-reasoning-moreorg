@@ -26,23 +26,7 @@ public:
      * To qualify ObjectProperties and DataProperties they have to differ from the TOP concepts, i.e. owl:Thing and rdfs::Literal respectively
      * 
      */
-    OWLQualifiedRestriction(OWLPropertyExpression::Ptr property, const OWLQualification& qualification)
-        : OWLRestriction(property)
-    {
-        if(qualification == IRI())
-        {
-            if(isDataRestriction())
-            {
-                mQualification = owl_om::vocabulary::RDFS::Literal();
-            } else {
-                mQualification = owl_om::vocabulary::OWL::Thing();
-            }
-        } else {
-            mQualification = qualification;
-        }
-
-        mQualified = !( mQualification == owl_om::vocabulary::OWL::Thing() || mQualification == owl_om::vocabulary::RDFS::Literal() );
-    }
+    OWLQualifiedRestriction(OWLPropertyExpression::Ptr property, const OWLQualification& qualification);
 
     /**
      * Retrieve the qualification for this restriction
@@ -54,10 +38,14 @@ public:
      * \details Determines if this restriction is qualified. Qualified cardinality restrictions are defined to be cardinality restrictions that have fillers which aren't TOP (owl:Thing or rdfs:Literal). An object restriction is unqualified if it has a filler that is owl:Thing. A data restriction is unqualified if it has a filler which is the top data type (rdfs:Literal).
      * \return true if the given qualification differs from the TOP concepts, false otherwise
      */
-    bool isQualified() const
-    {
-        return mQualified;
-    }
+    bool isQualified() const { return mQualified; }
+
+protected:
+    /**
+     * Allow to set the qualification for this restriction to
+     * allow incremental construction
+     */
+    void setQualification(const OWLQualification& qualification) { mQualification = qualification; }
 
 };
 

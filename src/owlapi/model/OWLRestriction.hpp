@@ -23,6 +23,11 @@ public:
 
     virtual OWLPropertyExpression::Ptr getProperty() const { return mpProperty; }
 
+    /**
+     * Set property
+     */
+    void setProperty(OWLPropertyExpression::Ptr property) { mpProperty = property; }
+
     virtual bool isDataRestriction() const { return  mpProperty->isDataPropertyExpression(); }
     virtual bool isObjectRestriction() const { return mpProperty->isObjectPropertyExpression(); }
 

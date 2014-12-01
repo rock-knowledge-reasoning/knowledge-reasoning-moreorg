@@ -190,6 +190,14 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#Localization -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Localization">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Capability"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Location -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Location">
@@ -240,6 +248,21 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ServiceModel">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ResourceModel"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#Sherpa -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Sherpa">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Actor"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization"/>
+                <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
     </owl:Class>
     
 

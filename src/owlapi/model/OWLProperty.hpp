@@ -13,7 +13,7 @@ namespace model {
  * properties. By definition, properties are either data properties or object
  * properties.
  */
-class OWLProperty : public OWLPropertyExpression, public OWLLogicalEntity
+class OWLProperty : public OWLLogicalEntity //,  public OWLPropertyExpression
 {
 public:
     typedef boost::shared_ptr<OWLProperty> Ptr;

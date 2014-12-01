@@ -17,6 +17,8 @@ public:
 
     virtual bool isDataPropertyExpression() const { throw std::runtime_error("OWLPropertyExpression::isDataPropertyExpression: not implemented"); }
     virtual bool isObjectPropertyExpression() const { throw std::runtime_error("OWLPropertyExpression::isObjectPropertyExpression: not implemented"); }
+
+    virtual std::string toString() const { throw std::runtime_error("OWLPropertyExpression::toString: not implemented"); }
 };
 
 } // end namespace model

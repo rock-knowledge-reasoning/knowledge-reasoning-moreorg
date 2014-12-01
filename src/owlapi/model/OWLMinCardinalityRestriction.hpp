@@ -9,7 +9,7 @@ namespace model {
 class OWLMinCardinalityRestriction : public OWLCardinalityRestriction
 {
 public:
-    OWLMinCardinalityRestriction(const OWLPropertyExpression& property, uint32_t cardinality, const OWLQualification& qualification)
+    OWLMinCardinalityRestriction(OWLPropertyExpression::Ptr property, uint32_t cardinality, const OWLQualification& qualification)
         : OWLCardinalityRestriction(property, cardinality, qualification, OWLCardinalityRestriction::MIN)
     {}
 };

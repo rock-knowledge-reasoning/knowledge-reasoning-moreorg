@@ -10,6 +10,7 @@ namespace vocabulary {
 
 /**
  * The vocabulary for OWL
+ * \see http://www.w3.org/TR/owl2-mapping-to-rdf/
  */
 class OWL
 {
@@ -34,6 +35,7 @@ public:
     VOCABULARY_ADD_WORD(TransitiveProperty);
     VOCABULARY_ADD_WORD(allValuesFrom);
     VOCABULARY_ADD_WORD(backwardCompatibleWith);
+    /// Unqualified cardinality
     VOCABULARY_ADD_WORD(cardinality);
     VOCABULARY_ADD_WORD(complementOf);
     VOCABULARY_ADD_WORD(differentFrom);
@@ -48,6 +50,7 @@ public:
     VOCABULARY_ADD_WORD(inverseOf);
     VOCABULARY_ADD_WORD(maxCardinality);
     VOCABULARY_ADD_WORD(minCardinality);
+    VOCABULARY_ADD_WORD(onClass);
     VOCABULARY_ADD_WORD(onProperty);
     VOCABULARY_ADD_WORD(oneOf);
     VOCABULARY_ADD_WORD(priorVersion);
@@ -56,8 +59,14 @@ public:
     VOCABULARY_ADD_WORD(unionOf);
     VOCABULARY_ADD_WORD(versionInfo);
 
+
     // OWL 2
     VOCABULARY_ADD_WORD(NamedIndividual);
+    VOCABULARY_ADD_WORD(qualifiedCardinality);
+    VOCABULARY_ADD_WORD(maxQualifiedCardinality);
+    VOCABULARY_ADD_WORD(minQualifiedCardinality);
+    VOCABULARY_ADD_WORD(real);
+    VOCABULARY_ADD_WORD(rational);
 };
 
 } // end namespace vocabulary
