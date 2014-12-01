@@ -47,6 +47,7 @@ rock_library(owl_om
         owlapi/model/OWLObjectPropertyAssertionAxiom.cpp
         owlapi/model/OWLQualifiedRestriction.cpp
         owlapi/model/OWLSubClassOfAxiom.cpp
+        owlapi/model/NodeID.cpp
         owlapi/model/URI.cpp
         exporter/PDDLExporter.cpp
         metrics/Redundancy.cpp

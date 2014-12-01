@@ -16,6 +16,11 @@ class OWLAnonymousIndividual : public OWLIndividual //, OWLAnnotationValue, OWLA
 {
     NodeID mNodeID;
 public:
+    OWLAnonymousIndividual();
+    OWLAnonymousIndividual(const NodeID& nodeId)
+        : mNodeID()
+    {}
+
     NodeID getID() const { return mNodeID; }
 };
 

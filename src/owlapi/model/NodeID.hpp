@@ -1,8 +1,10 @@
 #ifndef OWL_API_MODEL_NODE_ID_HPP
 #define OWL_API_MODEL_NODE_ID_HPP
 
+#include <stdint.h>
 #include <string.h>
 #include <sstream>
+#include <owl_om/owlapi/model/IRI.hpp>
 
 namespace owlapi {
 namespace model {
@@ -14,8 +16,13 @@ class NodeID
 {
     std::string mId;
     static uint32_t msGlobalId;
+    bool mAnonymous;
 
 public:
+    NodeID();
+
+    NodeID(const std::string& id, bool anonymous);
+
     std::string getID() const { return mId; }
 
     /**
@@ -42,18 +49,9 @@ public:
     /**
      * Generates next anonymous IRI
      */
-    static std::string nextAnonymousIRI()
-    {
-        return nodeString(msGlobalId);
-    }
+    static std::string nextAnonymousIRI();
 
-    static std::string nodeString(uint32_t id)
-    {
-        std::stringstream ss;
-        ss << id;
-        return ss.str();
-    }
-
+    static std::string nodeString(uint32_t id);
 };
 
 } // end namespace model

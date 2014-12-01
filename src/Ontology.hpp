@@ -31,14 +31,15 @@ class Ontology : public owl_om::KnowledgeBase
     std::map<owlapi::model::OWLDataProperty::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mDataProperties;
     std::map<owlapi::model::OWLObjectProperty::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mObjectProperties;
     std::map<owlapi::model::OWLNamedIndividual::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mNamedIndividuals;
+    /// Map of anonymous individual to all axiom the individual is involved into
     std::map<owlapi::model::OWLAnonymousIndividual::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mAnonymousIndividuals;
     std::map<owlapi::model::OWLEntity::Ptr, std::vector<owlapi::model::OWLDeclarationAxiom::Ptr> > mDeclarationsByEntity;
 
 
     /// Map to access subclass axiom by a given subclass
-    std::map<owlapi::model::OWLClass::Ptr, std::vector<owlapi::model::OWLSubClassOfAxiom::Ptr> > mSubClassAxiomBySubPosition;
+    std::map<owlapi::model::OWLClassExpression::Ptr, std::vector<owlapi::model::OWLSubClassOfAxiom::Ptr> > mSubClassAxiomBySubPosition;
     /// Map to access subclass axiom by a given superclass
-    std::map<owlapi::model::OWLClass::Ptr, std::vector<owlapi::model::OWLSubClassOfAxiom::Ptr> > mSubClassAxiomBySuperPosition;
+    std::map<owlapi::model::OWLClassExpression::Ptr, std::vector<owlapi::model::OWLSubClassOfAxiom::Ptr> > mSubClassAxiomBySuperPosition;
 
 public:
     /**

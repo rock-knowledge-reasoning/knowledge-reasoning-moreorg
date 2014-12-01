@@ -52,13 +52,18 @@ void Ontology::reload()
             subclassOf(subject, vocabulary::OWL::Thing());
 
             // All classes inherit from top concept, i.e. owl:Thing
-            OWLClassExpression::Ptr e_subject(new OWLClass(subject));
-            OWLClassExpression::Ptr e_thing(new OWLClass(vocabulary::OWL::Thing()));
-            OWLClassAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_thing ));
+            OWLClass::Ptr e_subject(new OWLClass(subject));
+            OWLClass::Ptr e_thing(new OWLClass(vocabulary::OWL::Thing()));
+            OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_thing ));
+
+            mSubClassAxiomBySubPosition[e_subject].push_back(axiom);
+            mSubClassAxiomBySuperPosition[e_thing].push_back(axiom);
+
+            // mDeclarationsByEntity[e_subject] = OWLClassDeclaration
         }
     }
 
-    // Cache for restrictions -- will contain the id, should be anonymous
+    // Identify restrictions -- will contain the id, should be anonymous
     // Since SPARQL cannot query directly for anonymous restrictions, we do
     // an incremental construction after querying all triple and filtering for
     // the one that are related to the restriction
@@ -140,10 +145,24 @@ void Ontology::reload()
                 // All classes inherit from top concept, i.e. owl:Thing
                 OWLClass::Ptr e_subject(new OWLClass(subject));
                 OWLClass::Ptr e_object(new OWLClass(object));
-                OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_object ));
 
-                mSubClassAxiomBySubPosition[e_subject].push_back(axiom);
-                mSubClassAxiomBySuperPosition[e_object].push_back(axiom);
+                // Check if this is truely a class (or an AnonymousIndividual)
+                if( mSubClassAxiomBySubPosition.end() == mSubClassAxiomBySubPosition.find(e_object))
+                {
+                    OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_object ));
+
+                    mSubClassAxiomBySubPosition[e_subject].push_back(axiom);
+                    mSubClassAxiomBySuperPosition[e_object].push_back(axiom);
+                } else {
+                    OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_object ));
+
+                    // AnonymousIndividual
+                    NodeID node(object.toString(), true);
+                    OWLAnonymousIndividual::Ptr e_object(new OWLAnonymousIndividual(node));
+
+                    mSubClassAxiomBySubPosition[e_subject].push_back(axiom);
+                    mAnonymousIndividuals[e_object].push_back(axiom);
+                }
             }
         }
     }
@@ -258,12 +277,48 @@ void Ontology::reload()
         std::map<owlapi::model::IRI, OWLCardinalityRestriction>::const_iterator cit = cardinalityRestrictions.begin();
         for(; cit != cardinalityRestrictions.end(); ++cit)
         {
+            // Found cardinality restriction
             OWLCardinalityRestriction::Ptr cardinalityRestriction = cit->second.narrow();
-            if(cardinalityRestriction)
+
+            // Get anonymous node this restriction is responsible for
+            IRI anonymousNode = cit->first;
+            NodeID node(anonymousNode.toString(), false);
+            OWLAnonymousIndividual::Ptr anonymousIndividual(new OWLAnonymousIndividual(node));
+
+            // Get related axioms
+            std::vector<OWLAxiom::Ptr>& axioms = mAnonymousIndividuals[anonymousIndividual];
+            // Iterate over related subclass axioms
+            OWLSubClassOfAxiom::Ptr subclassAxiomPtr;
+            while(true)
             {
-                LOG_INFO_S << cardinalityRestriction->toString();
-            }
+                std::vector<OWLAxiom::Ptr>::iterator it = axioms.begin();
+                bool subClassFound = false;
+                for(; it != axioms.end(); ++it)
+                {
+                    if((*it)->getAxiomType() == OWLAxiom::SubClassOf)
+                    {
+                        subclassAxiomPtr = boost::dynamic_pointer_cast<OWLSubClassOfAxiom>(*it);
+                        axioms.erase(it);;
+                        subClassFound = true;
+                        break;
+                    }
+                }
+                if(!subClassFound)
+                {
+                    break;
+                }
+                OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom(subclassAxiomPtr->getSubClass(), cardinalityRestriction));
+                mSubClassAxiomBySubPosition[subclassAxiomPtr->getSubClass()].push_back(axiom);
+                mSubClassAxiomBySuperPosition[cardinalityRestriction].push_back(axiom);
+            } // end while
         }
+
+        // In order to find a restriction for a given class
+        // 1. check class assertions for individuals
+        // 2. check subclass axioms for classes
+        //      - find superclass definitions, collect all restrictions
+        //        - (including the ones for the superclasses -- identify restrictions)
+
 
 
         // TODO: add ObjectCardinalityRestriction
