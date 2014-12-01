@@ -41,7 +41,12 @@ public:
     std::string toString() const;
 };
 
-class Query 
+/**
+ * \class Query
+ * \brief Query of that allow to create SPARQL queries programatically
+ *
+ */
+class Query
 {
     friend class WhereClause;
 
@@ -85,11 +90,25 @@ public:
      * \param uri Uri this prefix maps to
      */
     Query& prefix(const std::string& prefix, const owlapi::model::IRI& iri);
+
+    /**
+     * Add a variable to the select part of this query
+     */
     Query& select(const db::query::Variable& variable, bool do_throw = true);
+
+    /**
+     * Start definition of the where part of the query
+     */
     WhereClause& beginWhere() { return mWhere; }
 
+    /**
+     * Retrieve bindings of this query, i.e. extracted from the select part
+     */
     db::query::Bindings getBindings() const;
 
+    /**
+     * Convert query to string
+     */
     std::string toString() const;
 };
 

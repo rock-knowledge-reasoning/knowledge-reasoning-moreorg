@@ -17,11 +17,12 @@ Variable::Variable(const IRI& iri)
 Variable::Variable(const std::string& name, bool grounded)
     : IRI(name)
 {
+    // Making sure ungrounded variables are valid and properly prefixed
     if(!grounded)
     {
         if(name.find("http://") != std::string::npos)
         {
-            throw std::invalid_argument("owl_om::Query::unboundVariable: given URI: '" + name + "'");
+            throw std::invalid_argument("owl_om::Query::Variable: given URI: '" + name + "'");
         }
 
         if(name.data()[0] != '?')
@@ -31,6 +32,12 @@ Variable::Variable(const std::string& name, bool grounded)
             mPrefix = name;
         }
     }
+}
+
+bool Variable::needsQuoting() const
+{
+    // Absolute iri will require quoting
+    return isAbsolute();
 }
 
 std::string Variable::getName() const
@@ -52,7 +59,7 @@ std::string Variable::getName() const
 
 std::string Variable::getQueryName() const
 {
-    if(isGrounded())
+    if(needsQuoting())
     {
         return toQuotedString();
     } else {
@@ -61,7 +68,7 @@ std::string Variable::getQueryName() const
 }
 
 bool Variable::isGrounded() const
-{ 
+{
     return mPrefix.empty() || mPrefix[0] != '?';
 }
 

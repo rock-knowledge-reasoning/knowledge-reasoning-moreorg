@@ -14,6 +14,11 @@ namespace query {
  */
 class Variable : public owlapi::model::IRI
 {
+    /**
+     * Check whether this variable requires to be quoted in a query
+     */
+    bool needsQuoting() const;
+
 public:
     /**
      * Default Variable constructor
@@ -38,7 +43,7 @@ public:
 
     /**
      * Get query name of this variable, ungrounded variables
-     * will be presented with leading question marks, 
+     * will be presented with leading question marks,
      * and URI will be quoted, e.g., <http://www.w3.org/>
      * \return Query name of this variable
      */

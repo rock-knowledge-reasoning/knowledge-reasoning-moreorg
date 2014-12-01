@@ -20,8 +20,8 @@ void IRI::setFromString(const std::string& s)
     {
         mPrefix = s;
     } else {
-        mPrefix = s.substr(0,splitPos);
-        mRemainder = s.substr(splitPos);
+        mPrefix = s.substr(0,splitPos+1);
+        mRemainder = s.substr(splitPos+1);
     }
 }
 
@@ -106,18 +106,7 @@ std::string IRI::getFragment() const
 
 IRI IRI::create(const std::string& s)
 {
-    if(s.empty())
-    {
-        return IRI();
-    }
-
-    size_t splitPos = owlapi::io::XMLUtils::getNCNameSuffixIndex(s);
-    if(splitPos == std::string::npos)
-    {
-        return IRI(s, "");
-    }
-
-    return IRI(s.substr(0,splitPos), s.substr(splitPos));
+    return IRI(s);
 }
 
 IRI IRI::create(const std::string& prefix, const std::string& suffix)

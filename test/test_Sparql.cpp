@@ -93,3 +93,50 @@ BOOST_AUTO_TEST_CASE(it_should_query_db_with_sparql)
         }
     }
 }
+
+BOOST_AUTO_TEST_CASE(it_should_query_anonymous_node)
+{
+    {
+        std::string baseUri = "http://www.rock-robotics.org/2013/09/om-schema#";
+        db::SopranoDB db(getRootDir() + rdfTestFiles[2], baseUri);
+        db::rdf::sparql::Query query;
+        query.select(db::query::Subject())
+            .beginWhere() \
+                .triple(db::query::Subject(),vocabulary::OWL::onClass(), IRI("http://www.rock-robotics.org/2014/01/om-schema#Localization"))
+            .endWhere();
+
+        BOOST_TEST_MESSAGE("Display query: " << query.toString() );
+        db::query::Results results = db.query(query.toString(), query.getBindings());
+        BOOST_REQUIRE_MESSAGE(results.rows.size() != 0, "NamedIndividuals retrieved count: " << results.rows.size());
+
+        db::query::ResultsIterator it(results);
+        while(it.next())
+        {
+            BOOST_REQUIRE_MESSAGE(!it[db::query::Subject()].empty(), "Result expected to be not empty: '" << it[db::query::Subject()]);
+        }
+    }
+
+    {
+        std::string baseUri = "http://www.rock-robotics.org/2013/09/om-schema#";
+        db::SopranoDB db(getRootDir() + rdfTestFiles[2], baseUri);
+        db::rdf::sparql::Query query;
+        query.select(db::query::Predicate())
+            .select(db::query::Object())
+            .beginWhere() \
+                // _:a will apply to all possible groundings
+                .triple(db::query::Variable("_:a",true),db::query::Predicate(), db::query::Object())
+            .endWhere();
+
+        BOOST_TEST_MESSAGE("Display query: " << query.toString() );
+        db::query::Results results = db.query(query.toString(), query.getBindings());
+        BOOST_REQUIRE_MESSAGE(results.rows.size() != 0, "Result count: " << results.rows.size());
+
+        db::query::ResultsIterator it(results);
+        while(it.next())
+        {
+            BOOST_REQUIRE_MESSAGE(!it[db::query::Predicate()].empty(), "Result expected to be not empty: '" << it[db::query::Predicate()]);
+            BOOST_REQUIRE_MESSAGE(!it[db::query::Object()].empty(), "Result expected to be not empty: '" << it[db::query::Object()]);
+        }
+    }
+}
+

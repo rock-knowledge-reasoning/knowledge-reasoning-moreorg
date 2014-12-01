@@ -29,6 +29,9 @@ struct Results
     bool empty() { return rows.empty(); }
 };
 
+/**
+ * \class ResultIterator
+ */
 class ResultsIterator
 {
     Results mResults;
@@ -47,6 +50,24 @@ public:
 /**
  * \class SparqlInterface
  * \brief Class for implementation for all database that allow sparql querying
+ * \verbatim
+ * SparqlInterface* si = ...
+ * db::rdf::sparql::Query customQuery;
+ * query.select(db::query::Subject())
+ *      .beginWhere() \
+ *      .triple(db::query::Subject(),vocabulary::RDF::type(),
+ *              vocabulary::OWL::NamedIndividual()) \
+ *      .endWhere();
+ *
+ * Results results = si->query(customQuery.toString(),
+ * customQuery.getBindings());
+ *
+ * ResultIterator rit(results);
+ * while(rit->next())
+ * {
+ *      IRI subject = rit[Subject()];
+ * }
+ * \endverbatim
  */
 class SparqlInterface
 {
