@@ -12,7 +12,7 @@ void IRI::setFromString(const std::string& s)
 {
     if(s.empty())
     {
-        throw std::invalid_argument("IRI::setFromString iri cannot created from empty string");
+        return;
     }
 
     size_t splitPos = owlapi::io::XMLUtils::getNCNameSuffixIndex(s);
