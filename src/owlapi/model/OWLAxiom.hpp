@@ -77,6 +77,8 @@ public:
                 SubPropertyChainOf
     };
 
+    static std::map<AxiomType, std::string> AxiomTypeTxt;
+
     OWLAxiom(AxiomType type, const OWLAnnotationList annotations)
         : HasAnnotations(annotations)
         , mAxiomType(type)
@@ -199,6 +201,7 @@ public:
 //    bool isAnnotationAxiom();
 //    bool isLogicalAxiom();
 //    isOfType()
+    virtual std::string toString() const;
 
 private:
     AxiomType mAxiomType;

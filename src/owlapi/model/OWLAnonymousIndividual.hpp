@@ -16,12 +16,18 @@ class OWLAnonymousIndividual : public OWLIndividual //, OWLAnnotationValue, OWLA
 {
     NodeID mNodeID;
 public:
+    typedef boost::shared_ptr<OWLAnonymousIndividual> Ptr;
+
     OWLAnonymousIndividual();
     OWLAnonymousIndividual(const NodeID& nodeId)
         : mNodeID()
     {}
 
-    NodeID getID() const { return mNodeID; }
+    /**
+     * Retrieve associated NodeID of this anonymous individual
+     * \return NodeID
+     */
+    NodeID getNodeID() const { return mNodeID; }
 };
 
 } // end namespace model

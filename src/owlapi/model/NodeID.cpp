@@ -14,11 +14,14 @@ NodeID::NodeID()
 NodeID::NodeID(const std::string& id, bool anonymous)
     : mAnonymous(anonymous)
 {
-    if(boost::starts_with(id, "_:"))
+    if(anonymous)
     {
-        mId = "_:" + id;
-    } else {
-        mId = id;
+        if(boost::starts_with(id, "_:"))
+        {
+            mId = id;
+        } else {
+            mId = "_:" + id;
+        }
     }
 }
 

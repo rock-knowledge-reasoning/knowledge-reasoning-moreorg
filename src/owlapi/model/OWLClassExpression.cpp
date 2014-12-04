@@ -6,7 +6,6 @@ namespace owlapi {
 namespace model {
 
 std::map<OWLClassExpression::ClassExpressionType, std::string> OWLClassExpression::TypeTxt = boost::assign::map_list_of
-    (UNKNOWN, "UNKNOWN")
     (DATA_ALL_VALUES_FROM, "DATA_ALL_VALUES_FROM")
     (DATA_HAS_VALUE, "DATA_HAS_VALUE")
     (DATA_EXACT_CARDINALITY, "DATA_EXACT_CARDINALITY")

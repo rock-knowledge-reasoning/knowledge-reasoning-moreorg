@@ -33,6 +33,7 @@ rock_library(owl_om
         organization_model/Statistics.cpp
         owlapi/io/XMLUtils.cpp
         owlapi/model/IRI.cpp
+        owlapi/model/OWLAxiom.cpp
         owlapi/model/OWLCardinalityRestriction.cpp
         owlapi/model/OWLClassAssertionAxiom.cpp
         owlapi/model/OWLClassExpression.cpp

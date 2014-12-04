@@ -14,28 +14,36 @@ namespace model {
  */
 class OWLClass : public OWLClassExpression, public OWLLogicalEntity
 {
-    bool isThing;
-    bool isNothing;
+    bool mIsThing;
+    bool mIsNothing;
 
 public:
     typedef boost::shared_ptr<OWLClass> Ptr;
 
-    OWLClass(const IRI& iri)
-        : OWLClassExpression()
-        , OWLLogicalEntity(iri)
-    {
-        isThing = (iri == owl_om::vocabulary::OWL::Thing());
-        isNothing = (iri == owl_om::vocabulary::OWL::Nothing());
-    }
+    /**
+     * Default constructor 
+     */
+    OWLClass(const IRI& iri);
 
-    bool isTopEntity() const { return isThing; }
-    bool isBottomEntity() const { return isNothing; }
+    /**
+     * Test if this class is the top entity, i.e. owl:Thing
+     * \return true, if this is the top entity, false otherwise
+     */
+    bool isTopEntity() const { return mIsThing; }
 
-    OWLClassExpression::ClassExpressionType getClassExpressionType() { return OWLClassExpression::OWL_CLASS; }
+    /**
+     * Test if this class is the bottom entity, i.e. owl:Nothing
+     * \return true, if this is the bottom entity, false otherwise
+     */
+    bool isBottomEntity() const { return mIsNothing; }
 
-    bool isAnonymous() { return false; }
+    ClassExpressionType getClassExpressionType() const { return OWLClassExpression::OWL_CLASS; }
 
-    bool isClassExpressionLiteral() { return true; }
+    bool isAnonymous() const { return false; }
+
+    bool isClassExpressionLiteral() const { return true; }
+
+    virtual std::string toString() const;
 };
 
 } // end namespace model

@@ -22,17 +22,24 @@ class Ontology : public owl_om::KnowledgeBase
 {
     friend class OrganizationModel;
 
+    // Mapping of iri to type
+    std::map<owlapi::model::IRI, owlapi::model::OWLClass::Ptr> mClasses;
+    std::map<owlapi::model::IRI, owlapi::model::OWLNamedIndividual::Ptr> mNamedIndividuals;
+    std::map<owlapi::model::IRI, owlapi::model::OWLAnonymousIndividual::Ptr> mAnonymousIndividuals;
+    std::map<owlapi::model::IRI, owlapi::model::OWLObjectProperty::Ptr> mObjectProperties;
+    std::map<owlapi::model::IRI, owlapi::model::OWLDataProperty::Ptr> mDataProperties;
+
     std::map<owlapi::model::OWLAxiom::AxiomType, std::vector<owlapi::model::OWLAxiom::Ptr> > mAxiomsByType;
 
     std::map<owlapi::model::OWLClassExpression::Ptr, std::vector<owlapi::model::OWLClassAssertionAxiom::Ptr> > mClassAssertionAxiomsByClass;
 
     std::map<owlapi::model::OWLIndividual::Ptr, std::vector<owlapi::model::OWLClassAssertionAxiom::Ptr> > mClassAssertionAxiomsByIndividual;
 
-    std::map<owlapi::model::OWLDataProperty::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mDataProperties;
-    std::map<owlapi::model::OWLObjectProperty::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mObjectProperties;
-    std::map<owlapi::model::OWLNamedIndividual::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mNamedIndividuals;
+    std::map<owlapi::model::OWLDataProperty::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mDataPropertyAxioms;
+    std::map<owlapi::model::OWLObjectProperty::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mObjectPropertyAxioms;
+    std::map<owlapi::model::OWLNamedIndividual::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mNamedIndividualAxioms;
     /// Map of anonymous individual to all axiom the individual is involved into
-    std::map<owlapi::model::OWLAnonymousIndividual::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mAnonymousIndividuals;
+    std::map<owlapi::model::OWLAnonymousIndividual::Ptr, std::vector<owlapi::model::OWLAxiom::Ptr> > mAnonymousIndividualAxioms;
     std::map<owlapi::model::OWLEntity::Ptr, std::vector<owlapi::model::OWLDeclarationAxiom::Ptr> > mDeclarationsByEntity;
 
 
@@ -75,6 +82,16 @@ public:
      */
     std::string toString() const;
 
+    /**
+     * Compute restrictions on classes
+     */
+    std::map<owlapi::model::IRI, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> > getCardinalityRestrictions(const std::vector<owlapi::model::IRI>& klasses);
+
+    owlapi::model::OWLClass::Ptr getOWLClass(const IRI& iri);
+    owlapi::model::OWLAnonymousIndividual::Ptr getOWLAnonymousIndividual(const IRI& iri);
+    owlapi::model::OWLNamedIndividual::Ptr getOWLNamedIndividual(const IRI& iri);
+    owlapi::model::OWLObjectProperty::Ptr getOWLObjectProperty(const IRI& iri);
+    owlapi::model::OWLDataProperty::Ptr getOWLDataProperty(const IRI& iri);
 private:
 
     /**
