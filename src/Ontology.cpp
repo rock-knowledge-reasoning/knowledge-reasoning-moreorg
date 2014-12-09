@@ -391,15 +391,14 @@ void Ontology::reload()
     loadObjectProperties();
 }
 
-std::vector<OWLCardinalityRestriction::Ptr> Ontology::getCardinalityRestrictions(const IRI& iri)
+std::vector<OWLCardinalityRestriction::Ptr> Ontology::getCardinalityRestrictions(owlapi::model::OWLClassExpression::Ptr ce)
 {
     // In order to find a restriction for a given class
     //    1. check class assertions for individuals
     // -> 2. check subclass axioms for classes
     //      - find superclass definitions, collect all restrictions
     //        - (including the ones for the superclasses -- identify restrictions)
-    OWLClass::Ptr klass = getOWLClass(iri);
-    std::vector<OWLSubClassOfAxiom::Ptr> subclassAxioms = mSubClassAxiomBySubPosition[klass];
+    std::vector<OWLSubClassOfAxiom::Ptr> subclassAxioms = mSubClassAxiomBySubPosition[ce];
 
     std::vector<OWLCardinalityRestriction::Ptr> restrictions;
     std::vector<OWLSubClassOfAxiom::Ptr>::const_iterator sit = subclassAxioms.begin();
@@ -419,11 +418,28 @@ std::vector<OWLCardinalityRestriction::Ptr> Ontology::getCardinalityRestrictions
             case OWLClassExpression::DATA_MAX_CARDINALITY:
                 restrictions.push_back(boost::dynamic_pointer_cast<OWLCardinalityRestriction>(superClass));
                 break;
+            case OWLClassExpression::OWL_CLASS:
+            {
+                std::vector<OWLCardinalityRestriction::Ptr> inheritedRestrictions =    getCardinalityRestrictions(superClass);
+                restrictions.insert(restrictions.end(), inheritedRestrictions.begin(), inheritedRestrictions.end());
+            }
             default:
                 break;
         }
     }
     return restrictions;
+
+}
+
+std::vector<OWLCardinalityRestriction::Ptr> Ontology::getCardinalityRestrictions(const IRI& iri)
+{
+    // In order to find a restriction for a given class
+    //    1. check class assertions for individuals
+    // -> 2. check subclass axioms for classes
+    //      - find superclass definitions, collect all restrictions
+    //        - (including the ones for the superclasses -- identify restrictions)
+    OWLClass::Ptr klass = getOWLClass(iri);
+    return getCardinalityRestrictions(klass);
 }
 
 std::map<IRI, std::vector<OWLCardinalityRestriction::Ptr> > Ontology::getCardinalityRestrictions(const std::vector<IRI>& klasses)

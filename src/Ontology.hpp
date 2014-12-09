@@ -86,6 +86,12 @@ public:
     std::string toString() const;
 
     /**
+     * Compute restrictions on a given ClassExpression
+     * \return List of restrictions
+     */
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> getCardinalityRestrictions(owlapi::model::OWLClassExpression::Ptr klassExpression);
+
+    /**
      * Compute restrictions on a given class
      * \return List of restrictions
      */
