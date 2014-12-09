@@ -334,6 +334,8 @@ IRIList OrganizationModel::getModelRequirements(const IRI& model) const
         return it->second;
     }
 
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> restrictions = mpOntology->getCardinalityRestrictions(classType);
+    // SCHOKO
     IRI requirementModel = getResourceModel(model);
     IRIList requirements = allRelatedInstances( requirementModel, OM::dependsOn());
     mModelRequirementsCache[model] = requirements;
@@ -542,26 +544,14 @@ IRI OrganizationModel::getResourceModel(const IRI& instance) const
 
     IRI model;
     try {
-         model = mpOntology->relatedInstance(instance, OM::modelledBy(), OM::ResourceModel());
+         model = mpOntology->typeOf(instance);
     } catch(const std::invalid_argument& e)
     {
         // no model means, this instance is a model by itself
         model = instance;
     }
     mResourceModelCache[instance] = model;
-    return  model;
-}
-
-IRI OrganizationModel::getResourceModelInstanceType(const IRI& model) const
-{
-    IRI modelType;
-    try {
-        modelType = mpOntology->typeOf(model);
-        return mpOntology->relatedInstance(modelType, OM::models(), OM::Resource());
-    } catch(const std::invalid_argument& e)
-    {
-        throw std::invalid_argument("OrganizationModel::createResourceModelInstanceType: '" + modelType.toString() + "' does not specify 'models' relation, thus cannot infer type for new model instances of " + model.toString());
-    }
+    return model;
 }
 
 IRI OrganizationModel::createNewRequirement(const IRI& requirement, uint32_t marker)
@@ -577,34 +567,29 @@ IRI OrganizationModel::createNewRequirement(const IRI& requirement, uint32_t mar
     return newRequirement;
 }
 
-IRI OrganizationModel::createNewFromModel(const IRI& model, bool createDependants) const
+IRI OrganizationModel::createNewInstance(const IRI& classType, bool createRequiredResources) const
 {
+    LOG_DEBUG_S << "CreateNewInstance: " << std::endl
+        << "    class type:    " << classType << std::endl;
 
-    // Retrieve the class type this model instances have
-    IRI classType = getResourceModelInstanceType(model);
-
-    LOG_DEBUG_S << "CreateNewFromModel: " << std::endl
-        << "    model:    " << model << std::endl
-        << "    new class type:    " << classType << std::endl;
-
-    IRIList modelInstances = mpOntology->allInverseRelatedInstances(model, OM::modelledBy());
+    IRIList instances = mpOntology->allInstancesOf(model, true);
     std::stringstream ss;
-    ss << modelInstances.size();
-    IRI newInstanceName = model.toString() + "-instance-" + ss.str();
+    ss << instances.size();
+    // NAMING CONVENTION INTRODUCED
+    IRI newInstanceName = model.toString() + "_" + ss.str();
 
     mpOntology->instanceOf(newInstanceName, classType);
-    mpOntology->relatedTo(newInstanceName, OM::modelledBy(), model);
 
-    if(!createDependants)
+    if(!createRequiredResourced)
     {
-        LOG_DEBUG_S << "CreateNewFromModel: " << std::endl
+        LOG_DEBUG_S << "CreateNewInstance: " << std::endl
             << "    instance:                 " << newInstanceName << std::endl
             << "    dependant (has relation): [ creation not requested ]";
 
         return newInstanceName;
     }
 
-    // Create dependencies that come with that model
+    // Create dependencies/requirement that are defined for that model
     IRIList dependencies = getModelRequirements(model);
     IRIList newDependants;
     BOOST_FOREACH(IRI dependency, dependencies)
