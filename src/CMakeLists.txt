@@ -35,6 +35,7 @@ rock_library(owl_om
         owlapi/model/IRI.cpp
         owlapi/model/OWLAxiom.cpp
         owlapi/model/OWLCardinalityRestriction.cpp
+        owlapi/model/OWLClass.cpp
         owlapi/model/OWLClassAssertionAxiom.cpp
         owlapi/model/OWLClassExpression.cpp
         owlapi/model/OWLDataPropertyAssertionAxiom.cpp

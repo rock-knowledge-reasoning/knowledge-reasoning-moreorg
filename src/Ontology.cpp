@@ -194,7 +194,7 @@ void Ontology::reload()
                 // add object to a class description if this is an object
                 // property and convert to data range if this is a data property
                 // and add this class the the
-                // range of the given property (if 
+                // range of the given property (if
             } else if(predicate == vocabulary::RDFS::subPropertyOf())
             {
                 // validate that subject and object have the same property type
@@ -206,7 +206,7 @@ void Ontology::reload()
             } else if(predicate == vocabulary::OWL::inverseOf())
             {
                 // check that subject and object are object properties, if not
-                // raise, else 
+                // raise, else
             } else if(predicate == vocabulary::OWL::oneOf())
             {
                 // object is a node representing a list of named individuals
@@ -309,7 +309,7 @@ void Ontology::reload()
                 cardinalityRestrictionPtr->setCardinality(cardinality);
                 cardinalityRestrictionPtr->setCardinalityRestrictionType(OWLCardinalityRestriction::MIN);
                 continue;
-            } else if(predicate == vocabulary::OWL::maxCardinality() || predicate == vocabulary::OWL::qualifiedCardinality())
+            } else if(predicate == vocabulary::OWL::maxCardinality() || predicate == vocabulary::OWL::maxQualifiedCardinality())
             {
                 OWLCardinalityRestriction* cardinalityRestrictionPtr = &cardinalityRestrictions[restriction];
                 uint32_t cardinality = OWLLiteral::create( it[Object()].toString() )->getInteger();
@@ -343,37 +343,42 @@ void Ontology::reload()
         {
 
             // Found cardinality restriction
-            OWLCardinalityRestriction::Ptr cardinalityRestriction = cit->second.narrow();
-            // Get anonymous node this restriction is responsible for
-            OWLAnonymousIndividual::Ptr anonymousIndividual = getOWLAnonymousIndividual(cit->first);
+            try {
+                OWLCardinalityRestriction::Ptr cardinalityRestriction = cit->second.narrow();
+                // Get anonymous node this restriction is responsible for
+                OWLAnonymousIndividual::Ptr anonymousIndividual = getOWLAnonymousIndividual(cit->first);
 
-            std::vector<OWLAxiom::Ptr>& axioms = mAnonymousIndividualAxioms[anonymousIndividual];
-            // Iterate over related subclass axioms
-            OWLSubClassOfAxiom::Ptr subclassAxiomPtr;
-            while(true)
-            {
-                std::vector<OWLAxiom::Ptr>::iterator it = axioms.begin();
-                bool subClassFound = false;
-                for(; it != axioms.end(); ++it)
+                std::vector<OWLAxiom::Ptr>& axioms = mAnonymousIndividualAxioms[anonymousIndividual];
+                // Iterate over related subclass axioms
+                OWLSubClassOfAxiom::Ptr subclassAxiomPtr;
+                while(true)
                 {
-                    if((*it)->getAxiomType() == OWLAxiom::SubClassOf)
+                    std::vector<OWLAxiom::Ptr>::iterator it = axioms.begin();
+                    bool subClassFound = false;
+                    for(; it != axioms.end(); ++it)
                     {
-                        subclassAxiomPtr = boost::dynamic_pointer_cast<OWLSubClassOfAxiom>(*it);
-                        axioms.erase(it);;
-                        subClassFound = true;
+                        if((*it)->getAxiomType() == OWLAxiom::SubClassOf)
+                        {
+                            subclassAxiomPtr = boost::dynamic_pointer_cast<OWLSubClassOfAxiom>(*it);
+                            axioms.erase(it);;
+                            subClassFound = true;
+                            break;
+                        }
+                    }
+                    if(!subClassFound)
+                    {
                         break;
                     }
-                }
-                if(!subClassFound)
-                {
-                    break;
-                }
-                OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom(subclassAxiomPtr->getSubClass(), cardinalityRestriction));
-                mSubClassAxiomBySubPosition[subclassAxiomPtr->getSubClass()].push_back(axiom);
-                mSubClassAxiomBySuperPosition[cardinalityRestriction].push_back(axiom);
+                    OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom(subclassAxiomPtr->getSubClass(), cardinalityRestriction));
+                    mSubClassAxiomBySubPosition[subclassAxiomPtr->getSubClass()].push_back(axiom);
+                    mSubClassAxiomBySuperPosition[cardinalityRestriction].push_back(axiom);
 
-                LOG_DEBUG_S << "Added " << subclassAxiomPtr->getSubClass()->toString() << " axiom: " << axiom->toString();
-            } // end while
+                    LOG_DEBUG_S << "Added " << subclassAxiomPtr->getSubClass()->toString() << " axiom: " << axiom->toString();
+                } // end while
+            } catch(const std::runtime_error& e)
+            {
+                LOG_ERROR_S << "Error handling restriction: '" << cit->first << "' -- " << e.what();
+            }
         }
 
         // TODO: add ObjectCardinalityRestriction
@@ -386,49 +391,50 @@ void Ontology::reload()
     loadObjectProperties();
 }
 
-
-std::map<IRI, std::vector<OWLCardinalityRestriction::Ptr> > Ontology::getCardinalityRestrictions(const std::vector<IRI>& klasses)
+std::vector<OWLCardinalityRestriction::Ptr> Ontology::getCardinalityRestrictions(const IRI& iri)
 {
-
     // In order to find a restriction for a given class
     //    1. check class assertions for individuals
     // -> 2. check subclass axioms for classes
     //      - find superclass definitions, collect all restrictions
     //        - (including the ones for the superclasses -- identify restrictions)
+    OWLClass::Ptr klass = getOWLClass(iri);
+    std::vector<OWLSubClassOfAxiom::Ptr> subclassAxioms = mSubClassAxiomBySubPosition[klass];
 
+    std::vector<OWLCardinalityRestriction::Ptr> restrictions;
+    std::vector<OWLSubClassOfAxiom::Ptr>::const_iterator sit = subclassAxioms.begin();
+    for(; sit != subclassAxioms.end(); ++sit)
+    {
+        OWLSubClassOfAxiom::Ptr subclassAxiomPtr = *sit;
+        OWLClassExpression::Ptr superClass = subclassAxiomPtr->getSuperClass();
+        OWLClassExpression::Ptr subClass = subclassAxiomPtr->getSubClass();
 
+        switch(superClass->getClassExpressionType())
+        {
+            case OWLClassExpression::OBJECT_MIN_CARDINALITY:
+            case OWLClassExpression::OBJECT_MAX_CARDINALITY:
+            case OWLClassExpression::OBJECT_EXACT_CARDINALITY:
+            case OWLClassExpression::DATA_EXACT_CARDINALITY:
+            case OWLClassExpression::DATA_MIN_CARDINALITY:
+            case OWLClassExpression::DATA_MAX_CARDINALITY:
+                restrictions.push_back(boost::dynamic_pointer_cast<OWLCardinalityRestriction>(superClass));
+                break;
+            default:
+                break;
+        }
+    }
+    return restrictions;
+}
+
+std::map<IRI, std::vector<OWLCardinalityRestriction::Ptr> > Ontology::getCardinalityRestrictions(const std::vector<IRI>& klasses)
+{
     std::vector<IRI>::const_iterator cit = klasses.begin();
     std::map<IRI, std::vector<OWLCardinalityRestriction::Ptr> > restrictionsMap;
 
     for(; cit != klasses.end(); ++cit)
     {
         IRI iri = *cit;
-        OWLClass::Ptr klass = getOWLClass(iri);
-        std::vector<OWLSubClassOfAxiom::Ptr> subclassAxioms = mSubClassAxiomBySubPosition[klass];
-
-        std::vector<OWLCardinalityRestriction::Ptr> restrictions;
-        std::vector<OWLSubClassOfAxiom::Ptr>::const_iterator sit = subclassAxioms.begin();
-        for(; sit != subclassAxioms.end(); ++sit)
-        {
-            OWLSubClassOfAxiom::Ptr subclassAxiomPtr = *sit;
-            OWLClassExpression::Ptr superClass = subclassAxiomPtr->getSuperClass();
-            OWLClassExpression::Ptr subClass = subclassAxiomPtr->getSubClass();
-
-            switch(superClass->getClassExpressionType())
-            {
-                case OWLClassExpression::OBJECT_MIN_CARDINALITY:
-                case OWLClassExpression::OBJECT_MAX_CARDINALITY:
-                case OWLClassExpression::OBJECT_EXACT_CARDINALITY:
-                case OWLClassExpression::DATA_EXACT_CARDINALITY:
-                case OWLClassExpression::DATA_MIN_CARDINALITY:
-                case OWLClassExpression::DATA_MAX_CARDINALITY:
-                    restrictions.push_back(boost::dynamic_pointer_cast<OWLCardinalityRestriction>(superClass));
-                    break;
-                default:
-                    break;
-            }
-        }
-        restrictionsMap[iri] = restrictions;
+        restrictionsMap[iri] = getCardinalityRestrictions(iri);
     }
     return restrictionsMap;
 }
