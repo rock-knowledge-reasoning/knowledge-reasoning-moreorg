@@ -202,5 +202,11 @@ void OWLOntologyTell::inverseOf(const IRI& relation, const IRI& inverseType)
     mpOntology->kb()->inverseOf(relation, inverseType);
 }
 
+void OWLOntologyTell::valueOf(const IRI& instance, const IRI& dataProperty, OWLLiteral::Ptr literal)
+{
+    reasoner::factpp::DataValue dataValue = mpOntology->kb()->dataValue(literal->getValue(), literal->getType());
+    mpOntology->kb()->valueOf(instance, dataProperty, dataValue);
+}
+
 } // end namespace model
 } // end namespace owlapi

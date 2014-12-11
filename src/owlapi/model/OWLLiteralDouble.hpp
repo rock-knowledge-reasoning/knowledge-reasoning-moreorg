@@ -9,9 +9,9 @@ namespace model {
 class OWLLiteralDouble : public OWLLiteral
 {
 public:
-    OWLLiteralDouble(const std::string& value)
-        : OWLLiteral(value)
-    {}
+    OWLLiteralDouble(double value);
+
+    OWLLiteralDouble(const std::string& value);
 
     double getDouble() const;
 };

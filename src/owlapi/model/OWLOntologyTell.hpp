@@ -2,6 +2,7 @@
 #define OWLAPI_MODEL_OWL_ONTOLOGY_TELL_HPP
 
 #include <owl_om/owlapi/model/OWLOntology.hpp>
+#include <owl_om/owlapi/model/OWLLiteral.hpp>
 
 namespace owlapi {
 namespace model {
@@ -85,6 +86,9 @@ public:
     void objectPropertyDomainOf(const IRI& relation, const IRI& classType);
     void objectPropertyRangeOf(const IRI& relation, const IRI& classType);
     void inverseOf(const IRI& relation, const IRI& inverseType);
+
+    // DataPropertyAssert
+    void valueOf(const IRI& instance, const IRI& dataProperty, OWLLiteral::Ptr literal);
 };
 
 } // end namespace model

@@ -619,7 +619,15 @@ public:
      */
     reasoner::factpp::ExplorationNode getExplorationNode(const IRI& klass);
 
+    /**
+     * Retrieve object properties that are related to the given class
+     * NOTE: not sure whether that is what Fact++ actually provides here
+     */
     reasoner::factpp::ObjectPropertyExpressionList getRelatedObjectProperties(const IRI& klass);
+    /**
+     * Retrieve data properties
+     * NOTE: not sure whether that is what Fact++ actually provides here
+     */
     reasoner::factpp::DataPropertyExpressionList getRelatedDataProperties(const IRI& klass);
 
 };

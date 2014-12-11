@@ -11,6 +11,7 @@
 
 #include <owl_om/ccf/CCF.hpp>
 #include <owl_om/owlapi/model/OWLOntologyReader.hpp>
+#include <owl_om/owlapi/model/OWLLiteralDouble.hpp>
 
 using namespace owlapi::vocabulary;
 using namespace owl_om::organization_model;
@@ -991,11 +992,8 @@ IRI OrganizationModel::getRelatedProviderInstance(const IRI& actor, const IRI& m
 
 void OrganizationModel::setDouble(const IRI& iri, const IRI& dataProperty, double value)
 {
-    std::stringstream ss;
-    ss << value;
-    // SCHOKO
-    //DataValue dataValue = mpOntology->dataValue(ss.str(), "double");
-    //mpOntology->valueOf(iri, dataProperty, dataValue);
+    owlapi::model::OWLLiteral::Ptr dataValue(new owlapi::model::OWLLiteralDouble(value));
+    mpTell->valueOf(iri, dataProperty, dataValue);
 }
 
 IRIList OrganizationModel::sortByDependency(const IRIList& list)

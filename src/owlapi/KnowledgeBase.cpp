@@ -8,6 +8,8 @@
 #include <factpp/Actor.h>
 #include <factpp/tOntologyPrinterLISP.h>
 
+#include "Vocabulary.hpp"
+
 using namespace owlapi::reasoner::factpp;
 
 namespace owlapi {
@@ -183,6 +185,33 @@ KnowledgeBase::KnowledgeBase()
     mDataTypes["double"] = getExpressionManager()->getRealDataType();
     mDataTypes["bool"] = getExpressionManager()->getBoolDataType();
     mDataTypes["time"] = getExpressionManager()->getTimeDataType();
+
+    using namespace owlapi::vocabulary;
+
+    mDataTypes[XSD::resolve("double").toString()] = getExpressionManager()->getRealDataType();
+    mDataTypes[XSD::resolve("float").toString()] = getExpressionManager()->getRealDataType();
+
+    mDataTypes[XSD::resolve("long").toString()] = getExpressionManager()->getIntDataType();
+    mDataTypes[XSD::resolve("int").toString()] = getExpressionManager()->getIntDataType();
+    mDataTypes[XSD::resolve("short").toString()] = getExpressionManager()->getIntDataType();
+
+    mDataTypes[XSD::nonNegativeInteger().toString()] = getExpressionManager()->getIntDataType();
+    mDataTypes[XSD::nonPositiveInteger().toString()] = getExpressionManager()->getIntDataType();
+    mDataTypes[XSD::positiveInteger().toString()] = getExpressionManager()->getIntDataType();
+    mDataTypes[XSD::negativeInteger().toString()] = getExpressionManager()->getIntDataType();
+    mDataTypes[XSD::integer().toString()] = getExpressionManager()->getIntDataType();
+
+    mDataTypes[XSD::byte().toString()] = getExpressionManager()->getIntDataType();
+    mDataTypes[XSD::unsignedLong().toString()] = getExpressionManager()->getIntDataType();
+    mDataTypes[XSD::unsignedInt().toString()] = getExpressionManager()->getIntDataType();
+    mDataTypes[XSD::unsignedShort().toString()] = getExpressionManager()->getIntDataType();
+    mDataTypes[XSD::unsignedByte().toString()] = getExpressionManager()->getIntDataType();
+
+    mDataTypes[XSD::decimal().toString()] = getExpressionManager()->getRealDataType();
+    mDataTypes[XSD::string().toString()] = getExpressionManager()->getStrDataType();
+
+    mDataTypes[XSD::dateTime().toString()] = getExpressionManager()->getTimeDataType();
+    mDataTypes[XSD::dateTimeStamp().toString()] = getExpressionManager()->getTimeDataType();
 }
 
 KnowledgeBase::~KnowledgeBase()

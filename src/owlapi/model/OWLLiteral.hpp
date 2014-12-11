@@ -28,7 +28,10 @@ protected:
     std::string mValue;
     std::string mType;
 
+    OWLLiteral();
+
     OWLLiteral(const std::string& value);
+
 public:
     typedef boost::shared_ptr<OWLLiteral> Ptr;
 
@@ -41,6 +44,8 @@ public:
     bool hasType(const IRI& typeIRI) const;
 
     std::string getType() const { return mType; }
+
+    std::string getValue() const { return mValue; }
 
     // http://owlapi.sourceforge.net/javadoc/index.html?org/semanticweb/owlapi/model/OWLClassExpression.html
     //OWLDatatype getDatatype()

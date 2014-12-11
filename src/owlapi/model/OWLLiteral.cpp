@@ -7,6 +7,9 @@
 namespace owlapi {
 namespace model {
 
+OWLLiteral::OWLLiteral()
+{}
+
 OWLLiteral::OWLLiteral(const std::string& value)
 {
     size_t pos = value.find("^^");
