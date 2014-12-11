@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_OBJECT_HPP
-#define OWL_API_MODEL_OBJECT_HPP
+#ifndef OWLAPI_MODEL_OWL_OBJECT_HPP
+#define OWLAPI_MODEL_OWL_OBJECT_HPP
 
 #include <owl_om/Exceptions.hpp>
 #include <boost/shared_ptr.hpp>
@@ -26,4 +26,4 @@ public:
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_OBJECT_HPP
+#endif // OWLAPI_MODEL_OWL_OBJECT_HPP

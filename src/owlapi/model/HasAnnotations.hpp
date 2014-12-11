@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_HAS_ANNOTATIONS_HPP
-#define OWL_API_MODEL_HAS_ANNOTATIONS_HPP
+#ifndef OWLAPI_MODEL_HAS_ANNOTATIONS_HPP
+#define OWLAPI_MODEL_HAS_ANNOTATIONS_HPP
 
 #include <boost/shared_ptr.hpp>
 #include <vector>
@@ -27,4 +27,4 @@ public:
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_HAS_ANNOTATIONS_HPP
+#endif // OWLAPI_MODEL_HAS_ANNOTATIONS_HPP

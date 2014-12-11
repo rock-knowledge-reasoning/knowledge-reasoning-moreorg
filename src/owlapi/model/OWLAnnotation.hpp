@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_OWL_ANNOTATION_HPP
-#define OWL_API_MODEL_OWL_ANNOTATION_HPP
+#ifndef OWLAPI_MODEL_OWL_ANNOTATION_HPP
+#define OWLAPI_MODEL_OWL_ANNOTATION_HPP
 
 #include <vector>
 #include <owl_om/owlapi/model/OWLObject.hpp>
@@ -22,4 +22,4 @@ typedef std::vector<OWLAnnotation> OWLAnnotationList;
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_OWL_ANNOTATION_HPP
+#endif // OWLAPI_MODEL_OWL_ANNOTATION_HPP

@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_QUALIFIED_RESTRICTION_HPP
-#define OWL_API_MODEL_QUALIFIED_RESTRICTION_HPP
+#ifndef OWLAPI_MODEL_OWL_QUALIFIED_RESTRICTION_HPP
+#define OWLAPI_MODEL_OWL_QUALIFIED_RESTRICTION_HPP
 
 #include <owl_om/owlapi/model/IRI.hpp>
 #include <owl_om/owlapi/model/OWLRestriction.hpp>
@@ -57,4 +57,4 @@ protected:
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_QUALIFIED_RESTRICTION_HPP
+#endif // OWLAPI_MODEL_OWL_QUALIFIED_RESTRICTION_HPP

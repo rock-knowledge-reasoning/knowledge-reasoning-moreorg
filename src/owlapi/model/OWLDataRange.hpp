@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_OWL_DATA_RANGE_HPP
-#define OWL_API_MODEL_OWL_DATA_RANGE_HPP
+#ifndef OWLAPI_MODEL_OWL_DATA_RANGE_HPP
+#define OWLAPI_MODEL_OWL_DATA_RANGE_HPP
 
 #include <owl_om/owlapi/model/OWLPropertyRange.hpp>
 
@@ -12,4 +12,4 @@ class OWLDataRange : public OWLPropertyRange//, SWRLPredicate
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_OWL_DATA_RANGE_HPP
+#endif // OWLAPI_MODEL_OWL_DATA_RANGE_HPP

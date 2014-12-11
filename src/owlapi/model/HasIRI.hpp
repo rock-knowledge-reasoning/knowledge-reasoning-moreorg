@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_HAS_IRI_HPP
-#define OWL_API_MODEL_HAS_IRI_HPP
+#ifndef OWLAPI_MODEL_HAS_IRI_HPP
+#define OWLAPI_MODEL_HAS_IRI_HPP
 
 #include <owl_om/Exceptions.hpp>
 #include <owl_om/owlapi/model/IRI.hpp>
@@ -15,6 +15,6 @@ public:
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_HAS_IRI_HPP
+#endif // OWLAPI_MODEL_HAS_IRI_HPP
 
 

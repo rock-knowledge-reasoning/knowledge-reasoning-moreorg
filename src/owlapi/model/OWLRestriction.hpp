@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_OWL_RESTRICTION_HPP
-#define OWL_API_MODEL_OWL_RESTRICTION_HPP
+#ifndef OWLAPI_MODEL_OWL_RESTRICTION_HPP
+#define OWLAPI_MODEL_OWL_RESTRICTION_HPP
 
 #include <owl_om/owlapi/model/OWLClassExpression.hpp>
 #include <owl_om/owlapi/model/OWLPropertyExpression.hpp>
@@ -46,4 +46,4 @@ typedef std::vector<OWLRestriction::Ptr> OWLRestrictionPtrList;
  */
 std::ostream& operator<<(std::ostream& os, const owlapi::model::OWLRestrictionPtrList& list);
 
-#endif // OWL_API_MODEL_OWL_RESTRICTION_HPP
+#endif // OWLAPI_MODEL_OWL_RESTRICTION_HPP

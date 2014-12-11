@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_NODE_ID_HPP
-#define OWL_API_MODEL_NODE_ID_HPP
+#ifndef OWLAPI_MODEL_NODE_ID_HPP
+#define OWLAPI_MODEL_NODE_ID_HPP
 
 #include <stdint.h>
 #include <string.h>
@@ -56,4 +56,4 @@ public:
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_NODE_ID_HPP
+#endif // OWLAPI_MODEL_NODE_ID_HPP

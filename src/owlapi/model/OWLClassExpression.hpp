@@ -74,4 +74,4 @@ typedef std::vector<OWLClassExpression::Ptr> OWLClassExpressionPtrList;
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_OWL_CLASS_EXPRESSION_HPP
+#endif // OWLAPI_MODEL_OWL_CLASS_EXPRESSION_HPP

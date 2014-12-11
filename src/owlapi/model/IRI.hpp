@@ -1,5 +1,5 @@
-#ifndef OWL_OM_OWL_API_MODEL_IRI_HPP
-#define OWL_OM_OWL_API_MODEL_IRI_HPP
+#ifndef OWLAPI_MODEL_IRI_HPP
+#define OWLAPI_MODEL_IRI_HPP
 
 #include <stdexcept>
 #include <vector>
@@ -136,4 +136,4 @@ std::ostream& operator<<(std::ostream& os, const std::vector< IRIList >& iris);
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_OM_OWL_API_MODEL_IRI_HPP
+#endif // OWLAPI_MODEL_IRI_HPP

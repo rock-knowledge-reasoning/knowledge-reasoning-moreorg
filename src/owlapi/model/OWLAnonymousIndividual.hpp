@@ -1,5 +1,5 @@
-#ifndef OWL_API_MODEL_ANONYMOUS_INDIVIDUAL_HPP
-#define OWL_API_MODEL_ANONYMOUS_INDIVIDUAL_HPP
+#ifndef OWLAPI_MODEL_ANONYMOUS_INDIVIDUAL_HPP
+#define OWLAPI_MODEL_ANONYMOUS_INDIVIDUAL_HPP
 
 #include <owl_om/owlapi/model/NodeID.hpp>
 #include <owl_om/owlapi/model/OWLObject.hpp>
@@ -32,4 +32,4 @@ public:
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_API_MODEL_ANONYMOUS_INDIVIDUAL_HPP
+#endif // OWLAPI_MODEL_ANONYMOUS_INDIVIDUAL_HPP

@@ -1,5 +1,5 @@
-#ifndef OWL_OM_OWL_API_MODEL_URI_HPP
-#define OWL_OM_OWL_API_MODEL_URI_HPP
+#ifndef OWLAPI_MODEL_URI_HPP
+#define OWLAPI_MODEL_URI_HPP
 
 #include <string>
 #include <map>
@@ -48,4 +48,4 @@ public:
 
 } // end namespace model
 } // end namespace owlapi
-#endif // OWL_OM_OWL_API_MODEL_URI_HPP
+#endif // OWLAPI_MODEL_URI_HPP
