@@ -11,8 +11,10 @@ OWLOntologyTell::OWLOntologyTell(OWLOntology::Ptr ontology)
 {}
 
 void OWLOntologyTell::initializeDefaultClasses()
-{ 
+{
+    getOWLClass(vocabulary::OWL::Class());
     getOWLClass(vocabulary::OWL::Thing());
+
 //    // http://www.w3.org/TR/2009/REC-owl2-syntax-20091027/#Entity_Declarations_and_Typing
 //    // Declarations for the built-in entities of OWL 2, listed in Table 5, are implicitly present in every OWL 2 ontology.
 //    OWLClass thing(vocabulary::OWL::Thing());
@@ -36,6 +38,7 @@ void OWLOntologyTell::initializeDefaultClasses()
 
 OWLClass::Ptr OWLOntologyTell::getOWLClass(const IRI& iri)
 {
+    LOG_WARN_S << "Retrieve class: " << iri;
     std::map<IRI, OWLClass::Ptr>::const_iterator it = mpOntology->mClasses.find(iri);
     if(it != mpOntology->mClasses.end())
     {
@@ -43,6 +46,10 @@ OWLClass::Ptr OWLOntologyTell::getOWLClass(const IRI& iri)
     } else {
         OWLClass::Ptr klass(new OWLClass(iri));
         mpOntology->mClasses[iri] = klass;
+
+        // Update kb
+        mpOntology->kb()->getClassLazy(iri);
+
         return klass;
     }
 }
@@ -70,6 +77,10 @@ OWLNamedIndividual::Ptr OWLOntologyTell::getOWLNamedIndividual(const IRI& iri)
     } else {
         OWLNamedIndividual::Ptr individual(new OWLNamedIndividual(iri));
         mpOntology->mNamedIndividuals[iri] = individual;
+
+        //Update kb
+        mpOntology->kb()->getInstanceLazy(iri);
+
         return individual;
     }
 }
@@ -83,6 +94,10 @@ OWLObjectProperty::Ptr OWLOntologyTell::getOWLObjectProperty(const IRI& iri)
     } else {
         OWLObjectProperty::Ptr property(new OWLObjectProperty(iri));
         mpOntology->mObjectProperties[iri] = property;
+
+        //Update kb
+        mpOntology->kb()->getObjectPropertyLazy(iri);
+
         return property;
     }
 }
@@ -96,6 +111,10 @@ OWLDataProperty::Ptr OWLOntologyTell::getOWLDataProperty(const IRI& iri)
     } else {
         OWLDataProperty::Ptr property(new OWLDataProperty(iri));
         mpOntology->mDataProperties[iri] = property;
+
+        //Update kb
+        mpOntology->kb()->getDataPropertyLazy(iri);
+
         return property;
     }
 }
@@ -128,7 +147,7 @@ OWLSubClassOfAxiom::Ptr OWLOntologyTell::subclassOf(OWLClassExpression::Ptr subc
     OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom(subclassExpression, superclassExpression));
     mpOntology->mSubClassAxiomBySubPosition[subclassExpression].push_back(axiom);
     mpOntology->mSubClassAxiomBySuperPosition[superclassExpression].push_back(axiom);
-    
+
     LOG_DEBUG_S << "Added SubClassOfAxiom:" << subclassExpression->toString() << " axiom: " << axiom->toString();
     return axiom;
 }
