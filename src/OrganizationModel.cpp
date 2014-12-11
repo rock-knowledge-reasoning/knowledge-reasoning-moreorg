@@ -13,6 +13,7 @@
 
 using namespace owl_om::vocabulary;
 using namespace owl_om::organization_model;
+using namespace owlapi::model;
 
 namespace owl_om {
 
@@ -56,48 +57,49 @@ void OrganizationModel::refresh(bool performInference)
 
     mCurrentStats.timeRegisterCompositeSystems = base::Time::now();
 
-    IRIList newActors;
-    if(!interfaceCombinations.empty())
-    {
-        InterfaceCombinationList::const_iterator cit = interfaceCombinations.begin();
-        std::map<IRISet, uint32_t> actorTypes;
-        for(; cit != interfaceCombinations.end(); ++cit)
-        {
-            IRISet actorCombination;
-            std::vector<ActorModelLink> actorModelCombination;
-            InterfaceConnectionList::const_iterator iit = cit->begin();
-            for(; iit != cit->end(); ++iit)
-            {
-                actorCombination.insert(iit->parents.begin(), iit->parents.end());
-                actorModelCombination.push_back(iit->actorModelLink);
-            }
-            std::sort(actorModelCombination.begin(), actorModelCombination.end());
+    // SCHOKO
+    //IRIList newActors;
+    //if(!interfaceCombinations.empty())
+    //{
+    //    InterfaceCombinationList::const_iterator cit = interfaceCombinations.begin();
+    //    std::map<IRISet, uint32_t> actorTypes;
+    //    for(; cit != interfaceCombinations.end(); ++cit)
+    //    {
+    //        IRISet actorCombination;
+    //        std::vector<ActorModelLink> actorModelCombination;
+    //        InterfaceConnectionList::const_iterator iit = cit->begin();
+    //        for(; iit != cit->end(); ++iit)
+    //        {
+    //            actorCombination.insert(iit->parents.begin(), iit->parents.end());
+    //            actorModelCombination.push_back(iit->actorModelLink);
+    //        }
+    //        std::sort(actorModelCombination.begin(), actorModelCombination.end());
 
-            std::vector< std::vector<ActorModelLink> >::const_iterator eit = std::find(mCompositeActorModels.begin(), mCompositeActorModels.end(), actorModelCombination);
-            if(eit == mCompositeActorModels.end())
-            {
-                mCompositeActorModels.push_back(actorModelCombination);
-            }
+    //        std::vector< std::vector<ActorModelLink> >::const_iterator eit = std::find(mCompositeActorModels.begin(), mCompositeActorModels.end(), actorModelCombination);
+    //        if(eit == mCompositeActorModels.end())
+    //        {
+    //            mCompositeActorModels.push_back(actorModelCombination);
+    //        }
 
 
-            uint32_t count = actorTypes[actorCombination] + 1;
-            actorTypes[actorCombination] = count;
-            IRI newActor = createNewCompositeActor(actorCombination, *cit, count);
-            if(!newActor.empty())
-            {
-                ++mCompositeActorsCount;
-                newActors.push_back(newActor);
-            }
-        }
+    //        uint32_t count = actorTypes[actorCombination] + 1;
+    //        actorTypes[actorCombination] = count;
+    //        IRI newActor = createNewCoalitionModel(actorCombination);
+    //        if(!newActor.empty())
+    //        {
+    //            ++mCompositeActorsCount;
+    //            newActors.push_back(newActor);
+    //        }
+    //    }
 
-        //mpOntology->refresh();
-        LOG_INFO_S << "OrganizationModel: with inferred actors: " << newActors;
+    //    //mpOntology->refresh();
+    //    LOG_INFO_S << "OrganizationModel: with inferred actors: " << newActors;
 
-        mCurrentStats.actorsInferred = newActors;
+    //    mCurrentStats.actorsInferred = newActors;
 
-    } else {
-        LOG_INFO_S << "OrganizationModel: no interface combinations available, so no actors inferred";
-    }
+    //} else {
+    //    LOG_INFO_S << "OrganizationModel: no interface combinations available, so no actors inferred";
+    //}
 
     mCurrentStats.timeRegisterCompositeSystems = base::Time::now() - mCurrentStats.timeRegisterCompositeSystems;
 
@@ -119,117 +121,64 @@ void OrganizationModel::refresh(bool performInference)
     mStatistics.push_back(mCurrentStats);
 }
 
-IRI OrganizationModel::createNewCompositeActor(const IRISet& actorSet, const InterfaceConnectionList& interfaceConnections, uint32_t id)
+IRI createCoalitionModelName(const std::vector<OWLCardinalityRestriction::Ptr>& actorModelRequirements)
 {
-    // create new actor name from fragment, using the first IRI as base
-    // add an id, since multiple actor can be combined in different ways
-    IRI actorName;
-    IRI actorModelName;
-    {
-        IRISet::const_iterator cit = actorSet.begin();
-        for(; cit != actorSet.end(); ++cit)
-        {
-            if(actorName.empty())
+    // Make sure actor model requirement are sorted so that we get a consistent
+    // naming schema for the coalition model
+    std::vector<OWLCardinalityRestriction::Ptr> requirements = actorModelRequirements;
+    std::sort(requirements.begin(), requirements.end(), [](OWLCardinalityRestriction::Ptr a,
+                OWLCardinalityRestriction::Ptr b)
             {
-                actorName = *cit;
-                actorModelName = getResourceModel(*cit);
-            } else {
-                actorName = IRI( actorName.toString() + "+" + cit->getFragment());
-                actorModelName = IRI( actorModelName.toString() + "+" + getResourceModel(*cit).getFragment());
-            }
-        }
+                return a->getQualification() < b->getQualification();
+            });
+
+    // Create name:
+    // <actorname-0>#<number-of-occurence>_<actortype-1>#<number-of-occurrence>
+    std::string coalitionModelName;
+    std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = requirements.begin();
+    for(; cit != requirements.end(); ++cit)
+    {
+        OWLCardinalityRestriction::Ptr restriction = *cit;
+        uint32_t cardinality = restrictions->getCardinality();
+        OWLQualification qualification = restrictions->getQualification();
+
         std::stringstream ss;
-        ss << id;
-        actorName = IRI( actorName.toString() + "[" + ss.str() + "]");
-        actorModelName = IRI( actorModelName.toString() + "[" + ss.str() + "]");
-    }
+        ss << cardinality;
 
-    try {
-        if(mpOntology->isInstanceOf(actorName, OM::CompositeActor()))
+        if(!coalitionModelName.empty())
         {
-            // this instance does already exist
-            return IRI();
+            coalitionModelName += "_";
         }
-    } catch(const std::invalid_argument& e)
-    {
-        // actor does not exist
+        coalitionModelName +=  qualification.getFragment() + "#" + ss.str();
     }
 
-
-    // Create ActorModel
-    bool newModel = false;
-    try {
-        mpOntology->instanceOf(actorModelName, OM::CompositeActorModel());
-        newModel = true;
-        ++mCompositeActorModelsCount;
-    } catch(const std::invalid_argument& e)
-    {
-        throw;
-        // model does already exist
-    }
-
-    // Create Instance
-    mpOntology->instanceOf(actorName, OM::CompositeActor());
-    mpOntology->relatedTo(actorName, OM::modelledBy(), actorModelName);
-
-    IRIList allNewRequirements;
-    // Register set of actors which are associate with this actor
-    {
-        // maker for the set of requirements, since requirement will be all added
-        // at this actors level, i.e. per actor a suffix is added
-        uint32_t marker = 0;
-        IRISet::const_iterator ait = actorSet.begin();
-        for(; ait != actorSet.end(); ++ait)
-        {
-            LOG_DEBUG_S << "New actor '" << actorName << "' has '" << *ait << " with count " << actorSet.size();
-            mpOntology->relatedTo(actorName, OM::has(), *ait);
-
-            // ActorModel dependsOn the same requirement instances of the modelled resources, i.e.
-            IRIList requirements = allRelatedInstances( getResourceModel(*ait), OM::dependsOn() );
-            BOOST_FOREACH(const IRI& requirement, requirements)
-            {
-                IRI newRequirement = createNewRequirement( requirement, marker);
-                mpOntology->relatedTo(actorModelName, OM::dependsOn(), newRequirement );
-                allNewRequirements.push_back(newRequirement);
-            }
-            marker++;
-        }
-    }
-    if(newModel)
-    {
-        // allow fast retrieval
-        mModelRequirementsCache[actorModelName] = allNewRequirements;
-    }
-
-    IRIList usedInterfaces;
-    {
-        // Associate actor with used interfaces
-        InterfaceConnectionList::const_iterator iit = interfaceConnections.begin();
-        for(; iit != interfaceConnections.end(); ++iit)
-        {
-
-            mpOntology->relatedTo(actorName, OM::uses(), iit->begin);
-            mpOntology->relatedTo(actorName, OM::uses(), iit->end);
-
-            usedInterfaces.push_back(iit->begin);
-            usedInterfaces.push_back(iit->end);
-        }
-    }
-
-
-    LOG_INFO_S << "New actor: '" << actorName << std::endl
-        << "     new actor model:    " << actorModelName << " [" << newModel << "]" << std::endl
-        << "     involved actors:    " << actorSet << std::endl
-        << "     requirements:       " << allNewRequirements << std::endl
-        << "     used interfaces:    " << usedInterfaces;
-
-    return actorName;
+    return IRI(coalitionModelName);
 }
 
-void OrganizationModel::createInstance(const IRI& instanceName, const IRI& klass, const IRI& model)
+IRI createNewCoalitionModel(const std::vector<OWLCardinalityRestriction::Ptr>& actorModelRequirements)
+{
+    IRI coalitionModelName = createCoalitionModelName(actorModelRequirements);
+
+    // Create the model and associate the set of requirements with this new
+    // model
+    mpOntology->declareSubClassOf(coalitionModelName, vocabulary::OM::CompositeActor());
+
+    // Associate all restriction with this model
+    std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = actorModelRequirements.begin();
+    for(;cit != actorModelRequirements.end(); ++cit)
+    {
+        mpOntology->declareSubClassOf(coalitionModelName, *cit);
+    }
+
+    LOG_INFO_S << "New coalition model: '" << coalitionModelName << std::endl
+        << "     involved actor models:    " << actorModelRequirements << std::endl
+
+    return coalitionModelName;
+}
+
+void OrganizationModel::createInstance(const IRI& instanceName, const IRI& klass)
 {
     mpOntology->instanceOf(instanceName, klass);
-    mpOntology->relatedTo(instanceName, OM::modelledBy(), model);
 }
 
 void OrganizationModel::runInferenceEngine()
@@ -326,45 +275,55 @@ IRIList OrganizationModel::allRelatedInstances(const IRI& instance, const IRI& r
     return all;
 }
 
-IRIList OrganizationModel::getModelRequirements(const IRI& model) const
+std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModel::getModelRequirements(const IRI& model) const
 {
-    IRI2IRIListCache::const_iterator it = mModelRequirementsCache.find(model);
+    IRI2RestrictionsCache::const_iterator it = mModelRequirementsCache.find(model);
     if(it != mModelRequirementsCache.end())
     {
         return it->second;
     }
 
-    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> restrictions = mpOntology->getCardinalityRestrictions(classType);
-    // SCHOKO
-    IRI requirementModel = getResourceModel(model);
-    IRIList requirements = allRelatedInstances( requirementModel, OM::dependsOn());
-    mModelRequirementsCache[model] = requirements;
-    return requirements;
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> restrictions = mpOntology->getCardinalityRestrictions(model);
+    mModelRequirementsCache[model] = restrictions;
+    return restrictions;
 }
 
-bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& model) const
+bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& providerModel) const
 {
-    std::pair<IRI, IRI> key(actorModel, model);
+    std::pair<IRI, IRI> key(actorModel, providerModel);
     RelationPredicateCache::const_iterator cit = mModelProviderCache.find(key);
     if(cit != mModelProviderCache.end())
     {
         return cit->second;
     }
 
-    // actorModels define the requirements (that will be fulfilled by instances of this actor model
-    IRIList availableResources = getModelRequirements(actorModel);
+    using namespace owlapi::model;
+    // Models define the requirements (that will be fulfilled by instances of this actor model
+    // so we can assume this the the available resources
+    std::vector<OWLCardinalityRestriction::Ptr> actorRequirements = getModelRequirements(actorModel);
+
+    // Add the inferred set of resources
     IRISet provisioned = mModelProviderSetCache[actorModel];
-    availableResources.insert(availableResources.begin(), provisioned.begin(), provisioned.end());
+
+    IRISet::const_iterator pit = provisioned.begin();
+    for(; pit != provisioned.end(); ++pit)
+    {
+        OWLObjectPropertyExpression::Ptr property = mpOntology->getOWLObjectProperty(vocabulary::OM::has());
+        actorRequirements.push_back( OWLExactCardinalityRestriction::Ptr(new OWLExactCardinalityRestriction( property, 1,  *pit)) );
+    }
 
     // model (service/capability/...) define the set of requirements
-    IRIList requirements = getModelRequirements(model);
+    std::vector<OWLCardinalityRestriction::Ptr> providerRequirements = getModelRequirements(providerModel);
 
     bool result;
     try {
-        Grounding grounding = resolveRequirements(requirements, availableResources, model, actorModel);
+        // List of resources -- actually resource models
+        IRIList availableResources = exactRequiredResources(actorRequirements);
+
+        Grounding grounding = resolveRequirements(providerRequirements, availableResources, providerModel, actorModel);
         result = grounding.isComplete();
 
-        LOG_DEBUG_S << "Is " << actorModel << " provider for " << model << ": " << grounding.toString();
+        LOG_DEBUG_S << "Is " << actorModel << " provider for " << providerModel << ": " << grounding.toString();
 
     } catch(const std::invalid_argument& e)
     {
@@ -374,10 +333,10 @@ bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& model)
     mModelProviderCache[key] = result;
     if(result)
     {
-        mModelProviderSetCache[actorModel].insert(model);
-        LOG_DEBUG_S << "actorModel: " << actorModel << " provides " << model; 
+        mModelProviderSetCache[actorModel].insert(providerModel);
+        LOG_DEBUG_S << "actorModel: " << actorModel << " provides " << providerModel; 
     } else {
-        LOG_DEBUG_S << "actorModel: " << actorModel << " does not provide " << model;
+        LOG_DEBUG_S << "actorModel: " << actorModel << " does not provide " << providerModel;
     }
 
     return result;
@@ -442,7 +401,7 @@ bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& model)
 //    return inferred;
 //}
 
-Grounding OrganizationModel::resolveRequirements(const IRIList& requirements, const IRIList& availableResources, const IRI& resourceProvider, const IRI& requirementModel) const
+Grounding OrganizationModel::resolveRequirements(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& requirements, const IRIList& availableResources, const IRI& resourceProvider, const IRI& requirementModel) const
 {
     if(requirements.empty())
     {
@@ -453,53 +412,52 @@ Grounding OrganizationModel::resolveRequirements(const IRIList& requirements, co
         << "    resourceProvider " << resourceProvider  << std::endl
         << "    requirements for '" << requirementModel << "'" << std::endl
         << "    available resources:     " << availableResources << std::endl
-        << "    requirements: " << requirements;
+        << "    requirements: ";// << requirements;
 
-    IRIList::const_iterator cit = requirements.begin();
+    using namespace owlapi::model;
+    std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = requirements.begin();
 
-    bool success = true;
     RequirementsGrounding grounding;
-    std::map<IRI,bool> grounded;
+    IRIList resources;
+
     for(; cit != requirements.end(); ++cit)
     {
-        IRI requirement = *cit;
+        OWLCardinalityRestriction::Ptr requirement = *cit;
         if(availableResources.empty())
         {
             LOG_DEBUG_S << "no available resources on '" << resourceProvider << "'";
         }
 
         IRIList::const_iterator nit = availableResources.begin();
-        bool dependencyFulfilled = false;
-        for(; nit != availableResources.end(); ++nit)
-        {
-            IRI availableResource = *nit;
 
-            if( grounded[availableResource] )
+        uint32_t cardinality = requirement->getCardinality();
+        OWLQualification qualification = requirement->getQualification();
+
+        for(uint32_t i = 0; i < cardinality; ++i)
+        {
+            IRIList::iterator rit = resources.begin();
+            bool found = false;
+            for(; rit != resources.end(); ++rit)
             {
-                LOG_DEBUG_S << "resource '" << availableResource << "' already in use (grounded)";
-                continue;
+                IRI resourceModel = *rit;
+                if( fulfills(resourceModel, qualification))
+                {
+                    grounding[requirement].push_back(resourceModel);
+                    resources.erase(rit);
+                    found = true;
+                    break;
+                }
             }
 
-            if( isSameResourceModel(requirement, availableResource) )
+            if(!found)
             {
-                LOG_DEBUG_S << "requirement " << requirement << " fulfilled by '" << resourceProvider << "' using '"<< availableResource << "'";
-                grounding[requirement] = availableResource;
-                grounded[availableResource] = true;
-                dependencyFulfilled = true;
-                break;
+                grounding[requirement].push_back(Grounding::ungrounded());
             }
-        }
-
-        if(!dependencyFulfilled)
-        {
-            LOG_DEBUG_S << "requirement " << requirement << " cannot be fulfilled by '" << resourceProvider << "'";
-            grounding[requirement] = Grounding::ungrounded();
-            success = false;
-            break;
         }
     }
 
     Grounding groundingMap(grounding);
+    bool success = groundingMap.isComplete();
 
     std::stringstream ss;
     ss << "Fulfillment: ";
@@ -572,6 +530,7 @@ IRI OrganizationModel::createNewInstance(const IRI& classType, bool createRequir
     LOG_DEBUG_S << "CreateNewInstance: " << std::endl
         << "    class type:    " << classType << std::endl;
 
+    IRI model = classType;
     IRIList instances = mpOntology->allInstancesOf(model, true);
     std::stringstream ss;
     ss << instances.size();
@@ -580,7 +539,7 @@ IRI OrganizationModel::createNewInstance(const IRI& classType, bool createRequir
 
     mpOntology->instanceOf(newInstanceName, classType);
 
-    if(!createRequiredResourced)
+    if(!createRequiredResources)
     {
         LOG_DEBUG_S << "CreateNewInstance: " << std::endl
             << "    instance:                 " << newInstanceName << std::endl
@@ -590,29 +549,27 @@ IRI OrganizationModel::createNewInstance(const IRI& classType, bool createRequir
     }
 
     // Create dependencies/requirement that are defined for that model
-    IRIList dependencies = getModelRequirements(model);
+    using namespace owlapi::model;
+    std::vector<OWLCardinalityRestriction::Ptr> dependencies = getModelRequirements(model);
+
     IRIList newDependants;
-    BOOST_FOREACH(IRI dependency, dependencies)
+    BOOST_FOREACH(OWLCardinalityRestriction::Ptr dependency, dependencies)
     {
-        // Find out the actual model of this resource (in case in need to instanciate further
-        // requirements)
-        IRI resourceModel = getResourceModel(dependency);
+        // Get the actual model of this dependency -- qualification of the
+        // cardinality restriction
+        IRI resourceModel = dependency->getQualification();
         if(resourceModel.empty())
         {
-            throw std::invalid_argument("owl_om::OrganizationModel::createNewFromModel: could not infer model for dependency / requirement '" + dependency.toString() + "'");
+            throw std::invalid_argument("owl_om::OrganizationModel::createNewInstance: could not infer model for dependency / requirement '" + dependency->toString() + "'");
         }
 
-        LOG_DEBUG_S << "CreateNewFromModel: dependency of " << newInstanceName << std::endl
+        LOG_DEBUG_S << "CreateNewInstance: dependency of " << newInstanceName << std::endl
             << "    dependency:        " << dependency << std::endl
             << "    resource model:    " << resourceModel << std::endl;
 
         // dependency is a placeholder requirement of the same class as the final
-        IRI dependant = createNewFromModel(resourceModel, true );
+        IRI dependant = createNewInstance(resourceModel, true );
         mpOntology->relatedTo(newInstanceName, OM::has(), dependant);
-
-        // Add reverse mapping, so that we can indentify which dependant
-        // fulfills a given requirement (role)
-        mpOntology->relatedTo(dependant, OM::fulfills(), dependency);
         newDependants.push_back(dependant);
     }
 
@@ -623,9 +580,9 @@ IRI OrganizationModel::createNewInstance(const IRI& classType, bool createRequir
     return newInstanceName;
 }
 
-bool OrganizationModel::isSameResourceModel(const IRI& instance, const IRI& otherInstance) const
+bool OrganizationModel::fulfills(const IRI& model, const IRI& otherModel) const
 {
-    return getResourceModel(instance) == getResourceModel(otherInstance);
+    return mpOntology->isSubclassOf(model, otherModel);
 }
 
 InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
@@ -1085,6 +1042,26 @@ bool OrganizationModel::hasModelDependency(const IRI& main, const IRI& other)
     }
 
     return false;
+}
+
+IRIList OrganizationModel::exactRequiredResources(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions) const
+{
+    using namespace owlapi::model;
+
+    IRIList resources;
+    std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = restrictions.begin();
+    for(; cit != restrictions.end(); ++cit)
+    {
+        OWLCardinalityRestriction::Ptr restriction = *cit;
+        uint32_t cardinality = restriction->getCardinality();
+        OWLQualification qualification = restriction->getQualification();
+
+        for(uint32_t i = 0; i < cardinality; ++i)
+        {
+            resources.push_back(qualification);
+        }
+    }
+    return resources;
 }
 
 } // end namespace owl_om

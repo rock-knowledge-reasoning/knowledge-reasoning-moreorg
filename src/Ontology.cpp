@@ -50,19 +50,7 @@ void Ontology::reload()
         while(it.next())
         {
             owlapi::model::IRI subject = it[Subject()];
-            subclassOf(subject, vocabulary::OWL::Thing());
-
-            // All classes inherit from top concept, i.e. owl:Thing
-            OWLClass::Ptr e_subject = getOWLClass(subject);
-            OWLClass::Ptr e_thing = getOWLClass(vocabulary::OWL::Thing());
-            OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_thing ));
-
-            LOG_DEBUG_S << "Found class: " << e_subject->getIRI();
-
-            mSubClassAxiomBySubPosition[e_subject].push_back(axiom);
-            mSubClassAxiomBySuperPosition[e_thing].push_back(axiom);
-
-            // mDeclarationsByEntity[e_subject] = OWLClassDeclaration
+            declareSubClassOf(subject, vocabulary::OWL::Thing());
         }
     }
 
@@ -369,11 +357,8 @@ void Ontology::reload()
                     {
                         break;
                     }
-                    OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom(subclassAxiomPtr->getSubClass(), cardinalityRestriction));
-                    mSubClassAxiomBySubPosition[subclassAxiomPtr->getSubClass()].push_back(axiom);
-                    mSubClassAxiomBySuperPosition[cardinalityRestriction].push_back(axiom);
 
-                    LOG_DEBUG_S << "Added " << subclassAxiomPtr->getSubClass()->toString() << " axiom: " << axiom->toString();
+                    declareSubClassOf(subclassAxiomPtr->getSubClass(), cardinalityRestriction);
                 } // end while
             } catch(const std::runtime_error& e)
             {
@@ -663,5 +648,31 @@ void Ontology::addAxiom(OWLAxiom::Ptr axiom)
 {
     mAxiomsByType[axiom->getAxiomType()].push_back( axiom );
 }
+
+void Ontology::declareSubClassOf(const IRI& subclass, const IRI& superclass)
+{
+    subclassOf(subject, vocabulary::OWL::Thing());
+
+    // All classes inherit from top concept, i.e. owl:Thing
+    OWLClass::Ptr e_subject = getOWLClass(subject);
+    OWLClass::Ptr e_thing = getOWLClass(vocabulary::OWL::Thing());
+    OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom( e_subject, e_thing ));
+
+    LOG_DEBUG_S << "Declare class: " << e_subject->getIRI();
+
+    mSubClassAxiomBySubPosition[e_subject].push_back(axiom);
+    mSubClassAxiomBySuperPosition[e_thing].push_back(axiom);
+    // mDeclarationsByEntity[e_subject] = OWLClassDeclaration
+}
+
+void Ontology::declareSubClassOf(OWLClassExpression::Ptr subclassExpression, OWLClassExpression::Ptr superclassExpression)
+{
+    OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom(subclassExpression, superclassExpression));
+    mSubClassAxiomBySubPosition[subclassExpression].push_back(axiom);
+    mSubClassAxiomBySuperPosition[superclassExpression].push_back(axiom);
+    
+    LOG_DEBUG_S << "Added SubClassOfAxiom:" << subclassExpression->toString() << " axiom: " << axiom->toString();
+}
+
 
 } // end namespace owl_om

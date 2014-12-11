@@ -1,6 +1,7 @@
 #ifndef OWL_OM_OWL_API_HPP
 #define OWL_OM_OWL_API_HPP
 
+#include <boost/shared_ptr.hpp>
 #include <owl_om/owlapi/model/HasIRI.hpp>
 #include <owl_om/owlapi/model/OWLObject.hpp>
 #include <owl_om/owlapi/model/OWLNamedObject.hpp>
@@ -11,6 +12,7 @@
 #include <owl_om/owlapi/model/OWLClass.hpp>
 #include <owl_om/owlapi/model/OWLDataProperty.hpp>
 #include <owl_om/owlapi/model/OWLObjectProperty.hpp>
+#include <owl_om/owlapi/model/OWLRestriction.hpp>
 #include <owl_om/owlapi/model/OWLQualifiedRestriction.hpp>
 #include <owl_om/owlapi/model/OWLCardinalityRestriction.hpp>
 #include <owl_om/owlapi/model/OWLObjectExactCardinality.hpp>

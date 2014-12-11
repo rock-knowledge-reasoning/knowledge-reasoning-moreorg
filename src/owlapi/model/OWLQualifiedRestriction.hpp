@@ -40,6 +40,12 @@ public:
      */
     bool isQualified() const { return mQualified; }
 
+    /**
+     * Stringify the qualified restriction
+     * \return stringified version fo the qualified restriction
+     */
+    virtual std::string toString() const;
+
 protected:
     /**
      * Allow to set the qualification for this restriction to

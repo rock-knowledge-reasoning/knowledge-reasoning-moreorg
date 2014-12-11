@@ -1,6 +1,7 @@
 #ifndef OWL_API_MODEL_CARDINALITY_RESTRICTION_HPP
 #define OWL_API_MODEL_CARDINALITY_RESTRICTION_HPP
 
+#include <vector>
 #include <stdint.h>
 #include <owl_om/owlapi/model/OWLQualifiedRestriction.hpp>
 
@@ -39,7 +40,7 @@ public:
      */
     virtual CardinalityRestrictionType getCardinalityRestrictionType() const { return mCardinalityRestrictionType; }
 
-    std::string toString() const;
+    virtual std::string toString() const;
 
 protected:
     /**

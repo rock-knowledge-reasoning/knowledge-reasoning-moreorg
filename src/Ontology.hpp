@@ -152,6 +152,12 @@ private:
 
     /// Pointer to the underlying query interfaces for SPARQL
     db::query::SparqlInterface* mSparqlInterface;
+
+
+    /**
+     * Declare the subclass relation ship between two classes
+     */
+    void declareSubClassOf(const IRI& subclass, const IRI& superclass);
 };
 
 } // end namespace owl_om

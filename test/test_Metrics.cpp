@@ -13,8 +13,8 @@ BOOST_AUTO_TEST_CASE(it_should_handle_redundancy_metrics)
     using namespace owl_om;
     using namespace owl_om::vocabulary;
     {
-        IRI instance = om.createNewFromModel(OM::resolve("Sherpa"), true);
-        om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        IRI instance = om.createNewInstance(OM::resolve("Sherpa"), true);
+        om.createNewInstance(OM::resolve("PayloadCamera"), true);
 
         BOOST_TEST_MESSAGE("Created new from model" << instance);
         BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");

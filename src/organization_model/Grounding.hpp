@@ -2,32 +2,58 @@
 #define OWL_OM_ORGANIZATION_MODEL_GROUNDING_HPP
 
 #include <map>
-#include <owl_om/KnowledgeBase.hpp>
+#include <owl_om/OWLApi.hpp>
 
 namespace owl_om {
 namespace organization_model {
 
-typedef std::map<IRI,IRI> RequirementsGrounding;
+typedef std::map<owlapi::model::OWLRestriction::Ptr, std::vector<owlapi::model::IRI> > RequirementsGrounding;
 
+/**
+ * Grounding allows to map a requirement / restriction to a given set of
+ * resources (via IRI)
+ */
 class Grounding
 {
+    /// Map the requirement to the associated resource(s)
     RequirementsGrounding mRequirementToResourceMap;
+
 public:
     Grounding(const RequirementsGrounding& grounding);
 
     const RequirementsGrounding& getRequirementsGrounding() { return mRequirementToResourceMap; }
 
+    /**
+     * Check if grounding is complete
+     */
     bool isComplete() const;
 
     /**
+     * Check if IRIList contains ungrounded elements
      */
-    IRIList ungroundedRequirements() const;
+    bool isComplete(const std::vector<owlapi::model::IRI>& partialGrounding) const;
 
-    static IRI ungrounded();
+    /**
+     * Provide the open ungrounded requirements
+     * \return map of open groundings
+     */
+    RequirementsGrounding ungroundedRequirements() const;
 
+    /**
+     * Compute the IRI which represents an ungrounded resource
+     * \return IRI to represent ungrounded resources
+     */
+    static owlapi::model::IRI ungrounded();
+
+    /**
+     * Compute string representation of the grounding
+     * \return Stringified Grounding object
+     */
     std::string toString() const;
+
 };
 
 } // end namespace organization_model
 } // end namespace owl_om
+
 #endif // OWL_OM_ORGANIZATION_MODEL_GROUNDING_HPP

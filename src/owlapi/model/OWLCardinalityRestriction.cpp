@@ -51,7 +51,7 @@ OWLCardinalityRestriction::OWLCardinalityRestriction(OWLPropertyExpression::Ptr 
 std::string OWLCardinalityRestriction::toString() const
 {
     std::stringstream ss;
-    ss << "OWLCardinalityRestriction: " << std::endl;
+    ss << "OWLCardinalityRestriction:" << std::endl;
     ss << "    property: " << getProperty()->toString() << std::endl;
     ss << "    cardinality: " << getCardinality() << std::endl;
     ss << "    qualification: " << getQualification().toString() << std::endl;

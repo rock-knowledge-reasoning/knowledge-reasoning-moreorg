@@ -369,12 +369,8 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_with_punning)
             BOOST_REQUIRE_MESSAGE(iri == OM::Service(), "ServiceModel is models Service");
         }
         {
-            IRI iri = om.getResourceModel(OM::resolve("EmiActive-requirement-0"));
-            BOOST_REQUIRE_MESSAGE(iri == OM::resolve("EmiActive"), "EmiActive-requirement-0 should have EmiActive as interface");
-        }
-        {
-            IRI iri = om.getResourceModelInstanceType(OM::resolve("EmiActive"));
-            BOOST_REQUIRE_MESSAGE(iri == OM::resolve("Interface"), "EmiActive should map to Interface instances");
+            IRI iri = om.getResourceModel(OM::resolve("EmiActive"));
+            BOOST_REQUIRE_MESSAGE(iri == OM::resolve("EmiActive"), "EmiActive should have EmiActive as model");
         }
     }
 }
@@ -386,19 +382,19 @@ BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
     OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
 
     {
-        IRI instance = om.createNewFromModel(OM::resolve("Sherpa"), true);
+        IRI instance = om.createNewInstance(OM::resolve("Sherpa"), true);
 
         BOOST_TEST_MESSAGE("Created new from model" << instance);
         BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
     }
     {
-        IRI instance = om.createNewFromModel(OM::resolve("CREX"), true);
+        IRI instance = om.createNewInstance(OM::resolve("CREX"), true);
 
         BOOST_TEST_MESSAGE("Created new from model" << instance);
         BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
     }
     {
-        IRI instance = om.createNewFromModel(OM::resolve("PayloadCamera"), true);
+        IRI instance = om.createNewInstance(OM::resolve("PayloadCamera"), true);
 
         BOOST_TEST_MESSAGE("Created new from model" << instance);
         BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");

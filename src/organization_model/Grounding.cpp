@@ -1,5 +1,7 @@
 #include "Grounding.hpp"
 
+using namespace owlapi::model;
+
 namespace owl_om {
 namespace organization_model {
 
@@ -12,7 +14,7 @@ bool Grounding::isComplete() const
     RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
     for(; mip != mRequirementToResourceMap.end(); ++mip)
     {
-        if(mip->second == Grounding::ungrounded())
+        if(!isComplete(mip->second))
         {
             return false;
         }
@@ -20,18 +22,37 @@ bool Grounding::isComplete() const
     return true;
 }
 
-IRIList Grounding::ungroundedRequirements() const
+bool Grounding::isComplete(const std::vector<IRI>& partialGrounding) const
 {
-    IRIList requirements;
+    std::vector<IRI>::const_iterator cit = partialGrounding.begin();
+    for(; cit != partialGrounding.end(); ++cit)
+    {
+        if(*cit == Grounding::ungrounded())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+RequirementsGrounding Grounding::ungroundedRequirements() const
+{
+    RequirementsGrounding ungroundedRequirements;
     RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
     for(; mip != mRequirementToResourceMap.end(); ++mip)
     {
-        if(mip->second == Grounding::ungrounded())
+        const std::vector<IRI>& groundings = mip->second;
+        std::vector<IRI>::const_iterator cit = groundings.begin();
+        for(; cit != groundings.end(); ++cit)
         {
-            requirements.push_back( mip->second );
+            if(*cit == Grounding::ungrounded())
+            {
+                ungroundedRequirements[mip->first].push_back(*cit);
+            }
         }
     }
-    return requirements;
+    return ungroundedRequirements;
 }
 
 IRI Grounding::ungrounded()
@@ -48,7 +69,10 @@ std::string Grounding::toString() const
     RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
     for(; mip != mRequirementToResourceMap.end(); ++mip)
     {
-        ss << "    " << mip->first  << " -> " << mip->second << std::endl;
+        ss << "Requirement:" << std::endl;
+        ss << "    " << mip->first  << std::endl;
+        ss << "Grounding:" << std::endl;
+        ss << mip->second << std::endl;
     }
     return ss.str();
 }

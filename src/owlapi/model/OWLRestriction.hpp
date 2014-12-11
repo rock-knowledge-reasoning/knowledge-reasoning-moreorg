@@ -17,6 +17,8 @@ class OWLRestriction : public OWLClassExpression
     OWLPropertyExpression::Ptr mpProperty;
 
 public: 
+    typedef boost::shared_ptr<OWLRestriction> Ptr;
+
     OWLRestriction(OWLPropertyExpression::Ptr property)
         : mpProperty(property)
     {}
@@ -31,8 +33,17 @@ public:
     virtual bool isDataRestriction() const { return  mpProperty->isDataPropertyExpression(); }
     virtual bool isObjectRestriction() const { return mpProperty->isObjectPropertyExpression(); }
 
+    virtual std::string toString() const;
 };
+
+typedef std::vector<OWLRestriction::Ptr> OWLRestrictionPtrList;
 
 } // end namespace model
 } // end namespace owlapi
+
+/**
+ * Stream operator for writing cardinality restriction lists
+ */
+std::ostream& operator<<(std::ostream& os, const owlapi::model::OWLRestrictionPtrList& list);
+
 #endif // OWL_API_MODEL_OWL_RESTRICTION_HPP
