@@ -7,6 +7,8 @@
 
 using namespace owlapi::model;
 
+BOOST_AUTO_TEST_SUITE(ontology)
+
 BOOST_AUTO_TEST_CASE(it_should_load_restrictions)
 {
     OWLOntologyReader reader;
@@ -41,3 +43,5 @@ BOOST_AUTO_TEST_CASE(it_should_load_restrictions)
         }
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()
