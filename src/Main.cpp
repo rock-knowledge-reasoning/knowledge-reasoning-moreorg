@@ -21,7 +21,7 @@ int main(int argc, char** argv)
         om.setMaximumNumberOfLinks(2);
 
         using namespace owl_om;
-        using namespace owl_om::vocabulary;
+        using namespace owlapi::vocabulary;
 
         om.createNewInstance(OM::resolve("Sherpa"), true);
         om.createNewInstance(OM::resolve("BaseCamp"), true);

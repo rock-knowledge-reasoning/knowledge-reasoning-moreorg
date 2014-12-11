@@ -1,7 +1,7 @@
 #ifndef OWLAPI_MODEL_OWL_CLASS_HPP
 #define OWLAPI_MODEL_OWL_CLASS_HPP
 
-#include <owl_om/Vocabulary.hpp>
+#include <owl_om/owlapi/Vocabulary.hpp>
 #include <owl_om/owlapi/model/OWLClassExpression.hpp>
 #include <owl_om/owlapi/model/OWLLogicalEntity.hpp>
 

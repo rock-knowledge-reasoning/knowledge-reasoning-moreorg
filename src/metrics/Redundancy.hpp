@@ -31,21 +31,22 @@ struct Metric
     }
 };
 
-typedef std::map<IRI, Metric> IRIMetricMap;
+typedef std::map<owlapi::model::IRI, Metric> IRIMetricMap;
 
 
 class Redundancy
 {
     OrganizationModel mOrganizationModel;
+    owlapi::model::OWLOntologyAsk mAsk;
 
-    uint32_t computeOutDegree(const IRI& iri, const IRI& relation, const IRI& filter = IRI());
-    uint32_t computeInDegree(const IRI& iri, const IRI& relation, const IRI& filter = IRI());
+    uint32_t computeOutDegree(const owlapi::model::IRI& iri, const owlapi::model::IRI& relation, const owlapi::model::IRI& filter = owlapi::model::IRI());
+    uint32_t computeInDegree(const owlapi::model::IRI& iri, const owlapi::model::IRI& relation, const owlapi::model::IRI& filter = owlapi::model::IRI());
 
     /**
      * Compute the probability of survival for a resource with respect to a given actor
      *
      */
-    double computeProbabilityOfSurvival(const IRI& resource, const IRI& actor);
+    double computeProbabilityOfSurvival(const owlapi::model::IRI& resource, const owlapi::model::IRI& actor);
 
 public:
     Redundancy(const OrganizationModel& organization);

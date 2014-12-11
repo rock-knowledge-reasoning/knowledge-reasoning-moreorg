@@ -7,8 +7,8 @@ OWLClass::OWLClass(const IRI& iri)
     : OWLClassExpression()
     , OWLLogicalEntity(iri)
 {
-    mIsThing = (iri == owl_om::vocabulary::OWL::Thing());
-    mIsNothing = (iri == owl_om::vocabulary::OWL::Nothing());
+    mIsThing = (iri == owlapi::vocabulary::OWL::Thing());
+    mIsNothing = (iri == owlapi::vocabulary::OWL::Nothing());
 }
 
 std::string OWLClass::toString() const 

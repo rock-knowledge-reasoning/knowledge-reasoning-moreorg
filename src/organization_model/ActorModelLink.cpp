@@ -1,5 +1,7 @@
 #include "ActorModelLink.hpp"
 #include <boost/foreach.hpp>
+#include <algorithm>
+#include <assert.h>
 
 namespace owl_om {
 namespace organization_model {

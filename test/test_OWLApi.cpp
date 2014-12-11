@@ -1,8 +1,8 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
-#include <owl_om/OWLApi.hpp>
-#include <owl_om/Vocabulary.hpp>
+#include <owl_om/owlapi/OWLApi.hpp>
+#include <owl_om/owlapi/Vocabulary.hpp>
 #include <boost/regex.hpp>
 
 using namespace owlapi::model;

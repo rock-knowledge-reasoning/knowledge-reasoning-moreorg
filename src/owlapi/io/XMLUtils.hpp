@@ -1,5 +1,5 @@
-#ifndef OWL_OM_OWL_API_IO_XML_UTILS_HPP
-#define OWL_OM_OWL_API_IO_XML_UTILS_HPP
+#ifndef OWLAPI_IO_XML_UTILS_HPP
+#define OWLAPI_IO_XML_UTILS_HPP
 
 #include <string>
 
@@ -99,4 +99,4 @@ public:
 
 } // end namespace io
 } // end namespace owlapi
-#endif // OWL_OM_OWL_API_IO_XML_UTILS_HPP
+#endif // OWLAPI_IO_XML_UTILS_HPP

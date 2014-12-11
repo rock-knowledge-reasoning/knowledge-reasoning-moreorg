@@ -6,17 +6,17 @@ namespace model {
 
 void OWLObject::accept(boost::shared_ptr<OWLAxiomVisitor> visitor)
 {
-    throw owl_om::NotImplemented("owlapi::model::OWLObject::accept");
+    throw NotImplemented("owlapi::model::OWLObject::accept");
 }
 
 bool OWLObject::isBottomEntity()
 {
-    throw owl_om::NotImplemented("owlapi::model::OWLObject::isBottomEntity");
+    throw NotImplemented("owlapi::model::OWLObject::isBottomEntity");
 }
 
 bool OWLObject::isTopEntity()
 {
-    throw owl_om::NotImplemented("owlapi::model::OWLObject::isTopEntity");
+    throw NotImplemented("owlapi::model::OWLObject::isTopEntity");
 }
 
 } // end namespace model

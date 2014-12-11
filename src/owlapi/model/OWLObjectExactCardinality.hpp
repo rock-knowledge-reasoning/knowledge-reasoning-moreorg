@@ -4,7 +4,7 @@
 #include <owl_om/owlapi/model/OWLClassExpression.hpp>
 #include <owl_om/owlapi/model/OWLObjectPropertyExpression.hpp>
 #include <owl_om/owlapi/model/OWLExactCardinalityRestriction.hpp>
-#include <owl_om/Vocabulary.hpp>
+#include <owl_om/owlapi/Vocabulary.hpp>
 
 namespace owlapi {
 namespace model {
@@ -12,7 +12,7 @@ namespace model {
 class OWLObjectExactCardinality : public OWLExactCardinalityRestriction
 {
 public:
-    OWLObjectExactCardinality(OWLObjectPropertyExpression::Ptr property, uint32_t cardinality, const OWLQualification& qualification = owl_om::vocabulary::OWL::Thing())
+    OWLObjectExactCardinality(OWLObjectPropertyExpression::Ptr property, uint32_t cardinality, const OWLQualification& qualification = owlapi::vocabulary::OWL::Thing())
         : OWLExactCardinalityRestriction( boost::dynamic_pointer_cast<OWLPropertyExpression>(property), cardinality, qualification)
     {}
 

@@ -1,7 +1,7 @@
 #ifndef OWL_OM_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
 #define OWL_OM_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
 
-#include <owl_om/Ontology.hpp>
+#include <owl_om/owlapi/model/IRI.hpp>
 
 namespace owl_om {
 namespace organization_model {
@@ -11,12 +11,12 @@ namespace organization_model {
  */
 class EndpointModel
 {
-    IRI mActorModel;
-    IRI mInterfaceRole;
+    owlapi::model::IRI mActorModel;
+    owlapi::model::IRI mInterfaceRole;
 
 public:
     EndpointModel();
-    EndpointModel(const IRI& actorModel, const IRI& interfaceRole);
+    EndpointModel(const owlapi::model::IRI& actorModel, const owlapi::model::IRI& interfaceRole);
 
     bool operator<(const EndpointModel& other) const;
 

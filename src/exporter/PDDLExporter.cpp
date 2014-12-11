@@ -1,15 +1,18 @@
 #include "PDDLExporter.hpp"
-#include <pddl_planner/representation/Domain.hpp>
 #include <iostream>
 #include <fstream>
 #include <boost/foreach.hpp>
-#include <owl_om/Vocabulary.hpp>
+#include <base/Logging.hpp>
+#include <pddl_planner/representation/Domain.hpp>
+#include <owl_om/owlapi/Vocabulary.hpp>
+
+using namespace owlapi::model;
 
 namespace owl_om {
 
 pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationModel& model)
 {
-    using namespace owl_om::vocabulary;
+    using namespace owlapi::vocabulary;
     using namespace pddl_planner;
 
     pddl_planner::representation::Domain domain("om");
@@ -24,7 +27,8 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
     std::string serviceType = OM::Service().getFragment();
 
     // Adding types to the domain -> concepts
-    IRIList klasses = model.ontology()->allClasses();
+    owlapi::model::OWLOntologyAsk ask(model.ontology());
+    IRIList klasses = ask.allClasses();
     BOOST_FOREACH(IRI klass, klasses)
     {
         try {
@@ -37,7 +41,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
     }
 
     LOG_DEBUG_S << "All instance of actor";
-    IRIList instances = model.ontology()->allInstancesOf( OM::Actor(), false);
+    IRIList instances = ask.allInstancesOf( OM::Actor(), false);
     BOOST_FOREACH(IRI instance, instances)
     {
         try {
@@ -50,7 +54,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
         }
     }
     LOG_DEBUG_S << "All services";
-    IRIList services = model.ontology()->allInstancesOf( OM::ServiceModel(), false);
+    IRIList services = ask.allInstancesOf( OM::ServiceModel(), false);
     BOOST_FOREACH(IRI service, services)
     {
         try {
@@ -181,7 +185,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
 
 pddl_planner::representation::Problem PDDLExporter::toProblem(const OrganizationModel& model)
 {
-    using namespace owl_om::vocabulary;
+    using namespace owlapi::vocabulary;
 
     using namespace pddl_planner;
     using namespace pddl_planner::representation;
@@ -194,12 +198,13 @@ pddl_planner::representation::Problem PDDLExporter::toProblem(const Organization
     std::string provides = "provides";
     std::string mobilityCapability = "MoveTo";
 
-    IRIList instances = model.ontology()->allInstancesOf( OM::Actor(), false);
+    owlapi::model::OWLOntologyAsk ask(model.ontology());
+    IRIList instances = ask.allInstancesOf( OM::Actor(), false);
     BOOST_FOREACH(IRI instance, instances)
     {
         try {
             std::string instanceName = instance.getFragment();
-            IRIList relatedActors = model.ontology()->allRelatedInstances(instance, OM::has(), OM::Actor());
+            IRIList relatedActors = ask.allRelatedInstances(instance, OM::has(), OM::Actor());
             BOOST_FOREACH(IRI relatedActor, relatedActors)
             {
                 // embodies: CombinedActor embodies Actor
@@ -207,15 +212,15 @@ pddl_planner::representation::Problem PDDLExporter::toProblem(const Organization
             }
 
             // provides: Actor provides Capability / Service
-            IRIList relatedServicesOrCapabilities = model.ontology()->allRelatedInstances(instance, OM::provides());
+            IRIList relatedServicesOrCapabilities = ask.allRelatedInstances(instance, OM::provides());
             BOOST_FOREACH(IRI related, relatedServicesOrCapabilities)
             {
-                if(model.ontology()->isInstanceOf(related, OM::ServiceModel()))
+                if(ask.isInstanceOf(related, OM::ServiceModel()))
                 {
                     problem.addInitialStatus( Expression(provides, instanceName, related.getFragment()) );
                 }
 
-                if(model.ontology()->isInstanceOf(related, OM::CapabilityModel()))
+                if(ask.isInstanceOf(related, OM::CapabilityModel()))
                 {
                     // mobile: general characteristics
                     if(related.getFragment() == mobilityCapability)
@@ -231,7 +236,7 @@ pddl_planner::representation::Problem PDDLExporter::toProblem(const Organization
     }
 
     // All atomic actors
-    IRIList atomicActors = model.ontology()->allInstancesOf( OM::Actor(), true);
+    IRIList atomicActors = ask.allInstancesOf( OM::Actor(), true);
     BOOST_FOREACH(IRI atomicActor, atomicActors)
     {
         std::string actorName = atomicActor.getFragment();

@@ -2,15 +2,17 @@
 #define OWL_OM_ORGANIZATION_MODEL_HPP
 
 #include <stdint.h>
-#include <owl_om/Ontology.hpp>
+#include <owl_om/owlapi/model/OWLOntology.hpp>
 #include <owl_om/organization_model/ActorModelLink.hpp>
 #include <owl_om/organization_model/InterfaceConnection.hpp>
 #include <owl_om/organization_model/Grounding.hpp>
 #include <owl_om/organization_model/Statistics.hpp>
 
+namespace owl = owlapi::model;
+
 namespace owl_om {
 
-typedef std::vector<IRIList> CandidatesList;
+typedef std::vector<owl::IRIList> CandidatesList;
 
 /**
  * \mainpage Organization modelling with OWL
@@ -20,12 +22,12 @@ class OrganizationModel
 public:
 
     typedef boost::shared_ptr<OrganizationModel> Ptr;
-    typedef std::map< IRI, IRIList> IRI2IRIListCache;
-    typedef std::map< IRI, IRI> IRI2IRICache;
-    typedef std::map< std::pair<IRI,IRI>, IRIList> RelationCache;
-    typedef std::map< std::pair<IRI,IRI>, bool> RelationPredicateCache;
-    typedef std::map< IRI, IRISet> IRI2IRISetCache;
-    typedef std::map< IRI, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> > IRI2RestrictionsCache;
+    typedef std::map< owl::IRI, owl::IRIList> IRI2IRIListCache;
+    typedef std::map< owl::IRI, owl::IRI> IRI2IRICache;
+    typedef std::map< std::pair<owl::IRI,owl::IRI>, owl::IRIList> RelationCache;
+    typedef std::map< std::pair<owl::IRI,owl::IRI>, bool> RelationPredicateCache;
+    typedef std::map< owl::IRI, owl::IRISet> IRI2IRISetCache;
+    typedef std::map< owl::IRI, std::vector<owl::OWLCardinalityRestriction::Ptr> > IRI2RestrictionsCache;
 
     /**
      * Constructor to create an OrganizationModel from an existing description file
@@ -38,14 +40,14 @@ public:
      */
     void refresh(bool performInference = true);
 
-    Ontology::Ptr ontology() { return mpOntology; }
+    owlapi::model::OWLOntology::Ptr ontology() { return mpOntology; }
 
-    const Ontology::Ptr ontology() const { return mpOntology; }
+    const owlapi::model::OWLOntology::Ptr ontology() const { return mpOntology; }
 
     /**
-     * Creation of an instance of a given elementary klass, which is modeled by a given model klass
+     * Create and add a instance of a given elementary klass
      */
-    void createInstance(const IRI& instanceName, const IRI& klass, const IRI& model);
+    void createInstance(const owl::IRI& instanceName, const owl::IRI& klass);
 
     /**
      * Try to map requirements to provider
@@ -55,7 +57,7 @@ public:
      * \param requirementModel Optional label for requirement model that the requirements originate from
      * \return corresponding grounding, which need to be check on completness
      */
-    organization_model::Grounding resolveRequirements(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& resourceRequirements, const IRIList& availableResources, const IRI& resourceProvider = IRI(), const IRI& requirementModel = IRI()) const;
+    organization_model::Grounding resolveRequirements(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& resourceRequirements, const owl::IRIList& availableResources, const owl::IRI& resourceProvider = owl::IRI(), const owl::IRI& requirementModel = owl::IRI()) const;
 
     // PREDICATES
     /**
@@ -63,7 +65,7 @@ public:
      * Test the relation 'compatibleWith'
      *
      */
-    bool checkIfCompatible(const IRI& instance, const IRI& otherInstance);
+    bool checkIfCompatible(const owl::IRI& instance, const owl::IRI& otherInstance);
 
     /**
      * Run inference to identify services and capabilites that are provided
@@ -75,26 +77,19 @@ public:
      * Reduce list of actor to unique individuals, i.e. removing
      * alias and same individuals
      */
-    IRIList compactActorList();
+    owl::IRIList compactActorList();
 
     /**
      * Get resource model of this instance (type of this instance)
      * \return IRI of resource model
      */
-    IRI getResourceModel(const IRI& instance) const;
+    owl::IRI getResourceModel(const owl::IRI& instance) const;
 
     /**
      * Check if first model fullfills second (subsumption)
      * \return True upon success, false otherwise
      */
-    bool fulfills(const IRI& model, const IRI& otherModel) const;
-
-
-    /**
-     * Create requirement from an existing one.
-     * Marker serves to make it unique
-     */
-    IRI createNewRequirement(const IRI& requirement, uint32_t marker);
+    bool fulfills(const owl::IRI& model, const owl::IRI& otherModel) const;
 
     /**
      * Create new instance (ABox from existing model (model is defined in TBox,
@@ -108,7 +103,7 @@ public:
      * generate based on the number of existing instances
      * (<classtype>_<globalcount>)
      */
-    IRI createNewInstance(const IRI& classType, bool createRequiredResources = false) const;
+    owl::IRI createNewInstance(const owl::IRI& classType, bool createRequiredResources = false) const;
 
     /**
      * Generate a combination list based on actor link combination, i.e. here the 
@@ -137,9 +132,9 @@ public:
     void setMaximumNumberOfLinks(uint32_t n) { mMaximumNumberOfLinks = n; }
     uint32_t getMaximumNumberOfLinks() { return mMaximumNumberOfLinks; }
 
-    IRI getRelatedProviderInstance(const IRI& actor, const IRI& model);
+    owl::IRI getRelatedProviderInstance(const owl::IRI& actor, const owl::IRI& model);
 
-    void setDouble(const IRI& iri, const IRI& dataProperty, double val);
+    void setDouble(const owl::IRI& iri, const owl::IRI& dataProperty, double val);
 
 
 private:
@@ -147,7 +142,7 @@ private:
     /**
      * Add a provides relationship to for the given actor and a model
      */
-    void addProvider(const IRI& actor, const IRI& model);
+    void addProvider(const owl::IRI& actor, const owl::IRI& model);
 
     /**
      * Check if model is provider for a given model, i.e.
@@ -159,19 +154,19 @@ private:
      * this values
      * \return True upon success, false otherwise
      */
-    bool isModelProvider(const IRI& actorModel, const IRI& model) const;
+    bool isModelProvider(const owl::IRI& actorModel, const owl::IRI& model) const;
 
     /**
      * Cached version
      *
      * Checks if the associated actor model is providing the given model
      */
-    bool isProviding(const IRI& actor, const IRI& model) const;
+    bool isProviding(const owl::IRI& actor, const owl::IRI& model) const;
 
     /**
      * Cached version
      */
-    IRIList allRelatedInstances(const IRI& actor, const IRI& relation) const;
+    owl::IRIList allRelatedInstances(const owl::IRI& actor, const owl::IRI& relation) const;
 
 
     /**
@@ -179,33 +174,33 @@ private:
      * restrictions
      * \return List of cardinality restrictions for the given model
      */
-    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> getModelRequirements(const IRI& model) const;
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> getModelRequirements(const owl::IRI& model) const;
 
     /**
      * Sort the list so that items with dependencies
      * are listed after their dependencies
      */
-    IRIList sortByDependency(const IRIList& list);
+    owl::IRIList sortByDependency(const owl::IRIList& list);
 
     /**
      * Check if item has a dependency on other model
      * i.e. main -> Service
      * other -> Service
      */
-    bool hasModelDependency(const IRI& main, const IRI& other);
+    bool hasModelDependency(const owl::IRI& main, const owl::IRI& other);
 
     /**
      * Create a new coalition model name from a given set of requirements (i.e.
      * actor models)
      */
-    IRI createCoalitionModelName(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& actorModelRequirements);
+    owl::IRI createCoalitionModelName(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& actorModelRequirements);
 
     /**
      * Creates a new coalition model based on a given 
      * Registers a new class of actor if necessary for this actor
      * \return IRI of new actor, or empty IRI if the actor already exists
      */
-    IRI createNewCoalitionModel(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& actorModelRequirement);
+    owl::IRI createNewCoalitionModel(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& actorModelRequirement);
 
     /**
      * Infer new instance of a given class type, base on checking whether a given model
@@ -217,7 +212,7 @@ private:
      *     (b) has instance of the class type  (where instance is modelledBy the given model)
      * \param models List of models that should be check
      */
-    IRIList infer(const IRI& actor, const IRIList& models);
+    owl::IRIList infer(const owl::IRI& actor, const owl::IRIList& models);
 
     /**
      * Compute a list of resources that should be available if the restrictions
@@ -225,9 +220,11 @@ private:
      *
      * MIN/MAX are translated into exact requirements
      */
-    IRIList exactRequiredResources(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions) const;
+    owl::IRIList exactRequiredResources(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions) const;
 
-    Ontology::Ptr mpOntology;
+    owlapi::model::OWLOntology::Ptr mpOntology;
+    owlapi::model::OWLOntologyTell::Ptr mpTell;
+    owlapi::model::OWLOntologyAsk::Ptr mpAsk;
 
     organization_model::Statistics mCurrentStats;
     std::vector<organization_model::Statistics> mStatistics;
@@ -243,8 +240,8 @@ private:
     // Get list of provided service per model
     mutable IRI2IRISetCache mModelProviderSetCache;
 
-    IRIList mServices;
-    IRIList mCapabilities;
+    owl::IRIList mServices;
+    owl::IRIList mCapabilities;
 
     uint32_t mCompositeActorModelsCount;
     uint32_t mCompositeActorsCount;

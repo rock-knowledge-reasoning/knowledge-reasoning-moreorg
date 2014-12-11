@@ -5,19 +5,17 @@
 #include <stdint.h>
 #include <owl_om/owlapi/model/OWLQualifiedRestriction.hpp>
 
-namespace owl_om {
-    class Ontology;
-}
-
 namespace owlapi {
 namespace model {
+
+class OWLOntologyReader;
 
 /**
  * \class OWLCardinalityRestriction
  */
 class OWLCardinalityRestriction : public OWLQualifiedRestriction
 {
-    friend class owl_om::Ontology;
+    friend class OWLOntologyReader;
 
 public:
     typedef boost::shared_ptr<OWLCardinalityRestriction> Ptr;

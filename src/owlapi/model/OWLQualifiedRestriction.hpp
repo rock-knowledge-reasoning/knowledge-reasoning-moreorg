@@ -3,7 +3,7 @@
 
 #include <owl_om/owlapi/model/IRI.hpp>
 #include <owl_om/owlapi/model/OWLRestriction.hpp>
-#include <owl_om/Vocabulary.hpp>
+#include <owl_om/owlapi/Vocabulary.hpp>
 
 namespace owlapi {
 namespace model {

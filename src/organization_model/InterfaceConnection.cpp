@@ -1,5 +1,10 @@
 #include "InterfaceConnection.hpp"
 #include <stdint.h>
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+
+using namespace owlapi::model;
 
 namespace owl_om {
 namespace organization_model {

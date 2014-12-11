@@ -4,28 +4,33 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
-#include <owl_om/Vocabulary.hpp>
+#include <owl_om/owlapi/Vocabulary.hpp>
 #include <numeric/Combinatorics.hpp>
 #include <math.h>
 #include <set>
 
 #include <owl_om/ccf/CCF.hpp>
+#include <owl_om/owlapi/model/OWLOntologyReader.hpp>
 
-using namespace owl_om::vocabulary;
+using namespace owlapi::vocabulary;
 using namespace owl_om::organization_model;
 using namespace owlapi::model;
 
 namespace owl_om {
 
 OrganizationModel::OrganizationModel(const std::string& filename)
-    : mpOntology( new Ontology())
+    : mpOntology( new OWLOntology())
     , mMaximumNumberOfLinks(32)
 {
     if(!filename.empty())
     {
-        mpOntology = Ontology::fromFile(filename);
+        OWLOntologyReader reader;
+        mpOntology = reader.fromFile(filename);
         refresh();
     }
+
+    mpTell = OWLOntologyTell::Ptr( new OWLOntologyTell(mpOntology));
+    mpAsk = OWLOntologyAsk::Ptr( new OWLOntologyAsk(mpOntology));
 }
 
 void OrganizationModel::refresh(bool performInference)
@@ -36,7 +41,8 @@ void OrganizationModel::refresh(bool performInference)
     mCurrentStats = Statistics();
     mCurrentStats.timeElapsed = base::Time::now();
 
-    mpOntology->refresh();
+    // SCHOKO
+    // mpOntology->refresh();
 
     mCurrentStats.upperCombinationBound = upperCombinationBound();
 
@@ -49,10 +55,10 @@ void OrganizationModel::refresh(bool performInference)
         LOG_WARN_S << e.what();
     }
 
-    mCurrentStats.actorsAtomic = mpOntology->allInstancesOf(OM::Actor(), true);
-    mCurrentStats.actorsKnown = mpOntology->allInstancesOf(OM::Actor(), false);
-    mCurrentStats.actorsCompositePrevious = mpOntology->allInstancesOf(OM::CompositeActor(), true);
-    mCurrentStats.actorsCompositeModelPrevious = mpOntology->allInstancesOf(OM::CompositeActorModel(), true);
+    mCurrentStats.actorsAtomic = mpAsk->allInstancesOf(OM::Actor(), true);
+    mCurrentStats.actorsKnown = mpAsk->allInstancesOf(OM::Actor(), false);
+    mCurrentStats.actorsCompositePrevious = mpAsk->allInstancesOf(OM::CompositeActor(), true);
+    mCurrentStats.actorsCompositeModelPrevious = mpAsk->allInstancesOf(OM::CompositeActorModel(), true);
     mCurrentStats.linkCombinations = interfaceCombinations;
 
     mCurrentStats.timeRegisterCompositeSystems = base::Time::now();
@@ -121,7 +127,7 @@ void OrganizationModel::refresh(bool performInference)
     mStatistics.push_back(mCurrentStats);
 }
 
-IRI createCoalitionModelName(const std::vector<OWLCardinalityRestriction::Ptr>& actorModelRequirements)
+IRI OrganizationModel::createCoalitionModelName(const std::vector<OWLCardinalityRestriction::Ptr>& actorModelRequirements)
 {
     // Make sure actor model requirement are sorted so that we get a consistent
     // naming schema for the coalition model
@@ -139,8 +145,8 @@ IRI createCoalitionModelName(const std::vector<OWLCardinalityRestriction::Ptr>& 
     for(; cit != requirements.end(); ++cit)
     {
         OWLCardinalityRestriction::Ptr restriction = *cit;
-        uint32_t cardinality = restrictions->getCardinality();
-        OWLQualification qualification = restrictions->getQualification();
+        uint32_t cardinality = restriction->getCardinality();
+        OWLQualification qualification = restriction->getQualification();
 
         std::stringstream ss;
         ss << cardinality;
@@ -155,44 +161,44 @@ IRI createCoalitionModelName(const std::vector<OWLCardinalityRestriction::Ptr>& 
     return IRI(coalitionModelName);
 }
 
-IRI createNewCoalitionModel(const std::vector<OWLCardinalityRestriction::Ptr>& actorModelRequirements)
+IRI OrganizationModel::createNewCoalitionModel(const std::vector<OWLCardinalityRestriction::Ptr>& actorModelRequirements)
 {
     IRI coalitionModelName = createCoalitionModelName(actorModelRequirements);
 
     // Create the model and associate the set of requirements with this new
     // model
-    mpOntology->declareSubClassOf(coalitionModelName, vocabulary::OM::CompositeActor());
+    mpTell->subclassOf(coalitionModelName, OM::CompositeActor());
 
     // Associate all restriction with this model
     std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = actorModelRequirements.begin();
     for(;cit != actorModelRequirements.end(); ++cit)
     {
-        mpOntology->declareSubClassOf(coalitionModelName, *cit);
+        mpTell->subclassOf(coalitionModelName, *cit);
     }
 
-    LOG_INFO_S << "New coalition model: '" << coalitionModelName << std::endl
-        << "     involved actor models:    " << actorModelRequirements << std::endl
+    LOG_INFO_S << "New coalition model: '" << coalitionModelName << std::endl;
+        //<< "     involved actor models:    " << actorModelRequirements << std::endl;
 
     return coalitionModelName;
 }
 
 void OrganizationModel::createInstance(const IRI& instanceName, const IRI& klass)
 {
-    mpOntology->instanceOf(instanceName, klass);
+    mpTell->instanceOf(instanceName, klass);
 }
 
 void OrganizationModel::runInferenceEngine()
 {
-    IRIList actorModels = mpOntology->allInstancesOf( OM::ActorModel(), false);
+    IRIList actorModels = mpAsk->allInstancesOf( OM::ActorModel(), false);
 
     // Load service and capabilities and make sure
     // dependant services end up later in the list
-    mServices = mpOntology->allInstancesOf( OM::ServiceModel() );
+    mServices = mpAsk->allInstancesOf( OM::ServiceModel() );
     mServices = sortByDependency(mServices);
 
     LOG_WARN_S << "Validate known services: " << mServices;
 
-    mCapabilities = mpOntology->allInstancesOf( OM::CapabilityModel() );
+    mCapabilities = mpAsk->allInstancesOf( OM::CapabilityModel() );
     mCapabilities = sortByDependency(mCapabilities);
 
     LOG_WARN_S << "Validate known capabilities: " << mCapabilities;
@@ -217,7 +223,7 @@ void OrganizationModel::runInferenceEngine()
     }
 
     // Add provides to actors
-    IRIList actors = mpOntology->allInstancesOf( OM::Actor(), false);
+    IRIList actors = mpAsk->allInstancesOf( OM::Actor(), false);
     BOOST_FOREACH(const IRI& actor, actors)
     {
         IRI model = getResourceModel(actor);
@@ -243,7 +249,7 @@ void OrganizationModel::runInferenceEngine()
 
 void OrganizationModel::addProvider(const IRI& actorOrModel, const IRI& model)
 {
-    mpOntology->relatedTo(actorOrModel, OM::provides(), model);
+    mpTell->relatedTo(actorOrModel, OM::provides(), model);
 }
 
 bool OrganizationModel::isProviding(const IRI& actor, const IRI& model) const
@@ -256,7 +262,7 @@ bool OrganizationModel::isProviding(const IRI& actor, const IRI& model) const
     }
 
     IRI actorModel = getResourceModel(actor);
-    bool providing = mpOntology->isRelatedTo(actorModel, OM::provides(), model);
+    bool providing = mpAsk->isRelatedTo(actorModel, OM::provides(), model);
     mProviderCache[key] = providing;
     return providing;
 }
@@ -270,7 +276,7 @@ IRIList OrganizationModel::allRelatedInstances(const IRI& instance, const IRI& r
         return it->second;
     }
 
-    IRIList all = mpOntology->allRelatedInstances(instance, relation);
+    IRIList all = mpAsk->allRelatedInstances(instance, relation);
     mRelationsCache[key] = all;
     return all;
 }
@@ -283,7 +289,7 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModel::ge
         return it->second;
     }
 
-    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> restrictions = mpOntology->getCardinalityRestrictions(model);
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> restrictions = mpAsk->getCardinalityRestrictions(model);
     mModelRequirementsCache[model] = restrictions;
     return restrictions;
 }
@@ -308,7 +314,7 @@ bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& provid
     IRISet::const_iterator pit = provisioned.begin();
     for(; pit != provisioned.end(); ++pit)
     {
-        OWLObjectPropertyExpression::Ptr property = mpOntology->getOWLObjectProperty(vocabulary::OM::has());
+        OWLObjectPropertyExpression::Ptr property = mpAsk->getOWLObjectProperty(OM::has());
         actorRequirements.push_back( OWLExactCardinalityRestriction::Ptr(new OWLExactCardinalityRestriction( property, 1,  *pit)) );
     }
 
@@ -348,8 +354,8 @@ bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& provid
 //
 //    IRI resourceProviderModel = getResourceModel(actor);
 //    IRIList availableResources = allRelatedInstances(actor, OM::has());
-//    //IRIList availableServices = mpOntology->allRelatedInstances(actor, OM::provides(), OM::ServiceModel());
-//    //IRIList availableCapabilities = mpOntology->allRelatedInstances(actor, OM::has(), OM::Capability());
+//    //IRIList availableServices = mpAsk->allRelatedInstances(actor, OM::provides(), OM::ServiceModel());
+//    //IRIList availableCapabilities = mpAsk->allRelatedInstances(actor, OM::has(), OM::Capability());
 //
 //    LOG_DEBUG_S << "Check " << std::endl
 //        << "    resourceProvider [" << resourceProviderModel << "] '" << actor  << std::endl
@@ -375,11 +381,11 @@ bool OrganizationModel::isModelProvider(const IRI& actorModel, const IRI& provid
 //                    IRI instance = createNewFromModel(model);
 //
 //                    addProvider(actor, model);
-//                    mpOntology->relatedTo(actor, OM::has(), instance);
+//                    mpTell->relatedTo(actor, OM::has(), instance);
 //
 //                    BOOST_FOREACH(const RequirementsGrounding::value_type& pair, grounding.getRequirementsGrounding())
 //                    {
-//                        mpOntology->relatedTo(instance, OM::uses(), pair.second);
+//                        mpTell->relatedTo(instance, OM::uses(), pair.second);
 //                    }
 //
 //                    LOG_DEBUG_S << modelType << " inference: " << std::endl
@@ -486,7 +492,7 @@ bool OrganizationModel::checkIfCompatible(const IRI& resource, const IRI& otherR
         return cit->second;
     }
 
-    bool isCompatible = mpOntology->isRelatedTo( resource, OM::compatibleWith(), otherResource );
+    bool isCompatible = mpAsk->isRelatedTo( resource, OM::compatibleWith(), otherResource );
     mCompatibilityCache[key] = isCompatible;
     return isCompatible;
 }
@@ -502,7 +508,7 @@ IRI OrganizationModel::getResourceModel(const IRI& instance) const
 
     IRI model;
     try {
-         model = mpOntology->typeOf(instance);
+         model = mpAsk->typeOf(instance);
     } catch(const std::invalid_argument& e)
     {
         // no model means, this instance is a model by itself
@@ -512,32 +518,19 @@ IRI OrganizationModel::getResourceModel(const IRI& instance) const
     return model;
 }
 
-IRI OrganizationModel::createNewRequirement(const IRI& requirement, uint32_t marker)
-{
-    IRI resourceModel = getResourceModel(requirement);
-
-    std::stringstream ss;
-    ss << requirement.toString() << marker;
-
-    IRI newRequirement( ss.str() );
-    mpOntology->instanceOf( newRequirement, OM::Requirement());
-    mpOntology->relatedTo( newRequirement, OM::modelledBy(), resourceModel );
-    return newRequirement;
-}
-
 IRI OrganizationModel::createNewInstance(const IRI& classType, bool createRequiredResources) const
 {
     LOG_DEBUG_S << "CreateNewInstance: " << std::endl
         << "    class type:    " << classType << std::endl;
 
     IRI model = classType;
-    IRIList instances = mpOntology->allInstancesOf(model, true);
+    IRIList instances = mpAsk->allInstancesOf(model, true);
     std::stringstream ss;
     ss << instances.size();
     // NAMING CONVENTION INTRODUCED
     IRI newInstanceName = model.toString() + "_" + ss.str();
 
-    mpOntology->instanceOf(newInstanceName, classType);
+    mpTell->instanceOf(newInstanceName, classType);
 
     if(!createRequiredResources)
     {
@@ -569,7 +562,7 @@ IRI OrganizationModel::createNewInstance(const IRI& classType, bool createRequir
 
         // dependency is a placeholder requirement of the same class as the final
         IRI dependant = createNewInstance(resourceModel, true );
-        mpOntology->relatedTo(newInstanceName, OM::has(), dependant);
+        mpTell->relatedTo(newInstanceName, OM::has(), dependant);
         newDependants.push_back(dependant);
     }
 
@@ -582,14 +575,14 @@ IRI OrganizationModel::createNewInstance(const IRI& classType, bool createRequir
 
 bool OrganizationModel::fulfills(const IRI& model, const IRI& otherModel) const
 {
-    return mpOntology->isSubclassOf(model, otherModel);
+    return mpAsk->isSubclassOf(model, otherModel);
 }
 
 InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
 {
     using namespace numeric;
 
-    IRIList actors = mpOntology->allInstancesOf( OM::Actor(), true );
+    IRIList actors = mpAsk->allInstancesOf( OM::Actor(), true );
     if(actors.size() < 2)
     {
         throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
@@ -628,13 +621,13 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
 //
 //    // Get all basic actors to get number of actors, associated interface and maximum number of connections
 //    // we have to account for
-//    IRIList actors = mpOntology->allInstancesOf( OM::Actor(), true );
+//    IRIList actors = mpAsk->allInstancesOf( OM::Actor(), true );
 //    if(actors.size() < 2)
 //    {
 //        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
 //    }
 //
-//    IRIList interfaces = mpOntology->allInstancesOf( OM::Interface(), true);
+//    IRIList interfaces = mpAsk->allInstancesOf( OM::Interface(), true);
 //    InterfaceConnectionList validConnections;
 //    if(interfaces.size() < 2)
 //    {
@@ -651,8 +644,8 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinationsCCF()
 //            throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: no two interfaces available to create connection");
 //        }
 //
-//        IRIList parents0 = mpOntology->allInverseRelatedInstances(match[0], OM::has());
-//        IRIList parents1 = mpOntology->allInverseRelatedInstances(match[1], OM::has());
+//        IRIList parents0 = mpAsk->allInverseRelatedInstances(match[0], OM::has());
+//        IRIList parents1 = mpAsk->allInverseRelatedInstances(match[1], OM::has());
 //
 //        if(parents0 == parents1)
 //        {
@@ -796,13 +789,13 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
 
     // Get all basic actors to get number of actors, associated interface and maximum number of connections
     // we have to account for
-    IRIList actors = mpOntology->allInstancesOf( OM::Actor(), true );
+    IRIList actors = mpAsk->allInstancesOf( OM::Actor(), true );
     if(actors.size() < 2)
     {
         throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
     }
 
-    IRIList interfaces = mpOntology->allInstancesOf( OM::Interface(), true);
+    IRIList interfaces = mpAsk->allInstancesOf( OM::Interface(), true);
     InterfaceConnectionList validConnections;
     if(interfaces.size() < 2)
     {
@@ -823,8 +816,8 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
             throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: no two interfaces available to create connection");
         }
 
-        IRIList parents0 = mpOntology->allInverseRelatedInstances(match[0], OM::has());
-        IRIList parents1 = mpOntology->allInverseRelatedInstances(match[1], OM::has());
+        IRIList parents0 = mpAsk->allInverseRelatedInstances(match[0], OM::has());
+        IRIList parents1 = mpAsk->allInverseRelatedInstances(match[1], OM::has());
 
         if(parents0 == parents1)
         {
@@ -845,8 +838,8 @@ InterfaceCombinationList OrganizationModel::generateInterfaceCombinations()
         // we still have to compute the model for this connection, in the following
 
         // Retrieve the role of each interface
-        IRIList role0 = mpOntology->allRelatedInstances(match[0], OM::fulfills());
-        IRIList role1 = mpOntology->allRelatedInstances(match[1], OM::fulfills());
+        IRIList role0 = mpAsk->allRelatedInstances(match[0], OM::fulfills());
+        IRIList role1 = mpAsk->allRelatedInstances(match[1], OM::fulfills());
 
         EndpointModel endpoint0(resourceModel0, role0[0]);
         EndpointModel endpoint1(resourceModel1, role1[0]);
@@ -959,7 +952,7 @@ uint32_t OrganizationModel::upperCombinationBound()
 {
     using namespace numeric;
 
-    IRIList interfaces = mpOntology->allInstancesOf( OM::Interface(), true);
+    IRIList interfaces = mpAsk->allInstancesOf( OM::Interface(), true);
     if(interfaces.size() < 2)
     {
         return 0;
@@ -967,7 +960,7 @@ uint32_t OrganizationModel::upperCombinationBound()
 
     Combination<IRI> interfaceCombinations(interfaces, 2, EXACT);
 
-    IRIList actors = mpOntology->allInstancesOf( OM::Actor(), true );
+    IRIList actors = mpAsk->allInstancesOf( OM::Actor(), true );
     if(actors.size() == 1)
     {
         return 0;
@@ -1000,8 +993,9 @@ void OrganizationModel::setDouble(const IRI& iri, const IRI& dataProperty, doubl
 {
     std::stringstream ss;
     ss << value;
-    DataValue dataValue = mpOntology->dataValue(ss.str(), "double");
-    mpOntology->valueOf(iri, dataProperty, dataValue);
+    // SCHOKO
+    //DataValue dataValue = mpOntology->dataValue(ss.str(), "double");
+    //mpOntology->valueOf(iri, dataProperty, dataValue);
 }
 
 IRIList OrganizationModel::sortByDependency(const IRIList& list)

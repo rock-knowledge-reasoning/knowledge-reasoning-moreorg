@@ -6,6 +6,7 @@
 #include <set>
 
 using namespace owl_om;
+using namespace owlapi::model;
 
 BOOST_AUTO_TEST_CASE(it_should_handle_sets)
 {

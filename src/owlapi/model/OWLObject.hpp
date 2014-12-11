@@ -1,7 +1,7 @@
 #ifndef OWLAPI_MODEL_OWL_OBJECT_HPP
 #define OWLAPI_MODEL_OWL_OBJECT_HPP
 
-#include <owl_om/Exceptions.hpp>
+#include <owl_om/owlapi/Exceptions.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace owlapi {

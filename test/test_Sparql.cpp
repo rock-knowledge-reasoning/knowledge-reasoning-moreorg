@@ -1,11 +1,12 @@
 #include <boost/test/unit_test.hpp>
-#include <owl_om/Vocabulary.hpp>
-#include <owl_om/Ontology.hpp>
-#include <owl_om/db/rdf/SopranoDB.hpp>
-#include <owl_om/db/rdf/Sparql.hpp>
+#include <owl_om/owlapi/Vocabulary.hpp>
+#include <owl_om/owlapi/model/OWLOntology.hpp>
+#include <owl_om/owlapi/db/rdf/SopranoDB.hpp>
+#include <owl_om/owlapi/db/rdf/Sparql.hpp>
 #include "test_utils.hpp"
 
-using namespace owl_om;
+using namespace owlapi;
+using namespace owlapi::model;
 
 extern std::string rdfTestFiles[];
 

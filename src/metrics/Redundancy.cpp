@@ -1,33 +1,36 @@
 #include "Redundancy.hpp"
 #include <boost/foreach.hpp>
 #include <math.h>
+#include <base/Logging.hpp>
+
+using namespace owlapi::model;
+using namespace owlapi::vocabulary;
 
 namespace owl_om {
 namespace metrics {
 
 Redundancy::Redundancy(const OrganizationModel& organization)
     : mOrganizationModel(organization)
+    , mAsk(mOrganizationModel.ontology())
 {}
 
 uint32_t Redundancy::computeOutDegree(const IRI& iri, const IRI& relation, const IRI& klass)
 {
-    IRIList related = mOrganizationModel.ontology()->allRelatedInstances(iri, relation, klass);
+    IRIList related = mAsk.allRelatedInstances(iri, relation, klass);
     return related.size();
 }
 
 uint32_t Redundancy::computeInDegree(const IRI& iri, const IRI& relation, const IRI& klass)
 {
-    IRIList related = mOrganizationModel.ontology()->allInverseRelatedInstances(iri, relation, klass);
+    IRIList related = mAsk.allInverseRelatedInstances(iri, relation, klass);
     return related.size();
 }
 
 double Redundancy::computeProbabilityOfSurvival(const IRI& resource, const IRI& actor)
 {
-    using namespace owl_om::vocabulary;
-
     // Get count for requirement type per resource type
     IRI model = mOrganizationModel.getResourceModel( resource );
-    IRIList dependantResources = mOrganizationModel.ontology()->allRelatedInstances( model, OM::dependsOn() );
+    IRIList dependantResources = mAsk.allRelatedInstances( model, OM::dependsOn() );
     std::map<IRI, uint32_t> resourceRequirementCount;
     BOOST_FOREACH(const IRI& dependant, dependantResources)
     {
@@ -37,7 +40,7 @@ double Redundancy::computeProbabilityOfSurvival(const IRI& resource, const IRI& 
     }
 
     // Get count for available resources
-    IRIList availableResources = mOrganizationModel.ontology()->allRelatedInstances( actor, OM::has() );
+    IRIList availableResources = mAsk.allRelatedInstances( actor, OM::has() );
     std::map<IRI, IRIList> availableResourceMap;
     BOOST_FOREACH(const IRI& availableResource, availableResources)
     {
@@ -46,7 +49,7 @@ double Redundancy::computeProbabilityOfSurvival(const IRI& resource, const IRI& 
     }
 
     // The instance for the requested resource (model) which can be updated
-    availableResources = mOrganizationModel.ontology()->allRelatedInstances( actor, OM::provides() );
+    availableResources = mAsk.allRelatedInstances( actor, OM::provides() );
     BOOST_FOREACH(const IRI& availableResource, availableResources)
     {
         IRI resourceModel = mOrganizationModel.getResourceModel( availableResource );
@@ -80,9 +83,10 @@ double Redundancy::computeProbabilityOfSurvival(const IRI& resource, const IRI& 
         BOOST_FOREACH(const IRI& component, components)
         {
             try {
-                DataValue value = mOrganizationModel.ontology()->getDataValue(component, OM::probabilityOfFailure());
-                LOG_DEBUG_S << "Retrieved probability of failure for '" << component << ": " << value.toDouble();
-                pSum += 1 - value.toDouble();
+                // SCHOKO
+                OWLLiteral::Ptr value = mAsk.getDataValue(component, OM::probabilityOfFailure());
+                LOG_DEBUG_S << "Retrieved probability of failure for '" << component << ": " << value->getDouble();
+                pSum += 1 - value->getDouble();
             } catch(...)
             {
                 LOG_DEBUG_S << "Default probability of failure for '" << component << ": 0.5";
@@ -102,10 +106,8 @@ double Redundancy::computeProbabilityOfSurvival(const IRI& resource, const IRI& 
 
 IRIMetricMap Redundancy::compute()
 {
-    using namespace owl_om::vocabulary;
-
     IRIMetricMap metricMap;
-    IRIList resources = mOrganizationModel.ontology()->allInstancesOf( OM::Resource() );
+    IRIList resources = mAsk.allInstancesOf( OM::Resource() );
     IRI relation = OM::uses();
 
     BOOST_FOREACH(const IRI& resource, resources)
@@ -121,8 +123,8 @@ IRIMetricMap Redundancy::compute()
             << "    metric:   " << metric.toString();
     }
 
-    IRIList services = mOrganizationModel.ontology()->allInstancesOf( OM::ServiceModel() );
-    IRIList actors = mOrganizationModel.ontology()->allInstancesOf( OM::Actor() );
+    IRIList services = mAsk.allInstancesOf( OM::ServiceModel() );
+    IRIList actors = mAsk.allInstancesOf( OM::Actor() );
     LOG_DEBUG_S << "Compute probabilityOfSurvival for: " << services;
 
     BOOST_FOREACH(const IRI& actor, actors)

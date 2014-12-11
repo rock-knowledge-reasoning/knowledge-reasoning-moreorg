@@ -6,6 +6,8 @@
 #include <owl_om/organization_model/InterfaceConnection.hpp>
 #include <owl_om/organization_model/ActorModelLink.hpp>
 
+namespace owl = owlapi::model;
+
 namespace owl_om {
 namespace organization_model {
 
@@ -23,22 +25,22 @@ struct Statistics
     base::Time timeInference;
     base::Time timeElapsed;
 
-    IRIList interfaces;
+    owl::IRIList interfaces;
     uint32_t maxAllowedLinks;
     InterfaceConnectionList links;
     InterfaceCombinationList linkCombinations;
 
     uint32_t constraintsChecked;
 
-    IRIList actorsAtomic;
-    IRIList actorsKnown;
-    IRIList actorsInferred;
+    owl::IRIList actorsAtomic;
+    owl::IRIList actorsKnown;
+    owl::IRIList actorsInferred;
 
-    IRIList actorsCompositePrevious;
-    //IRIList actorsCompositePost;
+    owl::IRIList actorsCompositePrevious;
+    //owl::IRIList actorsCompositePost;
     uint32_t actorsCompositePost;
 
-    IRIList actorsCompositeModelPrevious;
+    owl::IRIList actorsCompositeModelPrevious;
     std::vector< std::vector<ActorModelLink> > actorsCompositeModelPost;
     //uint32_t actorsCompositeModelPost;
 

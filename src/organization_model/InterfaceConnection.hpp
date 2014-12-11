@@ -1,7 +1,7 @@
 #ifndef OWL_OM_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP
 #define OWL_OM_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP
 
-#include <owl_om/KnowledgeBase.hpp>
+#include <owl_om/owlapi/model/IRI.hpp>
 #include <owl_om/organization_model/ActorModelLink.hpp>
 
 namespace owl_om {
@@ -10,20 +10,20 @@ namespace organization_model {
 struct InterfaceConnection
 {
     InterfaceConnection();
-    InterfaceConnection(const IRI& interface0, const IRI& interface1);
+    InterfaceConnection(const owlapi::model::IRI& interface0, const owlapi::model::IRI& interface1);
 
-    IRI begin;
-    IRI end;
+    owlapi::model::IRI begin;
+    owlapi::model::IRI end;
 
     // The ActorModel pair this interface connection can be abstracted to
     ActorModelLink actorModelLink;
 
-    IRIList parents;
-    IRIList modelParents;
+    owlapi::model::IRIList parents;
+    owlapi::model::IRIList modelParents;
 
     void setActorModelLink(const ActorModelLink& link) { actorModelLink = link; }
 
-    void addParent(const IRI& parent);
+    void addParent(const owlapi::model::IRI& parent);
     bool sameParents(const InterfaceConnection& other) const;
 
     bool selfReferencing() const;

@@ -11,15 +11,15 @@ OWLQualifiedRestriction::OWLQualifiedRestriction(OWLPropertyExpression::Ptr prop
     {
         if(isDataRestriction())
         {
-            mQualification = owl_om::vocabulary::RDFS::Literal();
+            mQualification = owlapi::vocabulary::RDFS::Literal();
         } else {
-            mQualification = owl_om::vocabulary::OWL::Thing();
+            mQualification = owlapi::vocabulary::OWL::Thing();
         }
     } else {
         mQualification = qualification;
     }
 
-    mQualified = !( mQualification == owl_om::vocabulary::OWL::Thing() || mQualification == owl_om::vocabulary::RDFS::Literal() );
+    mQualified = !( mQualification == owlapi::vocabulary::OWL::Thing() || mQualification == owlapi::vocabulary::RDFS::Literal() );
 }
 
 std::string OWLQualifiedRestriction::toString() const

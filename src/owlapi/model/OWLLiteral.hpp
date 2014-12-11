@@ -55,6 +55,8 @@ public:
     static OWLLiteral::Ptr create(const std::string& literal);
 
     virtual int getInteger() const;
+
+    virtual double getDouble() const;
 };
 
 } // end namespace model

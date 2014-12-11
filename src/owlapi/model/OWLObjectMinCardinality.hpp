@@ -4,7 +4,7 @@
 #include <owl_om/owlapi/model/OWLClassExpression.hpp>
 #include <owl_om/owlapi/model/OWLObjectPropertyExpression.hpp>
 #include <owl_om/owlapi/model/OWLMinCardinalityRestriction.hpp>
-#include <owl_om/Vocabulary.hpp>
+#include <owl_om/owlapi/Vocabulary.hpp>
 
 namespace owlapi {
 namespace model {
@@ -12,7 +12,7 @@ namespace model {
 class OWLObjectMinCardinality : public OWLMinCardinalityRestriction
 {
 public:
-    OWLObjectMinCardinality(OWLObjectPropertyExpression::Ptr property, uint32_t cardinality, const OWLQualification& qualification = owl_om::vocabulary::OWL::Thing())
+    OWLObjectMinCardinality(OWLObjectPropertyExpression::Ptr property, uint32_t cardinality, const OWLQualification& qualification = owlapi::vocabulary::OWL::Thing())
         : OWLMinCardinalityRestriction( boost::dynamic_pointer_cast<OWLPropertyExpression>(property), cardinality, qualification)
     {}
 
