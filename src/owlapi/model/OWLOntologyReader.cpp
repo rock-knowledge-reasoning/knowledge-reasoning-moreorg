@@ -125,7 +125,7 @@ void OWLOntologyReader::load()
                     LOG_DEBUG_S << "Annotation property '" << subject << "' ignored for reasoning";
                 } else if( object == vocabulary::OWL::Restriction() )
                 {
-                    LOG_WARN_S << "Found restriction: " << subject;
+                    LOG_DEBUG_S << "Found restriction: " << subject;
                     restrictions.push_back(subject);
                 }
             } else if(predicate == vocabulary::RDFS::subClassOf())
@@ -153,7 +153,7 @@ void OWLOntologyReader::load()
                     // cache the restrictions
                     anonymousRestrictions[object].push_back(e_subject);
 
-                    LOG_WARN_S << "Add anonymous " << object << " from s: " << subject << ", p: " << predicate << ", o: " << object;
+                    LOG_DEBUG_S << "Add anonymous " << object << " from s: " << subject << ", p: " << predicate << ", o: " << object;
                 }
             } else if(predicate == vocabulary::RDFS::domain())
             {
@@ -270,7 +270,6 @@ void OWLOntologyReader::load()
                 }
 
                 cardinalityRestrictions[restriction].setProperty(boost::dynamic_pointer_cast<OWLPropertyExpression>(oProperty));
-                LOG_WARN_S << "Restriction '" << restriction << "' applies to: " << oProperty->toString();
                 continue;
             }
             else if(predicate == vocabulary::OWL::minCardinality() || predicate == vocabulary::OWL::minQualifiedCardinality())

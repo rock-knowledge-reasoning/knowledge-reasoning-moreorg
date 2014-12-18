@@ -64,6 +64,8 @@ protected:
 public:
     typedef boost::shared_ptr<OWLOntology> Ptr;
 
+    void refresh();
+
     /**
      * Default constructor
      */

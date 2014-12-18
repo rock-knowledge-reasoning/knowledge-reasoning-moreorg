@@ -39,14 +39,26 @@ class Redundancy
     OrganizationModel mOrganizationModel;
     owlapi::model::OWLOntologyAsk mAsk;
 
-    uint32_t computeOutDegree(const owlapi::model::IRI& iri, const owlapi::model::IRI& relation, const owlapi::model::IRI& filter = owlapi::model::IRI());
-    uint32_t computeInDegree(const owlapi::model::IRI& iri, const owlapi::model::IRI& relation, const owlapi::model::IRI& filter = owlapi::model::IRI());
+    uint32_t computeOutDegree(const owlapi::model::IRI& iri, const owlapi::model::IRI& relation, const owlapi::model::IRI& klass = owlapi::model::IRI());
+    uint32_t computeInDegree(const owlapi::model::IRI& iri, const owlapi::model::IRI& relation, const owlapi::model::IRI& klass = owlapi::model::IRI());
 
     /**
-     * Compute the probability of survival for a resource with respect to a given actor
+     * Compute the probability of survival for a service/capability with respect to a given model
+     *
+     * It use the assigned restriction on that model to infer what is available
+     * and matches this to the service requirements accordingly
      *
      */
-    double computeProbabilityOfSurvival(const owlapi::model::IRI& resource, const owlapi::model::IRI& actor);
+    double computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const owlapi::model::IRI& model);
+
+    /**
+     * Compute the probability of survival for the function of the system with
+     * respect to a given set of composite actor model -- which is defined by a set of atomic
+     * actor models
+     */
+    double computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const std::map<owlapi::model::IRI,uint32_t>& models);
+
+    double compute(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available);
 
 public:
     Redundancy(const OrganizationModel& organization);

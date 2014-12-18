@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(it_should_query_db)
 
 BOOST_AUTO_TEST_CASE(it_should_query_db_abstract)
 {
-    Ontology::Ptr ontology = Ontology::fromFile( getRootDir() + rdfTestFiles[0]);
+    OWLOntology::Ptr ontology = OWLOntology::fromFile( getRootDir() + rdfTestFiles[0]);
 
     db::query::Results results = ontology->findAll("?s","?p","?o");
     BOOST_REQUIRE_MESSAGE(results.rows.size() != 0, "Results retrieved");
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(it_should_query_db_abstract)
 BOOST_AUTO_TEST_CASE(it_should_create_ontology)
 {
     using namespace owl_om;
-    Ontology::Ptr ontology = Ontology::fromFile( getRootDir() + rdfTestFiles[0]);
+    OWLOntology::Ptr ontology = OWLOntology::fromFile( getRootDir() + rdfTestFiles[0]);
     BOOST_TEST_MESSAGE("Ontology: " << ontology->toString());
 }
 

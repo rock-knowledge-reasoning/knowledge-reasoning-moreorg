@@ -43,10 +43,12 @@ rock_library(owlapi
         owlapi/model/NodeID.cpp
         owlapi/model/URI.cpp
         owlapi/reasoner/factpp/Types.cpp
+        owlapi/reasoner
     HEADERS owlapi/Exceptions.hpp
         owlapi/KnowledgeBase.hpp
         owlapi/OWLApi.hpp
         owlapi/Vocabulary.hpp
+        owlapi/csp/ResourceMatching.hpp
         owlapi/vocabularies/OM.hpp
         owlapi/vocabularies/OWL.hpp
         owlapi/vocabularies/RDF.hpp
@@ -99,10 +101,21 @@ rock_library(owlapi
         owlapi/model/OWLRestriction.hpp
         owlapi/model/URI.hpp
         owlapi/reasoner/factpp/Types.hpp
-    DEPS_PKGCONFIG soprano factpp liburiparser
+    DEPS_PKGCONFIG soprano factpp liburiparser base-lib
 )
+
+set(GECODE_LIBRARIES
+    gecodesearch
+    gecodesupport
+    gecodeset
+    gecodekernel
+    gecodeminimodel
+    gecodeint
+    gecodefloat
+)
+
 include_directories(${Boost_INCLUDE_DIR})
-target_link_libraries(owlapi ${Boost_LIBRARIES} ${ICU_LIBS})
+target_link_libraries(owlapi ${Boost_LIBRARIES} ${ICU_LIBS} ${GECODE_LIBRARIES})
 
 rock_library(organization_model
     SOURCES
@@ -142,13 +155,13 @@ rock_library(organization_model
         organization_model/Statistics.hpp
         utils/CoalitionStructureGeneration.hpp
         utils/CorrelationClustering.hpp
-    DEPS owlapi 
+    DEPS owlapi
     DEPS_PKGCONFIG numeric pddl_planner 
 )
 target_link_libraries(organization_model glpk)
 
-rock_executable(owl_om_bin Main.cpp
-    DEPS organization_model)
+#rock_executable(owl_om_bin Main.cpp
+#    DEPS organization_model)
 
 rock_executable(multiagent_caf ccf/CAF.cpp
     DEPS organization_model)

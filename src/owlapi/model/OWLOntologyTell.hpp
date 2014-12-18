@@ -54,6 +54,7 @@ public:
      */
     OWLDataProperty::Ptr getOWLDataProperty(const IRI& iri);
 
+    OWLSubClassOfAxiom::Ptr subclassOf(OWLClass::Ptr subclass, OWLClass::Ptr superclass);
     OWLSubClassOfAxiom::Ptr subclassOf(const IRI& subclass, OWLClassExpression::Ptr superclass);
 
     /**

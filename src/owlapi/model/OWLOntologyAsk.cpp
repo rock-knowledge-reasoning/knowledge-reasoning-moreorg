@@ -195,5 +195,10 @@ OWLLiteral::Ptr OWLOntologyAsk::getDataValue(const IRI& instance, const IRI& dat
     return OWLLiteral::create(valueRepresentation);
 }
 
+IRIList OWLOntologyAsk::ancestors(const IRI& instance) const
+{
+    return mpOntology->kb()->typesOf(instance);
+}
+
 } // end namespace model
 } // end namespace owlapi

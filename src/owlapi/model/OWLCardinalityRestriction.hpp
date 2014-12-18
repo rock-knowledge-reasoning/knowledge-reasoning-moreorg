@@ -40,6 +40,11 @@ public:
 
     virtual std::string toString() const;
 
+    /** 
+     * Convert to exact mapping
+     */
+    static std::map<IRI, uint32_t> convertToExactMapping(const std::vector<OWLCardinalityRestriction::Ptr>& restrictions);
+
 protected:
     /**
      * Set cardinality -- e.g. to allow incremental construction of restrictions

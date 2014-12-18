@@ -125,7 +125,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Actor -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Actor">
-        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PhysicalEntity"/>
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
         <rdfs:comment>An actor is a physical or logical entity that can act, i.e. perform actions which have an effect</rdfs:comment>
     </owl:Class>
     
@@ -476,13 +476,6 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
-                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
                 <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
@@ -562,6 +555,14 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Actor -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Actor"/>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#CREX_0 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#CREX_0">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#CREX"/>
+    </owl:NamedIndividual>
     
 
 

@@ -127,20 +127,19 @@ OWLSubClassOfAxiom::Ptr OWLOntologyTell::subclassOf(const IRI& subclass, OWLClas
 
 OWLSubClassOfAxiom::Ptr OWLOntologyTell::subclassOf(const IRI& subclass, const IRI& superclass)
 {
-    // Update reasoner kb
-    mpOntology->kb()->subclassOf(subclass, superclass);
-
     // All classes inherit from top concept, i.e. owl:Thing
     OWLClass::Ptr e_subclass = getOWLClass(subclass);
     OWLClass::Ptr e_superclass = getOWLClass(superclass);
-    OWLSubClassOfAxiom::Ptr axiom(new OWLSubClassOfAxiom(e_subclass, e_superclass));
 
-    mpOntology->mSubClassAxiomBySubPosition[e_subclass].push_back(axiom);
-    mpOntology->mSubClassAxiomBySuperPosition[e_superclass].push_back(axiom);
-    // mDeclarationsByEntity[e_subject] = OWLClassDeclaration
-    LOG_DEBUG_S << "Added SubClassOfAxiom:" << subclass.toString() << " axiom: " << axiom->toString();
-    return axiom;
+    return subclassOf(e_subclass, e_superclass);
 }
+
+OWLSubClassOfAxiom::Ptr OWLOntologyTell::subclassOf(OWLClass::Ptr subclass, OWLClass::Ptr superclass)
+{
+    mpOntology->kb()->subclassOf(subclass->getIRI(), superclass->getIRI());
+    return subclassOf(boost::dynamic_pointer_cast<OWLClassExpression>(subclass),boost::dynamic_pointer_cast<OWLClassExpression>(superclass));
+}
+
 
 OWLSubClassOfAxiom::Ptr OWLOntologyTell::subclassOf(OWLClassExpression::Ptr subclassExpression, OWLClassExpression::Ptr superclassExpression)
 {

@@ -2,6 +2,7 @@
 #include "OWLObjectExactCardinality.hpp"
 #include "OWLObjectMinCardinality.hpp"
 #include "OWLObjectMaxCardinality.hpp"
+#include <algorithm>
 #include <sstream>
 #include <boost/assign/list_of.hpp>
 
@@ -57,6 +58,24 @@ std::string OWLCardinalityRestriction::toString() const
     ss << "    qualification: " << getQualification().toString() << std::endl;
     ss << "    type: " << CardinalityRestrictionTypeTxt[getCardinalityRestrictionType()] << std::endl;
     return ss.str();
+}
+
+std::map<IRI, uint32_t> OWLCardinalityRestriction::convertToExactMapping(const std::vector<OWLCardinalityRestriction::Ptr>& restrictions)
+{
+    std::map<IRI, uint32_t> exactMapping;
+    std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = restrictions.begin();
+    for(; cit != restrictions.end(); ++cit)
+    {
+        OWLCardinalityRestriction::Ptr restriction = *cit;
+        // Here we assume that 
+        //  max 3 and max 4 -> exact 4
+        //  min 3 and max 4 -> exact 4
+        //  exact 1 and exact 2 -> exact 4
+        uint32_t current = exactMapping[restriction->getQualification()];
+        exactMapping[restriction->getQualification()] = std::max(current, restriction->getCardinality());
+    }
+
+    return exactMapping;
 }
 
 } // end namespace model

@@ -134,6 +134,12 @@ public:
      * \return data value
      */
     OWLLiteral::Ptr getDataValue(const IRI& instance, const IRI& dataProperty);
+
+    /**
+     * Retrieve the list of ancestors
+     * \return list of ancestors
+     */
+    IRIList ancestors(const IRI& instance) const;
 };
 
 } // end namespace model
