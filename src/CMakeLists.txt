@@ -11,6 +11,7 @@ set(ICU_LIBS icutu
 
 rock_library(owlapi
     SOURCES owlapi/KnowledgeBase.cpp
+        owlapi/csp/ResourceMatch.cpp
         owlapi/db/FileBackend.cpp
         owlapi/db/rdf/SopranoDB.cpp
         owlapi/db/rdf/Sparql.cpp
@@ -43,12 +44,11 @@ rock_library(owlapi
         owlapi/model/NodeID.cpp
         owlapi/model/URI.cpp
         owlapi/reasoner/factpp/Types.cpp
-        owlapi/reasoner
     HEADERS owlapi/Exceptions.hpp
         owlapi/KnowledgeBase.hpp
         owlapi/OWLApi.hpp
         owlapi/Vocabulary.hpp
-        owlapi/csp/ResourceMatching.hpp
+        owlapi/csp/ResourceMatch.hpp
         owlapi/vocabularies/OM.hpp
         owlapi/vocabularies/OWL.hpp
         owlapi/vocabularies/RDF.hpp

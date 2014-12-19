@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include <owl_om/owlapi/csp/ResourceMatching.hpp>
+#include <owl_om/owlapi/csp/ResourceMatch.hpp>
 #include <owl_om/owlapi/model/OWLOntologyReader.hpp>
 #include <owl_om/owlapi/model/OWLOntologyTell.hpp>
 #include <owl_om/owlapi/OWLApi.hpp>
@@ -38,9 +38,12 @@ BOOST_AUTO_TEST_CASE(it_should_match_resources)
     resourcePool.push_back(b->getIRI());
     resourcePool.push_back(c->getIRI());
 
-    owlapi::csp::ResourceMatching* matching = owlapi::csp::ResourceMatching::solve(query, resourcePool, ontology);
+    owlapi::csp::ResourceMatch* match = owlapi::csp::ResourceMatch::solve(query, resourcePool, ontology);
 
-    BOOST_TEST_MESSAGE("Assignment: " << matching->toString());
+    BOOST_TEST_MESSAGE("Assignment: " << match->toString());
+
+    IRI assignment = match->getAssignment(a->getIRI());
+    BOOST_REQUIRE_MESSAGE( assignment == b->getIRI(), "Expected base to be matched by base-derived");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
