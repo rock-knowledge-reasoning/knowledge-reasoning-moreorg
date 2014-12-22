@@ -23,6 +23,7 @@ class ResourceMatch : public Gecode::Space
     std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> mQueryRestrictions;
     std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> mResourcePoolRestrictions;
     std::map<owlapi::model::OWLCardinalityRestriction::Ptr, InstanceList> mSolution;
+    InstanceList mResourcePool;
 
     /**
      * Assignments of query resources to pool resources. This is what has to be solved.
@@ -32,7 +33,7 @@ class ResourceMatch : public Gecode::Space
     ResourceMatch* solve();
 
 protected:
-    ResourceMatch(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& queryRestrictions, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& resourcePoolRestrictions, owlapi::model::OWLOntology::Ptr ontology);
+    ResourceMatch(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& queryRestrictions, const InstanceList& resourcePoolRestrictions, owlapi::model::OWLOntology::Ptr ontology);
 
     /**
      * Search support
@@ -47,7 +48,6 @@ protected:
     virtual Gecode::Space* copy(bool share);
 
     static TypeInstanceMap toTypeInstanceMap(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
-    static InstanceList getInstanceList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
     static TypeList getTypeList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
 
     static AllowedTypesMap getAllowedTypes(const TypeInstanceMap& query, const TypeInstanceMap& pool, owlapi::model::OWLOntology::Ptr ontology);
@@ -60,19 +60,22 @@ protected:
 
 public:
     void print(std::ostream& os) const;
+    static InstanceList getInstanceList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
 
     /*
      * constrain function for best solution search. the
      * currently best solution _b is passed and we have to constraint that this solution can only
      * be better than b, for it to be excluded if it isn't
      */
-    virtual void constrain(const Gecode::Space& _b);
+    //virtual void constrain(const Gecode::Space& _b);
 
     /**
      * Construct a solution with an initial situation to search
      * \throw std::runtime_error if a solution could not be found
      */
     static ResourceMatch* solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& queryRestrictions, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& resourcePoolRestrictions, owlapi::model::OWLOntology::Ptr ontology);
+
+    static ResourceMatch* solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& queryRestrictions, const InstanceList& resourcePool, owlapi::model::OWLOntology::Ptr ontology);
 
     /**
      * Create a string representation of this object
@@ -85,7 +88,12 @@ public:
      * \return InstanceList that has been assigned from the resourcePool to
      * fulfill this restriction
      */
-    InstanceList getAssignments(owlapi::model::OWLCardinalityRestriction::Ptr restriction) const;
+    InstanceList getAssignedResources(owlapi::model::OWLCardinalityRestriction::Ptr restriction) const;
+
+    /**
+     * Retrieve the list of resources that remain unassigned
+     */
+    InstanceList getUnassignedResources() const;
 };
 
 } // end namespace cps

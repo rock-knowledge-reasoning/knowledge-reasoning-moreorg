@@ -3,6 +3,7 @@
 #include <owl_om/owlapi/model/OWLOntologyReader.hpp>
 #include <owl_om/owlapi/model/OWLOntologyTell.hpp>
 #include <owl_om/owlapi/OWLApi.hpp>
+
 #include "test_utils.hpp"
 
 using namespace owlapi::model;
@@ -77,7 +78,7 @@ BOOST_AUTO_TEST_CASE(it_should_match_resource_via_restrictions)
     }
 
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 1, b->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 3, b->getIRI()));
         resourcePool.push_back(restriction);
     }
     {
@@ -91,8 +92,10 @@ BOOST_AUTO_TEST_CASE(it_should_match_resource_via_restrictions)
     std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = query.begin();
     for(; cit != query.end(); ++cit)
     {
-        BOOST_TEST_MESSAGE("Assignment: " << (*cit)->toString() << " -- " << IRI::toString( match->getAssignments(*cit) ) );
+        BOOST_TEST_MESSAGE("Assignment: " << (*cit)->toString() << " -- " << IRI::toString( match->getAssignedResources(*cit) ) );
     }
+
+    BOOST_TEST_MESSAGE("Unassigned: " << IRI::toString( match->getUnassignedResources() ) );
 
 //    IRI assignment = match->getAssignment(a->getIRI());
 //    BOOST_REQUIRE_MESSAGE( assignment == b->getIRI(), "Expected base to be matched by base-derived");

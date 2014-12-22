@@ -7,23 +7,60 @@
 
 using namespace owl_om;
 using namespace owlapi;
+using namespace owlapi::model;
+
+BOOST_AUTO_TEST_SUITE(redundancy_metrics)
 
 BOOST_AUTO_TEST_CASE(it_should_handle_redundancy_metrics)
 {
-    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
+    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.6.owl" );
 
-    using namespace owlapi::vocabulary;
+    //using namespace owlapi::vocabulary;
+    //{
+    //    owlapi::model::IRI instance = om.createNewInstance(OM::resolve("Sherpa"), true);
+    //    om.createNewInstance(OM::resolve("PayloadCamera"), true);
+
+    //    BOOST_TEST_MESSAGE("Created new from model" << instance);
+    //    owlapi::model::OWLOntologyAsk ask(om.ontology());
+    //    bool isInstance = ask.isInstanceOf(instance, OM::Actor());
+    //    BOOST_REQUIRE_MESSAGE(isInstance, "New model instance of Actor");
+    //}
+
+    OWLOntologyTell tell(om.ontology());
+
+    OWLClass::Ptr a = tell.getOWLClass("http://klass/base");
+    OWLClass::Ptr b = tell.getOWLClass("http://klass/base-derived");
+    OWLClass::Ptr c = tell.getOWLClass("http://klass/base-derived-derived");
+    OWLObjectProperty::Ptr property = tell.getOWLObjectProperty("http://property/has");
+
+    tell.subclassOf(c,b);
+    tell.subclassOf(b,a);
+    om.ontology()->refresh();
+
+    std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
     {
-        owlapi::model::IRI instance = om.createNewInstance(OM::resolve("Sherpa"), true);
-        om.createNewInstance(OM::resolve("PayloadCamera"), true);
-
-        BOOST_TEST_MESSAGE("Created new from model" << instance);
-        owlapi::model::OWLOntologyAsk ask(om.ontology());
-        bool isInstance = ask.isInstanceOf(instance, OM::Actor());
-        BOOST_REQUIRE_MESSAGE(isInstance, "New model instance of Actor");
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
+        query.push_back(restriction);
     }
-    om.refresh();
+    {
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, c->getIRI()));
+        query.push_back(restriction);
+    }
+
+    {
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 3, b->getIRI()));
+        resourcePool.push_back(restriction);
+    }
+    {
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 3, c->getIRI()));
+        resourcePool.push_back(restriction);
+    }
 
     metrics::Redundancy redundancy(om);
-    metrics::IRIMetricMap metrics = redundancy.compute();
+    double redundancyVal = redundancy.compute(query, resourcePool);
+    BOOST_TEST_MESSAGE("Redundancy test: " << redundancyVal); 
+    //metrics::IRIMetricMap metrics = redundancy.compute();
+
 }
+
+BOOST_AUTO_TEST_SUITE_END()

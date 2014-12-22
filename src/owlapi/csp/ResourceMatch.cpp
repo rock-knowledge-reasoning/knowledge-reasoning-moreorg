@@ -11,7 +11,7 @@ namespace csp {
 ResourceMatch::ResourceMatch(bool share, ResourceMatch& other)
     : Gecode::Space(share, other)
     , mQueryRestrictions(other.mQueryRestrictions)
-    , mResourcePoolRestrictions(other.mResourcePoolRestrictions)
+    , mResourcePool(other.mResourcePool)
 {
     mSetAssignment.update(*this, share, other.mSetAssignment);
     //LOG_DEBUG_S << "ResourceMatch: construct: " << toString();
@@ -22,11 +22,11 @@ Gecode::Space* ResourceMatch::copy(bool share)
     return new ResourceMatch(share,*this);
 }
 
-void ResourceMatch::constrain(const Gecode::Space& _b)
-{
-    const ResourceMatch& b = static_cast<const ResourceMatch&>(_b);
-
-}
+//void ResourceMatch::constrain(const Gecode::Space& _b)
+//{
+//    const ResourceMatch& b = static_cast<const ResourceMatch&>(_b);
+//
+//}
 
 TypeInstanceMap ResourceMatch::toTypeInstanceMap(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions)
 {
@@ -137,7 +137,7 @@ uint32_t ResourceMatch::getInstanceCount(const TypeInstanceMap& map)
 
 ResourceMatch* ResourceMatch::solve(const std::vector<OWLCardinalityRestriction::Ptr>& queryRestrictions, const std::vector<OWLCardinalityRestriction::Ptr>& resourcePoolRestrictions, OWLOntology::Ptr ontology)
 {
-    ResourceMatch* match = new ResourceMatch(queryRestrictions, resourcePoolRestrictions, ontology);
+    ResourceMatch* match = new ResourceMatch(queryRestrictions, getInstanceList(resourcePoolRestrictions), ontology);
     ResourceMatch* solvedMatch = match->solve();
     delete match;
     match = NULL;
@@ -147,22 +147,43 @@ ResourceMatch* ResourceMatch::solve(const std::vector<OWLCardinalityRestriction:
 
 }
 
-ResourceMatch::ResourceMatch(const std::vector<OWLCardinalityRestriction::Ptr>& queryRestrictions, const std::vector<OWLCardinalityRestriction::Ptr>& resourcePoolRestrictions, OWLOntology::Ptr ontology)
+ResourceMatch* ResourceMatch::solve(const std::vector<OWLCardinalityRestriction::Ptr>& queryRestrictions, const InstanceList& resourcePool, OWLOntology::Ptr ontology)
+{
+    ResourceMatch* match = new ResourceMatch(queryRestrictions, resourcePool, ontology);
+    ResourceMatch* solvedMatch = match->solve();
+    delete match;
+    match = NULL;
+
+    solvedMatch->remapSolution();
+    return solvedMatch;
+
+}
+
+ResourceMatch::ResourceMatch(const std::vector<OWLCardinalityRestriction::Ptr>& queryRestrictions, const InstanceList& resources, OWLOntology::Ptr ontology)
     : mQueryRestrictions(queryRestrictions)
-    , mResourcePoolRestrictions(resourcePoolRestrictions)
+    , mResourcePool( resources )
     , mSetAssignment(*this, queryRestrictions.size())
 {
     TypeInstanceMap query = ResourceMatch::toTypeInstanceMap(queryRestrictions);
-    TypeInstanceMap resourcePool = ResourceMatch::toTypeInstanceMap(resourcePoolRestrictions);
+
+    TypeInstanceMap resourcePoolTypeMap;
+    {
+        InstanceList::const_iterator iit = mResourcePool.begin();
+        int index = 0;
+        for(; iit != mResourcePool.end(); ++iit)
+        {
+            resourcePoolTypeMap[*iit].push_back(index++);
+        }
+    }
 
     // The restriction will be fulfilled by a set of instances -- that are
     // defined by the resourcePoolRestrictions in this case
-    Gecode::IntSet allDomainValues(0, getInstanceCount(resourcePool)-1);
+    Gecode::IntSet allDomainValues(0, mResourcePool.size()-1);
     dom(*this, mSetAssignment, Gecode::SRT_SUB, allDomainValues);
     // Domain must no be empty
     dom(*this, mSetAssignment, Gecode::SRT_NQ, Gecode::IntSet(1,0));
 
-    LOG_WARN_S << "All domain values: " << allDomainValues;
+    LOG_DEBUG_S << "All domain values: " << allDomainValues;
 
     // Make sure the assignments are unique, i.e. pairwise disjoint sets
     std::vector<int> indexes;
@@ -183,7 +204,7 @@ ResourceMatch::ResourceMatch(const std::vector<OWLCardinalityRestriction::Ptr>& 
 
     //// For all resource types in the pool, find all resources that are allowed
     //// to fulfill the query
-    AllowedTypesMap allowedTypesMap = ResourceMatch::getAllowedTypes(query, resourcePool, ontology);
+    AllowedTypesMap allowedTypesMap = ResourceMatch::getAllowedTypes(query, resourcePoolTypeMap, ontology);
 
     uint32_t assignmentIndex = 0;
     std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = queryRestrictions.begin();
@@ -192,7 +213,7 @@ ResourceMatch::ResourceMatch(const std::vector<OWLCardinalityRestriction::Ptr>& 
         OWLCardinalityRestriction::Ptr restriction = *cit;
 
         // Compute allowedPoolResources for this slot
-        std::vector<int> domain = getAllowedDomain(restriction->getQualification(), allowedTypesMap, resourcePool);
+        std::vector<int> domain = getAllowedDomain(restriction->getQualification(), allowedTypesMap, resourcePoolTypeMap);
         // initialize with an array int[] and given size n, does not really work
         // as expected, create only a range [0,domain.size()] -- Gecode::IntSet set(domain[0], domain.size());
         Gecode::IntArgs args;
@@ -241,14 +262,13 @@ void ResourceMatch::remapSolution()
 {
     // update solution vector
     InstanceList queryInstances = getTypeList(mQueryRestrictions);
-    InstanceList resourcePoolInstances = getInstanceList(mResourcePoolRestrictions);
 
     for(int i = 0; i < mSetAssignment.size(); i++)
     {
         InstanceList assignedResources;
         for(Gecode::SetVarGlbValues v(mSetAssignment[i]); v(); ++v)
         {
-            assignedResources.push_back(resourcePoolInstances[v.val()]);
+            assignedResources.push_back(mResourcePool[v.val()]);
         }
 
         OWLCardinalityRestriction::Ptr restriction = mQueryRestrictions[i];
@@ -289,7 +309,6 @@ ResourceMatch* ResourceMatch::solve()
 std::string ResourceMatch::toString() const 
 {
     InstanceList queryInstances = getTypeList(mQueryRestrictions);
-    InstanceList resourcePoolInstances = getInstanceList(mResourcePoolRestrictions);
 
     std::stringstream ss;
     ss << "ResourceMatch: #" << mSetAssignment.size() << " { " << std::endl;
@@ -301,7 +320,7 @@ std::string ResourceMatch::toString() const
         {
             for(Gecode::SetVarGlbValues v(mSetAssignment[i]); v(); ++v)
             {
-                ss << "            " << resourcePoolInstances[v.val()] << std::endl;
+                ss << "            " << mResourcePool[v.val()] << std::endl;
             }
         } else {
             ss << "        "<<  "unassigned " << std::endl;
@@ -312,7 +331,7 @@ std::string ResourceMatch::toString() const
     return ss.str();
 }
 
-InstanceList ResourceMatch::getAssignments(OWLCardinalityRestriction::Ptr restriction) const
+InstanceList ResourceMatch::getAssignedResources(OWLCardinalityRestriction::Ptr restriction) const
 {
     std::map<OWLCardinalityRestriction::Ptr, InstanceList>::const_iterator cit = mSolution.find(restriction);
     if(cit != mSolution.end())
@@ -322,6 +341,24 @@ InstanceList ResourceMatch::getAssignments(OWLCardinalityRestriction::Ptr restri
     {
         throw std::runtime_error("ResourceMatch::getAssignment: there exists no assignment for '" + restriction->toString() + "'");
     }
+}
+
+
+InstanceList ResourceMatch::getUnassignedResources() const
+{
+    InstanceList instances = mResourcePool;
+    std::map<OWLCardinalityRestriction::Ptr, InstanceList>::const_iterator cit = mSolution.begin();
+    for(; cit != mSolution.end(); ++cit)
+    {
+        InstanceList assignedResources = cit->second;
+        InstanceList::const_iterator iit = assignedResources.begin();
+        for(; iit != assignedResources.end(); ++iit)
+        {
+            InstanceList::iterator uit = std::find(instances.begin(), instances.end(), *iit);
+            instances.erase(uit);
+        }
+    }
+    return instances;
 }
 
 

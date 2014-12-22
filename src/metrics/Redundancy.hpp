@@ -6,6 +6,35 @@
 namespace owl_om {
 namespace metrics {
 
+struct ModelSurvivability
+{
+    owlapi::model::OWLCardinalityRestriction::Ptr restriction;
+    double modelProbability;
+    double redundancy;
+
+    ModelSurvivability(owlapi::model::OWLCardinalityRestriction::Ptr restriction, double modelProbability, double redundancy)
+        : restriction(restriction)
+        , modelProbability(modelProbability)
+        , redundancy(redundancy)
+    {}
+
+    double getProbabilityOfSurvival() const { return 1 - pow(1-modelProbability, redundancy); }
+
+    owlapi::model::IRI getQualification() const { return restriction->getQualification(); }
+    uint32_t getCardinality() const { return restriction->getCardinality(); }
+
+    std::string toString() const 
+    {
+        std::stringstream ss;
+        ss << " ModelSurvivability: " << std::endl;
+        ss << "    modelProbability: " << modelProbability << std::endl;
+        ss << "    redundancy: " << redundancy << std::endl;
+        ss << "    probabilityOfSurvival: " << getProbabilityOfSurvival() << std::endl;
+        ss << "  > " << restriction->toString();
+        return ss.str();
+    }
+};
+
 struct Metric
 {
     std::string label;
@@ -58,9 +87,9 @@ class Redundancy
      */
     double computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const std::map<owlapi::model::IRI,uint32_t>& models);
 
+public:
     double compute(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available);
 
-public:
     Redundancy(const OrganizationModel& organization);
 
     IRIMetricMap compute();
