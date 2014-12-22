@@ -9,6 +9,11 @@
 namespace owlapi {
 namespace model {
 
+class IRI;
+
+typedef std::vector<IRI> IRIList;
+typedef std::set<IRI> IRISet;
+
 class IRI
 {
 protected:
@@ -72,6 +77,11 @@ public:
     std::string toString() const { return mPrefix + mRemainder; }
 
     /**
+     * To string
+     */
+    static std::string toString(const IRIList& list);
+
+    /**
      * To escape string, e.g. for usage as regular expression
      */
     std::string toEscapedString() const;
@@ -110,9 +120,6 @@ public:
  
     bool operator<(const IRI& other) const { return toString() < other.toString(); }
 };
-
-typedef std::vector<IRI> IRIList;
-typedef std::set<IRI> IRISet;
 
 /**
  * Stream an IRI

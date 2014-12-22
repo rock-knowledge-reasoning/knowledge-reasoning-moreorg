@@ -149,6 +149,13 @@ std::string IRI::toEscapedString() const
     return iri;
 }
 
+std::string IRI::toString(const IRIList& list)
+{
+    std::stringstream ss;
+    ss << list;
+    return ss.str();
+}
+
 
 bool IRI::operator==(const IRI& other) const
 {
