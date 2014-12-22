@@ -101,7 +101,7 @@ rock_library(owlapi
         owlapi/model/OWLRestriction.hpp
         owlapi/model/URI.hpp
         owlapi/reasoner/factpp/Types.hpp
-    DEPS_PKGCONFIG soprano factpp liburiparser base-lib
+    DEPS_PKGCONFIG soprano factpp liburiparser base-lib numeric
 )
 
 set(GECODE_LIBRARIES

@@ -1,6 +1,7 @@
 #ifndef OWLAPI_CSP_RESOURCE_MATCH_HPP
 #define OWLAPI_CSP_RESOURCE_MATCH_HPP
 
+#include <gecode/set.hh>
 #include <gecode/int.hh>
 #include <gecode/search.hh>
 
@@ -23,6 +24,8 @@ class ResourceMatch : public Gecode::Space
      * Assignments of query resources to pool resources. This is what has to be solved.
      */
     Gecode::IntVarArray mAssignment;
+
+    Gecode::SetVarArray mSetAssignment;
 
     ResourceMatch* solve();
 
