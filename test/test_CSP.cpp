@@ -71,23 +71,28 @@ BOOST_AUTO_TEST_CASE(it_should_match_resource_via_restrictions)
         OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
         query.push_back(restriction);
     }
-    //{
-    //    OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 1, c->getIRI()));
-    //    query.push_back(restriction);
-    //}
+    {
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, c->getIRI()));
+        query.push_back(restriction);
+    }
 
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, b->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 1, b->getIRI()));
         resourcePool.push_back(restriction);
     }
-    //{
-    //    OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 1, c->getIRI()));
-    //    resourcePool.push_back(restriction);
-    //}
+    {
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 3, c->getIRI()));
+        resourcePool.push_back(restriction);
+    }
 
     owlapi::csp::ResourceMatch* match = owlapi::csp::ResourceMatch::solve(query, resourcePool, ontology);
 
     BOOST_TEST_MESSAGE("Assignment: " << match->toString());
+    std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = query.begin();
+    for(; cit != query.end(); ++cit)
+    {
+        BOOST_TEST_MESSAGE("Assignment: " << (*cit)->toString() << " -- " << IRI::toString( match->getAssignments(*cit) ) );
+    }
 
 //    IRI assignment = match->getAssignment(a->getIRI());
 //    BOOST_REQUIRE_MESSAGE( assignment == b->getIRI(), "Expected base to be matched by base-derived");

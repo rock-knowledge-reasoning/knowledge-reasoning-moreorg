@@ -13,25 +13,25 @@ namespace owlapi {
 namespace csp {
 
 typedef std::map<owlapi::model::IRI, std::vector<int> > TypeInstanceMap;
-typedef std::map<owlapi::model::IRI, std::vector<owlapi::model::IRI> > AllowedTypesMap;
+typedef std::map<owlapi::model::IRI, owlapi::model::IRIList > AllowedTypesMap;
+typedef owlapi::model::IRIList InstanceList;
+typedef owlapi::model::IRIList TypeList;
 
 
 class ResourceMatch : public Gecode::Space
 {
-    owlapi::model::IRIList mQuery;
-    owlapi::model::IRIList mResourcePool;
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> mQueryRestrictions;
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> mResourcePoolRestrictions;
+    std::map<owlapi::model::OWLCardinalityRestriction::Ptr, InstanceList> mSolution;
+
     /**
      * Assignments of query resources to pool resources. This is what has to be solved.
      */
-    Gecode::IntVarArray mAssignment;
-
     Gecode::SetVarArray mSetAssignment;
 
     ResourceMatch* solve();
 
 protected:
-    ResourceMatch(const owlapi::model::IRIList& query, const owlapi::model::IRIList& resourcePool, owlapi::model::OWLOntology::Ptr ontology);
-
     ResourceMatch(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& queryRestrictions, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& resourcePoolRestrictions, owlapi::model::OWLOntology::Ptr ontology);
 
     /**
@@ -46,13 +46,17 @@ protected:
      */
     virtual Gecode::Space* copy(bool share);
 
-    static TypeInstanceMap convert(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
+    static TypeInstanceMap toTypeInstanceMap(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
+    static InstanceList getInstanceList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
+    static TypeList getTypeList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
 
     static AllowedTypesMap getAllowedTypes(const TypeInstanceMap& query, const TypeInstanceMap& pool, owlapi::model::OWLOntology::Ptr ontology);
 
     static std::vector<int> getAllowedDomain(const owlapi::model::IRI& qualificationItem, const AllowedTypesMap& allowedTypes, const TypeInstanceMap& typeInstanceMap);
 
     static uint32_t getInstanceCount(const TypeInstanceMap& map);
+
+    void remapSolution();
 
 public:
     void print(std::ostream& os) const;
@@ -68,12 +72,6 @@ public:
      * Construct a solution with an initial situation to search
      * \throw std::runtime_error if a solution could not be found
      */
-    static ResourceMatch* solve(const owlapi::model::IRIList& query, const owlapi::model::IRIList& resourcePool, owlapi::model::OWLOntology::Ptr ontology);
-
-    /**
-     * Construct a solution with an initial situation to search
-     * \throw std::runtime_error if a solution could not be found
-     */
     static ResourceMatch* solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& queryRestrictions, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& resourcePoolRestrictions, owlapi::model::OWLOntology::Ptr ontology);
 
     /**
@@ -83,10 +81,11 @@ public:
     std::string toString() const;
 
     /**
-     * Retrieve assignment of a solution
-     * \return IRI that has been assigned from the resourcePool
+     * Retrieve assignment of a solution for a given restriction
+     * \return InstanceList that has been assigned from the resourcePool to
+     * fulfill this restriction
      */
-    owlapi::model::IRI getAssignment(const owlapi::model::IRI& iri) const;
+    InstanceList getAssignments(owlapi::model::OWLCardinalityRestriction::Ptr restriction) const;
 };
 
 } // end namespace cps
