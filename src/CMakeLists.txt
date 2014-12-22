@@ -112,6 +112,7 @@ set(GECODE_LIBRARIES
     gecodeminimodel
     gecodeint
     gecodefloat
+    gecodegist
 )
 
 include_directories(${Boost_INCLUDE_DIR})

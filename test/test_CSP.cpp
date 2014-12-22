@@ -46,4 +46,51 @@ BOOST_AUTO_TEST_CASE(it_should_match_resources)
     BOOST_REQUIRE_MESSAGE( assignment == b->getIRI(), "Expected base to be matched by base-derived");
 }
 
+BOOST_AUTO_TEST_CASE(it_should_match_resource_via_restrictions)
+{
+    OWLOntologyReader reader;
+    OWLOntology::Ptr ontology(new OWLOntology());
+    OWLOntologyTell tell(ontology);
+    OWLOntologyAsk ask(ontology);
+    tell.initializeDefaultClasses();
+
+    OWLClass::Ptr a = tell.getOWLClass("http://klass/base");
+    OWLClass::Ptr b = tell.getOWLClass("http://klass/base-derived");
+    OWLClass::Ptr c = tell.getOWLClass("http://klass/base-derived-derived");
+    OWLObjectProperty::Ptr property = tell.getOWLObjectProperty("http://property/has");
+
+    tell.subclassOf(c,b);
+    tell.subclassOf(b,a);
+    ontology->refresh();
+    BOOST_REQUIRE_MESSAGE(ask.isSubclassOf(c->getIRI(), b->getIRI()), "C should be subclass of b");
+
+
+
+    std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
+    {
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
+        query.push_back(restriction);
+    }
+    //{
+    //    OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 1, c->getIRI()));
+    //    query.push_back(restriction);
+    //}
+
+    {
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, b->getIRI()));
+        resourcePool.push_back(restriction);
+    }
+    //{
+    //    OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 1, c->getIRI()));
+    //    resourcePool.push_back(restriction);
+    //}
+
+    owlapi::csp::ResourceMatch* match = owlapi::csp::ResourceMatch::solve(query, resourcePool, ontology);
+
+    BOOST_TEST_MESSAGE("Assignment: " << match->toString());
+
+//    IRI assignment = match->getAssignment(a->getIRI());
+//    BOOST_REQUIRE_MESSAGE( assignment == b->getIRI(), "Expected base to be matched by base-derived");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
