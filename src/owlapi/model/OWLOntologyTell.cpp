@@ -122,7 +122,7 @@ OWLDataProperty::Ptr OWLOntologyTell::getOWLDataProperty(const IRI& iri)
 OWLSubClassOfAxiom::Ptr OWLOntologyTell::subclassOf(const IRI& subclass, OWLClassExpression::Ptr superclass)
 {
     OWLClass::Ptr e_subclass = getOWLClass(subclass);
-    return subclassOf(subclass, superclass);
+    return subclassOf(e_subclass, superclass);
 }
 
 OWLSubClassOfAxiom::Ptr OWLOntologyTell::subclassOf(const IRI& subclass, const IRI& superclass)
