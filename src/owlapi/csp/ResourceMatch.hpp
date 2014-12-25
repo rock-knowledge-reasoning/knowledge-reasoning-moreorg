@@ -56,10 +56,20 @@ protected:
 
     static uint32_t getInstanceCount(const TypeInstanceMap& map);
 
+    /**
+     * Map solution from internally used integer list to input format, i.e.
+     * cardinality restrictions
+     */
     void remapSolution();
 
 public:
     void print(std::ostream& os) const;
+
+    /**
+     * Convert restriction list to a list of instance, e.g. min 4 Item will
+     * converted to a list of size 4 Items (qualification of the restriction)
+     * \return List of (model) instances
+     */
     static InstanceList getInstanceList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
 
     /*
@@ -75,6 +85,12 @@ public:
      */
     static ResourceMatch* solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& queryRestrictions, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& resourcePoolRestrictions, owlapi::model::OWLOntology::Ptr ontology);
 
+    /**
+     * Solve the given constraint satisfaction problem
+     * \param queryRestrictions The restrictions to be fulfilled
+     * \param resourePool The items available to fulfill the restriction
+     * \param ontology Ontology to check whether an item in the resource pool is a valid replacement for an item in the query
+     */
     static ResourceMatch* solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& queryRestrictions, const InstanceList& resourcePool, owlapi::model::OWLOntology::Ptr ontology);
 
     /**
