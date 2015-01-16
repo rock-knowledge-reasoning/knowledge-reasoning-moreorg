@@ -6,41 +6,17 @@
 namespace owl_om {
 namespace metrics {
 
-struct Metric
-{
-    std::string label;
-    uint32_t outDegree;
-    uint32_t inDegree;
+typedef owlapi::model::IRI ServiceIRI;
+typedef owlapi::model::IRI ActorIRI;
+typedef std::map< std::pair<ServiceIRI, ActorIRI>, double> IRISurvivabilityMap;
 
-    Metric()
-    {}
-
-    Metric(const std::string& label, uint32_t out, uint32_t in)
-        : label(label)
-        , outDegree(out)
-        , inDegree(in)
-    {}
-
-    std::string toString() const 
-    { 
-        std::stringstream ss;
-        ss << "label: " << label << ", ";
-        ss << "outDegree: " << outDegree << ", ";
-        ss << "inDegree: " << inDegree;
-        return ss.str();
-    }
-};
-
-typedef std::map<owlapi::model::IRI, Metric> IRIMetricMap;
-
-
+/**
+ * Compute redundancy for a model
+ */
 class Redundancy
 {
     OrganizationModel mOrganizationModel;
     owlapi::model::OWLOntologyAsk mAsk;
-
-    uint32_t computeOutDegree(const owlapi::model::IRI& iri, const owlapi::model::IRI& relation, const owlapi::model::IRI& klass = owlapi::model::IRI());
-    uint32_t computeInDegree(const owlapi::model::IRI& iri, const owlapi::model::IRI& relation, const owlapi::model::IRI& klass = owlapi::model::IRI());
 
     /**
      * Compute the probability of survival for a service/capability with respect to a given model
@@ -59,12 +35,13 @@ class Redundancy
     double computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const std::map<owlapi::model::IRI,uint32_t>& models);
 
 public:
-    double compute(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available);
-
     Redundancy(const OrganizationModel& organization);
 
-    IRIMetricMap compute();
+    IRISurvivabilityMap compute();
 
+    double compute(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available);
+
+    static std::string toString(const IRISurvivabilityMap& map);
 };
 
 } // end namespace metrics

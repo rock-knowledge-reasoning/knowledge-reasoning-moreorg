@@ -59,8 +59,17 @@ BOOST_AUTO_TEST_CASE(it_should_handle_redundancy_metrics)
     metrics::Redundancy redundancy(om);
     double redundancyVal = redundancy.compute(query, resourcePool);
     BOOST_TEST_MESSAGE("Redundancy test: " << redundancyVal); 
-    //metrics::IRIMetricMap metrics = redundancy.compute();
+}
 
+BOOST_AUTO_TEST_CASE(it_should_handle_metric_map_computation)
+{
+    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.6.owl" );
+    om.ontology()->refresh();
+    metrics::Redundancy redundancy(om);
+
+    metrics::IRISurvivabilityMap survivability = redundancy.compute();
+
+    BOOST_TEST_MESSAGE("Survivability: \n" << metrics::Redundancy::toString(survivability));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

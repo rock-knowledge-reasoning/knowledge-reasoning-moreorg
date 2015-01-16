@@ -17,61 +17,19 @@ Redundancy::Redundancy(const OrganizationModel& organization)
     , mAsk(mOrganizationModel.ontology())
 {}
 
-uint32_t Redundancy::computeOutDegree(const IRI& iri, const IRI& relation, const IRI& klass)
-{
-    IRIList related = mAsk.allRelatedInstances(iri, relation, klass);
-    return related.size();
-}
-
-uint32_t Redundancy::computeInDegree(const IRI& iri, const IRI& relation, const IRI& klass)
-{
-    IRIList related = mAsk.allInverseRelatedInstances(iri, relation, klass);
-    return related.size();
-}
-
 double Redundancy::computeModelBasedProbabilityOfSurvival(const IRI& function, const IRI& model)
 {
     // Get minimal requirements to maintain the function
     std::vector<OWLCardinalityRestriction::Ptr> requirements = mAsk.getCardinalityRestrictions(function);
     // Get model restrictions, i.e. in effect what has to be available
     std::vector<OWLCardinalityRestriction::Ptr> availableResources = mAsk.getCardinalityRestrictions(model);
-    return 0.0;
 
-
-
-//    // Get count for requirement type per resource type
-//    IRI model = mOrganizationModel.getResourceModel( resource );
-//    IRIList dependantResources = mAsk.allRelatedInstances( model, OM::dependsOn() );
-//    std::map<IRI, uint32_t> resourceRequirementCount;
-//    BOOST_FOREACH(const IRI& dependant, dependantResources)
-//    {
-//        IRI resourceModel = mOrganizationModel.getResourceModel( dependant );
-//        uint32_t currentValue = resourceRequirementCount[ resourceModel ];
-//        resourceRequirementCount[ resourceModel ] = currentValue + 1;
-//    }
-//
-//    // Get count for available resources
-//    IRIList availableResources = mAsk.allRelatedInstances( actor, OM::has() );
-//    std::map<IRI, IRIList> availableResourceMap;
-//    BOOST_FOREACH(const IRI& availableResource, availableResources)
-//    {
-//        IRI resourceModel = mOrganizationModel.getResourceModel( availableResource );
-//        availableResourceMap[ resourceModel ].push_back( availableResource );
-//    }
-//
-//    // The instance for the requested resource (model) which can be updated
-//    availableResources = mAsk.allRelatedInstances( actor, OM::provides() );
-//    BOOST_FOREACH(const IRI& availableResource, availableResources)
-//    {
-//        IRI resourceModel = mOrganizationModel.getResourceModel( availableResource );
-//        availableResourceMap[ resourceModel ].push_back( availableResource );
-//    }
-//
+    return compute(requirements, availableResources);
 }
 
 double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& required, const std::vector<OWLCardinalityRestriction::Ptr>& available)
 {
-    // Strategies to compute redundancy: 
+    // Strategies to compute redundancy:
     // 1. account for relevant functionality only
     //
     // Best common redundancy:
@@ -86,15 +44,16 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
     // Best redundancy: assign resource where it contributes the most, i.e.
     //  --- system parts with lowest level of survivability gets resource first
     //  (since they will most likely fail, that should be fair enough)
-     
+
     // Firstly -- we need to find a proper match of required resources to
     // available resources, thus defining here a small Constraint Satisfaction
     // Problem already
     owlapi::csp::ResourceMatch* match = NULL;
     uint32_t fullModelRedundancy = 0;
     owlapi::csp::InstanceList remainingResources;
+    owlapi::csp::InstanceList resources = owlapi::csp::ResourceMatch::getInstanceList(available);
+
     try {
-        owlapi::csp::InstanceList resources = owlapi::csp::ResourceMatch::getInstanceList(available);
         // Check how often a full redundancy of the top level model is given
         while(true)
         {
@@ -104,8 +63,16 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
         }
     } catch(const std::runtime_error& )
     {
-        remainingResources = match->getUnassignedResources();
-        LOG_WARN_S << "No solution found -- full model redundancy count is at: " << fullModelRedundancy << 
+        if(match)
+        {
+            // the matching was successful at least once
+            remainingResources = match->getUnassignedResources();
+        } else {
+            // the matching was never successful, this all available resources
+            // remain
+            remainingResources = resources;
+        }
+        LOG_INFO_S << "No solution found -- full model redundancy count is at: " << fullModelRedundancy <<
             " remainingResources " <<  remainingResources;
     }
 
@@ -129,11 +96,10 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
     for(; cit != required.end(); ++cit)
     {
         IRI qualification = (*cit)->getQualification();
-        uint32_t cardinality = (*cit)->getCardinality();
-        
+
         // Mean probability of failure
         // Probability of component failure
-        // default is p=0.5 
+        // default is p=0.5
         double probabilityOfSurvival = 0;
         try {
             // SCHOKO: Model should have an associated probability of failure
@@ -193,58 +159,64 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
     std::vector<ModelSurvivability>::iterator mit = models.begin();
     for(; mit != models.end(); ++mit)
     {
-        LOG_WARN_S << "Probability of survival: " << mit->toString(); 
+        LOG_INFO_S << "Probability of survival: " << mit->toString();
         fullModelSurvival *= mit->getProbabilityOfSurvival();
     }
 
     return fullModelSurvival;
 }
 
-IRIMetricMap Redundancy::compute()
+IRISurvivabilityMap Redundancy::compute()
 {
-    IRIMetricMap metricMap;
-//    IRIList resources = mAsk.allInstancesOf( OM::Resource() );
-//    IRI relation = OM::uses();
-//
-//    BOOST_FOREACH(const IRI& resource, resources)
-//    {
-//        uint32_t inDegree = computeInDegree(resource, relation);
-//        uint32_t outDegree = computeOutDegree(resource, relation);
-//
-//        Metric metric(relation.toString(), outDegree, inDegree);
-//        metricMap[resource] = metric;
-//
-//        LOG_DEBUG_S << "Metric: " << std::endl
-//            << "    instance: " << resource << std::endl
-//            << "    metric:   " << metric.toString();
-//    }
-//
-//    IRIList services = mAsk.allInstancesOf( OM::ServiceModel() );
-//    IRIList actors = mAsk.allInstancesOf( OM::Actor() );
-//    LOG_DEBUG_S << "Compute probabilityOfSurvival for: " << services;
-//
-//    BOOST_FOREACH(const IRI& actor, actors)
-//    {
-//        BOOST_FOREACH(const IRI& service, services)
-//        {
-//            try {
-//                double probabilityOfSurvival = computeModelBasedProbabilityOfSurvival(service ,actor);
-//
-//                IRI instance = mOrganizationModel.getRelatedProviderInstance(actor, service);
-////                mOrganizationModel.setDouble(instance, OM::probabilityOfFailure(), 1 - probabilityOfSurvival);
-//
-//                LOG_DEBUG_S << "Probability of survival:" << std::endl
-//                    << "    actor :  " << actor << std::endl
-//                    << "    service: " << service << std::endl
-//                    << "    value:   " << probabilityOfSurvival;
-//            } catch(const std::invalid_argument& e)
-//            {
-//                LOG_DEBUG_S << "Redundancy: computing probability failed: " << e.what();
-//            }
-//        }
-//    }
+    IRISurvivabilityMap survivabilityMap;
+    IRIList actorModels = mAsk.allSubclassesOf( OM::Actor() );
 
-    return metricMap;
+    IRIList services = mAsk.allSubclassesOf( OM::Service() );
+
+    BOOST_FOREACH(const IRI& actorModel, actorModels)
+    {
+        BOOST_FOREACH(const IRI& service, services)
+        {
+            try {
+                LOG_DEBUG_S << "Compute probabilityOfSurvival for: " << actorModel << " and " << service;
+
+                double probabilityOfSurvival = computeModelBasedProbabilityOfSurvival(service, actorModel);
+                std::pair<ServiceIRI, ActorIRI> key(service, actorModel);
+                survivabilityMap[key] = probabilityOfSurvival;
+
+                LOG_INFO_S << "Probability of survival:" << std::endl
+                    << "    actorModel :  " << actorModel << std::endl
+                    << "    service: " << service << std::endl
+                    << "    value:   " << probabilityOfSurvival;
+
+            } catch(const std::invalid_argument& e)
+            {
+                LOG_DEBUG_S << "Redundancy: computing probability failed: " << e.what();
+            } catch(const std::runtime_error& e)
+            {
+                LOG_DEBUG_S << e.what();
+                continue;
+            }
+        }
+    }
+
+    return survivabilityMap;
+}
+
+std::string Redundancy::toString(const IRISurvivabilityMap& map)
+{
+    std::stringstream ss;
+    IRISurvivabilityMap::const_iterator cit = map.begin();
+    for(; cit != map.end(); ++cit)
+    {
+        std::pair<ServiceIRI, ActorIRI> pair = cit->first;
+        double survivability = cit->second;
+
+        ss << "Service: " << pair.first << ", Actor: " << pair.second << " --> " << survivability;
+        ss << std::endl;
+    }
+
+    return ss.str();
 }
 
 } // end namespace metrics
