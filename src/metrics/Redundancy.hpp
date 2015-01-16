@@ -18,6 +18,11 @@ class Redundancy
     OrganizationModel mOrganizationModel;
     owlapi::model::OWLOntologyAsk mAsk;
 
+public:
+    Redundancy(const OrganizationModel& organization);
+
+    IRISurvivabilityMap compute();
+
     /**
      * Compute the probability of survival for a service/capability with respect to a given model
      *
@@ -34,10 +39,6 @@ class Redundancy
      */
     double computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const std::map<owlapi::model::IRI,uint32_t>& models);
 
-public:
-    Redundancy(const OrganizationModel& organization);
-
-    IRISurvivabilityMap compute();
 
     double compute(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available);
 

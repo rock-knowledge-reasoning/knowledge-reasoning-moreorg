@@ -45,12 +45,13 @@ public:
      */
     static std::map<IRI, uint32_t> convertToExactMapping(const std::vector<OWLCardinalityRestriction::Ptr>& restrictions);
 
-protected:
     /**
      * Set cardinality -- e.g. to allow incremental construction of restrictions
+     * or reuse
      */
     void setCardinality(uint32_t cardinality) { mCardinality = cardinality; }
 
+protected:
     void setCardinalityRestrictionType(OWLCardinalityRestriction::CardinalityRestrictionType type) { mCardinalityRestrictionType = type; }
 
     /**

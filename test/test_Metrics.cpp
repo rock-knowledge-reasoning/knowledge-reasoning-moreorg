@@ -70,6 +70,31 @@ BOOST_AUTO_TEST_CASE(it_should_handle_metric_map_computation)
     metrics::IRISurvivabilityMap survivability = redundancy.compute();
 
     BOOST_TEST_MESSAGE("Survivability: \n" << metrics::Redundancy::toString(survivability));
+
+    {
+        IRI locationImageProvider("http://www.rock-robotics.org/2014/01/om-schema#ImageProvider");
+        IRI sherpa("http://www.rock-robotics.org/2014/01/om-schema#Sherpa");
+
+        std::map<IRI, uint32_t> models;
+        for(int i = 1; i <= 3; ++i)
+        {
+            models[sherpa] = i;
+            double pSurvivability = redundancy.computeModelBasedProbabilityOfSurvival(locationImageProvider, models);
+            BOOST_TEST_MESSAGE("Survivability for #" << i << " " << sherpa << ": \n" << pSurvivability);
+        }
+    }
+    {
+        IRI locationImageProvider("http://www.rock-robotics.org/2014/01/om-schema#LocationImageProvider");
+        IRI crex("http://www.rock-robotics.org/2014/01/om-schema#CREX");
+
+        std::map<IRI, uint32_t> models;
+        for(int i = 1; i <= 3; ++i)
+        {
+            models[crex] = i;
+            double pSurvivability = redundancy.computeModelBasedProbabilityOfSurvival(locationImageProvider, models);
+            BOOST_TEST_MESSAGE("Survivability for #" << i << " " << crex << ": \n" << pSurvivability);
+        }
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
