@@ -136,6 +136,7 @@ rock_library(organization_model
         organization_model/Statistics.cpp
         exporter/PDDLExporter.cpp
         metrics/Redundancy.cpp
+        metrics/ModelSurvivability.cpp
         utils/CoalitionStructureGeneration.cpp
     HEADERS
         OrganizationModel.hpp
@@ -149,6 +150,7 @@ rock_library(organization_model
         ccf/Scenario.hpp
         exporter/PDDLExporter.hpp
         metrics/Redundancy.hpp
+        metrics/ModelSurvivability.hpp
         organization_model/ActorModelLink.hpp
         organization_model/EndpointModel.hpp
         organization_model/Grounding.hpp

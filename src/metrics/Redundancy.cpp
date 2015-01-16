@@ -4,6 +4,7 @@
 #include <vector>
 #include <base/Logging.hpp>
 #include <owl_om/owlapi/csp/ResourceMatch.hpp>
+#include <owl_om/metrics/ModelSurvivability.hpp>
 
 using namespace owlapi::model;
 using namespace owlapi::vocabulary;
@@ -70,14 +71,8 @@ double Redundancy::computeModelBasedProbabilityOfSurvival(const IRI& function, c
 
 double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& required, const std::vector<OWLCardinalityRestriction::Ptr>& available)
 {
-    //std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = required.begin();
-    //std::map<IRI, uint32_t> requiredResources = OWLCardinalityRestriction::convertToExactMapping(available);
-    //std::map<IRI, uint32_t> availableResources = OWLCardinalityRestriction::convertToExactMapping(available);
-
-
     // Strategies to compute redundancy: 
-    //
-    // 1. account for relvant functionality only
+    // 1. account for relevant functionality only
     //
     // Best common redundancy:
     //  --- account for full replacements
@@ -88,12 +83,11 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
     //   >> check how often that can be done -- compute redundancy for serial
     //   system, allow parallel system being
     //
-    // Best redundancy: assign resource where it can contributes the most, i.e.
-    //  --- system parts with lowest level of survivability get resource first
+    // Best redundancy: assign resource where it contributes the most, i.e.
+    //  --- system parts with lowest level of survivability gets resource first
     //  (since they will most likely fail, that should be fair enough)
-    //
      
-    // Firstly -- we need to find a propery match of required resources to
+    // Firstly -- we need to find a proper match of required resources to
     // available resources, thus defining here a small Constraint Satisfaction
     // Problem already
     owlapi::csp::ResourceMatch* match = NULL;
@@ -101,6 +95,7 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
     owlapi::csp::InstanceList remainingResources;
     try {
         owlapi::csp::InstanceList resources = owlapi::csp::ResourceMatch::getInstanceList(available);
+        // Check how often a full redundancy of the top level model is given
         while(true)
         {
             match = owlapi::csp::ResourceMatch::solve(required, resources, mOrganizationModel.ontology());
@@ -141,7 +136,7 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
         // default is p=0.5 
         double probabilityOfSurvival = 0;
         try {
-            // SCHOKO: Model should have an assoicate probability of failure
+            // SCHOKO: Model should have an associated probability of failure
             OWLLiteral::Ptr value = mAsk.getDataValue(qualification, OM::probabilityOfFailure());
             LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
             probabilityOfSurvival = 1 - value->getDouble();
@@ -155,7 +150,7 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
         models.push_back(survivability);
     }
 
-    // Best model redundancy
+    // Best model fit: redundancy
     while(true)
     {
         // Sort based on probability of survival -- try to maximize redundancy
@@ -168,11 +163,15 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
         owlapi::csp::InstanceList::iterator rit = remainingResources.begin();
         for(; rit != remainingResources.end() && !nextIteration; ++rit)
         {
+            // Try to fit remaining resources
             std::vector<ModelSurvivability>::iterator mit = models.begin();
             for(; mit != models.end(); ++mit)
             {
                 if( mit->getQualification() == *rit || mAsk.isSubclassOf(*rit, mit->getQualification()) )
                 {
+                    // Increase redundancy
+                    // Remaining resource (count is 1) over required count
+                    // (mit->getCardinality)
                     mit->redundancy += 1.0/(1.0*mit->getCardinality());
                     remainingResources.erase(rit);
                     nextIteration = true;
@@ -188,7 +187,7 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
         }
     }
 
-    // Parallel model (of the full system)
+    // Serial model of all subcomponents --> the full system
     double fullModelSurvival = 1;
 
     std::vector<ModelSurvivability>::iterator mit = models.begin();
@@ -199,51 +198,6 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
     }
 
     return fullModelSurvival;
-
-
-
-    //    uint32_t available = availableResourceMap[ cit->first ];
-
-    //    double redundancy = 0;
-    //    if(available)
-    //    {
-    //        // available vs. required
-    //        redundancy = available / (1.0 * cit->second);
-    //        LOG_DEBUG_S << "Redundancy level for: " << cit->first << " is " << redundancy << std::endl
-    //            << "    available: " << available << std::endl
-    //            << "    required:  " << cit->second;
-    //    } else {
-    //        LOG_DEBUG_S << "No resource available for " << cit->first << "; probability of survival will be 0";
-    //        return 0;
-    //    }
-
-    //    // Mean probability of failure
-    //    // Probability of component failure
-    //    // default is p=0.5 
-    //    double pSum = 0;
-    //    BOOST_FOREACH(const IRI& component, components)
-    //    {
-    //        try {
-    //            // SCHOKO
-    //            OWLLiteral::Ptr value = mAsk.getDataValue(component, OM::probabilityOfFailure());
-    //            LOG_DEBUG_S << "Retrieved probability of failure for '" << component << ": " << value->getDouble();
-    //            pSum += 1 - value->getDouble();
-    //        } catch(...)
-    //        {
-    //            LOG_DEBUG_S << "Default probability of failure for '" << component << ": 0.5";
-    //            pSum += 0.5;
-    //        }
-    //    }
-
-    //    double p = pSum / (1.0*components.size());
-
-    //    // Serial chain of parallel components thus multiplication of R(t)
-    //    // Zuverlässigkeitstechnik, Meyna and Pauli, 2 Ed p.175
-    //    probabilityOfSurvival *= 1 - pow(1 - p,redundancy);
-    //}
-
-    //return probabilityOfSurvival;
-    return 0.0;
 }
 
 IRIMetricMap Redundancy::compute()

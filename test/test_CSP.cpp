@@ -98,12 +98,10 @@ BOOST_AUTO_TEST_CASE(it_should_match_resource_via_restrictions)
 
     BOOST_TEST_MESSAGE("Unassigned: " << IRI::toString( match->getUnassignedResources() ) );
     delete match;
-
 }
 
 BOOST_AUTO_TEST_CASE(csp_test_provider_via_restrictions)
 {
-
     OWLOntologyReader reader;
     //OWLOntology::Ptr ontology(new OWLOntology());
     OWLOntology::Ptr ontology = reader.fromFile( getRootDir() + "/test/data/om-schema-v0.6.owl");

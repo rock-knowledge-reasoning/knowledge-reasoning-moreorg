@@ -17,7 +17,14 @@ typedef std::map<owlapi::model::IRI, owlapi::model::IRIList > AllowedTypesMap;
 typedef owlapi::model::IRIList InstanceList;
 typedef owlapi::model::IRIList TypeList;
 
-
+/**
+ * ResourceMatch allow to search for a valid solution to a CSP problem. 
+ * The CSP problem is defined by a query that searches to fulfill a set of cardinality 
+ * restrictions. Available resources are implicitly defined -- also by a list of
+ * cardinality restrictions. This originates from the fact that these
+ * restrictions describe a model that a certain 'robot' fulfills and thus
+ * defines which resource have to exist for this robot. 
+ */
 class ResourceMatch : public Gecode::Space
 {
     std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> mQueryRestrictions;
@@ -47,13 +54,32 @@ protected:
      */
     virtual Gecode::Space* copy(bool share);
 
+    /**
+     * Convert restrictions to type instance map
+     * \return Type to instances map
+     */
     static TypeInstanceMap toTypeInstanceMap(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
+
+    /**
+     * Get the list of types the are given by the restrictions
+     * \return List of types
+     */
     static TypeList getTypeList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions);
 
+    /**
+     * Identify the allowed types, i.e. what items in the pool can fulfill the
+     * items in the query
+     */
     static AllowedTypesMap getAllowedTypes(const TypeInstanceMap& query, const TypeInstanceMap& pool, owlapi::model::OWLOntology::Ptr ontology);
 
+    /**
+     * Compute the allowed domains for Gecode
+     */
     static std::vector<int> getAllowedDomain(const owlapi::model::IRI& qualificationItem, const AllowedTypesMap& allowedTypes, const TypeInstanceMap& typeInstanceMap);
 
+    /**
+     * Compute the number of all instances
+     */
     static uint32_t getInstanceCount(const TypeInstanceMap& map);
 
     /**
@@ -82,6 +108,8 @@ public:
     /**
      * Construct a solution with an initial situation to search
      * \throw std::runtime_error if a solution could not be found
+     * \return Solution to the constrained satisfaction problem as ResourceMatch
+     * object, receiver takes over ownership, i.e. object needs to be deleted
      */
     static ResourceMatch* solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& queryRestrictions, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& resourcePoolRestrictions, owlapi::model::OWLOntology::Ptr ontology);
 
@@ -90,12 +118,14 @@ public:
      * \param queryRestrictions The restrictions to be fulfilled
      * \param resourePool The items available to fulfill the restriction
      * \param ontology Ontology to check whether an item in the resource pool is a valid replacement for an item in the query
+     * \return Solution to the constrained satisfaction problem as ResourceMatch
+     * object, receiver takes over ownership, i.e. object needs to be deleted
      */
     static ResourceMatch* solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& queryRestrictions, const InstanceList& resourcePool, owlapi::model::OWLOntology::Ptr ontology);
 
     /**
      * Create a string representation of this object
-     * \return String
+     * \return Stringified ResourceMatch object
      */
     std::string toString() const;
 
@@ -108,6 +138,7 @@ public:
 
     /**
      * Retrieve the list of resources that remain unassigned
+     * \return InstanceList representing unassigned resources
      */
     InstanceList getUnassignedResources() const;
 };
