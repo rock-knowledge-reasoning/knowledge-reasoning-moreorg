@@ -79,7 +79,6 @@ TypeList ResourceMatch::getTypeList(const std::vector<owlapi::model::OWLCardinal
     for(; cit != restrictions.end(); ++cit)
     {
         OWLCardinalityRestriction::Ptr restriction = *cit;
-        uint32_t cardinality = restriction->getCardinality();
         OWLQualification qualification = restriction->getQualification();
         types.push_back(qualification);
     }
