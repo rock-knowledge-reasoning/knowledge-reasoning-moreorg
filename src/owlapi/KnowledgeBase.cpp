@@ -738,7 +738,11 @@ IRIList KnowledgeBase::allSubclassesOf(const IRI& klass, bool direct)
     const char** result = actor.getElements1D();
     for(size_t i = 0; result[i] != NULL; ++i)
     {
-        subclasses.push_back( IRI::create(result[i]) );
+        IRI subclass = IRI::create(result[i]);
+        if(subclass != IRI("BOTTOM"))
+        {
+            subclasses.push_back(subclass);
+        }
     }
     delete[] result;
     return subclasses;
