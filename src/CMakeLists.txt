@@ -45,62 +45,90 @@ rock_library(owlapi
         owlapi/model/URI.cpp
         owlapi/reasoner/factpp/Types.cpp
     HEADERS owlapi/Exceptions.hpp
-        owlapi/KnowledgeBase.hpp
         owlapi/OWLApi.hpp
+        owlapi/reasoner/factpp/AxiomVisitor.hpp
+        owlapi/reasoner/factpp/Types.hpp
         owlapi/Vocabulary.hpp
-        owlapi/csp/ResourceMatch.hpp
-        owlapi/vocabularies/OM.hpp
-        owlapi/vocabularies/OWL.hpp
-        owlapi/vocabularies/RDF.hpp
-        owlapi/vocabularies/RDFS.hpp
         owlapi/db/FileBackend.hpp
         owlapi/db/rdf/SopranoDB.hpp
-        owlapi/db/rdf/Sparql.hpp
         owlapi/db/rdf/SparqlInterface.hpp
         owlapi/db/rdf/Variable.hpp
-        owlapi/model/HasAnnotations.hpp
-        owlapi/model/HasIRI.hpp
-        owlapi/model/IRI.hpp
-        owlapi/model/OWLAnnotation.hpp
-        owlapi/model/OWLAnnotationObject.hpp
-        owlapi/model/OWLAnnotationProperty.hpp
-        owlapi/model/OWLAnnotationValue.hpp
-        owlapi/model/OWLAnonymousIndividual.hpp
-        owlapi/model/OWLAxiom.hpp
-        owlapi/model/OWLCardinalityRestriction.hpp
-        owlapi/model/OWLClassAssertionAxiom.hpp
-        owlapi/model/OWLClassExpression.hpp
-        owlapi/model/OWLClass.hpp
-        owlapi/model/OWLDataRange.hpp
-        owlapi/model/OWLEntity.hpp
-        owlapi/model/OWLExactCardinalityRestriction.hpp
-        owlapi/model/OWLIndividual.hpp
-        owlapi/model/OWLIndiviualAxiom.hpp
-        owlapi/model/OWLInverseObjectProperty.hpp
-        owlapi/model/OWLLiteral.hpp
-        owlapi/model/OWLLiteralInteger.hpp
-        owlapi/model/OWLLiteralDouble.hpp
-        owlapi/model/OWLLogicalAxiom.hpp
-        owlapi/model/OWLLogicalEntity.hpp
-        owlapi/model/OWLMaxCardinalityRestriction.hpp
-        owlapi/model/OWLMinCardinalityRestriction.hpp
-        owlapi/model/OWLNamedIndividual.hpp
-        owlapi/model/OWLNamedObject.hpp
-        owlapi/model/OWLObjectExactCardinality.hpp
-        owlapi/model/OWLObject.hpp
-        owlapi/model/OWLObjectPropertyExpression.hpp
-        owlapi/model/OWLObjectProperty.hpp
-        owlapi/model/OWLOntology.hpp
-        owlapi/model/OWLOntologyAsk.hpp
-        owlapi/model/OWLOntologyReader.hpp
-        owlapi/model/OWLOntologyTell.hpp
-        owlapi/model/OWLPropertyExpression.hpp
+        owlapi/db/rdf/Sparql.hpp
+        owlapi/csp/ResourceMatch.hpp
+        owlapi/KnowledgeBase.hpp
+        owlapi/vocabularies/OWL.hpp
+        owlapi/vocabularies/OM.hpp
+        owlapi/vocabularies/XSD.hpp
+        owlapi/vocabularies/RDF.hpp
+        owlapi/vocabularies/RDFS.hpp
+        owlapi/model/OWLSubClassOfAxiom.hpp
         owlapi/model/OWLPropertyRange.hpp
-        owlapi/model/OWLQualifiedRestriction.hpp
+        owlapi/model/OWLAxiomVisitor.hpp
         owlapi/model/OWLReasoner.hpp
-        owlapi/model/OWLRestriction.hpp
+        owlapi/model/OWLObjectMinCardinality.hpp
+        owlapi/model/HasAnnotations.hpp
+        owlapi/model/OWLObjectProperty.hpp
+        owlapi/model/OWLExactCardinalityRestriction.hpp
+        owlapi/model/OWLAnnotationProperty.hpp
+        owlapi/model/OWLDisjointClassesAxiom.hpp
+        owlapi/model/OWLClassExpression.hpp
+        owlapi/model/OWLObjectPropertyAssertionAxiom.hpp
+        owlapi/model/OWLDataPropertyAssertionAxiom.hpp
+        owlapi/model/OWLAnnotationValue.hpp
+        owlapi/model/OWLDataPropertyAxiom.hpp
+        owlapi/model/OWLPropertyAxiom.hpp
+        owlapi/model/OWLNamedIndividual.hpp
+        owlapi/model/HasIRI.hpp
         owlapi/model/URI.hpp
-        owlapi/reasoner/factpp/Types.hpp
+        owlapi/model/OWLMinCardinalityRestriction.hpp
+        owlapi/model/OWLOntologyReader.hpp
+        owlapi/model/OWLOntologyAsk.hpp
+        owlapi/model/OWLEquivalentClassesAxiom.hpp
+        owlapi/model/OWLClassAssertionAxiom.hpp
+        owlapi/model/OWLOntology.hpp
+        owlapi/model/OWLLiteral.hpp
+        owlapi/model/OWLAnonymousIndividual.hpp
+        owlapi/model/OWLQualifiedRestriction.hpp
+        owlapi/model/OWLLiteralInteger.hpp
+        owlapi/model/OWLDataPropertyExpression.hpp
+        owlapi/model/OWLInverseObjectProperty.hpp
+        owlapi/model/OWLDataProperty.hpp
+        owlapi/model/OWLLogicalEntity.hpp
+        owlapi/model/IRI.hpp
+        owlapi/model/OWLDatatype.hpp
+        owlapi/model/OWLClass.hpp
+        owlapi/model/OWLPropertyAssertionAxiom.hpp
+        owlapi/model/OWLObjectMaxCardinality.hpp
+        owlapi/model/OWLLiteralDouble.hpp
+        owlapi/model/OWLRestriction.hpp
+        owlapi/model/OWLDataRange.hpp
+        owlapi/model/OWLObjectExactCardinality.hpp
+        owlapi/model/OWLDeclarationAxiom.hpp
+        owlapi/model/OWLObjectPropertyExpression.hpp
+        owlapi/model/OWLCardinalityRestriction.hpp
+        owlapi/model/OWLNaryAxiom.hpp
+        owlapi/model/OWLAxiom.hpp
+        owlapi/model/OWLEntity.hpp
+        owlapi/model/OWLDisjointUnionAxiom.hpp
+        owlapi/model/NodeID.hpp
+        owlapi/model/OWLMaxCardinalityRestriction.hpp
+        owlapi/model/OWLAnnotation.hpp
+        owlapi/model/OWLIndividual.hpp
+        owlapi/model/OWLObjectPropertyAxiom.hpp
+        owlapi/model/OWLAnnotationObject.hpp
+        owlapi/model/OWLPropertyAssertionObject.hpp
+        owlapi/model/OWLNaryClassAxiom.hpp
+        owlapi/model/OWLPropertyExpression.hpp
+        owlapi/model/OWLUnaryPropertyAxiom.hpp
+        owlapi/model/OWLClassAxiom.hpp
+        owlapi/model/OWLObject.hpp
+        owlapi/model/OWLNamedObject.hpp
+        owlapi/model/OWLLogicalAxiom.hpp
+        owlapi/model/OWLProperty.hpp
+        owlapi/model/OWLIndividualAxiom.hpp
+        owlapi/model/OWLObjectPropertyCharacteristicAxiom.hpp
+        owlapi/model/OWLOntologyTell.hpp
+        owlapi/io/XMLUtils.hpp
     DEPS_PKGCONFIG soprano factpp liburiparser base-lib numeric
 )
 
@@ -159,7 +187,7 @@ rock_library(organization_model
         utils/CoalitionStructureGeneration.hpp
         utils/CorrelationClustering.hpp
     DEPS owlapi
-    DEPS_PKGCONFIG numeric pddl_planner 
+    DEPS_PKGCONFIG numeric pddl_planner
 )
 target_link_libraries(organization_model glpk)
 
