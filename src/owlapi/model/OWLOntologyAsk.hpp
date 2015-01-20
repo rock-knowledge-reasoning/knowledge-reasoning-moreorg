@@ -77,6 +77,12 @@ public:
     IRIList allClasses(bool excludeBottomClass = true) const;
 
     /**
+     * Retrieve all known instances
+     * \return list of all instances
+     */
+    IRIList allInstances() const;
+
+    /**
      * Retrieve all subclasses of a given klass
      * \return list of all subclasses
      */

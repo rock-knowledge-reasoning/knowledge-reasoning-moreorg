@@ -145,6 +145,11 @@ IRIList OWLOntologyAsk::allSubclassesOf(const IRI& classType, bool direct)
     return mpOntology->kb()->allSubclassesOf(classType, direct);
 }
 
+IRIList OWLOntologyAsk::allInstances() const
+{
+    return mpOntology->kb()->allInstances();
+}
+
 IRIList OWLOntologyAsk::allClasses(bool excludeBottomClass) const
 {
     return mpOntology->kb()->allClasses(excludeBottomClass);
