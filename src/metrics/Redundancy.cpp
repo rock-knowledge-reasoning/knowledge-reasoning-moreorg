@@ -3,8 +3,8 @@
 #include <math.h>
 #include <vector>
 #include <base/Logging.hpp>
-#include <owl_om/owlapi/csp/ResourceMatch.hpp>
-#include <owl_om/metrics/ModelSurvivability.hpp>
+#include <owlapi/csp/ResourceMatch.hpp>
+#include <organization_model/metrics/ModelSurvivability.hpp>
 
 using namespace owlapi::model;
 using namespace owlapi::vocabulary;

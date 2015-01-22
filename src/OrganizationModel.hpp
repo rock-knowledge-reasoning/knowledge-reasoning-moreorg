@@ -2,11 +2,11 @@
 #define OWL_OM_ORGANIZATION_MODEL_HPP
 
 #include <stdint.h>
-#include <owl_om/owlapi/model/OWLOntology.hpp>
-#include <owl_om/organization_model/ActorModelLink.hpp>
-#include <owl_om/organization_model/InterfaceConnection.hpp>
-#include <owl_om/organization_model/Grounding.hpp>
-#include <owl_om/organization_model/Statistics.hpp>
+#include <owlapi/model/OWLOntology.hpp>
+#include <organization_model/organization_model/ActorModelLink.hpp>
+#include <organization_model/organization_model/InterfaceConnection.hpp>
+#include <organization_model/organization_model/Grounding.hpp>
+#include <organization_model/organization_model/Statistics.hpp>
 
 namespace owl = owlapi::model;
 

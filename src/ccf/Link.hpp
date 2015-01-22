@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include <owl_om/ccf/Actor.hpp>
-#include <owl_om/ccf/Interface.hpp>
-#include <owl_om/ccf/LinkGroup.hpp>
-#include <owl_om/ccf/LinkType.hpp>
+#include <organization_model/ccf/Actor.hpp>
+#include <organization_model/ccf/Interface.hpp>
+#include <organization_model/ccf/LinkGroup.hpp>
+#include <organization_model/ccf/LinkType.hpp>
 
 namespace multiagent {
 namespace ccf {

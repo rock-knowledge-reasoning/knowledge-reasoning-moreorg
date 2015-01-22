@@ -4,14 +4,14 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
-#include <owl_om/owlapi/Vocabulary.hpp>
+#include <owlapi/Vocabulary.hpp>
 #include <numeric/Combinatorics.hpp>
 #include <math.h>
 #include <set>
 
-#include <owl_om/ccf/CCF.hpp>
-#include <owl_om/owlapi/model/OWLOntologyReader.hpp>
-#include <owl_om/owlapi/model/OWLLiteralDouble.hpp>
+#include <organization_model/ccf/CCF.hpp>
+#include <owlapi/model/OWLOntologyReader.hpp>
+#include <owlapi/model/OWLLiteralDouble.hpp>
 
 using namespace owlapi::vocabulary;
 using namespace owl_om::organization_model;

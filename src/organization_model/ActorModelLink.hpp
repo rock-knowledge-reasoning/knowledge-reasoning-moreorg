@@ -1,7 +1,7 @@
 #ifndef OWL_OM_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP
 #define OWL_OM_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP
 
-#include <owl_om/organization_model/EndpointModel.hpp>
+#include <organization_model/organization_model/EndpointModel.hpp>
 
 namespace owl_om {
 namespace organization_model {

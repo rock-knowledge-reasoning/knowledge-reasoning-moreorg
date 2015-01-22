@@ -1,7 +1,7 @@
 #ifndef OWL_OM_EXPORTER_PDDL_EXPORTER_HPP 
 #define OWL_OM_EXPORTER_PDDL_EXPORTER_HPP 
 
-#include <owl_om/OrganizationModel.hpp>
+#include <organization_model/OrganizationModel.hpp>
 #include <pddl_planner/representation/Domain.hpp>
 #include <pddl_planner/representation/Problem.hpp>
 

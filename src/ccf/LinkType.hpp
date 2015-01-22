@@ -2,8 +2,8 @@
 #define MULTIAGENT_CCF_LINK_TYPE_HPP
 
 #include <iostream>
-#include <owl_om/ccf/Actor.hpp>
-#include <owl_om/ccf/Interface.hpp>
+#include <organization_model/ccf/Actor.hpp>
+#include <organization_model/ccf/Interface.hpp>
 
 namespace multiagent {
 namespace ccf {

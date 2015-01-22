@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 #include <base/Time.hpp>
-#include <owl_om/organization_model/InterfaceConnection.hpp>
-#include <owl_om/organization_model/ActorModelLink.hpp>
+#include <organization_model/organization_model/InterfaceConnection.hpp>
+#include <organization_model/organization_model/ActorModelLink.hpp>
 
 namespace owl = owlapi::model;
 

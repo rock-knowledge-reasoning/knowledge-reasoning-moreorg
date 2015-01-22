@@ -1,6 +1,7 @@
 <package>
-  <description brief="OWL object model library">
-  This library allows to create an object model from existing owl definition
+  <description brief="Organization modelling library">
+      This library allows to create an organization model of a system and
+      reason and plan with it.
   </description>
   <author>Thomas Roehr/thomas.roehr@dfki.de</author>
   <license></license>
@@ -10,13 +11,8 @@
   <depend package="boost" />
   <depend package="base/types" />
   <depend package="base/numeric" />
-  <depend package="external/factpp" />
   <depend package="planning/pddl_planner" />
-  <depend package="uriparser" />
-  <depend package="soprano" />
+  <depend package="knowledge_reasoning/owlapi" />
   <!-- gnu linear programming kit -->
   <depend package="glpk" />
-  <!-- constraint satisfaction -->
-  <depend package="gecode" />
-  <!-- <depend package="ctemplate" /> -->
 </package>

@@ -1,7 +1,7 @@
 #ifndef OWL_OM_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
 #define OWL_OM_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
 
-#include <owl_om/owlapi/model/IRI.hpp>
+#include <owlapi/model/IRI.hpp>
 
 namespace owl_om {
 namespace organization_model {

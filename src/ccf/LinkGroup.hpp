@@ -1,7 +1,7 @@
 #ifndef MULTIAGENT_CCF_LINKGROUP_HPP
 #define MULTIAGENT_CCF_LINKGROUP_HPP
 
-#include <owl_om/ccf/Actor.hpp>
+#include <organization_model/ccf/Actor.hpp>
 
 namespace multiagent {
 namespace ccf {

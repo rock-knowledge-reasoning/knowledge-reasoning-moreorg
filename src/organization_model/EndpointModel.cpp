@@ -1,4 +1,4 @@
-#include <owl_om/organization_model/EndpointModel.hpp>
+#include <organization_model/organization_model/EndpointModel.hpp>
 #include <sstream>
 
 using namespace owlapi::model;

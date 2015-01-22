@@ -1,7 +1,7 @@
 #ifndef OWL_OM_METRICS_REDUNDANCY_HPP
 #define OWL_OM_METRICS_REDUNDANCY_HPP
 
-#include <owl_om/OrganizationModel.hpp>
+#include <organization_model/OrganizationModel.hpp>
 
 namespace owl_om {
 namespace metrics {

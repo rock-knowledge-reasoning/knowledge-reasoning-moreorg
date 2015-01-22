@@ -1,7 +1,7 @@
 #ifndef OWL_OM_METRICS_MODEL_SURVIVABILITY_HPP
 #define OWL_OM_METRICS_MODEL_SURVIVABILITY_HPP
 
-#include <owl_om/owlapi/OWLApi.hpp>
+#include <owlapi/OWLApi.hpp>
 
 namespace owl_om {
 namespace metrics {

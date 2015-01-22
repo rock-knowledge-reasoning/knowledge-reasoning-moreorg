@@ -1,4 +1,4 @@
-#include "owl_om/ccf/Scenario.hpp"
+#include "organization_model/ccf/Scenario.hpp"
 
 #include <set>
 #include <iostream>

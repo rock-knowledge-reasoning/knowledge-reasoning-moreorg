@@ -2,7 +2,7 @@
 #define OWL_OM_ORGANIZATION_MODEL_GROUNDING_HPP
 
 #include <map>
-#include <owl_om/owlapi/OWLApi.hpp>
+#include <owlapi/OWLApi.hpp>
 
 namespace owl_om {
 namespace organization_model {

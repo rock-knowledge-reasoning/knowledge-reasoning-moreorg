@@ -4,7 +4,7 @@
 #include <boost/foreach.hpp>
 #include <base/Logging.hpp>
 #include <pddl_planner/representation/Domain.hpp>
-#include <owl_om/owlapi/Vocabulary.hpp>
+#include <owlapi/Vocabulary.hpp>
 
 using namespace owlapi::model;
 
