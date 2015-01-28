@@ -42,7 +42,7 @@ rock_library(organization_model
 )
 target_link_libraries(organization_model glpk)
 
-#rock_executable(owl_om_bin Main.cpp
+#rock_executable(organization_model_bin Main.cpp
 #    DEPS organization_model)
 
 rock_executable(multiagent_caf ccf/CAF.cpp

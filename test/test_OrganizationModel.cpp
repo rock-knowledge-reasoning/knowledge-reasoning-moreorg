@@ -1,12 +1,12 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
-#include <owl_om/OrganizationModel.hpp>
-#include <owl_om/exporter/PDDLExporter.hpp>
+#include <organization_model/OrganizationModel.hpp>
+#include <organization_model/exporter/PDDLExporter.hpp>
 #include <numeric/Combinatorics.hpp>
-#include <owl_om/metrics/Redundancy.hpp>
+#include <organization_model/metrics/Redundancy.hpp>
 
-using namespace owl_om;
+using namespace organization_model;
 
 //BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
 //{
@@ -226,7 +226,7 @@ using namespace owl_om;
 //
 //BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_with_punning)
 //{
-//    using namespace owl_om::vocabulary;
+//    using namespace organization_model::vocabulary;
 //
 //    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
 //
@@ -249,7 +249,7 @@ using namespace owl_om;
 //
 //BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
 //{
-//    using namespace owl_om::vocabulary;
+//    using namespace organization_model::vocabulary;
 //    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
 //
 //    {
@@ -283,7 +283,7 @@ using namespace owl_om;
 //    distances.push_back("location_c0");
 //    distances.push_back("location_p0");
 //
-//    using namespace owl_om::vocabulary;
+//    using namespace organization_model::vocabulary;
 //    using namespace pddl_planner::representation;
 //
 //    std::string locationType = OM::Location().getFragment();
@@ -325,7 +325,7 @@ using namespace owl_om;
 //
 //BOOST_AUTO_TEST_CASE(it_should_handle_actorlinkmodel)
 //{
-//    using namespace owl_om::organization_model;
+//    using namespace organization_model::organization_model;
 //
 //    EndpointModel model0("http://test#P", "http://test#p0");
 //    EndpointModel model1("http://test#P", "http://test#p0");

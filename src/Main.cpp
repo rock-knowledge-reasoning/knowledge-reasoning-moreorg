@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv)
 {
-    using namespace owl_om;
+    using namespace organization_model;
 
     std::string o_filename;
 
@@ -20,7 +20,7 @@ int main(int argc, char** argv)
         OrganizationModel om( o_filename );
         om.setMaximumNumberOfLinks(2);
 
-        using namespace owl_om;
+        using namespace organization_model;
         using namespace owlapi::vocabulary;
 
         om.createNewInstance(OM::resolve("Sherpa"), true);

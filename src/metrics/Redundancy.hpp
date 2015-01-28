@@ -1,9 +1,9 @@
-#ifndef OWL_OM_METRICS_REDUNDANCY_HPP
-#define OWL_OM_METRICS_REDUNDANCY_HPP
+#ifndef ORGANIZATION_MODEL_METRICS_REDUNDANCY_HPP
+#define ORGANIZATION_MODEL_METRICS_REDUNDANCY_HPP
 
 #include <organization_model/OrganizationModel.hpp>
 
-namespace owl_om {
+namespace organization_model {
 namespace metrics {
 
 typedef owlapi::model::IRI ServiceIRI;
@@ -46,5 +46,5 @@ public:
 };
 
 } // end namespace metrics
-} // end namespace owl_om
-#endif // OWL_OM_METRICS_REDUNDANCY_HPP
+} // end namespace organization_model
+#endif // ORGANIZATION_MODEL_METRICS_REDUNDANCY_HPP

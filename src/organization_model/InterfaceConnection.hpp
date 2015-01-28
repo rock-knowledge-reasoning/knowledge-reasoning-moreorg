@@ -1,10 +1,10 @@
-#ifndef OWL_OM_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP
-#define OWL_OM_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP
+#ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP
+#define ORGANIZATION_MODEL_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP
 
 #include <owlapi/model/IRI.hpp>
 #include <organization_model/organization_model/ActorModelLink.hpp>
 
-namespace owl_om {
+namespace organization_model {
 namespace organization_model {
 
 struct InterfaceConnection
@@ -47,5 +47,5 @@ std::ostream& operator<<(std::ostream& os, const InterfaceConnectionList& list);
 std::ostream& operator<<(std::ostream& os, const InterfaceCombinationList& list);
 
 } // end namespace organization_model
-} // end namespace owl_om
-#endif // OWL_OM_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP
+} // end namespace organization_model
+#endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP

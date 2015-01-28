@@ -14,10 +14,10 @@
 #include <owlapi/model/OWLLiteralDouble.hpp>
 
 using namespace owlapi::vocabulary;
-using namespace owl_om::organization_model;
+using namespace organization_model::organization_model;
 using namespace owlapi::model;
 
-namespace owl_om {
+namespace organization_model {
 
 OrganizationModel::OrganizationModel(const std::string& filename)
     : mpOntology( new OWLOntology())
@@ -561,7 +561,7 @@ OrganizationModel OrganizationModel::copy() const
 //        IRI resourceModel = dependency->getQualification();
 //        if(resourceModel.empty())
 //        {
-//            throw std::invalid_argument("owl_om::OrganizationModel::createNewInstance: could not infer model for dependency / requirement '" + dependency->toString() + "'");
+//            throw std::invalid_argument("organization_model::OrganizationModel::createNewInstance: could not infer model for dependency / requirement '" + dependency->toString() + "'");
 //        }
 //
 //        LOG_DEBUG_S << "CreateNewInstance: dependency of " << newInstanceName << std::endl
@@ -593,7 +593,7 @@ OrganizationModel OrganizationModel::copy() const
 //    IRIList actors = mpAsk->allInstancesOf( OM::Actor(), true );
 //    if(actors.size() < 2)
 //    {
-//        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
+//        throw std::invalid_argument("organization_model::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
 //    }
 //
 //    // Foreach each ActorModel
@@ -632,14 +632,14 @@ OrganizationModel OrganizationModel::copy() const
 ////    IRIList actors = mpAsk->allInstancesOf( OM::Actor(), true );
 ////    if(actors.size() < 2)
 ////    {
-////        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
+////        throw std::invalid_argument("organization_model::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
 ////    }
 ////
 ////    IRIList interfaces = mpAsk->allInstancesOf( OM::Interface(), true);
 ////    InterfaceConnectionList validConnections;
 ////    if(interfaces.size() < 2)
 ////    {
-////        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough interfaces available, i.e. no more than 1");
+////        throw std::invalid_argument("organization_model::OrganizationModel::generateInterfaceCombination: not enough interfaces available, i.e. no more than 1");
 ////    }
 ////
 ////    LOG_DEBUG_S << "INTERFACES " << interfaces;
@@ -649,7 +649,7 @@ OrganizationModel OrganizationModel::copy() const
 ////        IRIList match = interfaceCombinations.current();
 ////        if(match.size() != 2)
 ////        {
-////            throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: no two interfaces available to create connection");
+////            throw std::invalid_argument("organization_model::OrganizationModel::generateInterfaceCombination: no two interfaces available to create connection");
 ////        }
 ////
 ////        IRIList parents0 = mpAsk->allInverseRelatedInstances(match[0], OM::has());
@@ -800,14 +800,14 @@ OrganizationModel OrganizationModel::copy() const
 //    IRIList actors = mpAsk->allInstancesOf( OM::Actor(), true );
 //    if(actors.size() < 2)
 //    {
-//        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
+//        throw std::invalid_argument("organization_model::OrganizationModel::generateInterfaceCombination: not enough actors for recombination available, i.e. no more than 1");
 //    }
 //
 //    IRIList interfaces = mpAsk->allInstancesOf( OM::Interface(), true);
 //    InterfaceConnectionList validConnections;
 //    if(interfaces.size() < 2)
 //    {
-//        throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: not enough interfaces available, i.e. no more than 1");
+//        throw std::invalid_argument("organization_model::OrganizationModel::generateInterfaceCombination: not enough interfaces available, i.e. no more than 1");
 //    }
 //
 //    mCurrentStats.timeCompositeSystemGeneration = base::Time::now();
@@ -821,7 +821,7 @@ OrganizationModel OrganizationModel::copy() const
 //        LOG_DEBUG_S << "MATCH: " << match[0] << " -- " << match[1];
 //        if(match.size() != 2)
 //        {
-//            throw std::invalid_argument("owl_om::OrganizationModel::generateInterfaceCombination: no two interfaces available to create connection");
+//            throw std::invalid_argument("organization_model::OrganizationModel::generateInterfaceCombination: no two interfaces available to create connection");
 //        }
 //
 //        IRIList parents0 = mpAsk->allInverseRelatedInstances(match[0], OM::has());
@@ -1063,4 +1063,4 @@ OrganizationModel OrganizationModel::copy() const
 //    return resources;
 //}
 
-} // end namespace owl_om
+} // end namespace organization_model

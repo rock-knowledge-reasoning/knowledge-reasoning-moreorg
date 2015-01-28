@@ -1,9 +1,9 @@
-#ifndef OWL_OM_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
-#define OWL_OM_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
+#ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
+#define ORGANIZATION_MODEL_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
 
 #include <owlapi/model/IRI.hpp>
 
-namespace owl_om {
+namespace organization_model {
 namespace organization_model {
 
 /**
@@ -26,6 +26,6 @@ public:
 };
 
 } // end namespace organization_model
-} // end namespace owl_om
-#endif // OWL_OM_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
+} // end namespace organization_model
+#endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
 

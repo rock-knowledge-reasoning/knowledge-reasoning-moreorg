@@ -9,7 +9,7 @@
 using namespace owlapi::model;
 using namespace owlapi::vocabulary;
 
-namespace owl_om {
+namespace organization_model {
 namespace metrics {
 
 Redundancy::Redundancy(const OrganizationModel& organization)
@@ -247,6 +247,6 @@ std::string Redundancy::toString(const IRISurvivabilityMap& map)
 }
 
 } // end namespace metrics
-} // end namespace owl_om
+} // end namespace organization_model
 
 

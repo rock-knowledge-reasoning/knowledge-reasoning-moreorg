@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
-#include <owl_om/utils/CorrelationClustering.hpp>
+#include <organization_model/utils/CorrelationClustering.hpp>
 
 using namespace numeric;
 

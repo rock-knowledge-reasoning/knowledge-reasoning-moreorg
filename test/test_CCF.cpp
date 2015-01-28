@@ -1,11 +1,11 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
-#include <owl_om/ccf/CCF.hpp>
-#include <owl_om/OrganizationModel.hpp>
+#include <organization_model/ccf/CCF.hpp>
+#include <organization_model/OrganizationModel.hpp>
 #include <set>
 
-using namespace owl_om;
+using namespace organization_model;
 using namespace owlapi::model;
 
 BOOST_AUTO_TEST_CASE(it_should_handle_sets)

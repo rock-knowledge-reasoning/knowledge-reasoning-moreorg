@@ -1,12 +1,16 @@
-#ifndef OWL_OM_EXPORTER_PDDL_EXPORTER_HPP 
-#define OWL_OM_EXPORTER_PDDL_EXPORTER_HPP 
+#ifndef ORGANIZATION_MODEL_EXPORTER_PDDL_EXPORTER_HPP 
+#define ORGANIZATION_MODEL_EXPORTER_PDDL_EXPORTER_HPP 
 
 #include <organization_model/OrganizationModel.hpp>
 #include <pddl_planner/representation/Domain.hpp>
 #include <pddl_planner/representation/Problem.hpp>
 
-namespace owl_om {
+namespace organization_model {
 
+/**
+ * \brief The PDDLExporter allow to export the an instance of OrganizationModel
+ * to PDDL (Plan Domain Definition Language).
+ */
 class PDDLExporter
 {
 
@@ -33,5 +37,5 @@ public:
 
 };
 
-} // end namespace owl_om
-#endif // OWL_OM_EXPORTER_PDDL_EXPORTER_HPP 
+} // end namespace organization_model
+#endif // ORGANIZATION_MODEL_EXPORTER_PDDL_EXPORTER_HPP 

@@ -1,10 +1,10 @@
-#ifndef OWL_OM_ORGANIZATION_MODEL_GROUNDING_HPP
-#define OWL_OM_ORGANIZATION_MODEL_GROUNDING_HPP
+#ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_GROUNDING_HPP
+#define ORGANIZATION_MODEL_ORGANIZATION_MODEL_GROUNDING_HPP
 
 #include <map>
 #include <owlapi/OWLApi.hpp>
 
-namespace owl_om {
+namespace organization_model {
 namespace organization_model {
 
 typedef std::map<owlapi::model::OWLRestriction::Ptr, std::vector<owlapi::model::IRI> > RequirementsGrounding;
@@ -54,6 +54,6 @@ public:
 };
 
 } // end namespace organization_model
-} // end namespace owl_om
+} // end namespace organization_model
 
-#endif // OWL_OM_ORGANIZATION_MODEL_GROUNDING_HPP
+#endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_GROUNDING_HPP

@@ -1,5 +1,5 @@
-#ifndef OWL_OM_ORGANIZATION_MODEL_HPP
-#define OWL_OM_ORGANIZATION_MODEL_HPP
+#ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
+#define ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
 
 #include <stdint.h>
 #include <owlapi/model/OWLOntology.hpp>
@@ -10,7 +10,7 @@
 
 namespace owl = owlapi::model;
 
-namespace owl_om {
+namespace organization_model {
 
 typedef std::vector<owl::IRIList> CandidatesList;
 
@@ -274,5 +274,5 @@ public:
 //    std::vector< std::vector<organization_model::ActorModelLink> > mCompositeActorModels;
 };
 
-} // end namespace owl_om
-#endif // OWL_OM_ORGANIZATION_MODEL_HPP
+} // end namespace organization_model
+#endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP

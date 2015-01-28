@@ -1,9 +1,9 @@
-#ifndef OWL_OM_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP
-#define OWL_OM_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP
+#ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP
+#define ORGANIZATION_MODEL_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP
 
 #include <organization_model/organization_model/EndpointModel.hpp>
 
-namespace owl_om {
+namespace organization_model {
 namespace organization_model {
 
 /**
@@ -34,6 +34,6 @@ public:
 std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<ActorModelLink> > modelSet);
 
 } // namespace organization_model
-} // namespace owl_om
+} // namespace organization_model
 
-#endif // OWL_OM_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP
+#endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP

@@ -1,9 +1,9 @@
-#ifndef OWL_OM_METRICS_MODEL_SURVIVABILITY_HPP
-#define OWL_OM_METRICS_MODEL_SURVIVABILITY_HPP
+#ifndef ORGANIZATION_MODEL_METRICS_MODEL_SURVIVABILITY_HPP
+#define ORGANIZATION_MODEL_METRICS_MODEL_SURVIVABILITY_HPP
 
 #include <owlapi/OWLApi.hpp>
 
-namespace owl_om {
+namespace organization_model {
 namespace metrics {
 
 /**
@@ -29,5 +29,5 @@ struct ModelSurvivability
 };
 
 } // end namespace metrics
-} // end namespace owl_om
-#endif // OWL_OM_METRICS_MODEL_SURVIVABILITY_HPP
+} // end namespace organization_model
+#endif // ORGANIZATION_MODEL_METRICS_MODEL_SURVIVABILITY_HPP

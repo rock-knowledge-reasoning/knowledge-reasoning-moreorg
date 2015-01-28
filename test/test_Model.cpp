@@ -1,12 +1,12 @@
 #include <boost/test/unit_test.hpp>
-#include <owl_om/Vocabulary.hpp>
-#include <owl_om/Registry.hpp>
-#include <owl_om/Ontology.hpp>
-#include <owl_om/db/rdf/SopranoDB.hpp>
-#include <owl_om/OWLApi.hpp>
+#include <organization_model/Vocabulary.hpp>
+#include <organization_model/Registry.hpp>
+#include <organization_model/Ontology.hpp>
+#include <organization_model/db/rdf/SopranoDB.hpp>
+#include <organization_model/OWLApi.hpp>
 #include "test_utils.hpp"
 
-using namespace owl_om;
+using namespace organization_model;
 
 BOOST_AUTO_TEST_CASE(it_should_query_db)
 {
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(it_should_query_db_abstract)
 
 BOOST_AUTO_TEST_CASE(it_should_create_ontology)
 {
-    using namespace owl_om;
+    using namespace organization_model;
     OWLOntology::Ptr ontology = OWLOntology::fromFile( getRootDir() + rdfTestFiles[0]);
     BOOST_TEST_MESSAGE("Ontology: " << ontology->toString());
 }

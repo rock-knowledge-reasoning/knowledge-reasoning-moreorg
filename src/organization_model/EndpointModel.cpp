@@ -3,7 +3,7 @@
 
 using namespace owlapi::model;
 
-namespace owl_om {
+namespace organization_model {
 namespace organization_model {
 
 EndpointModel::EndpointModel()
@@ -53,4 +53,4 @@ std::string EndpointModel::toString() const
 }
 
 } // end namespace organization_model
-} // end namespace owl_om
+} // end namespace organization_model

@@ -1,5 +1,5 @@
-#ifndef OWL_OM_CCF_CCF_HPP
-#define OWL_OM_CCF_CCF_HPP
+#ifndef ORGANIZATION_MODEL_CCF_CCF_HPP
+#define ORGANIZATION_MODEL_CCF_CCF_HPP
 
 #include <set>
 #include <vector>
@@ -14,7 +14,7 @@
  * as suggested by Rahwan et. al "Constrained Coalition Formation",2011
  */
 
-namespace owl_om
+namespace organization_model
 {
 
 template<typename T>
@@ -754,5 +754,5 @@ public:
 
 };
 
-} // end namespace owl_om
-#endif // OWL_OM_CCF_CCF_HPP
+} // end namespace organization_model
+#endif // ORGANIZATION_MODEL_CCF_CCF_HPP

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <assert.h>
 
-namespace owl_om {
+namespace organization_model {
 namespace organization_model {
 
 ActorModelLink::ActorModelLink() {}
@@ -72,4 +72,4 @@ std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<ActorM
 }
 
 } // namespace organization_model
-} // namespace owl_om
+} // namespace organization_model

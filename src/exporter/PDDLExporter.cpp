@@ -8,7 +8,7 @@
 
 using namespace owlapi::model;
 
-namespace owl_om {
+namespace organization_model {
 
 pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationModel& model)
 {

@@ -4,7 +4,7 @@
 #include <string>
 /**
  * Retrieve the root directory by analysing the current execution path: 
- * returns /../owl_om/ as path
+ * returns /../organization_model/ as path
  */
 std::string getRootDir();
 #endif

@@ -6,7 +6,7 @@
 
 using namespace owlapi::model;
 
-namespace owl_om {
+namespace organization_model {
 namespace organization_model {
 
 InterfaceConnection::InterfaceConnection() {}
@@ -101,4 +101,4 @@ std::ostream& operator<<(std::ostream& os, const InterfaceCombinationList& list)
 }
 
 } // end namespace organization_model
-} // end namespace owl_om
+} // end namespace organization_model

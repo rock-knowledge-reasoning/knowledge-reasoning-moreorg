@@ -1,11 +1,11 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
-#include <owl_om/OrganizationModel.hpp>
-#include <owl_om/metrics/Redundancy.hpp>
-#include <owl_om/owlapi/model/OWLOntologyAsk.hpp>
+#include <organization_model/OrganizationModel.hpp>
+#include <organization_model/metrics/Redundancy.hpp>
+#include <owlapi/model/OWLOntologyAsk.hpp>
 
-using namespace owl_om;
+using namespace organization_model;
 using namespace owlapi;
 using namespace owlapi::model;
 

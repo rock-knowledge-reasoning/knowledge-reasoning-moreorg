@@ -2,7 +2,7 @@
 
 using namespace owlapi::model;
 
-namespace owl_om {
+namespace organization_model {
 namespace organization_model {
 
 Grounding::Grounding(const RequirementsGrounding& grounding)
@@ -78,4 +78,4 @@ std::string Grounding::toString() const
 }
 
 } // end namespace organization_model
-} // end namespace owl_om
+} // end namespace organization_model

@@ -1,5 +1,5 @@
-#ifndef OWL_OM_ORGANIZATION_MODEL_STATISTICS_HPP
-#define OWL_OM_ORGANIZATION_MODEL_STATISTICS_HPP
+#ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_STATISTICS_HPP
+#define ORGANIZATION_MODEL_ORGANIZATION_MODEL_STATISTICS_HPP
 
 #include <stdint.h>
 #include <base/Time.hpp>
@@ -8,7 +8,7 @@
 
 namespace owl = owlapi::model;
 
-namespace owl_om {
+namespace organization_model {
 namespace organization_model {
 
 /**
@@ -51,5 +51,5 @@ std::ostream& operator<<(std::ostream& os, const Statistics& statistics);
 std::ostream& operator<<(std::ostream& os, const std::vector<Statistics>& statisticsList);
 
 } // end namespace organization_model
-} // end namespace owl_om
-#endif // OWL_OM_ORGANIZATION_MODEL_STATISTICS_HPP
+} // end namespace organization_model
+#endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_STATISTICS_HPP

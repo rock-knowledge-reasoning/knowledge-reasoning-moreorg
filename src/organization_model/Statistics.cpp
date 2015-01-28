@@ -2,7 +2,7 @@
 #include <sstream>
 #include <boost/foreach.hpp>
 
-namespace owl_om {
+namespace organization_model {
 namespace organization_model {
 
 Statistics::Statistics()
@@ -58,6 +58,6 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Statistics>& statis
 }
 
 } // end namespace organization_model
-} // end namespace owl_om
+} // end namespace organization_model
 
 
