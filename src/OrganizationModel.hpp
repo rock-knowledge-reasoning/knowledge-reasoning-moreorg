@@ -17,7 +17,9 @@ typedef std::vector<owl::IRIList> CandidatesList;
 /**
  * \mainpage Organization modelling with OWL
  *
- * The organization model allow to retrieve information from a basic system
+ * The main purpose of the organization model is to describe (reconfigurable)
+ * multirobot systems so that one can reason about structure and funtion.
+ * The organization model relies on a basic system
  * description -- provided in OWL -- to infer system combinations from it. 
  *
  * These system combinations (coalition / composite actors) have quantifiable
@@ -26,12 +28,23 @@ typedef std::vector<owl::IRIList> CandidatesList;
  *
  * The organization model allows to augment an organization model for a given
  * set of atomic actors.
+ *
+ * \verbatim
+#include <organization_model/OrganizationModel.hpp>
+
+using namespace organization_model;
+
+OrganizationModel om;
+Ontology::Ptr ontology = om.ontology();
+
+ \endverbatim
  */
 class OrganizationModel
 {
 public:
 
     typedef boost::shared_ptr<OrganizationModel> Ptr;
+
     typedef std::map< owl::IRI, owl::IRIList> IRI2IRIListCache;
     typedef std::map< owl::IRI, owl::IRI> IRI2IRICache;
     typedef std::map< std::pair<owl::IRI,owl::IRI>, owl::IRIList> RelationCache;

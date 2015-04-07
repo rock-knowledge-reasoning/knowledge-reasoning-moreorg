@@ -38,7 +38,7 @@ std::ostream& operator<<(std::ostream& os, const Bounds& bounds);
  * This is an implementation of the coalition structure generation as described in:
  * "An Anytime Algorithm for Optimal Coalition Structure Generation", (Rahwan et al., 2009)
  *
- * Please not that the current implementation uses recursion, but that will be subject to change.
+ * Please note that the current implementation uses recursion
  */
 class CoalitionStructureGeneration
 {
