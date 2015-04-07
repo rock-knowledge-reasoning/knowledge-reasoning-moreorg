@@ -28,10 +28,10 @@ BOOST_AUTO_TEST_CASE(it_should_handle_redundancy_metrics)
 
     OWLOntologyTell tell(om.ontology());
 
-    OWLClass::Ptr a = tell.getOWLClass("http://klass/base");
-    OWLClass::Ptr b = tell.getOWLClass("http://klass/base-derived");
-    OWLClass::Ptr c = tell.getOWLClass("http://klass/base-derived-derived");
-    OWLObjectProperty::Ptr property = tell.getOWLObjectProperty("http://property/has");
+    OWLClass::Ptr a = tell.klass("http://klass/base");
+    OWLClass::Ptr b = tell.klass("http://klass/base-derived");
+    OWLClass::Ptr c = tell.klass("http://klass/base-derived-derived");
+    OWLObjectProperty::Ptr property = tell.objectProperty("http://property/has");
 
     tell.subclassOf(c,b);
     tell.subclassOf(b,a);
