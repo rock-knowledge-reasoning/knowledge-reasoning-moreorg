@@ -4,6 +4,8 @@
 #include <organization_model/OrganizationModel.hpp>
 #include <organization_model/metrics/Redundancy.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
+#include <owlapi/model/OWLOntologyTell.hpp>
+#include <owlapi/model/OWLExactCardinalityRestriction.hpp>
 
 using namespace organization_model;
 using namespace owlapi;

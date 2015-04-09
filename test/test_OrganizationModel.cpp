@@ -6,7 +6,43 @@
 #include <numeric/Combinatorics.hpp>
 #include <organization_model/metrics/Redundancy.hpp>
 
+#include <owlapi/Vocabulary.hpp>
+
 using namespace organization_model;
+
+BOOST_AUTO_TEST_SUITE(organization_model)
+
+BOOST_AUTO_TEST_CASE(load_file)
+{
+    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
+    BOOST_TEST_MESSAGE("Loaded model");
+}
+
+
+BOOST_AUTO_TEST_CASE(function_combination_mapping)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+    using namespace numeric;
+
+    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.6.owl" );
+    std::map<owlapi::model::IRI, size_t> items;
+    items[OM::resolve("Sherpa")] = 2;
+    items[OM::resolve("CREX")] = 1;
+    items[OM::resolve("Payload")] = 1;
+    items[OM::resolve("PayloadCamera")] = 1;
+
+    LimitedCombination<owlapi::model::IRI> limitedCombination(items, LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(items), MAX);
+    om.prepare(limitedCombination);
+
+    OrganizationModel::Combination2FunctionMap c2f = om.getCombination2FunctionMap();
+    BOOST_TEST_MESSAGE("Combination to function: " << OrganizationModel::toString(c2f));
+
+    OrganizationModel::Function2CombinationMap f2c = om.getFunction2CombinationMap();
+    BOOST_TEST_MESSAGE("Function to combination: " << OrganizationModel::toString(f2c));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 //BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
 //{
@@ -315,12 +351,6 @@ using namespace organization_model;
 //
 //    BOOST_REQUIRE_MESSAGE(true, "Domain:" << domain.toLISP());
 //    BOOST_REQUIRE_MESSAGE(true, "Problem:" << problem.toLISP());
-//}
-//
-//BOOST_AUTO_TEST_CASE(it_should_load_om_file)
-//{
-//    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
-//    BOOST_TEST_MESSAGE("Loaded om");
 //}
 //
 //BOOST_AUTO_TEST_CASE(it_should_handle_actorlinkmodel)

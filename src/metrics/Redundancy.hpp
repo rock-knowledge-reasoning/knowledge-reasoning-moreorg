@@ -2,6 +2,7 @@
 #define ORGANIZATION_MODEL_METRICS_REDUNDANCY_HPP
 
 #include <organization_model/OrganizationModel.hpp>
+#include <owlapi/model/OWLCardinalityRestriction.hpp>
 
 namespace organization_model {
 namespace metrics {
@@ -16,7 +17,7 @@ typedef std::map< std::pair<ServiceIRI, ActorIRI>, double> IRISurvivabilityMap;
 class Redundancy
 {
     OrganizationModel mOrganizationModel;
-    owlapi::model::OWLOntologyAsk mAsk;
+    boost::shared_ptr<owlapi::model::OWLOntologyAsk> mpAsk;
 
 public:
     Redundancy(const OrganizationModel& organization);

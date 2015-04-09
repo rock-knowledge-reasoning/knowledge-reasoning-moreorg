@@ -5,6 +5,7 @@
 #include <base/Logging.hpp>
 #include <pddl_planner/representation/Domain.hpp>
 #include <owlapi/Vocabulary.hpp>
+#include <owlapi/model/OWLOntologyAsk.hpp>
 
 using namespace owlapi::model;
 

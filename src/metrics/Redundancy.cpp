@@ -3,6 +3,7 @@
 #include <math.h>
 #include <vector>
 #include <base/Logging.hpp>
+#include <owlapi/model/OWLOntologyAsk.hpp>
 #include <owlapi/csp/ResourceMatch.hpp>
 #include <organization_model/metrics/ModelSurvivability.hpp>
 
@@ -14,15 +15,15 @@ namespace metrics {
 
 Redundancy::Redundancy(const OrganizationModel& organization)
     : mOrganizationModel(organization)
-    , mAsk(mOrganizationModel.ontology())
+    , mpAsk(new OWLOntologyAsk(mOrganizationModel.ontology()))
 {}
 
 double Redundancy::computeModelBasedProbabilityOfSurvival(const IRI& function, const IRI& model)
 {
     // Get minimal requirements to maintain the function
-    std::vector<OWLCardinalityRestriction::Ptr> requirements = mAsk.getCardinalityRestrictions(function);
+    std::vector<OWLCardinalityRestriction::Ptr> requirements = mpAsk->getCardinalityRestrictions(function);
     // Get model restrictions, i.e. in effect what has to be available
-    std::vector<OWLCardinalityRestriction::Ptr> availableResources = mAsk.getCardinalityRestrictions(model);
+    std::vector<OWLCardinalityRestriction::Ptr> availableResources = mpAsk->getCardinalityRestrictions(model);
 
     return compute(requirements, availableResources);
 }
@@ -30,7 +31,7 @@ double Redundancy::computeModelBasedProbabilityOfSurvival(const IRI& function, c
 double Redundancy::computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const std::map<owlapi::model::IRI,uint32_t>& models)
 {
     // Get minimal requirements to maintain the function
-    std::vector<OWLCardinalityRestriction::Ptr> requirements = mAsk.getCardinalityRestrictions(function);
+    std::vector<OWLCardinalityRestriction::Ptr> requirements = mpAsk->getCardinalityRestrictions(function);
 
     // Get model restrictions, i.e. in effect what has to be available
     std::map<IRI, uint32_t>::const_iterator mit = models.begin();
@@ -40,7 +41,7 @@ double Redundancy::computeModelBasedProbabilityOfSurvival(const owlapi::model::I
         IRI model = mit->first;
         uint32_t count = mit->second;
 
-        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mAsk.getCardinalityRestrictions(model);
+        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mpAsk->getCardinalityRestrictions(model);
         std::vector<OWLCardinalityRestriction::Ptr>::iterator cit = availableResources.begin();
         for(; cit != availableResources.end(); ++cit)
         {
@@ -130,7 +131,7 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
         double probabilityOfSurvival = 0;
         try {
             // SCHOKO: Model should have an associated probability of failure
-            OWLLiteral::Ptr value = mAsk.getDataValue(qualification, OM::probabilityOfFailure());
+            OWLLiteral::Ptr value = mpAsk->getDataValue(qualification, OM::probabilityOfFailure());
             LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
             probabilityOfSurvival = 1 - value->getDouble();
         } catch(...)
@@ -160,7 +161,7 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
             std::vector<ModelSurvivability>::iterator mit = models.begin();
             for(; mit != models.end(); ++mit)
             {
-                if( mit->getQualification() == *rit || mAsk.isSubclassOf(*rit, mit->getQualification()) )
+                if( mit->getQualification() == *rit || mpAsk->isSubclassOf(*rit, mit->getQualification()) )
                 {
                     // Increase redundancy
                     // Remaining resource (count is 1) over required count
@@ -196,9 +197,9 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
 IRISurvivabilityMap Redundancy::compute()
 {
     IRISurvivabilityMap survivabilityMap;
-    IRIList actorModels = mAsk.allSubclassesOf( OM::Actor() );
+    IRIList actorModels = mpAsk->allSubclassesOf( OM::Actor() );
 
-    IRIList services = mAsk.allSubclassesOf( OM::Service() );
+    IRIList services = mpAsk->allSubclassesOf( OM::Service() );
 
     BOOST_FOREACH(const IRI& actorModel, actorModels)
     {
