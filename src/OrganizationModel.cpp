@@ -119,4 +119,33 @@ void OrganizationModel::computeFunctionalityMaps(const ModelPool& modelPool)
     } while(limitedCombination.next());
 }
 
+OrganizationModel::ModelPool OrganizationModel::combination2ModelPool( const ModelCombination& combination)
+{
+    ModelPool modelPool;
+    ModelCombination::const_iterator cit = combination.begin();
+    for(; cit != combination.end(); ++cit)
+    {
+        modelPool[*cit] += 1;
+    }
+    return modelPool;
+}
+
+OrganizationModel::ModelCombination OrganizationModel::modelPool2Combination(const ModelPool& pool)
+{
+    ModelCombination combination;
+    ModelPool::const_iterator cit = pool.begin();
+    for(; cit != pool.end(); ++cit)
+    {
+        owlapi::model::IRI model = cit->first;
+        size_t modelCount = cit->second;
+
+        for(size_t i = 0; i < modelCount; ++i)
+        {
+            combination.push_back(model);
+        }
+    }
+    std::sort(combination.begin(), combination.end());
+    return combination;
+}
+
 } // end namespace organization_model

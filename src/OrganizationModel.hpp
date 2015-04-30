@@ -109,6 +109,9 @@ private:
      * limited set of available models
      */
     void computeFunctionalityMaps(const ModelPool& modelPool);
+
+    static ModelPool combination2ModelPool(const ModelCombination& combination);
+    static ModelCombination modelPool2Combination(const ModelPool& pool);
 };
 
 } // end namespace organization_model
