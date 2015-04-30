@@ -1,5 +1,6 @@
 rock_library(organization_model
     SOURCES
+        Algebra.cpp
         OrganizationModel.cpp
         OrganizationModelAsk.cpp
         ccf/Actor.cpp
@@ -20,6 +21,7 @@ rock_library(organization_model
         metrics/ModelSurvivability.cpp
         utils/CoalitionStructureGeneration.cpp
     HEADERS
+        Algebra.hpp
         OrganizationModel.hpp
         OrganizationModelAsk.hpp
         ccf/Actor.hpp
