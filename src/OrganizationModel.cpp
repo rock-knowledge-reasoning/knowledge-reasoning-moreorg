@@ -26,9 +26,9 @@ OrganizationModel::OrganizationModel(const std::string& filename)
     mpAsk = OWLOntologyAsk::Ptr( new OWLOntologyAsk(mpOntology));
 }
 
-void OrganizationModel::prepare(const ModelPool& modelPool)
+void OrganizationModel::prepare()
 {
-    computeFunctionalityMaps(modelPool);
+    computeFunctionalityMaps(mModelPool);
 }
 
 OrganizationModel OrganizationModel::copy() const
@@ -146,6 +146,61 @@ OrganizationModel::ModelCombination OrganizationModel::modelPool2Combination(con
     }
     std::sort(combination.begin(), combination.end());
     return combination;
+}
+
+OrganizationModel::ModelPoolDelta OrganizationModel::delta(const ModelPool& a, const ModelPool& b)
+{
+    ModelPoolDelta delta;
+
+    ModelPool::const_iterator ait = a.begin();
+    for(; ait != a.end(); ++ait)
+    {
+        owlapi::model::IRI model = ait->first;
+        size_t modelCount = ait->second;
+
+        ModelPool::const_iterator bit = b.find(model);
+        if(bit != b.end())
+        {
+            delta[model] = bit->second - modelCount;
+        } else {
+            delta[model] = 0 - modelCount;
+        }
+    }
+
+    ModelPool::const_iterator bit = b.begin();
+    for(; bit != b.end(); ++bit)
+    {
+        owlapi::model::IRI model = bit->first;
+        size_t modelCount = bit->second;
+
+        ModelPool::const_iterator ait = a.find(model);
+        if(ait != a.end())
+        {
+            // already handled
+        } else {
+            delta[model] = modelCount;
+        }
+    }
+
+    return delta;
+}
+
+std::vector<ModelCombinationList> OrganizationModel::getMinimalResourceSupport(const ServiceList& services)
+{
+    /// Store the systems that support the functionality
+    Function2CombinationMap resultMap;
+    ServiceList::const_iterator cit = services.begin();
+    for(; cit != services.end(); ++cit)
+    {
+        const Service& service = *cit;
+        const owlapi::model::IRI& model =  service.getModel();
+        ModelCombinationList combinationList = mFunction2Combination.find(model);
+
+        resultMap[model] = combinationList;
+    }
+    
+    /// 
+
 }
 
 } // end namespace organization_model

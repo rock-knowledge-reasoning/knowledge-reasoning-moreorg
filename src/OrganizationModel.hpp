@@ -16,6 +16,32 @@ class OWLOntologyAsk;
 
 namespace organization_model {
 
+class Service
+{
+public:
+    typedef double QualityOfService;
+    typedef double Duration;
+    typedef double Safety;
+
+    Service(const owlapi::model::IRI& model)
+        : mModel(model)
+    {}
+
+    const owlapi::model::IRI& getModel() const { return mModel; }
+
+private:
+    owlapi::model::IRI mModel;
+    /// How good shall be the quality
+    QualityOfService mQos;
+    /// How low shall the service be provided
+    Duration mDurationInS;
+    /// How safe (redundancy level, etc. shall be the execution)
+    Safety mSafety;
+};
+
+typedef std::vector<Service> ServiceList;
+
+
 typedef std::vector<owlapi::model::IRIList> CandidatesList;
 
 /**
@@ -51,6 +77,7 @@ public:
     typedef owlapi::model::IRIList ModelCombination;
     typedef std::vector<ModelCombination> ModelCombinationList;
     typedef std::map<owlapi::model::IRI, size_t> ModelPool;
+    typedef std::map<owlapi::model::IRI, int> ModelPoolDelta;
 
     /// Maps a 'combined system' to the functionality it can 'theoretically'
     /// provide when looking at its resources
@@ -74,10 +101,12 @@ public:
      */
     OrganizationModel copy() const;
 
+    void setModelPool(const ModelPool& modelPool) { mModelPool = modelPool; }
+
     /**
      * Prepare the organization model for a given set of available models
      */
-    void prepare(const ModelPool& modelPool);
+    void prepare();
 
     /**
      * Retrieve the list of all known service models
@@ -92,6 +121,15 @@ public:
 
     const Function2CombinationMap& getFunction2CombinationMap() const { return mFunction2Combination; }
 
+    /**
+     * Get the minimal set of resources (as combination of models) that should support a given
+     * list of services
+     * That means, that services are either supported by separate systems or 
+     * combined systems
+     * \param services should be a set of services / service models
+     */
+    std::vector<ModelCombinationList> getMinimalResourceSupport(const ServiceList& services);
+
 private:
     /// Ontology that serves as basis for this organization model
     owlapi::model::OWLOntology::Ptr mpOntology;
@@ -104,6 +142,9 @@ private:
     /// Maps a functionality to combination that support this functionality
     Function2CombinationMap mFunction2Combination;
 
+    /// Current set pool of models
+    ModelPool mModelPool;
+
     /**
      * Compute the functionality maps for the combination of models from a
      * limited set of available models
@@ -112,6 +153,13 @@ private:
 
     static ModelPool combination2ModelPool(const ModelCombination& combination);
     static ModelCombination modelPool2Combination(const ModelPool& pool);
+    static ModelPoolDelta delta(const ModelPool& a, const ModelPool& b);
+
+    /**
+     * Check if two ModelCombinations can be built from distinct resources
+     */
+    bool canBeDistinct(const ModelCombination& a, const ModelCombination& b) {}
+
 };
 
 } // end namespace organization_model
