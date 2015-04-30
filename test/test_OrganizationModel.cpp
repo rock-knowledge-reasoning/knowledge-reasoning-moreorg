@@ -24,7 +24,6 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
 {
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
-    using namespace numeric;
 
     OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.6.owl"));
 
@@ -36,11 +35,55 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
 
     OrganizationModelAsk ask(om, items);
 
-    OrganizationModel::Combination2FunctionMap c2f = ask.getCombination2FunctionMap();
+    Combination2FunctionMap c2f = ask.getCombination2FunctionMap();
     BOOST_TEST_MESSAGE("Combination to function: " << OrganizationModel::toString(c2f));
 
-    OrganizationModel::Function2CombinationMap f2c = ask.getFunction2CombinationMap();
+    Function2CombinationMap f2c = ask.getFunction2CombinationMap();
     BOOST_TEST_MESSAGE("Function to combination: " << OrganizationModel::toString(f2c));
+}
+
+BOOST_AUTO_TEST_CASE(resource_support)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.6.owl"));
+
+    {
+        std::map<owlapi::model::IRI, size_t> items;
+        items[OM::resolve("CREX")] = 1;
+
+        OrganizationModelAsk ask(om, items);
+
+        // http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider
+        // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
+        // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
+
+        ServiceList services;
+        services.push_back( Service(OM::resolve("StereoImageProvider") ) );
+
+        std::vector<ModelCombinationList> combinations = ask.getMinimalResourceSupport(services);
+
+        BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider");
+    }
+    {
+        std::map<owlapi::model::IRI, size_t> items;
+        items[OM::resolve("Sherpa")] = 1;
+        items[OM::resolve("CREX")] = 1;
+
+        OrganizationModelAsk ask(om, items);
+
+        // http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider
+        // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
+        // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
+
+        ServiceList services;
+        services.push_back( Service(OM::resolve("StereoImageProvider") ) );
+
+        std::vector<ModelCombinationList> combinations = ask.getMinimalResourceSupport(services);
+
+        BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider");
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -2,6 +2,7 @@
 #define ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
 
 #include <stdint.h>
+#include <organization_model/ModelPool.hpp>
 #include <owlapi/model/OWLOntology.hpp>
 
 namespace owlapi {
@@ -14,6 +15,15 @@ class OWLOntologyAsk;
 } // end namespace owlapi
 
 namespace organization_model {
+
+typedef owlapi::model::IRIList ModelCombination;
+typedef std::vector<ModelCombination> ModelCombinationList;
+
+/// Maps a 'combined system' to the functionality it can 'theoretically'
+/// provide when looking at its resources
+typedef std::map<ModelCombination, owlapi::model::IRIList> Combination2FunctionMap;
+typedef std::map<owlapi::model::IRI, ModelCombinationList > Function2CombinationMap;
+
 
 class Service
 {
@@ -75,17 +85,6 @@ class OrganizationModel
 public:
     typedef boost::shared_ptr<OrganizationModel> Ptr;
 
-    typedef owlapi::model::IRIList ModelCombination;
-    typedef std::vector<ModelCombination> ModelCombinationList;
-    typedef std::map<owlapi::model::IRI, size_t> ModelPool;
-    typedef std::map<owlapi::model::IRI, int> ModelPoolDelta;
-
-    /// Maps a 'combined system' to the functionality it can 'theoretically'
-    /// provide when looking at its resources
-    typedef std::map<ModelCombination, owlapi::model::IRIList> Combination2FunctionMap;
-    typedef std::map<owlapi::model::IRI, ModelCombinationList > Function2CombinationMap;
-
-
     /**
      * Constructor to create an OrganizationModel from an existing description file
      * \param filename File name to an rdf/xml formatted ontology description file
@@ -106,6 +105,9 @@ public:
     static std::string toString(const Combination2FunctionMap& combinationFunctionMap);
 
     static std::string toString(const Function2CombinationMap& functionCombinationMap);
+
+    static ModelPool combination2ModelPool(const ModelCombination& combination);
+    static ModelCombination modelPool2Combination(const ModelPool& pool);
 
 protected:
     boost::shared_ptr<owlapi::model::OWLOntologyAsk> ask() { return mpAsk; }

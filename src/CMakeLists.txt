@@ -1,8 +1,6 @@
 rock_library(organization_model
     SOURCES
         Algebra.cpp
-        OrganizationModel.cpp
-        OrganizationModelAsk.cpp
         ccf/Actor.cpp
         ccf/CombinedActor.cpp
         ccf/Interface.cpp
@@ -11,19 +9,20 @@ rock_library(organization_model
         ccf/LinkGroup.cpp
         ccf/LinkType.cpp
         ccf/Scenario.cpp
+        exporter/PDDLExporter.cpp
+        metrics/Redundancy.cpp
+        metrics/ModelSurvivability.cpp
+        ModelPool.cpp
+        OrganizationModel.cpp
+        OrganizationModelAsk.cpp
         organization_model/ActorModelLink.cpp
         organization_model/EndpointModel.cpp
         organization_model/Grounding.cpp
         organization_model/InterfaceConnection.cpp
         organization_model/Statistics.cpp
-        exporter/PDDLExporter.cpp
-        metrics/Redundancy.cpp
-        metrics/ModelSurvivability.cpp
         utils/CoalitionStructureGeneration.cpp
     HEADERS
         Algebra.hpp
-        OrganizationModel.hpp
-        OrganizationModelAsk.hpp
         ccf/Actor.hpp
         ccf/CombinedActor.hpp
         ccf/Interface.hpp
@@ -35,6 +34,9 @@ rock_library(organization_model
         exporter/PDDLExporter.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
+        ModelPool.hpp
+        OrganizationModel.hpp
+        OrganizationModelAsk.hpp
         organization_model/ActorModelLink.hpp
         organization_model/EndpointModel.hpp
         organization_model/Grounding.hpp

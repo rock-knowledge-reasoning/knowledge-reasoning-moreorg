@@ -1,4 +1,5 @@
 #include "OrganizationModelAsk.hpp"
+#include "Algebra.hpp"
 #include <sstream>
 
 #include <owlapi/model/OWLOntologyAsk.hpp>
@@ -30,40 +31,6 @@ owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
     bool directSubclassOnly = false;
     IRIList subclasses = mpOrganizationModel->ask()->allSubclassesOf(OM::Service(), directSubclassOnly);
     return subclasses;
-}
-
-std::string OrganizationModelAsk::toString(const Combination2FunctionMap& combinationFunctionMap)
-{
-    std::stringstream ss;
-    ss << "combination --> functions: " << std::endl;
-    Combination2FunctionMap::const_iterator cit = combinationFunctionMap.begin();
-    for(; cit != combinationFunctionMap.end(); ++cit)
-    {
-        ss << "    combination:    " << cit->first << std::endl;
-        ss << "      --> functions: " << cit->second << std::endl;
-    }
-    return ss.str();
-}
-
-std::string OrganizationModelAsk::toString(const Function2CombinationMap& functionCombinationMap)
-{
-    std::stringstream ss;
-    ss << "function --> combinations: ";
-    Function2CombinationMap::const_iterator cit = functionCombinationMap.begin();
-    for(; cit != functionCombinationMap.end(); ++cit)
-    {
-        ss << "    function:    " << cit->first << std::endl;
-        ss << "        supported by:" << std::endl;
-
-        const ModelCombinationList& combinationsList = cit->second;
-        ModelCombinationList::const_iterator comIt = combinationsList.begin();
-        for(; comIt != combinationsList.end(); ++comIt)
-        {
-            ss << "        combination:    " << *comIt << std::endl;
-        }
-    }
-
-    return ss.str();
 }
 
 void OrganizationModelAsk::computeFunctionalityMaps(const ModelPool& modelPool)
@@ -106,93 +73,85 @@ void OrganizationModelAsk::computeFunctionalityMaps(const ModelPool& modelPool)
     } while(limitedCombination.next());
 }
 
-ModelPool OrganizationModelAsk::combination2ModelPool(const ModelCombination& combination)
-{
-    ModelPool modelPool;
-    ModelCombination::const_iterator cit = combination.begin();
-    for(; cit != combination.end(); ++cit)
-    {
-        modelPool[*cit] += 1;
-    }
-    return modelPool;
-}
-
-ModelCombination OrganizationModelAsk::modelPool2Combination(const ModelPool& pool)
-{
-    ModelCombination combination;
-    ModelPool::const_iterator cit = pool.begin();
-    for(; cit != pool.end(); ++cit)
-    {
-        owlapi::model::IRI model = cit->first;
-        size_t modelCount = cit->second;
-
-        for(size_t i = 0; i < modelCount; ++i)
-        {
-            combination.push_back(model);
-        }
-    }
-    std::sort(combination.begin(), combination.end());
-    return combination;
-}
-
-OrganizationModel::ModelPoolDelta OrganizationModelAsk::delta(const ModelPool& a, const ModelPool& b)
-{
-    ModelPoolDelta delta;
-
-    ModelPool::const_iterator ait = a.begin();
-    for(; ait != a.end(); ++ait)
-    {
-        owlapi::model::IRI model = ait->first;
-        size_t modelCount = ait->second;
-
-        ModelPool::const_iterator bit = b.find(model);
-        if(bit != b.end())
-        {
-            delta[model] = bit->second - modelCount;
-        } else {
-            delta[model] = 0 - modelCount;
-        }
-    }
-
-    ModelPool::const_iterator bit = b.begin();
-    for(; bit != b.end(); ++bit)
-    {
-        owlapi::model::IRI model = bit->first;
-        size_t modelCount = bit->second;
-
-        ModelPool::const_iterator ait = a.find(model);
-        if(ait != a.end())
-        {
-            // already handled
-        } else {
-            delta[model] = modelCount;
-        }
-    }
-
-    return delta;
-}
-
 std::vector<ModelCombinationList> OrganizationModelAsk::getMinimalResourceSupport(const ServiceList& services)
 {
     /// Store the systems that support the functionality
+    /// i.e. per requested function the combination of models that support it,
     Function2CombinationMap resultMap;
-    ServiceList::const_iterator cit = services.begin();
-    for(; cit != services.end(); ++cit)
     {
-        const Service& service = *cit;
-        const owlapi::model::IRI& model =  service.getModel();
-        Function2CombinationMap::const_iterator fit = mFunction2Combination.find(model);
-        if(fit != mFunction2Combination.end())
+        ServiceList::const_iterator cit = services.begin();
+        for(; cit != services.end(); ++cit)
         {
-            resultMap[model] = fit->second;
-        } else {
-            LOG_DEBUG_S << "Could not find resource support for service: '" << model;
-            return std::vector<ModelCombinationList>();
+            const Service& service = *cit;
+            const owlapi::model::IRI& model =  service.getModel();
+            Function2CombinationMap::const_iterator fit = mFunction2Combination.find(model);
+            if(fit != mFunction2Combination.end())
+            {
+                resultMap[model] = fit->second;
+            } else {
+                LOG_DEBUG_S << "Could not find resource support for service: '" << model;
+                return std::vector<ModelCombinationList>();
+            }
         }
     }
-    /// 
-    std::vector<ModelCombinationList> list;
-    return list;
+
+    /// Go through the set of combinations and find valid
+    /// assignments, i.e. where
+    /// (a) one model combination supports all services -->
+    ///     intersection of function combination lists
+    /// (b) individual but possibly distinct combinations support services
+
+    std::vector<ModelCombinationList> resources;
+    {
+        bool first = true;
+        ModelCombinationList previousCombinationList;
+        // (a) Individual systems that support all functions
+        Function2CombinationMap::const_iterator cit = resultMap.begin();
+        for(; cit != resultMap.end(); ++cit)
+        {
+            if(first)
+            {
+                previousCombinationList = cit->second;
+                continue;
+            }
+
+            ModelCombinationList currentCombinationList = cit->second;
+
+            ModelCombinationList resultList(previousCombinationList.size() + currentCombinationList.size());
+
+            ModelCombinationList::iterator it;
+            it = std::set_intersection(previousCombinationList.begin(),
+                    previousCombinationList.end(),
+                    currentCombinationList.begin(),
+                    currentCombinationList.end(), resultList.begin());
+
+            resultList.resize(it - resultList.begin());
+            previousCombinationList = resultList;
+        }
+
+        ModelCombinationList::const_iterator mit = previousCombinationList.begin();
+        for(; mit != previousCombinationList.end(); ++mit)
+        {
+            // One list per system
+            ModelCombinationList combination;
+            combination.push_back(*mit);
+            resources.push_back(combination);
+        }
+    }
+
+
+    return resources;
+}
+
+bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelCombination& b)
+{
+    ModelPool poolA = OrganizationModel::combination2ModelPool(a);
+    ModelPool poolB = OrganizationModel::combination2ModelPool(b);
+
+    ModelPoolDelta totalRequirements = Algebra::sum(poolA, poolB);
+    ModelPoolDelta delta = Algebra::delta(mModelPool,totalRequirements);
+
+    return delta.isNegative();
 }
 
 } // end namespace organization_model
