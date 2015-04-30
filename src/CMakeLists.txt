@@ -1,6 +1,7 @@
 rock_library(organization_model
     SOURCES
         OrganizationModel.cpp
+        OrganizationModelAsk.cpp
         ccf/Actor.cpp
         ccf/CombinedActor.cpp
         ccf/Interface.cpp
@@ -20,6 +21,7 @@ rock_library(organization_model
         utils/CoalitionStructureGeneration.cpp
     HEADERS
         OrganizationModel.hpp
+        OrganizationModelAsk.hpp
         ccf/Actor.hpp
         ccf/CombinedActor.hpp
         ccf/Interface.hpp

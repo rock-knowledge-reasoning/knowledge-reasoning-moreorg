@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <owlapi/model/OWLOntology.hpp>
-#include <numeric/LimitedCombination.hpp>
 
 namespace owlapi {
 namespace model {
@@ -71,9 +70,11 @@ Ontology::Ptr ontology = om.ontology();
  */
 class OrganizationModel
 {
-public:
+    friend class OrganizationModelAsk;
 
+public:
     typedef boost::shared_ptr<OrganizationModel> Ptr;
+
     typedef owlapi::model::IRIList ModelCombination;
     typedef std::vector<ModelCombination> ModelCombinationList;
     typedef std::map<owlapi::model::IRI, size_t> ModelPool;
@@ -83,6 +84,7 @@ public:
     /// provide when looking at its resources
     typedef std::map<ModelCombination, owlapi::model::IRIList> Combination2FunctionMap;
     typedef std::map<owlapi::model::IRI, ModelCombinationList > Function2CombinationMap;
+
 
     /**
      * Constructor to create an OrganizationModel from an existing description file
@@ -101,34 +103,13 @@ public:
      */
     OrganizationModel copy() const;
 
-    void setModelPool(const ModelPool& modelPool) { mModelPool = modelPool; }
-
-    /**
-     * Prepare the organization model for a given set of available models
-     */
-    void prepare();
-
-    /**
-     * Retrieve the list of all known service models
-     */
-    owlapi::model::IRIList getServiceModels() const;
-
     static std::string toString(const Combination2FunctionMap& combinationFunctionMap);
 
     static std::string toString(const Function2CombinationMap& functionCombinationMap);
 
-    const Combination2FunctionMap& getCombination2FunctionMap() const { return mCombination2Function; }
-
-    const Function2CombinationMap& getFunction2CombinationMap() const { return mFunction2Combination; }
-
-    /**
-     * Get the minimal set of resources (as combination of models) that should support a given
-     * list of services
-     * That means, that services are either supported by separate systems or 
-     * combined systems
-     * \param services should be a set of services / service models
-     */
-    std::vector<ModelCombinationList> getMinimalResourceSupport(const ServiceList& services);
+protected:
+    boost::shared_ptr<owlapi::model::OWLOntologyAsk> ask() { return mpAsk; }
+    boost::shared_ptr<owlapi::model::OWLOntologyTell> tell() { return mpTell; }
 
 private:
     /// Ontology that serves as basis for this organization model
@@ -136,29 +117,6 @@ private:
 
     boost::shared_ptr<owlapi::model::OWLOntologyAsk> mpAsk;
     boost::shared_ptr<owlapi::model::OWLOntologyTell> mpTell;
-
-    /// Maps a combination to its supported functionality
-    Combination2FunctionMap mCombination2Function;
-    /// Maps a functionality to combination that support this functionality
-    Function2CombinationMap mFunction2Combination;
-
-    /// Current set pool of models
-    ModelPool mModelPool;
-
-    /**
-     * Compute the functionality maps for the combination of models from a
-     * limited set of available models
-     */
-    void computeFunctionalityMaps(const ModelPool& modelPool);
-
-    static ModelPool combination2ModelPool(const ModelCombination& combination);
-    static ModelCombination modelPool2Combination(const ModelPool& pool);
-    static ModelPoolDelta delta(const ModelPool& a, const ModelPool& b);
-
-    /**
-     * Check if two ModelCombinations can be built from distinct resources
-     */
-    bool canBeDistinct(const ModelCombination& a, const ModelCombination& b) {}
 
 };
 

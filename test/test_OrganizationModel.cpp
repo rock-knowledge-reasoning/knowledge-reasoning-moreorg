@@ -2,6 +2,7 @@
 #include "test_utils.hpp"
 
 #include <organization_model/OrganizationModel.hpp>
+#include <organization_model/OrganizationModelAsk.hpp>
 #include <organization_model/exporter/PDDLExporter.hpp>
 #include <numeric/Combinatorics.hpp>
 #include <organization_model/metrics/Redundancy.hpp>
@@ -25,19 +26,20 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
     using namespace owlapi::model;
     using namespace numeric;
 
-    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.6.owl" );
+    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.6.owl"));
+
     std::map<owlapi::model::IRI, size_t> items;
     items[OM::resolve("Sherpa")] = 3;
     items[OM::resolve("CREX")] = 2;
     items[OM::resolve("Payload")] = 5;
     items[OM::resolve("PayloadCamera")] = 5;
 
-    om.prepare(items);
+    OrganizationModelAsk ask(om, items);
 
-    OrganizationModel::Combination2FunctionMap c2f = om.getCombination2FunctionMap();
+    OrganizationModel::Combination2FunctionMap c2f = ask.getCombination2FunctionMap();
     BOOST_TEST_MESSAGE("Combination to function: " << OrganizationModel::toString(c2f));
 
-    OrganizationModel::Function2CombinationMap f2c = om.getFunction2CombinationMap();
+    OrganizationModel::Function2CombinationMap f2c = ask.getFunction2CombinationMap();
     BOOST_TEST_MESSAGE("Function to combination: " << OrganizationModel::toString(f2c));
 }
 
