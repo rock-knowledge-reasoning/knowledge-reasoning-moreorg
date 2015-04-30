@@ -27,13 +27,12 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
 
     OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.6.owl" );
     std::map<owlapi::model::IRI, size_t> items;
-    items[OM::resolve("Sherpa")] = 2;
-    items[OM::resolve("CREX")] = 1;
-    items[OM::resolve("Payload")] = 1;
-    items[OM::resolve("PayloadCamera")] = 1;
+    items[OM::resolve("Sherpa")] = 3;
+    items[OM::resolve("CREX")] = 2;
+    items[OM::resolve("Payload")] = 5;
+    items[OM::resolve("PayloadCamera")] = 5;
 
-    LimitedCombination<owlapi::model::IRI> limitedCombination(items, LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(items), MAX);
-    om.prepare(limitedCombination);
+    om.prepare(items);
 
     OrganizationModel::Combination2FunctionMap c2f = om.getCombination2FunctionMap();
     BOOST_TEST_MESSAGE("Combination to function: " << OrganizationModel::toString(c2f));

@@ -48,11 +48,14 @@ class OrganizationModel
 public:
 
     typedef boost::shared_ptr<OrganizationModel> Ptr;
+    typedef owlapi::model::IRIList ModelCombination;
+    typedef std::vector<ModelCombination> ModelCombinationList;
+    typedef std::map<owlapi::model::IRI, size_t> ModelPool;
 
     /// Maps a 'combined system' to the functionality it can 'theoretically'
     /// provide when looking at its resources
-    typedef std::map<owlapi::model::IRIList, owlapi::model::IRIList> Combination2FunctionMap;
-    typedef std::map<owlapi::model::IRI, std::vector<owlapi::model::IRIList> > Function2CombinationMap;
+    typedef std::map<ModelCombination, owlapi::model::IRIList> Combination2FunctionMap;
+    typedef std::map<owlapi::model::IRI, ModelCombinationList > Function2CombinationMap;
 
     /**
      * Constructor to create an OrganizationModel from an existing description file
@@ -74,7 +77,7 @@ public:
     /**
      * Prepare the organization model for a given set of available models
      */
-    void prepare(const numeric::LimitedCombination<owlapi::model::IRI>& modelPool);
+    void prepare(const ModelPool& modelPool);
 
     /**
      * Retrieve the list of all known service models
@@ -101,7 +104,11 @@ private:
     /// Maps a functionality to combination that support this functionality
     Function2CombinationMap mFunction2Combination;
 
-    void computeFunctionalityMaps(numeric::LimitedCombination<owlapi::model::IRI> modelPool);
+    /**
+     * Compute the functionality maps for the combination of models from a
+     * limited set of available models
+     */
+    void computeFunctionalityMaps(const ModelPool& modelPool);
 };
 
 } // end namespace organization_model
