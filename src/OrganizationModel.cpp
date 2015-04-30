@@ -35,8 +35,8 @@ std::string OrganizationModel::toString(const Combination2FunctionMap& combinati
     Combination2FunctionMap::const_iterator cit = combinationFunctionMap.begin();
     for(; cit != combinationFunctionMap.end(); ++cit)
     {
-        ss << "    combination:    " << cit->first << std::endl;
-        ss << "      --> functions: " << cit->second << std::endl;
+        ss << "    combination:    " << IRI::toString(cit->first, true) << std::endl;
+        ss << "      --> functions: " << IRI::toString(cit->second, true) << std::endl;
     }
     return ss.str();
 }
@@ -48,14 +48,14 @@ std::string OrganizationModel::toString(const Function2CombinationMap& functionC
     Function2CombinationMap::const_iterator cit = functionCombinationMap.begin();
     for(; cit != functionCombinationMap.end(); ++cit)
     {
-        ss << "    function:    " << cit->first << std::endl;
+        ss << "    function:    " << cit->first.getFragment() << std::endl;
         ss << "        supported by:" << std::endl;
 
         const ModelCombinationList& combinationsList = cit->second;
         ModelCombinationList::const_iterator comIt = combinationsList.begin();
         for(; comIt != combinationsList.end(); ++comIt)
         {
-            ss << "        combination:    " << *comIt << std::endl;
+            ss << "        combination:    " << IRI::toString(*comIt, true) << std::endl;
         }
     }
 
