@@ -73,74 +73,171 @@ void OrganizationModelAsk::computeFunctionalityMaps(const ModelPool& modelPool)
     } while(limitedCombination.next());
 }
 
-std::vector<ModelCombinationList> OrganizationModelAsk::getMinimalResourceSupport(const ServiceList& services)
+std::set<ModelCombinationSet> OrganizationModelAsk::getResourceSupport(const ServiceSet& services) const
 {
     /// Store the systems that support the functionality
     /// i.e. per requested function the combination of models that support it,
-    Function2CombinationMap resultMap;
+    Function2CombinationMap serviceProviders;
     {
-        ServiceList::const_iterator cit = services.begin();
+        ServiceSet::const_iterator cit = services.begin();
         for(; cit != services.end(); ++cit)
         {
             const Service& service = *cit;
-            const owlapi::model::IRI& model =  service.getModel();
-            Function2CombinationMap::const_iterator fit = mFunction2Combination.find(model);
+            const owlapi::model::IRI& serviceModel =  service.getModel();
+            Function2CombinationMap::const_iterator fit = mFunction2Combination.find(serviceModel);
             if(fit != mFunction2Combination.end())
             {
-                resultMap[model] = fit->second;
+                serviceProviders[serviceModel] = fit->second;
             } else {
-                LOG_DEBUG_S << "Could not find resource support for service: '" << model;
-                return std::vector<ModelCombinationList>();
+                LOG_DEBUG_S << "Could not find resource support for service: '" << serviceModel;
+                return std::set<ModelCombinationSet>();
             }
         }
     }
 
-    /// Go through the set of combinations and find valid
-    /// assignments, i.e. where
-    /// (a) one model combination supports all services -->
-    ///     intersection of function combination lists
-    /// (b) individual but possibly distinct combinations support services
-
-    std::vector<ModelCombinationList> resources;
+    std::set<ModelCombinationSet> resources;
     {
-        bool first = true;
-        ModelCombinationList previousCombinationList;
-        // (a) Individual systems that support all functions
-        Function2CombinationMap::const_iterator cit = resultMap.begin();
-        for(; cit != resultMap.end(); ++cit)
+        // Iterate over all service providers
+        // 1. check if existing service provider provides the current service
+        //   -- if not check if resources are sufficient to provide both
+        //   --   if so add to the updated resource list 
+        bool init = true;
+        Function2CombinationMap::const_iterator cit = serviceProviders.begin();
+        for(; cit != serviceProviders.end(); ++cit)
         {
-            if(first)
+            const Service& service = cit->first;
+            const ModelCombinationList& combinationList = cit->second;
+
+            LOG_DEBUG_S << "Checking service: " << service.getModel();
+
+            if(init)
             {
-                previousCombinationList = cit->second;
+                ModelCombinationList::const_iterator combinationIt = combinationList.begin();
+                for(; combinationIt != combinationList.end(); ++combinationIt)
+                {
+                    ModelCombinationSet set;
+                    set.insert(*combinationIt);
+                    resources.insert(set);
+                }
+                init = false;
                 continue;
+            } else {
+
+                std::set<ModelCombinationSet> updatedResourceList;
+                ModelCombinationList::const_iterator combinationIt = combinationList.begin();
+                for(; combinationIt != combinationList.end(); ++combinationIt)
+                {
+                    const ModelCombination& combination = *combinationIt;
+                    LOG_DEBUG_S << "ModelCombination: " << IRI::toString(combination, true);
+
+                    std::set<ModelCombinationSet>::const_iterator mit = resources.begin();
+                    for(; mit != resources.end(); ++mit)
+                    {
+                        const ModelCombinationSet& combinationSet = *mit;
+
+                        ModelPool requirements = Algebra::merge(combinationSet, combination);
+                        ModelPoolDelta delta = Algebra::delta(requirements, mModelPool);
+                        LOG_DEBUG_S << "Existing " << ModelPoolDelta(mModelPool).toString();
+                        LOG_DEBUG_S << "Requirements " << ModelPoolDelta(requirements).toString();
+                        LOG_DEBUG_S << "Delta " << delta.toString();
+
+                        if( delta.isNegative() )
+                        {
+                            // not enough resources
+                            LOG_DEBUG_S << "Not enough resources";
+                        } else {
+                            std::set< ModelCombination > updatedCombinationSet = combinationSet;
+                            LOG_DEBUG_S << "Enough resources";
+                            updatedCombinationSet.insert(combination);
+
+                            updatedResourceList.insert( updatedCombinationSet );
+                        }
+                    }
+                }
+                resources = updatedResourceList;
             }
-
-            ModelCombinationList currentCombinationList = cit->second;
-
-            ModelCombinationList resultList(previousCombinationList.size() + currentCombinationList.size());
-
-            ModelCombinationList::iterator it;
-            it = std::set_intersection(previousCombinationList.begin(),
-                    previousCombinationList.end(),
-                    currentCombinationList.begin(),
-                    currentCombinationList.end(), resultList.begin());
-
-            resultList.resize(it - resultList.begin());
-            previousCombinationList = resultList;
-        }
-
-        ModelCombinationList::const_iterator mit = previousCombinationList.begin();
-        for(; mit != previousCombinationList.end(); ++mit)
-        {
-            // One list per system
-            ModelCombinationList combination;
-            combination.push_back(*mit);
-            resources.push_back(combination);
         }
     }
-
-
     return resources;
+
+
+    ///// Go through the set of combinations and find valid
+    ///// assignments, i.e. where
+    ///// (a) one model combination supports all services -->
+    /////     intersection of function combination lists
+    ///// (b) individual but possibly distinct combinations support services
+
+    //std::vector<ModelCombinationList> resources;
+    //{
+    //    bool first = true;
+    //    ModelCombinationList previousCombinationList;
+    //    // (a) Individual systems that support all functions
+    //    Function2CombinationMap::const_iterator cit = resultMap.begin();
+    //    for(; cit != resultMap.end(); ++cit)
+    //    {
+    //        if(first)
+    //        {
+    //            previousCombinationList = cit->second;
+    //            continue;
+    //        }
+
+    //        ModelCombinationList currentCombinationList = cit->second;
+
+    //        ModelCombinationList resultList(previousCombinationList.size() + currentCombinationList.size());
+
+    //        ModelCombinationList::iterator it;
+    //        it = std::set_intersection(previousCombinationList.begin(),
+    //                previousCombinationList.end(),
+    //                currentCombinationList.begin(),
+    //                currentCombinationList.end(), resultList.begin());
+
+    //        resultList.resize(it - resultList.begin());
+    //        previousCombinationList = resultList;
+    //    }
+
+    //    ModelCombinationList::const_iterator mit = previousCombinationList.begin();
+    //    for(; mit != previousCombinationList.end(); ++mit)
+    //    {
+    //        // One list per system
+    //        ModelCombinationList combination;
+    //        combination.push_back(*mit);
+    //        resources.push_back(combination);
+    //    }
+    //}
+
+
+    //return resources;
+}
+
+
+std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport(const ServiceSet& services) const
+{
+    std::set<ModelCombination> modelCombinationSet;
+    std::set<ModelCombinationSet> modelSet = getResourceSupport(services);
+    std::set<ModelCombinationSet>::const_iterator cit = modelSet.begin();
+    for(; cit != modelSet.end(); ++cit)
+    {
+        const ModelCombinationSet& combinations = *cit;
+        ModelCombinationSet::const_iterator mit = combinations.begin();
+
+        ModelPoolDelta delta;
+        bool init = true;
+
+        for(; mit != combinations.end(); ++mit)
+        {
+            if(init)
+            {
+                delta = OrganizationModel::combination2ModelPool(*mit);
+                init = false;
+            } else {
+                delta = Algebra::sum( OrganizationModel::combination2ModelPool(*mit), delta );
+            }
+        }
+
+        ModelPool pool = delta.toModelPool();
+        modelCombinationSet.insert( OrganizationModel::modelPool2Combination(pool) );
+    }
+    return modelCombinationSet;
 }
 
 bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelCombination& b)
@@ -149,7 +246,7 @@ bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelC
     ModelPool poolB = OrganizationModel::combination2ModelPool(b);
 
     ModelPoolDelta totalRequirements = Algebra::sum(poolA, poolB);
-    ModelPoolDelta delta = Algebra::delta(mModelPool,totalRequirements);
+    ModelPoolDelta delta = Algebra::delta(totalRequirements, mModelPool);
 
     return delta.isNegative();
 }

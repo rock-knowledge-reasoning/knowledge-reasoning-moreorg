@@ -22,14 +22,20 @@ public:
     const Function2CombinationMap& getFunction2CombinationMap() const { return mFunction2Combination; }
 
     /**
-     * Get the minimal set of resources (as combination of models) that should support a given
+     * Get the set of resources (as combination of models) that should support a given
      * list of services
      * That means, that services are either supported by separate systems or 
      * combined systems
      * \param services should be a set of services / service models
      * \return available resources to support this set of services
      */
-    std::vector<ModelCombinationList> getMinimalResourceSupport(const ServiceList& services);
+    std::set<ModelCombinationSet> getResourceSupport(const ServiceSet& services) const;
+
+    /**
+     * Get the set of resources
+     * \return available resources to support this set of services
+     */
+    std::set<ModelCombination> getMinimalResourceSupport(const ServiceSet& services) const;
 
     /**
      * Check if two ModelCombinations can be built from distinct resources

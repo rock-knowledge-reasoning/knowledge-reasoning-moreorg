@@ -17,6 +17,14 @@ struct ModelPoolDelta : std::map<owlapi::model::IRI, int>
      * Check if the pool assignment contains any negative values
      */
     bool isNegative() const;
+
+    /**
+     * Convert to model pool
+     * \throws if conversion is not possible, due to negative values
+     */
+    ModelPool toModelPool() const;
+
+    std::string toString() const;
 };
 
 } // end namespace organization_model

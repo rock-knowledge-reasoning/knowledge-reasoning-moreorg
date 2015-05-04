@@ -59,10 +59,10 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        ServiceList services;
-        services.push_back( Service(OM::resolve("StereoImageProvider") ) );
+        ServiceSet services;
+        services.insert( Service(OM::resolve("StereoImageProvider") ) );
 
-        std::vector<ModelCombinationList> combinations = ask.getMinimalResourceSupport(services);
+        std::set<ModelCombinationSet> combinations = ask.getResourceSupport(services);
 
         BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider");
     }
@@ -77,12 +77,55 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        ServiceList services;
-        services.push_back( Service(OM::resolve("StereoImageProvider") ) );
+        ServiceSet services;
+        services.insert( Service(OM::resolve("StereoImageProvider") ) );
 
-        std::vector<ModelCombinationList> combinations = ask.getMinimalResourceSupport(services);
+        std::set<ModelCombinationSet> combinations = ask.getResourceSupport(services);
 
         BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider");
+    }
+    {
+        std::map<owlapi::model::IRI, size_t> items;
+        items[OM::resolve("Sherpa")] = 3;
+        items[OM::resolve("CREX")] = 2;
+        items[OM::resolve("Payload")] = 10;
+
+        OrganizationModelAsk ask(om, items);
+
+        // http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider
+        // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
+        // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
+
+        ServiceSet services;
+        services.insert( Service(OM::resolve("StereoImageProvider") ) );
+        services.insert( Service(OM::resolve("ImageProvider") ) );
+        services.insert( Service(OM::resolve("EmiPowerProvider") ) );
+
+        //std::set<ModelCombinationSet> combinations = ask.getResourceSupport(services);
+        //std::set<ModelCombinationSet>::const_iterator cit = combinations.begin();
+        //for(; cit != combinations.end(); ++cit)
+        //{
+        //    BOOST_TEST_MESSAGE("ModelCombination");
+        //    const ModelCombinationSet& list = *cit;
+        //    ModelCombinationSet::const_iterator mit = list.begin();
+        //    for(; mit != list.end(); ++mit)
+        //    {
+        //        BOOST_TEST_MESSAGE("    " << IRI::toString(*mit, true));
+        //    }
+        //}
+
+        //BOOST_REQUIRE_MESSAGE(combinations.size() > 1000, "Combinations that support stereo image provider, was " << combinations.size());
+
+        {
+            std::set<ModelCombination> combinations = ask.getMinimalResourceSupport(services);
+            std::set<ModelCombination>::const_iterator cit = combinations.begin();
+            for(; cit != combinations.end(); ++cit)
+            {
+                BOOST_TEST_MESSAGE("ModelCombination: " << ModelPoolDelta( OrganizationModel::combination2ModelPool(*cit)).toString() );
+            }
+
+            BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, was " << combinations.size());
+        }
     }
 }
 

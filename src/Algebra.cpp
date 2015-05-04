@@ -50,4 +50,50 @@ ModelPoolDelta Algebra::sum(const ModelPoolDelta& a, const ModelPoolDelta& b)
     return sum;
 }
 
+ModelPool Algebra::merge(const ModelPool& a, const ModelPool& b)
+{
+    std::set<ModelPool> modelPoolSet;
+    modelPoolSet.insert(a);
+    modelPoolSet.insert(b);
+
+    return merge(modelPoolSet);
+}
+
+ModelPool Algebra::merge(const std::set<ModelCombination>& a, const ModelCombination& b)
+{
+    // Create a set
+    std::set<ModelPool> modelPoolSet;
+
+    // Convert combination to pool
+    std::set<ModelCombination>::const_iterator cit = a.begin();
+    for(; cit != a.end(); ++cit)
+    {
+        modelPoolSet.insert( OrganizationModel::combination2ModelPool(*cit) );
+
+    }
+    modelPoolSet.insert( OrganizationModel::combination2ModelPool(b) );
+
+    return merge(modelPoolSet);
+}
+
+
+ModelPool Algebra::merge(const std::set<ModelPool>& modelPoolSet)
+{
+    std::set<ModelPool>::const_iterator cit = modelPoolSet.begin();
+    bool init = true;
+    ModelPoolDelta mergedPool;
+    for(; cit != modelPoolSet.end(); ++cit)
+    {
+        if(init)
+        {
+            mergedPool = *cit;
+            init = false;
+        } else {
+            mergedPool = sum(mergedPool, *cit);
+        }
+    }
+
+    return mergedPool.toModelPool();
+}
+
 } // end namespace organization_model

@@ -1,6 +1,7 @@
 #ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
 #define ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
 
+#include <set>
 #include <stdint.h>
 #include <organization_model/ModelPool.hpp>
 #include <owlapi/model/OWLOntology.hpp>
@@ -18,6 +19,7 @@ namespace organization_model {
 
 typedef owlapi::model::IRIList ModelCombination;
 typedef std::vector<ModelCombination> ModelCombinationList;
+typedef std::set<ModelCombination> ModelCombinationSet;
 
 /// Maps a 'combined system' to the functionality it can 'theoretically'
 /// provide when looking at its resources
@@ -38,6 +40,8 @@ public:
 
     const owlapi::model::IRI& getModel() const { return mModel; }
 
+    bool operator<(const Service& other) const;
+
 private:
     owlapi::model::IRI mModel;
     /// How good shall be the quality
@@ -49,6 +53,7 @@ private:
 };
 
 typedef std::vector<Service> ServiceList;
+typedef std::set<Service> ServiceSet;
 
 
 typedef std::vector<owlapi::model::IRIList> CandidatesList;

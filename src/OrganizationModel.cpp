@@ -8,6 +8,11 @@ using namespace owlapi::model;
 
 namespace organization_model {
 
+bool Service::operator<(const Service& other) const
+{
+    return this->getModel() < other.getModel();
+}
+
 OrganizationModel::OrganizationModel(const std::string& filename)
     : mpOntology( new OWLOntology())
 {

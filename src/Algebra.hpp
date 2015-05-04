@@ -10,6 +10,14 @@ class Algebra
 public:
     static ModelPoolDelta delta(const ModelPoolDelta& a, const ModelPoolDelta& b);
     static ModelPoolDelta sum(const ModelPoolDelta& a, const ModelPoolDelta& b);
+    /**
+     * Merge two systems, i.e. when they are identical M o M = M, M o N = M+N
+     */
+    static ModelPool merge(const ModelPool& a, const ModelPool& b);
+
+    static ModelPool merge(const ModelCombinationSet& a, const ModelCombination& b);
+
+    static ModelPool merge(const std::set<ModelPool>& pool);
 };
 
 } // end namespace organization_model
