@@ -57,4 +57,15 @@ std::string ModelPoolDelta::toString() const
     return ss.str();
 }
 
+std::vector<owlapi::model::IRI> ModelPoolDelta::getModels() const
+{
+    std::vector<owlapi::model::IRI> models;
+    ModelPoolDelta::const_iterator cit  = this->begin();
+    for(; cit != this->end(); ++cit)
+    {
+        models.push_back(cit->first);
+    }
+    return models;
+}
+
 } // end namespace organization_model

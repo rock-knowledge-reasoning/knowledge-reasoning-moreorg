@@ -212,6 +212,11 @@ std::set<ModelCombinationSet> OrganizationModelAsk::getResourceSupport(const Ser
 
 std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport(const ServiceSet& services) const
 {
+    return getMinimalResourceSupport_v1(services);
+}
+
+std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v1(const ServiceSet& services) const
+{
     std::set<ModelCombination> modelCombinationSet;
     std::set<ModelCombinationSet> modelSet = getResourceSupport(services);
     std::set<ModelCombinationSet>::const_iterator cit = modelSet.begin();
@@ -240,7 +245,77 @@ std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport(const
     return modelCombinationSet;
 }
 
-bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelCombination& b)
+bool OrganizationModelAsk::canProvideFullSupport(const Service& service, const owlapi::model::IRI& model) const
+{
+    std::vector<OWLCardinalityRestriction::Ptr> serviceRequirements = mpOrganizationModel->ask()->getCardinalityRestrictions(service);
+    std::vector<OWLCardinalityRestriction::Ptr> modelRequirements = mpOrganizationModel->ask()->getCardinalityRestrictions(model); 
+
+
+
+}
+
+bool OrganizationModelAsk::canProvidePartialSupport(const Service& service, const owlapi::model::IRI& model) const
+{
+}
+
+std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v2(const ServiceSet& services) const
+{
+    std::set<ModelCombination> modelCombinations;
+    std::vector<owlapi::model::IRI> models = mModelPool.getModels();
+
+    // Check 'type-clean' service support
+    std::vector<owlapi::model::IRI>::const_iterator cit = models.begin();
+    for(; cit != models.end(); ++cit)
+    {
+        try {
+            uint32_t minCardinality = minRequiredCardinality(services, *cit);
+            ModelPool modelPool;
+            modelPool[*cit] = minCardinality;
+
+            modelCombinations.insert( OrganizationModel::modelPool2Combination(modelPool) );
+        } catch(const std::runtime_error& e)
+        {
+            LOG_DEBUG_S << e.what();
+        }
+    }
+    return modelCombinations;
+}
+
+uint32_t OrganizationModelAsk::minRequiredCardinality(const ServiceSet& services, const owlapi::model::IRI& model)
+{
+    uint32_t lower = 1;
+    uint32_t upper = mModelPool[model];
+
+    bool supportExists = false;
+
+    do
+    {
+        currentSize = static_cast<uint32_t>( (lower + upper) / 2.0 );
+
+        ModelCombination combination;
+        for(int i = 0; i < currentSize; ++i)
+        {
+            combination.push_back(model);
+        }
+
+        if( isSupporting(combination, services) )
+        {
+            upper = currentPosition; 
+            supportExists = true;
+        } else {
+            lower = currentPosition + 1;
+        }
+    } while(currentPosition < upper)
+
+    if(!supportExists)
+    {
+        throw std::runtime_error("OrganizationModelAsk::minRequired no cardinality of model '" + model.toString() + "' can provide the given set of services");
+    }
+
+    return currentPosition;
+}
+
+bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelCombination& b) const
 {
     ModelPool poolA = OrganizationModel::combination2ModelPool(a);
     ModelPool poolB = OrganizationModel::combination2ModelPool(b);
@@ -249,6 +324,41 @@ bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelC
     ModelPoolDelta delta = Algebra::delta(totalRequirements, mModelPool);
 
     return delta.isNegative();
+}
+
+bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const ServiceSet& services) const
+{
+    ServiceSet::const_iterator cit = services.begin();
+    ModelCombinationList previousCombinations;
+    bool init = true;
+    for(; cit != services.end(); ++cit)
+    {
+        const Service& service = *cit;
+        const ModelCombinationList& combination = mFunction2Combination[service];
+        if(init)
+        {
+            previousCombinations = combination;
+            init = false;
+            continue;
+        }
+
+        ModelCombinationList resultList;
+        ModelCombinationList::iterator it;
+        it = std::set_intersection(combination.begin, combination.end(),
+                previousCombinations.begin(), previousCombinations.end(),
+                resultList.begin());
+         resultList.resize(it - resultList.begin());
+
+         previousCombinations = resultList;
+    }
+
+    ModelCombinationList::const_iterator cit = std::find(previousCombinations.begin(), previousCombinations.end(), c);
+    if(cit != previousCombinations.end())
+    {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 } // end namespace organization_model

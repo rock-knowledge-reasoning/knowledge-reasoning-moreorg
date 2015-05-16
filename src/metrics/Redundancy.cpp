@@ -33,24 +33,26 @@ double Redundancy::computeModelBasedProbabilityOfSurvival(const owlapi::model::I
     // Get minimal requirements to maintain the function
     std::vector<OWLCardinalityRestriction::Ptr> requirements = mpAsk->getCardinalityRestrictions(function);
 
-    // Get model restrictions, i.e. in effect what has to be available
+    // Get model restrictions, i.e. in effect what has to be available for the
+    // given models
     std::map<IRI, uint32_t>::const_iterator mit = models.begin();
     std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources;
     for(; mit != models.end(); ++mit)
     {
         IRI model = mit->first;
-        uint32_t count = mit->second;
+        uint32_t modelCount = mit->second;
 
         std::vector<OWLCardinalityRestriction::Ptr> availableResources = mpAsk->getCardinalityRestrictions(model);
         std::vector<OWLCardinalityRestriction::Ptr>::iterator cit = availableResources.begin();
         for(; cit != availableResources.end(); ++cit)
         {
             OWLCardinalityRestriction::Ptr restriction = *cit;
-            uint32_t cardinality = count*restriction->getCardinality();
+            // Update the cardinality with the actual model count
+            uint32_t cardinality = modelCount*restriction->getCardinality();
             restriction->setCardinality(cardinality);
         }
 
-        allAvailableResources.insert(allAvailableResources.end(), availableResources.begin(), availableResources.end());
+        allAvailableResources = owlapi::model::OWLCardinalityRestriction::sum(allAvailableResources, availableResources);
     }
     return compute(requirements, allAvailableResources);
 }
