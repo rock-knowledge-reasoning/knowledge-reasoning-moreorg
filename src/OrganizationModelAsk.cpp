@@ -247,28 +247,28 @@ std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v1(co
 
 bool OrganizationModelAsk::canProvideFullSupport(const Service& service, const owlapi::model::IRI& model) const
 {
-    std::vector<OWLCardinalityRestriction::Ptr> serviceRequirements = mpOrganizationModel->ask()->getCardinalityRestrictions(service);
+    std::vector<OWLCardinalityRestriction::Ptr> serviceRequirements = mpOrganizationModel->ask()->getCardinalityRestrictions(service.getModel());
     std::vector<OWLCardinalityRestriction::Ptr> modelRequirements = mpOrganizationModel->ask()->getCardinalityRestrictions(model); 
 
-
-
+    return false;
 }
 
 bool OrganizationModelAsk::canProvidePartialSupport(const Service& service, const owlapi::model::IRI& model) const
 {
+    return false;
 }
 
 std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v2(const ServiceSet& services) const
 {
     std::set<ModelCombination> modelCombinations;
-    std::vector<owlapi::model::IRI> models = mModelPool.getModels();
+    std::vector<owlapi::model::IRI> models = ModelPoolDelta::getModels(mModelPool);
 
     // Check 'type-clean' service support
     std::vector<owlapi::model::IRI>::const_iterator cit = models.begin();
     for(; cit != models.end(); ++cit)
     {
         try {
-            uint32_t minCardinality = minRequiredCardinality(services, *cit);
+            int32_t minCardinality = minRequiredCardinality(services, *cit);
             ModelPool modelPool;
             modelPool[*cit] = minCardinality;
 
@@ -281,19 +281,26 @@ std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v2(co
     return modelCombinations;
 }
 
-uint32_t OrganizationModelAsk::minRequiredCardinality(const ServiceSet& services, const owlapi::model::IRI& model)
+uint32_t OrganizationModelAsk::minRequiredCardinality(const ServiceSet& services, const owlapi::model::IRI& model) const
 {
     uint32_t lower = 1;
-    uint32_t upper = mModelPool[model];
+    ModelPool::const_iterator cit = mModelPool.find(model);
+    if(cit != mModelPool.end())
+    {
+        throw std::invalid_argument("organization_model::OrganizationModelAsk::minRequiredCardinality: could not find model '" + model.toString() + "' in pool");
+    }
+
+    uint32_t upper = cit->second;
 
     bool supportExists = false;
 
+    uint32_t currentPosition;
     do
     {
-        currentSize = static_cast<uint32_t>( (lower + upper) / 2.0 );
+        currentPosition = static_cast<uint32_t>( (lower + upper) / 2.0 );
 
         ModelCombination combination;
-        for(int i = 0; i < currentSize; ++i)
+        for(uint32_t i = 0; i < currentPosition; ++i)
         {
             combination.push_back(model);
         }
@@ -305,7 +312,7 @@ uint32_t OrganizationModelAsk::minRequiredCardinality(const ServiceSet& services
         } else {
             lower = currentPosition + 1;
         }
-    } while(currentPosition < upper)
+    } while(currentPosition < upper);
 
     if(!supportExists)
     {
@@ -334,7 +341,14 @@ bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const Service
     for(; cit != services.end(); ++cit)
     {
         const Service& service = *cit;
-        const ModelCombinationList& combination = mFunction2Combination[service];
+        Function2CombinationMap::const_iterator cit = mFunction2Combination.find(service.getModel());
+        if(cit != mFunction2Combination.end())
+        {
+            throw std::runtime_error("organization_model::OrganizationModelAsk::isSupporting \
+                    could not find service '" + service.getModel().toString() + "'");
+        }
+
+        const ModelCombinationList& combination = cit->second;
         if(init)
         {
             previousCombinations = combination;
@@ -344,7 +358,7 @@ bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const Service
 
         ModelCombinationList resultList;
         ModelCombinationList::iterator it;
-        it = std::set_intersection(combination.begin, combination.end(),
+        it = std::set_intersection(combination.begin(), combination.end(),
                 previousCombinations.begin(), previousCombinations.end(),
                 resultList.begin());
          resultList.resize(it - resultList.begin());
@@ -352,8 +366,8 @@ bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const Service
          previousCombinations = resultList;
     }
 
-    ModelCombinationList::const_iterator cit = std::find(previousCombinations.begin(), previousCombinations.end(), c);
-    if(cit != previousCombinations.end())
+    ModelCombinationList::const_iterator pit = std::find(previousCombinations.begin(), previousCombinations.end(), c);
+    if(pit != previousCombinations.end())
     {
         return true;
     } else {

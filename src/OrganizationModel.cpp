@@ -3,6 +3,7 @@
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <owlapi/model/OWLOntologyTell.hpp>
 #include <owlapi/model/OWLOntologyReader.hpp>
+#include <boost/make_shared.hpp>
 
 using namespace owlapi::model;
 
@@ -22,14 +23,14 @@ OrganizationModel::OrganizationModel(const std::string& filename)
         mpOntology = reader.fromFile(filename);
     }
 
-    mpTell = OWLOntologyTell::Ptr( new OWLOntologyTell(mpOntology));
-    mpAsk = OWLOntologyAsk::Ptr( new OWLOntologyAsk(mpOntology));
+    mpTell = boost::make_shared<OWLOntologyTell>(mpOntology);
+    mpAsk = boost::make_shared<OWLOntologyAsk>(mpOntology);
 }
 
 OrganizationModel OrganizationModel::copy() const
 {
     OrganizationModel om;
-    om.mpOntology = OWLOntology::Ptr( new OWLOntology( *ontology().get() ));
+    om.mpOntology = boost::make_shared<OWLOntology>(*ontology().get());
     return om;
 }
 

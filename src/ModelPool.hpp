@@ -29,7 +29,7 @@ struct ModelPoolDelta : std::map<owlapi::model::IRI, int>
     /**
      * Get models, i.e. keys of the model pool
      */
-    std::vector<owlapi::model::IRI> getModels() const;
+    static std::vector<owlapi::model::IRI> getModels(const ModelPool& modelPool);
 };
 
 } // end namespace organization_model

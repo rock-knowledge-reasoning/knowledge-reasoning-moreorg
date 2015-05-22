@@ -8,7 +8,9 @@
 using namespace organization_model;
 using namespace owlapi::model;
 
-BOOST_AUTO_TEST_CASE(it_should_handle_sets)
+BOOST_AUTO_TEST_SUITE(constraint_coalition_formation)
+
+BOOST_AUTO_TEST_CASE(handle_sets)
 {
     {
         Set<int> set;
@@ -32,8 +34,7 @@ BOOST_AUTO_TEST_CASE(it_should_handle_sets)
 
 }
 
-
-BOOST_AUTO_TEST_CASE(it_should_handle_reference_ccf)
+BOOST_AUTO_TEST_CASE(handle_reference_ccf)
 {
 
     { // Scenario form Rahwan et. al.
@@ -113,7 +114,7 @@ BOOST_AUTO_TEST_CASE(it_should_handle_reference_ccf)
     }
 }
 
-BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
+BOOST_AUTO_TEST_CASE(compute_coalitions)
 {
     {
         CCF<IRI>::Atoms atoms;
@@ -164,3 +165,5 @@ BOOST_AUTO_TEST_CASE(it_should_compute_coalitions)
         }
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()

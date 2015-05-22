@@ -25,7 +25,8 @@ double Redundancy::computeModelBasedProbabilityOfSurvival(const IRI& function, c
     // Get model restrictions, i.e. in effect what has to be available
     std::vector<OWLCardinalityRestriction::Ptr> availableResources = mpAsk->getCardinalityRestrictions(model);
 
-    return compute(requirements, availableResources);
+    //return compute(requirements, availableResources);
+    throw std::runtime_error("organization_model::metrics::Redundancy::computeModelBaseProbabilityOfSurvival not implemented properly");
 }
 
 double Redundancy::computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const std::map<owlapi::model::IRI,uint32_t>& models)
@@ -54,7 +55,8 @@ double Redundancy::computeModelBasedProbabilityOfSurvival(const owlapi::model::I
 
         allAvailableResources = owlapi::model::OWLCardinalityRestriction::sum(allAvailableResources, availableResources);
     }
-    return compute(requirements, allAvailableResources);
+    //return compute(requirements, allAvailableResources);
+    throw std::runtime_error("organization_model::metrics::Redundancy::computeModelBaseProbabilityOfSurvival not implemented properly");
 }
 
 double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& required, const std::vector<OWLCardinalityRestriction::Ptr>& available)

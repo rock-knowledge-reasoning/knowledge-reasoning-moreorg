@@ -58,7 +58,7 @@ public:
      *     functionality (and when switching into providing redundancy only)
      *  \return number of instances required for functional saturation
      */
-    uint32_t getFunctionalSaturationPoint(const Service& service, const owlapi::model::IRI& model) const
+    uint32_t getFunctionalSaturationPoint(const Service& service, const owlapi::model::IRI& model) const {return 0;}
 
     /**
      * Get the set of resources
@@ -73,7 +73,7 @@ public:
      * Retrieve the minimum cardinality of given model to support the set of
      * services
      */
-    uint32_t minRequiredCardinality(const ServiceSet& services, const owlapi::model::IRI& model)
+    uint32_t minRequiredCardinality(const ServiceSet& services, const owlapi::model::IRI& model) const;
 
     /**
      * Check if two ModelCombinations can be built from distinct resources

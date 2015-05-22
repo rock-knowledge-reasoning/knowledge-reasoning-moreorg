@@ -57,11 +57,11 @@ std::string ModelPoolDelta::toString() const
     return ss.str();
 }
 
-std::vector<owlapi::model::IRI> ModelPoolDelta::getModels() const
+std::vector<owlapi::model::IRI> ModelPoolDelta::getModels(const ModelPool& modelPool)
 {
     std::vector<owlapi::model::IRI> models;
-    ModelPoolDelta::const_iterator cit  = this->begin();
-    for(; cit != this->end(); ++cit)
+    ModelPool::const_iterator cit  = modelPool.begin();
+    for(; cit != modelPool.end(); ++cit)
     {
         models.push_back(cit->first);
     }

@@ -41,7 +41,9 @@ public:
     double computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const std::map<owlapi::model::IRI,uint32_t>& models);
 
 
-    double compute(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector< std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> >& available);
+    //double compute(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector< std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> >& available);
+    double compute(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
+            const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available);
 
     static std::string toString(const IRISurvivabilityMap& map);
 };
