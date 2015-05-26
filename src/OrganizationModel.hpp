@@ -114,8 +114,9 @@ public:
     static ModelPool combination2ModelPool(const ModelCombination& combination);
     static ModelCombination modelPool2Combination(const ModelPool& pool);
 
-protected:
     boost::shared_ptr<owlapi::model::OWLOntologyAsk> ask() { return mpAsk; }
+
+protected:
     boost::shared_ptr<owlapi::model::OWLOntologyTell> tell() { return mpTell; }
 
 private:

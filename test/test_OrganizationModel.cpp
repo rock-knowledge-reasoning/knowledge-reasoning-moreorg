@@ -7,8 +7,6 @@
 #include <numeric/Combinatorics.hpp>
 #include <organization_model/metrics/Redundancy.hpp>
 
-#include <owlapi/Vocabulary.hpp>
-
 using namespace organization_model;
 
 BOOST_AUTO_TEST_SUITE(organization_model)

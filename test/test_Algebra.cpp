@@ -1,9 +1,36 @@
 #include <boost/test/unit_test.hpp>
-#include <organization_model/algebra/ResourceSupportVector.hpp>
+#include <organization_model/algebra/ResourceSupport.hpp>
+#include <organization_model/OrganizationModel.hpp>
+#include "test_utils.hpp"
+#include <owlapi/Vocabulary.hpp>
 
+using namespace organization_model;
 using namespace organization_model::algebra;
 
 BOOST_AUTO_TEST_SUITE(algebra)
+
+BOOST_AUTO_TEST_CASE(resource_support)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.7.owl"));
+    {
+        IRI system = OM::resolve("Sherpa");
+        IRI service  = OM::resolve("StereoImageProvider");
+
+        IRIList combination;
+        combination.push_back(system);
+
+        IRIList services;
+        services.push_back(service);
+
+        ResourceSupport resourceSupport(om);
+        IRIList supportedServices = resourceSupport.filterSupportedModels(combination, services);
+        BOOST_REQUIRE_MESSAGE(supportedServices.size() == 1, "Sherpa support StereoImagerProvider");
+    }
+}
+
 
 BOOST_AUTO_TEST_CASE(resource_support_vector)
 {

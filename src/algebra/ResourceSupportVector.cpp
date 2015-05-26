@@ -5,8 +5,10 @@
 namespace organization_model {
 namespace algebra {
 
-ResourceSupportVector::ResourceSupportVector(const base::VectorXd& sizes)
+ResourceSupportVector::ResourceSupportVector(const base::VectorXd& sizes,
+    const owlapi::model::IRIList& labels)
     : mSizes(sizes)
+    , mLabels(labels)
 {}
 
 ResourceSupportVector ResourceSupportVector::intersection(const ResourceSupportVector& a, const ResourceSupportVector& b)

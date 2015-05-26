@@ -53,7 +53,7 @@ double Redundancy::computeModelBasedProbabilityOfSurvival(const owlapi::model::I
             restriction->setCardinality(cardinality);
         }
 
-        allAvailableResources = owlapi::model::OWLCardinalityRestriction::sum(allAvailableResources, availableResources);
+        allAvailableResources = owlapi::model::OWLCardinalityRestriction::join(allAvailableResources, availableResources);
     }
     //return compute(requirements, allAvailableResources);
     throw std::runtime_error("organization_model::metrics::Redundancy::computeModelBaseProbabilityOfSurvival not implemented properly");
@@ -100,7 +100,7 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
             // the matching was successful at least once
             remainingResources = match->getUnassignedResources();
         } else {
-            // the matching was never successful, this all available resources
+            // the matching was never successful, thus all available resources
             // remain
             remainingResources = resources;
         }
