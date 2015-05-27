@@ -1,7 +1,6 @@
 rock_library(organization_model
     SOURCES
         Algebra.cpp
-        algebra/ResourceSupport.cpp
         algebra/ResourceSupportVector.cpp
         ccf/Actor.cpp
         ccf/CombinedActor.cpp
@@ -26,7 +25,6 @@ rock_library(organization_model
         utils/CoalitionStructureGeneration.cpp
     HEADERS
         Algebra.hpp
-        algebra/ResourceSupport.hpp
         algebra/ResourceSupportVector.hpp
         ccf/Actor.hpp
         ccf/CombinedActor.hpp

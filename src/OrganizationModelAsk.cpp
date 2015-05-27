@@ -270,6 +270,33 @@ bool OrganizationModelAsk::canProvidePartialSupport(const Service& service, cons
     return false;
 }
 
+uint32_t OrganizationModelAsk::getFunctionalSaturationPoint(const Service& service, const owlapi::model::IRI& model) const
+{
+    algebra::ResourceSupportVector serviceSupportVector = getSupportVector(service.getModel(), IRIList(), false /*useMaxCardinality*/);
+    algebra::ResourceSupportVector modelSupportVector = getSupportVector(model, serviceSupportVector.getLabels(), true /*useMaxCardinality*/);
+
+    algebra::ResourceSupportVector ratios = serviceSupportVector.getRatios(modelSupportVector);
+
+    LOG_DEBUG_S << "Service: " << serviceSupportVector.toString();
+    LOG_DEBUG_S << "Provider: " << modelSupportVector.toString();
+    LOG_DEBUG_S << "Ratios: " << ratios.toString();
+    // max in the set of ratio tells us how many model instances
+    // contribute to fulfill this service (even partially)
+    double max = 0.0;
+    for(uint32_t i = 0; i < ratios.size(); ++i)
+    {
+        double val = ratios(i);
+        if(val != std::numeric_limits<double>::quiet_NaN())
+        {
+            if(val > max)
+            {
+                max = val;
+            }
+        }
+    }
+    return static_cast<uint32_t>( std::ceil(max) );
+}
+
 std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v2(const ServiceSet& services) const
 {
     std::set<ModelCombination> modelCombinations;
@@ -386,5 +413,123 @@ bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const Service
         return false;
     }
 }
+
+algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owlapi::model::IRI& model,
+        const owlapi::model::IRIList& filterLabels,
+        bool useMaxCardinality) const
+{
+    using namespace owlapi::model;
+    std::vector<OWLCardinalityRestriction::Ptr> restrictions = mOntologyAsk.getCardinalityRestrictions(model);
+    std::map<IRI, OWLCardinalityRestriction::MinMax> modelCount = OWLCardinalityRestriction::getBounds(restrictions);
+    return getSupportVector(modelCount, filterLabels, useMaxCardinality);
+
+}
+
+algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std::map<owlapi::model::IRI,
+    owlapi::model::OWLCardinalityRestriction::MinMax>& modelBounds,
+    const owlapi::model::IRIList& filterLabels, bool useMaxCardinality) const
+{
+    using namespace owlapi::model;
+
+    base::VectorXd vector;
+    std::vector<IRI> labels;
+
+    if(filterLabels.empty())
+    {
+        vector = base::VectorXd::Zero(modelBounds.size());
+
+        std::map<IRI, OWLCardinalityRestriction::MinMax>::const_iterator cit = modelBounds.begin();
+        uint32_t i = 0;
+        for(; cit != modelBounds.end(); ++cit)
+        {
+            labels.push_back(cit->first);
+            // using max value
+            if(useMaxCardinality)
+            {
+                vector(i++) = cit->second.second;
+            } else {
+                vector(i++) = cit->second.first;
+            }
+        }
+    } else {
+        vector = base::VectorXd::Zero(filterLabels.size());
+        labels = filterLabels;
+
+        std::vector<IRI>::const_iterator cit = filterLabels.begin();
+        uint32_t dimension = 0;
+        for(; cit != filterLabels.end(); ++cit)
+        {
+            const IRI& dimensionLabel = *cit;
+            std::map<IRI, OWLCardinalityRestriction::MinMax>::const_iterator mit = modelBounds.begin();
+            for(; mit != modelBounds.end(); ++mit)
+            {
+                const IRI& modelDimensionLabel = mit->first;
+                LOG_DEBUG_S << "Check model support for " << dimensionLabel << "  from " << modelDimensionLabel;
+
+                // Sum the requirement/availability of this model type
+                if(dimensionLabel == modelDimensionLabel || mOntologyAsk.isSubclassOf(modelDimensionLabel, dimensionLabel))
+                {
+                    if(useMaxCardinality)
+                    {
+                        LOG_DEBUG_S << "update " << dimension << " with " << mit->second.second << " -- min is "<< mit->second.first;
+                        // using max value
+                        vector(dimension) += mit->second.second;
+                    } else {
+                        // using min value
+                        LOG_DEBUG_S << "update " << dimension << " with min " << mit->second.first << " -- max is "<< mit->second.second;
+                        vector(dimension) += mit->second.first;
+                    }
+                } else {
+                    LOG_DEBUG_S << "No support";
+                    // nothing to do
+                }
+            }
+            ++dimension;
+        }
+    }
+
+    LOG_DEBUG_S << "Get support vector" << std::endl
+        << "    " << vector << std::endl
+        << "    " << labels;
+
+    return algebra::ResourceSupportVector(vector, labels);
+}
+
+//owlapi::model::IRIList OrganizationModelAsk::filterSupportedModels(const owlapi::model::IRIList& combinations,
+//        const owlapi::model::IRIList& serviceModels)
+//{
+//    using namespace owlapi::model;
+//
+//    std::vector<OWLCardinalityRestriction::Ptr> providerRestrictions =
+//            ontology()->getCardinalityRestrictions(combinations);
+//    owlapi::model::IRIList supportedModels;
+//
+//    owlapi::model::IRIList::const_iterator it = serviceModels.begin();
+//    for(; it != serviceModels.end(); ++it)
+//    {
+//        owlapi::model::IRI serviceModel = *it;
+//        std::vector<OWLCardinalityRestriction::Ptr> serviceRestrictions =
+//            ontology()->getCardinalityRestrictions(serviceModel);
+//
+//        std::map<IRI, OWLCardinalityRestriction::MinMax> serviceModelCount = OWLCardinalityRestriction::getBounds(serviceRestrictions);
+//        // get minimum requirements
+//        bool useMaxCardinality = false;
+//        ResourceSupportVector serviceSupportVector = getSupportVector(serviceModelCount, IRIList(), useMaxCardinality);
+//
+//        std::map<IRI, OWLCardinalityRestriction::MinMax> providerModelCount = OWLCardinalityRestriction::getBounds(providerRestrictions);
+//        // Use all available
+//        useMaxCardinality = true;
+//        ResourceSupportVector providerSupportVector = getSupportVector(providerModelCount, serviceSupportVector.getLabels(), useMaxCardinality);
+//
+//        if( serviceSupportVector.fullSupportFrom(providerSupportVector) )
+//        {
+//            supportedModels.push_back(serviceModel);
+//            LOG_DEBUG_S << "Full support for: ";
+//            LOG_DEBUG_S << "    service model: " << serviceModel;
+//            LOG_DEBUG_S << "    from combination of provider models: " << combinations;
+//        }
+//    }
+//    return supportedModels;
+//}
 
 } // end namespace organization_model

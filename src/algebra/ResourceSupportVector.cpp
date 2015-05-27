@@ -1,6 +1,8 @@
 #include "ResourceSupportVector.hpp"
 #include <math.h>
 #include <sstream>
+#include <base/Logging.hpp>
+#include <organization_model/OrganizationModelAsk.hpp>
 
 namespace organization_model {
 namespace algebra {
@@ -45,22 +47,29 @@ bool ResourceSupportVector::contains(const ResourceSupportVector& other) const
 
 bool ResourceSupportVector::fullSupportFrom(const ResourceSupportVector& other) const
 {
-    double dos = degreeOfSupport(other);
-    if(dos >= 1)
-    {
-        return true;
-    }
-    return false;
+    return other.contains(*this);
 }
 
 bool ResourceSupportVector::partialSupportFrom(const ResourceSupportVector& other) const
 {
-    double dos = degreeOfSupport(other);
-    if(dos > 0 && dos < 1)
+    return other.mSizes.dot(mSizes) != 0;
+}
+
+ResourceSupportVector ResourceSupportVector::getRatios(const ResourceSupportVector& other) const
+{
+    uint32_t maxDimensions = other.size();
+    ResourceSupportVector ratio( base::VectorXd::Zero(maxDimensions), mLabels);
+    for(uint32_t dim = 0; dim < maxDimensions; ++dim)
     {
-        return true;
+        double otherDim = other(dim);
+        if(std::abs(otherDim) < 1E-05)
+        {
+            ratio(dim) = std::numeric_limits<double>::quiet_NaN();
+        } else {
+            ratio(dim) = mSizes(dim) / otherDim;
+        }
     }
-    return false;
+    return ratio;
 }
 
 ResourceSupportVector ResourceSupportVector::missingSupportFrom(const ResourceSupportVector& other) const
@@ -80,45 +89,40 @@ ResourceSupportVector ResourceSupportVector::missingSupportFrom(const ResourceSu
     return delta;
 }
 
-double ResourceSupportVector::degreeOfSupport(const ResourceSupportVector& other) const
-{
-    // The projection of vector OS onto OR will give the degree of support,
-    // where OS can be interpreted as available resources, and OR as required resources
-    //
-    // .. ............S
-    // |             .
-    // |             .
-    // R             .
-    // |             .
-    // O-----------
-    //
-
-    // http://eigen.tuxfamily.org/dox-devel/classEigen_1_1MatrixBase.html#ad10353dcb54de8fbe27619cffd7fced5
-    double squaredNorm = mSizes.squaredNorm(); //dot(mSizes);
-    if(squaredNorm > 0)
-    {
-        // [1 1] -> current support [1camera 1battery]
-        // [3 1] -> current support [3cameras 1battery]
-        //
-        // 1*3 + 1*1 = 4
-        // 4 / sqrt(2) = 2.828
-        //
-        // double dotProduct = mSizes.dot(other.mSizes);
-        // dotProduct / mSizes.norm() refers to the unit vector, but
-        // since we want to refer to the actual size of the current
-        // vector we divide a second time by the norm leading to the squaredNorm
-        return mSizes.dot(other.mSizes) / squaredNorm;
-    } else{
-        throw std::runtime_error("organization_model::algebra::ResourceSupportVector::degreeOfSupport \
-                norm is null of current resource support vector -- cannot compute support degree");
-    }
-}
-
 std::string ResourceSupportVector::toString() const
 {
     std::stringstream ss;
+    ss << "ResourceSupportVector: ";
+    ss << mLabels << ", ";
     ss << mSizes;
     return ss.str();
+}
+
+ResourceSupportVector ResourceSupportVector::embedClassRelationship(const OrganizationModelAsk& ask)
+{
+    using namespace owlapi::model;
+
+    ResourceSupportVector supportVector = *this;
+
+    uint32_t max = supportVector.size();
+    std::vector<IRI> labels = supportVector.getLabels();
+    for(uint32_t i = 0; i < max; ++i)
+    {
+        IRI i_model = labels[i];
+        for(uint32_t a = i+1; a < max; ++a)
+        {
+            IRI a_model = labels[a];
+
+            if(ask.ontology().isSubclassOf(i_model, a_model))
+            {
+                supportVector(a) += supportVector(i);
+            } else if(ask.ontology().isSubclassOf(a_model, i_model))
+            {
+                supportVector(i) += supportVector(a);
+            }
+        }
+    }
+    return supportVector;
 }
 
 void ResourceSupportVector::checkDimensions(const ResourceSupportVector& a, const ResourceSupportVector& b)
@@ -142,6 +146,7 @@ bool ResourceSupportVector::isNonNegative(const ResourceSupportVector& a)
     }
     return true;
 }
+
 
 } // end namespace algebra
 } // end namespace organization_model

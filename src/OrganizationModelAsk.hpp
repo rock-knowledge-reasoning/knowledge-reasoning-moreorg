@@ -4,11 +4,14 @@
 #include <owlapi/model/OWLCardinalityRestriction.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <organization_model/OrganizationModel.hpp>
+#include <organization_model/algebra/ResourceSupportVector.hpp>
 
 namespace organization_model {
 
 class OrganizationModelAsk
 {
+    friend class algebra::ResourceSupportVector;
+
 public:
     typedef boost::shared_ptr<OrganizationModelAsk> Ptr;
 
@@ -62,7 +65,7 @@ public:
      *     functionality (and when switching into providing redundancy only)
      *  \return number of instances required for functional saturation
      */
-    uint32_t getFunctionalSaturationPoint(const Service& service, const owlapi::model::IRI& model) const {return 0;}
+    uint32_t getFunctionalSaturationPoint(const Service& service, const owlapi::model::IRI& model) const;
 
     /**
      * Get the set of resources
@@ -85,6 +88,22 @@ public:
     bool canBeDistinct(const ModelCombination& a, const ModelCombination& b) const;
 
     bool isSupporting(const ModelCombination& c, const ServiceSet& services) const;
+
+    /**
+     * Get the support vector for a given model
+     * Does not(!) account for (sub)class relationship
+     */
+    algebra::ResourceSupportVector getSupportVector(const owlapi::model::IRI& model,
+        const owlapi::model::IRIList& filterLabels = owlapi::model::IRIList(),
+        bool useMaxCardinality = false) const;
+
+    algebra::ResourceSupportVector getSupportVector(const std::map<owlapi::model::IRI,
+        owlapi::model::OWLCardinalityRestriction::MinMax>& modelBounds,
+        const owlapi::model::IRIList& filterLabels = owlapi::model::IRIList(),
+        bool useMaxCardinality = false ) const;
+
+    owlapi::model::IRIList filterSupportedModels(const owlapi::model::IRIList& combinations,
+        const owlapi::model::IRIList& serviceModels);
 
 protected:
     /**
