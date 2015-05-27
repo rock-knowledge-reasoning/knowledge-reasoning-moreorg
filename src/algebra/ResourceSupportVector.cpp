@@ -55,6 +55,30 @@ bool ResourceSupportVector::partialSupportFrom(const ResourceSupportVector& othe
     return other.mSizes.dot(mSizes) != 0;
 }
 
+ResourceSupportVector ResourceSupportVector::operator*(double factor) const
+{
+    ResourceSupportVector scaledVector = *this;
+    scaledVector.mSizes *= factor;
+    return scaledVector;
+}
+
+SupportType ResourceSupportVector::getSupportFrom(const ResourceSupportVector& other,
+        const OrganizationModelAsk& ask) const
+{
+    ResourceSupportVector a = this->embedClassRelationship(ask);
+    ResourceSupportVector b = other.embedClassRelationship(ask);
+
+    if(a.fullSupportFrom(b))
+    {
+        return FULL_SUPPORT;
+    } else if(a.partialSupportFrom(b))
+    {
+        return PARTIAL_SUPPORT;
+    } else {
+        return NO_SUPPORT;
+    }
+}
+
 ResourceSupportVector ResourceSupportVector::getRatios(const ResourceSupportVector& other) const
 {
     uint32_t maxDimensions = other.size();
@@ -98,7 +122,7 @@ std::string ResourceSupportVector::toString() const
     return ss.str();
 }
 
-ResourceSupportVector ResourceSupportVector::embedClassRelationship(const OrganizationModelAsk& ask)
+ResourceSupportVector ResourceSupportVector::embedClassRelationship(const OrganizationModelAsk& ask) const
 {
     using namespace owlapi::model;
 

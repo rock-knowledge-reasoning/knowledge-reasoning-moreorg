@@ -36,6 +36,8 @@ namespace algebra {
  * to be expected redundancy (0+0+3)/(1+1+1) = 1
  *
  */
+enum SupportType { NO_SUPPORT, PARTIAL_SUPPORT, FULL_SUPPORT };
+
 class ResourceSupportVector
 {
 public:
@@ -62,9 +64,7 @@ public:
      */
     bool contains(const ResourceSupportVector& other) const;
 
-    bool fullSupportFrom(const ResourceSupportVector& other) const;
-
-    bool partialSupportFrom(const ResourceSupportVector& other) const;
+    SupportType getSupportFrom(const ResourceSupportVector& other, const OrganizationModelAsk& ask) const;
 
     /**
      * Compute the ratios per dimension, i.e. new(0) = this(0) / other(0);
@@ -89,12 +89,19 @@ public:
 
     size_t size() const { return mSizes.size(); }
 
-    ResourceSupportVector embedClassRelationship(const OrganizationModelAsk& ask);
+    ResourceSupportVector embedClassRelationship(const OrganizationModelAsk& ask) const;
+
+    ResourceSupportVector operator*(double factor) const;
 
 protected:
     static void checkDimensions(const ResourceSupportVector& a, const ResourceSupportVector& b);
 
     static bool isNonNegative(const ResourceSupportVector& a);
+
+    bool fullSupportFrom(const ResourceSupportVector& other) const;
+
+    bool partialSupportFrom(const ResourceSupportVector& other) const;
+
 
 private:
     base::VectorXd mSizes;

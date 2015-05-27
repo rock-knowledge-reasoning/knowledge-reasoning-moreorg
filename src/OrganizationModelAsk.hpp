@@ -39,28 +39,22 @@ public:
     std::set<ModelCombinationSet> getResourceSupport(const ServiceSet& services) const;
 
     /**
-     * Check if a service can be supported by a model -- given enough instances
-     * of this model are provided 
+     * Check how a service is supported by a model if given cardinality
+     * of this model is provided
      * \see getFunctionalSaturationPoint in order to find the minimum number
-     * required to provide the functionality (if full support can be achieved)
+     * \return required to provide the functionality (if full support can be achieved)
      */
-    bool canProvideFullSupport(const Service& service, const owlapi::model::IRI& model) const;
-
-    /**
-     * Check if a service can be at least partially supported by a model
-     * \see getFunctionalSaturationPoint in order to find the maximum number
-     * of model instances that actually contribute to enable the functionality 
-     * (otherwise they only contribute to a higher redundancy)
-     */
-    bool canProvidePartialSupport(const Service& service, const owlapi::model::IRI& model) const;
+    algebra::SupportType getSupportType(const Service& service,
+            const owlapi::model::IRI& model,
+            uint32_t cardinalityOfModel = 1) const;
 
     /**
      *  Depending on the contribution of a model to the service the functional
      *  saturation point can be interpreted differently:
-     *  1. when all requires resources are provided by the model:
+     *  1. when all required resources (FULL_SUPPORT) are provided by the model:
      *     -- check how many instances are required of this model to achieve
      *     full functionality
-     *  2. when only a partial set of resource are provided:
+     *  2. when only a partial set of resource are provided (PARTIAL_SUPPORT)
      *     -- check how many instances are actually contributing to enable the
      *     functionality (and when switching into providing redundancy only)
      *  \return number of instances required for functional saturation
@@ -89,9 +83,21 @@ public:
 
     bool isSupporting(const ModelCombination& c, const ServiceSet& services) const;
 
+protected:
+    /**
+     * Prepare the organization model for a given set of available models
+     */
+    void prepare();
+
+    /**
+     * Compute the functionality maps for the combination of models from a
+     * limited set of available models
+     */
+    void computeFunctionalityMaps(const ModelPool& modelPool);
+
     /**
      * Get the support vector for a given model
-     * Does not(!) account for (sub)class relationship
+     * Does not (!) account for (sub)class relationship
      */
     algebra::ResourceSupportVector getSupportVector(const owlapi::model::IRI& model,
         const owlapi::model::IRIList& filterLabels = owlapi::model::IRIList(),
@@ -104,18 +110,6 @@ public:
 
     owlapi::model::IRIList filterSupportedModels(const owlapi::model::IRIList& combinations,
         const owlapi::model::IRIList& serviceModels);
-
-protected:
-    /**
-     * Prepare the organization model for a given set of available models
-     */
-    void prepare();
-
-    /**
-     * Compute the functionality maps for the combination of models from a
-     * limited set of available models
-     */
-    void computeFunctionalityMaps(const ModelPool& modelPool);
 
     /**
      * Return ontology that relates to this Ask object
@@ -131,7 +125,9 @@ private:
     /// Maps a functionality to combination that support this functionality
     Function2CombinationMap mFunction2Combination;
 
-    /// Current set pool of models
+    /// Current pool of models, i.e.
+    /// how many instances of type X,Y
+    /// to be considered
     ModelPool mModelPool;
 };
 

@@ -257,23 +257,23 @@ std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v1(co
     return modelCombinationSet;
 }
 
-bool OrganizationModelAsk::canProvideFullSupport(const Service& service, const owlapi::model::IRI& model) const
+algebra::SupportType OrganizationModelAsk::getSupportType(const Service& service, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
 {
-    std::vector<OWLCardinalityRestriction::Ptr> serviceRequirements = mOntologyAsk.getCardinalityRestrictions(service.getModel());
-    std::vector<OWLCardinalityRestriction::Ptr> modelRequirements = mOntologyAsk.getCardinalityRestrictions(model);
+    algebra::ResourceSupportVector serviceSupportVector = getSupportVector(service.getModel(), IRIList(), false /*useMaxCardinality*/);
+    algebra::ResourceSupportVector modelSupportVector = 
+        getSupportVector(model, serviceSupportVector.getLabels(), true /*useMaxCardinality*/)*
+        static_cast<double>(cardinalityOfModel);
 
-    return false;
-}
-
-bool OrganizationModelAsk::canProvidePartialSupport(const Service& service, const owlapi::model::IRI& model) const
-{
-    return false;
+    return serviceSupportVector.getSupportFrom(modelSupportVector, *this);
 }
 
 uint32_t OrganizationModelAsk::getFunctionalSaturationPoint(const Service& service, const owlapi::model::IRI& model) const
 {
     algebra::ResourceSupportVector serviceSupportVector = getSupportVector(service.getModel(), IRIList(), false /*useMaxCardinality*/);
     algebra::ResourceSupportVector modelSupportVector = getSupportVector(model, serviceSupportVector.getLabels(), true /*useMaxCardinality*/);
+
+    serviceSupportVector = serviceSupportVector.embedClassRelationship(*this);
+    modelSupportVector = modelSupportVector.embedClassRelationship(*this);
 
     algebra::ResourceSupportVector ratios = serviceSupportVector.getRatios(modelSupportVector);
 
