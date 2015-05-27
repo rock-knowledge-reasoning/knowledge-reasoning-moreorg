@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <organization_model/algebra/ResourceSupport.hpp>
 #include <organization_model/OrganizationModel.hpp>
+#include <organization_model/OrganizationModelAsk.hpp>
 #include "test_utils.hpp"
 #include <owlapi/Vocabulary.hpp>
 
@@ -15,20 +16,40 @@ BOOST_AUTO_TEST_CASE(resource_support)
     using namespace owlapi::model;
 
     OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.7.owl"));
+    OrganizationModelAsk ask(om);
     {
-        IRI system = OM::resolve("Sherpa");
-        IRI service  = OM::resolve("StereoImageProvider");
 
-        IRIList combination;
-        combination.push_back(system);
+        IRI actor = OM::resolve("Actor");
+        IRI sherpa = OM::resolve("Sherpa");
+        IRI crex = OM::resolve("CREX");
 
-        IRIList services;
-        services.push_back(service);
+        IRIList resources;
+        resources.push_back(sherpa);
+        resources.push_back(actor);
+        resources.push_back(crex);
 
-        ResourceSupport resourceSupport(om);
-        IRIList supportedServices = resourceSupport.filterSupportedModels(combination, services);
-        BOOST_REQUIRE_MESSAGE(supportedServices.size() == 1, "Sherpa support StereoImagerProvider");
+        base::VectorXd count = base::VectorXd::Zero(3);
+        count(0) = 1;
+        count(1) = 1;
+        count(2) = 1;
+        ResourceSupportVector supportVector(count, resources);
+
+        ResourceSupportVector e_supportVector = supportVector.embedClassRelationship(ask);
+        BOOST_TEST_MESSAGE("Test: " << e_supportVector.toString());
     }
+    //{
+    //    IRI system = OM::resolve("Sherpa");
+    //    IRI service  = OM::resolve("StereoImageProvider");
+
+    //    IRIList combination;
+    //    combination.push_back(system);
+
+    //    IRIList services;
+    //    services.push_back(service);
+
+    //    IRIList supportedServices = om.filterSupportedModels(combination, services);
+    //    BOOST_REQUIRE_MESSAGE(supportedServices.size() == 1, "Sherpa support StereoImagerProvider");
+    //}
 }
 
 
@@ -63,18 +84,30 @@ BOOST_AUTO_TEST_CASE(resource_support_vector)
         BOOST_REQUIRE_MESSAGE(!b.contains(a), "ResourceSupportVector b does not contain a");
 
         {
-            double dos = a.degreeOfSupport(b);
-            BOOST_REQUIRE_MESSAGE(dos < 1 && dos > 0, "Degree of support from b for a is < 1, but > 0: " << dos);
-
             ResourceSupportVector missing = a.missingSupportFrom(b);
             BOOST_REQUIRE_MESSAGE(missing(2) == 1, "Missing support in dimension 2: " << missing(2));
         }
+    }
 
-        {
-            double dos = b.degreeOfSupport(a);
-            BOOST_REQUIRE_MESSAGE((dos - 1.0) >= -1E-06 , "Degree of support from b for a is >= 1 value is: " << dos);
-            BOOST_CHECK_EQUAL(dos, 1.0);
-        }
+    {
+        base::VectorXd aSizes(3);
+        aSizes(0) = 1;
+        aSizes(1) = 1;
+        aSizes(2) = 1;
+
+        ResourceSupportVector a(aSizes);
+
+        base::VectorXd bSizes(3);
+        bSizes(0) = 0;
+        bSizes(1) = 0;
+        bSizes(2) = 3;
+        ResourceSupportVector b(bSizes);
+
+        ResourceSupportVector intersection = ResourceSupportVector::intersection(a,b);
+
+        BOOST_REQUIRE_MESSAGE(intersection(0) == 0, "Dim 0 --> 0");
+        BOOST_REQUIRE_MESSAGE(intersection(1) == 0, "Dim 1 --> 0");
+        BOOST_REQUIRE_MESSAGE(intersection(2) == 1, "Dim 1 --> 1");
     }
 }
 

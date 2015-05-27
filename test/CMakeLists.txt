@@ -6,4 +6,5 @@ rock_testsuite(${PROJECT_NAME}-test suite.cpp
     test_Algebra.cpp
     test_Metrics.cpp
     test_OrganizationModel.cpp
+    test_OrganizationModelAsk.cpp
     DEPS organization_model)
