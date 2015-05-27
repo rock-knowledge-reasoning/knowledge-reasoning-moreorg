@@ -1,6 +1,8 @@
 #ifndef ORGANIZATION_MODEL_ASK_HPP
 #define ORGANIZATION_MODEL_ASK_HPP
 
+#include <owlapi/model/OWLCardinalityRestriction.hpp>
+#include <owlapi/model/OWLOntologyAsk.hpp>
 #include <organization_model/OrganizationModel.hpp>
 
 namespace organization_model {
@@ -8,6 +10,8 @@ namespace organization_model {
 class OrganizationModelAsk
 {
 public:
+    typedef boost::shared_ptr<OrganizationModelAsk> Ptr;
+
     OrganizationModelAsk(OrganizationModel::Ptr om, const ModelPool& modelPool = ModelPool());
 
     /**
@@ -94,8 +98,14 @@ protected:
      */
     void computeFunctionalityMaps(const ModelPool& modelPool);
 
+    /**
+     * Return ontology that relates to this Ask object
+     */
+    owlapi::model::OWLOntologyAsk ontology() const { return mOntologyAsk; }
+
 private:
     OrganizationModel::Ptr mpOrganizationModel;
+    owlapi::model::OWLOntologyAsk mOntologyAsk;
 
     /// Maps a combination to its supported functionality
     Combination2FunctionMap mCombination2Function;

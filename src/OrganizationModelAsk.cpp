@@ -9,6 +9,8 @@
 #include <numeric/LimitedCombination.hpp>
 #include <owlapi/Vocabulary.hpp>
 
+#include <base/Logging.hpp>
+
 using namespace owlapi::model;
 using namespace owlapi::vocabulary;
 
@@ -16,9 +18,13 @@ namespace organization_model {
 
 OrganizationModelAsk::OrganizationModelAsk(OrganizationModel::Ptr om, const ModelPool& modelPool)
     : mpOrganizationModel(om)
+    , mOntologyAsk(om->ontology())
     , mModelPool(modelPool)
 {
-    prepare();
+    if(!modelPool.empty())
+    {
+        prepare();
+    }
 }
 
 void OrganizationModelAsk::prepare()
@@ -29,13 +35,19 @@ void OrganizationModelAsk::prepare()
 owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
 {
     bool directSubclassOnly = false;
-    IRIList subclasses = mpOrganizationModel->ask()->allSubclassesOf(OM::Service(), directSubclassOnly);
+    IRIList subclasses = mOntologyAsk.allSubclassesOf(OM::Service(), directSubclassOnly);
     return subclasses;
 }
 
 void OrganizationModelAsk::computeFunctionalityMaps(const ModelPool& modelPool)
 {
-    numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(modelPool, 
+    if(modelPool.empty())
+    {
+        throw std::invalid_argument("organization_model::OrganizationModel::computeFunctionalityMaps"
+                " cannot compute functionality map for empty model pool");
+    }
+
+    numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(modelPool,
             numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(modelPool), numeric::MAX);
 
     mCombination2Function.clear();
@@ -100,7 +112,7 @@ std::set<ModelCombinationSet> OrganizationModelAsk::getResourceSupport(const Ser
         // Iterate over all service providers
         // 1. check if existing service provider provides the current service
         //   -- if not check if resources are sufficient to provide both
-        //   --   if so add to the updated resource list 
+        //   --   if so add to the updated resource list
         bool init = true;
         Function2CombinationMap::const_iterator cit = serviceProviders.begin();
         for(; cit != serviceProviders.end(); ++cit)
@@ -247,8 +259,8 @@ std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v1(co
 
 bool OrganizationModelAsk::canProvideFullSupport(const Service& service, const owlapi::model::IRI& model) const
 {
-    std::vector<OWLCardinalityRestriction::Ptr> serviceRequirements = mpOrganizationModel->ask()->getCardinalityRestrictions(service.getModel());
-    std::vector<OWLCardinalityRestriction::Ptr> modelRequirements = mpOrganizationModel->ask()->getCardinalityRestrictions(model); 
+    std::vector<OWLCardinalityRestriction::Ptr> serviceRequirements = mOntologyAsk.getCardinalityRestrictions(service.getModel());
+    std::vector<OWLCardinalityRestriction::Ptr> modelRequirements = mOntologyAsk.getCardinalityRestrictions(model);
 
     return false;
 }
@@ -307,7 +319,7 @@ uint32_t OrganizationModelAsk::minRequiredCardinality(const ServiceSet& services
 
         if( isSupporting(combination, services) )
         {
-            upper = currentPosition; 
+            upper = currentPosition;
             supportExists = true;
         } else {
             lower = currentPosition + 1;

@@ -17,6 +17,7 @@ rock_library(organization_model
         ModelPool.cpp
         OrganizationModel.cpp
         OrganizationModelAsk.cpp
+        OrganizationModelTell.cpp
         organization_model/ActorModelLink.cpp
         organization_model/EndpointModel.cpp
         organization_model/Grounding.cpp
@@ -41,6 +42,7 @@ rock_library(organization_model
         ModelPool.hpp
         OrganizationModel.hpp
         OrganizationModelAsk.hpp
+        OrganizationModelTell.hpp
         organization_model/ActorModelLink.hpp
         organization_model/EndpointModel.hpp
         organization_model/Grounding.hpp

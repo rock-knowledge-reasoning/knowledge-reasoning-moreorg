@@ -6,16 +6,10 @@
 #include <organization_model/ModelPool.hpp>
 #include <owlapi/model/OWLOntology.hpp>
 
-namespace owlapi {
-namespace model {
-
-class OWLOntologyTell;
-class OWLOntologyAsk;
-
-} // end namespace model
-} // end namespace owlapi
-
 namespace organization_model {
+
+class OrganizationModelAsk;
+class OrganizationModelTell;
 
 typedef owlapi::model::IRIList ModelCombination;
 typedef std::vector<ModelCombination> ModelCombinationList;
@@ -86,6 +80,7 @@ Ontology::Ptr ontology = om.ontology();
 class OrganizationModel
 {
     friend class OrganizationModelAsk;
+    friend class OrganizationModelTell;
 
 public:
     typedef boost::shared_ptr<OrganizationModel> Ptr;
@@ -114,18 +109,9 @@ public:
     static ModelPool combination2ModelPool(const ModelCombination& combination);
     static ModelCombination modelPool2Combination(const ModelPool& pool);
 
-    boost::shared_ptr<owlapi::model::OWLOntologyAsk> ask() { return mpAsk; }
-
-protected:
-    boost::shared_ptr<owlapi::model::OWLOntologyTell> tell() { return mpTell; }
-
 private:
     /// Ontology that serves as basis for this organization model
     owlapi::model::OWLOntology::Ptr mpOntology;
-
-    boost::shared_ptr<owlapi::model::OWLOntologyAsk> mpAsk;
-    boost::shared_ptr<owlapi::model::OWLOntologyTell> mpTell;
-
 };
 
 } // end namespace organization_model

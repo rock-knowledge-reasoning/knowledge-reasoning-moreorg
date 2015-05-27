@@ -1,7 +1,6 @@
 #include "OrganizationModel.hpp"
-
-#include <owlapi/model/OWLOntologyAsk.hpp>
-#include <owlapi/model/OWLOntologyTell.hpp>
+#include "OrganizationModelAsk.hpp"
+#include "OrganizationModelTell.hpp"
 #include <owlapi/model/OWLOntologyReader.hpp>
 #include <boost/make_shared.hpp>
 
@@ -22,9 +21,6 @@ OrganizationModel::OrganizationModel(const std::string& filename)
         OWLOntologyReader reader;
         mpOntology = reader.fromFile(filename);
     }
-
-    mpTell = boost::make_shared<OWLOntologyTell>(mpOntology);
-    mpAsk = boost::make_shared<OWLOntologyAsk>(mpOntology);
 }
 
 OrganizationModel OrganizationModel::copy() const
