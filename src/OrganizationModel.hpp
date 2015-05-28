@@ -109,6 +109,8 @@ public:
     static ModelPool combination2ModelPool(const ModelCombination& combination);
     static ModelCombination modelPool2Combination(const ModelPool& pool);
 
+    static OrganizationModel::Ptr getInstance(const std::string& filename = "");
+
 private:
     /// Ontology that serves as basis for this organization model
     owlapi::model::OWLOntology::Ptr mpOntology;

@@ -93,4 +93,9 @@ ModelCombination OrganizationModel::modelPool2Combination(const ModelPool& pool)
     return combination;
 }
 
+OrganizationModel::Ptr OrganizationModel::getInstance(const std::string& filename)
+{
+    return boost::make_shared<OrganizationModel>(filename);
+}
+
 } // end namespace organization_model
