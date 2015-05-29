@@ -18,8 +18,13 @@ typedef std::set<ModelCombination> ModelCombinationSet;
 /// Maps a 'combined system' to the functionality it can 'theoretically'
 /// provide when looking at its resources
 typedef std::map<ModelCombination, owlapi::model::IRIList> Combination2FunctionMap;
-typedef std::map<owlapi::model::IRI, ModelCombinationList > Function2CombinationMap;
+typedef std::map<owlapi::model::IRI, ModelCombinationSet > Function2CombinationMap;
 
+struct FunctionalityMapping
+{
+    Combination2FunctionMap combination2Function;
+    Function2CombinationMap function2Combination;
+};
 
 class Service
 {

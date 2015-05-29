@@ -29,7 +29,7 @@ OrganizationModelAsk::OrganizationModelAsk(OrganizationModel::Ptr om, const Mode
 
 void OrganizationModelAsk::prepare()
 {
-    computeFunctionalityMaps(mModelPool);
+    mFunctionalityMapping = getFunctionalityMapping(mModelPool);
 }
 
 owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
@@ -39,21 +39,21 @@ owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
     return subclasses;
 }
 
-void OrganizationModelAsk::computeFunctionalityMaps(const ModelPool& modelPool)
+FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPool& modelPool) const
 {
+    FunctionalityMapping functionalityMapping;
+
     if(modelPool.empty())
     {
-        throw std::invalid_argument("organization_model::OrganizationModel::computeFunctionalityMaps"
+        throw std::invalid_argument("organization_model::OrganizationModel::getFunctionalityMaps"
                 " cannot compute functionality map for empty model pool");
     }
 
     numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(modelPool,
             numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(modelPool), numeric::MAX);
 
-    mCombination2Function.clear();
-    mFunction2Combination.clear();
-
     IRIList serviceModels = getServiceModels();
+    std::pair<Combination2FunctionMap, Function2CombinationMap> functionalityMaps;
 
     uint32_t count = 0;
     do {
@@ -75,17 +75,19 @@ void OrganizationModelAsk::computeFunctionalityMaps(const ModelPool& modelPool)
         LOG_WARN_S << "    --> required time: " << (stopTime - startTime).toSeconds();
         // Update the mapping functions - forward and inverse mapping from
         // model/combination to function
-        mCombination2Function[combination] = supportedServiceModels;
+        functionalityMapping.combination2Function[combination] = supportedServiceModels;
         IRIList::const_iterator cit = supportedServiceModels.begin();
         for(; cit != supportedServiceModels.end(); ++cit)
         {
             IRI iri = *cit;
-            mFunction2Combination[iri].push_back(combination);
+            functionalityMapping.function2Combination[iri].insert(combination);
         }
     } while(limitedCombination.next());
+
+    return functionalityMapping;
 }
 
-std::set<ModelCombinationSet> OrganizationModelAsk::getResourceSupport(const ServiceSet& services) const
+std::set<ModelCombination> OrganizationModelAsk::getResourceSupport(const ServiceSet& services) const
 {
     /// Store the systems that support the functionality
     /// i.e. per requested function the combination of models that support it,
@@ -96,81 +98,84 @@ std::set<ModelCombinationSet> OrganizationModelAsk::getResourceSupport(const Ser
         {
             const Service& service = *cit;
             const owlapi::model::IRI& serviceModel =  service.getModel();
-            Function2CombinationMap::const_iterator fit = mFunction2Combination.find(serviceModel);
-            if(fit != mFunction2Combination.end())
+            Function2CombinationMap::const_iterator fit = mFunctionalityMapping.function2Combination.find(serviceModel);
+            if(fit != mFunctionalityMapping.function2Combination.end())
             {
                 serviceProviders[serviceModel] = fit->second;
             } else {
                 LOG_DEBUG_S << "Could not find resource support for service: '" << serviceModel;
-                return std::set<ModelCombinationSet>();
+                return std::set<ModelCombination>();
             }
         }
     }
 
-    std::set<ModelCombinationSet> resources;
+    // If looking for a combined system that can provide the service
+    // Intersection of the sects is the solution
+
+    std::set<ModelCombination> resultSet;
+    Function2CombinationMap::const_iterator cit = serviceProviders.begin();
+    for(; cit != serviceProviders.end(); ++cit)
     {
-        // Iterate over all service providers
-        // 1. check if existing service provider provides the current service
-        //   -- if not check if resources are sufficient to provide both
-        //   --   if so add to the updated resource list
-        bool init = true;
-        Function2CombinationMap::const_iterator cit = serviceProviders.begin();
-        for(; cit != serviceProviders.end(); ++cit)
-        {
-            const Service& service = cit->first;
-            const ModelCombinationList& combinationList = cit->second;
-
-            LOG_DEBUG_S << "Checking service: " << service.getModel();
-
-            if(init)
-            {
-                ModelCombinationList::const_iterator combinationIt = combinationList.begin();
-                for(; combinationIt != combinationList.end(); ++combinationIt)
-                {
-                    ModelCombinationSet set;
-                    set.insert(*combinationIt);
-                    resources.insert(set);
-                }
-                init = false;
-                continue;
-            } else {
-
-                std::set<ModelCombinationSet> updatedResourceList;
-                ModelCombinationList::const_iterator combinationIt = combinationList.begin();
-                for(; combinationIt != combinationList.end(); ++combinationIt)
-                {
-                    const ModelCombination& combination = *combinationIt;
-                    LOG_DEBUG_S << "ModelCombination: " << IRI::toString(combination, true);
-
-                    std::set<ModelCombinationSet>::const_iterator mit = resources.begin();
-                    for(; mit != resources.end(); ++mit)
-                    {
-                        const ModelCombinationSet& combinationSet = *mit;
-
-                        ModelPool requirements = Algebra::merge(combinationSet, combination);
-                        ModelPoolDelta delta = Algebra::delta(requirements, mModelPool);
-                        LOG_DEBUG_S << "Existing " << ModelPoolDelta(mModelPool).toString();
-                        LOG_DEBUG_S << "Requirements " << ModelPoolDelta(requirements).toString();
-                        LOG_DEBUG_S << "Delta " << delta.toString();
-
-                        if( delta.isNegative() )
-                        {
-                            // not enough resources
-                            LOG_DEBUG_S << "Not enough resources";
-                        } else {
-                            std::set< ModelCombination > updatedCombinationSet = combinationSet;
-                            LOG_DEBUG_S << "Enough resources";
-                            updatedCombinationSet.insert(combination);
-
-                            updatedResourceList.insert( updatedCombinationSet );
-                        }
-                    }
-                }
-                resources = updatedResourceList;
-            }
-        }
+        std::set_intersection(
     }
-    return resources;
+
+    //// Use ModelCombination here in order to generate
+    //std::set<ModelCombination> resources;
+    //{
+    //    // Iterate over all service providers
+    //    // 1. check if existing service provider provides the current service
+    //    //   -- if not then check if resources are sufficient to provide both
+    //    //   --   if so add to the updated resource list
+    //    Function2CombinationMap::const_iterator cit = serviceProviders.begin();
+    //    for(; cit != serviceProviders.end(); ++cit)
+    //    {
+    //        const Service& service = cit->first;
+    //        // Combinations that support the given service
+    //        const ModelCombinationList& combinationList = cit->second;
+
+    //        LOG_DEBUG_S << "Checking service: " << service.getModel();
+
+    //        if(resources.empty())
+    //        {
+    //            ModelCombinationList::const_iterator combinationIt = combinationList.begin();
+    //            for(; combinationIt != combinationList.end(); ++combinationIt)
+    //            {
+    //                resources.insert(*combinationIt);
+    //            }
+    //            continue;
+    //        } else {
+
+    //            std::set<ModelCombination> updatedResources;
+
+    //            ModelCombinationList::const_iterator combinationIt = combinationList.begin();
+    //            for(; combinationIt != combinationList.end(); ++combinationIt)
+    //            {
+    //                const ModelCombination& combination = *combinationIt;
+    //                LOG_DEBUG_S << "ModelCombination: " << IRI::toString(combination, true);
+
+    //                std::set<ModelCombination>::const_iterator mit = resources.begin();
+    //                for(; mit != resources.end(); ++mit)
+    //                {
+    //                    ModelPool requirements = Algebra::merge(*mit, combination);
+    //                    ModelPoolDelta delta = Algebra::delta(requirements, mModelPool);
+    //                    LOG_DEBUG_S << "Existing " << ModelPoolDelta(mModelPool).toString();
+    //                    LOG_DEBUG_S << "Requirements " << ModelPoolDelta(requirements).toString();
+    //                    LOG_DEBUG_S << "Delta " << delta.toString();
+
+    //                    if( delta.isNegative() )
+    //                    {
+    //                        // not enough resources
+    //                        LOG_DEBUG_S << "Not enough resources";
+    //                    } else {
+    //                        updatedResources.insert(  
+    //                    }
+    //                }
+    //            }
+    //            resources = updatedResources;
+    //        }
+    //    }
+    //}
+    //return resources;
 
 
     ///// Go through the set of combinations and find valid
@@ -222,40 +227,45 @@ std::set<ModelCombinationSet> OrganizationModelAsk::getResourceSupport(const Ser
 }
 
 
-std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport(const ServiceSet& services) const
-{
-    return getMinimalResourceSupport_v1(services);
-}
-
-std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v1(const ServiceSet& services) const
-{
-    std::set<ModelCombination> modelCombinationSet;
-    std::set<ModelCombinationSet> modelSet = getResourceSupport(services);
-    std::set<ModelCombinationSet>::const_iterator cit = modelSet.begin();
-    for(; cit != modelSet.end(); ++cit)
-    {
-        const ModelCombinationSet& combinations = *cit;
-        ModelCombinationSet::const_iterator mit = combinations.begin();
-
-        ModelPoolDelta delta;
-        bool init = true;
-
-        for(; mit != combinations.end(); ++mit)
-        {
-            if(init)
-            {
-                delta = OrganizationModel::combination2ModelPool(*mit);
-                init = false;
-            } else {
-                delta = Algebra::sum( OrganizationModel::combination2ModelPool(*mit), delta );
-            }
-        }
-
-        ModelPool pool = delta.toModelPool();
-        modelCombinationSet.insert( OrganizationModel::modelPool2Combination(pool) );
-    }
-    return modelCombinationSet;
-}
+//std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport(const ServiceSet& services) const
+//{
+//
+//    ModelPool upperBound = getFunctionalSaturationBound(services);
+//    FuncationalityMapping functionalityMapping = getFunctionalityMappings(upperBound);
+//
+//
+//
+//}
+//
+//std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v1(const ServiceSet& services) const
+//{
+//    std::set<ModelCombination> modelCombinationSet;
+//    std::set<ModelCombinationSet> modelSet = getResourceSupport(services);
+//    std::set<ModelCombinationSet>::const_iterator cit = modelSet.begin();
+//    for(; cit != modelSet.end(); ++cit)
+//    {
+//        const ModelCombinationSet& combinations = *cit;
+//        ModelCombinationSet::const_iterator mit = combinations.begin();
+//
+//        ModelPoolDelta delta;
+//        bool init = true;
+//
+//        for(; mit != combinations.end(); ++mit)
+//        {
+//            if(init)
+//            {
+//                delta = OrganizationModel::combination2ModelPool(*mit);
+//                init = false;
+//            } else {
+//                delta = Algebra::sum( OrganizationModel::combination2ModelPool(*mit), delta );
+//            }
+//        }
+//
+//        ModelPool pool = delta.toModelPool();
+//        modelCombinationSet.insert( OrganizationModel::modelPool2Combination(pool) );
+//    }
+//    return modelCombinationSet;
+//}
 
 algebra::SupportType OrganizationModelAsk::getSupportType(const Service& service, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
 {
@@ -267,7 +277,7 @@ algebra::SupportType OrganizationModelAsk::getSupportType(const Service& service
     return serviceSupportVector.getSupportFrom(modelSupportVector, *this);
 }
 
-uint32_t OrganizationModelAsk::getFunctionalSaturationPoint(const Service& service, const owlapi::model::IRI& model) const
+uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const Service& service, const owlapi::model::IRI& model) const
 {
     algebra::ResourceSupportVector serviceSupportVector = getSupportVector(service.getModel(), IRIList(), false /*useMaxCardinality*/);
     algebra::ResourceSupportVector modelSupportVector = getSupportVector(model, serviceSupportVector.getLabels(), true /*useMaxCardinality*/);
@@ -297,69 +307,98 @@ uint32_t OrganizationModelAsk::getFunctionalSaturationPoint(const Service& servi
     return static_cast<uint32_t>( std::ceil(max) );
 }
 
-std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v2(const ServiceSet& services) const
+ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Service& service) const
 {
-    std::set<ModelCombination> modelCombinations;
-    std::vector<owlapi::model::IRI> models = ModelPoolDelta::getModels(mModelPool);
-
-    // Check 'type-clean' service support
-    std::vector<owlapi::model::IRI>::const_iterator cit = models.begin();
-    for(; cit != models.end(); ++cit)
+    ModelPool upperBounds;
+    ModelPool::const_iterator cit = mModelPool.begin();
+    for(; cit != mModelPool.end(); ++cit)
     {
-        try {
-            int32_t minCardinality = minRequiredCardinality(services, *cit);
-            ModelPool modelPool;
-            modelPool[*cit] = minCardinality;
-
-            modelCombinations.insert( OrganizationModel::modelPool2Combination(modelPool) );
-        } catch(const std::runtime_error& e)
-        {
-            LOG_DEBUG_S << e.what();
-        }
+        uint32_t saturation = getFunctionalSaturationBound(service, cit->first);
+        upperBounds[cit->first] = saturation;
     }
-    return modelCombinations;
+    return upperBounds;
 }
 
-uint32_t OrganizationModelAsk::minRequiredCardinality(const ServiceSet& services, const owlapi::model::IRI& model) const
+ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const ServiceSet& services) const
 {
-    uint32_t lower = 1;
-    ModelPool::const_iterator cit = mModelPool.find(model);
-    if(cit != mModelPool.end())
+    ModelPool upperBounds;
+    ServiceSet::const_iterator cit = services.begin();
+    for(; cit != services.end(); ++cit)
     {
-        throw std::invalid_argument("organization_model::OrganizationModelAsk::minRequiredCardinality: could not find model '" + model.toString() + "' in pool");
-    }
+        ModelPool saturation = getFunctionalSaturationBound(*cit);
 
-    uint32_t upper = cit->second;
-
-    bool supportExists = false;
-
-    uint32_t currentPosition;
-    do
-    {
-        currentPosition = static_cast<uint32_t>( (lower + upper) / 2.0 );
-
-        ModelCombination combination;
-        for(uint32_t i = 0; i < currentPosition; ++i)
+        ModelPool::const_iterator mit = saturation.begin();
+        for(; mit != saturation.end(); ++mit)
         {
-            combination.push_back(model);
+            upperBounds[mit->first] = std::max(upperBounds[mit->first], saturation[mit->first]);
         }
-
-        if( isSupporting(combination, services) )
-        {
-            upper = currentPosition;
-            supportExists = true;
-        } else {
-            lower = currentPosition + 1;
-        }
-    } while(currentPosition < upper);
-
-    if(!supportExists)
-    {
-        throw std::runtime_error("OrganizationModelAsk::minRequired no cardinality of model '" + model.toString() + "' can provide the given set of services");
     }
-
-    return currentPosition;
+    return upperBounds;
 }
+
+//std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport_v2(const ServiceSet& services) const
+//{
+//    std::set<ModelCombination> modelCombinations;
+//    std::vector<owlapi::model::IRI> models = ModelPoolDelta::getModels(mModelPool);
+//
+//    // Check 'type-clean' service support
+//    std::vector<owlapi::model::IRI>::const_iterator cit = models.begin();
+//    for(; cit != models.end(); ++cit)
+//    {
+//        try {
+//            int32_t minCardinality = minRequiredCardinality(services, *cit);
+//            ModelPool modelPool;
+//            modelPool[*cit] = minCardinality;
+//
+//            modelCombinations.insert( OrganizationModel::modelPool2Combination(modelPool) );
+//        } catch(const std::runtime_error& e)
+//        {
+//            LOG_DEBUG_S << e.what();
+//        }
+//    }
+//    return modelCombinations;
+//}
+//
+//uint32_t OrganizationModelAsk::minRequiredCardinality(const ServiceSet& services, const owlapi::model::IRI& model) const
+//{
+//    uint32_t lower = 1;
+//    ModelPool::const_iterator cit = mModelPool.find(model);
+//    if(cit != mModelPool.end())
+//    {
+//        throw std::invalid_argument("organization_model::OrganizationModelAsk::minRequiredCardinality: could not find model '" + model.toString() + "' in pool");
+//    }
+//
+//    uint32_t upper = cit->second;
+//
+//    bool supportExists = false;
+//
+//    uint32_t currentPosition;
+//    do
+//    {
+//        currentPosition = static_cast<uint32_t>( (lower + upper) / 2.0 );
+//
+//        ModelCombination combination;
+//        for(uint32_t i = 0; i < currentPosition; ++i)
+//        {
+//            combination.push_back(model);
+//        }
+//
+//        if( isSupporting(combination, services) )
+//        {
+//            upper = currentPosition;
+//            supportExists = true;
+//        } else {
+//            lower = currentPosition + 1;
+//        }
+//    } while(currentPosition < upper);
+//
+//    if(!supportExists)
+//    {
+//        throw std::runtime_error("OrganizationModelAsk::minRequired no cardinality of model '" + model.toString() + "' can provide the given set of services");
+//    }
+//
+//    return currentPosition;
+//}
 
 bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelCombination& b) const
 {
@@ -380,8 +419,8 @@ bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const Service
     for(; cit != services.end(); ++cit)
     {
         const Service& service = *cit;
-        Function2CombinationMap::const_iterator cit = mFunction2Combination.find(service.getModel());
-        if(cit != mFunction2Combination.end())
+        Function2CombinationMap::const_iterator cit = mFunctionalityMapping.function2Combination.find(service.getModel());
+        if(cit != mFunctionalityMapping.function2Combination.end())
         {
             throw std::runtime_error("organization_model::OrganizationModelAsk::isSupporting \
                     could not find service '" + service.getModel().toString() + "'");

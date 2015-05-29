@@ -24,9 +24,11 @@ public:
 
     void setModelPool(const ModelPool& modelPool) { mModelPool = modelPool; }
 
-    const Combination2FunctionMap& getCombination2FunctionMap() const { return mCombination2Function; }
-
-    const Function2CombinationMap& getFunction2CombinationMap() const { return mFunction2Combination; }
+    /**
+     * Get the functionality mapping for the model pool this object was
+     * initialized with
+     */
+    const FunctionalityMapping& getFunctionalityMapping() const { return mFunctionalityMapping; }
 
     /**
      * Get the set of resources (as combination of models) that should support a given
@@ -36,12 +38,12 @@ public:
      * \param services should be a set of services / service models
      * \return available resources to support this set of services
      */
-    std::set<ModelCombinationSet> getResourceSupport(const ServiceSet& services) const;
+    std::set<ModelCombination> getResourceSupport(const ServiceSet& services);
 
     /**
      * Check how a service is supported by a model if given cardinality
      * of this model is provided
-     * \see getFunctionalSaturationPoint in order to find the minimum number
+     * \see getFunctionalSaturationBound in order to find the minimum number
      * \return required to provide the functionality (if full support can be achieved)
      */
     algebra::SupportType getSupportType(const Service& service,
@@ -59,22 +61,39 @@ public:
      *     functionality (and when switching into providing redundancy only)
      *  \return number of instances required for functional saturation
      */
-    uint32_t getFunctionalSaturationPoint(const Service& service, const owlapi::model::IRI& model) const;
+    uint32_t getFunctionalSaturationBound(const Service& service, const owlapi::model::IRI& model) const;
 
     /**
-     * Get the set of resources
-     * \return available resources to support this set of services
+     * Compute the upper bound for the cardinality of each resource model
+     * \return Cardinality bound for resource models
      */
-    std::set<ModelCombination> getMinimalResourceSupport(const ServiceSet& services) const;
-
-    std::set<ModelCombination> getMinimalResourceSupport_v1(const ServiceSet& services) const;
-    std::set<ModelCombination> getMinimalResourceSupport_v2(const ServiceSet& services) const;
+    ModelPool getFunctionalSaturationBound(const Service& service) const;
 
     /**
-     * Retrieve the minimum cardinality of given model to support the set of
-     * services
+     * Compute the upper bound for the cardinality of each resource model
+     * to support the given set of services
+     * \return Cardinality bound for resource models
      */
-    uint32_t minRequiredCardinality(const ServiceSet& services, const owlapi::model::IRI& model) const;
+    ModelPool getFunctionalSaturationBound(const ServiceSet& services) const;
+
+    ///**
+    // * Get the set of resources
+    // * \return available resources to support this set of services
+    // */
+    //std::set<ModelCombination> getMinimalResourceSupport(const ServiceSet& services) const;
+
+    ///**
+    // * This function computes the minimal resource support for a set of services
+    // * by analyzing the existing ResourceSupport for each service and 
+    // */
+    //std::set<ModelCombination> getMinimalResourceSupport_v1(const ServiceSet& services) const;
+    //std::set<ModelCombination> getMinimalResourceSupport_v2(const ServiceSet& services) const;
+
+    ///**
+    // * Retrieve the minimum cardinality of given model to support the set of
+    // * services
+    // */
+    //uint32_t minRequiredCardinality(const ServiceSet& services, const owlapi::model::IRI& model) const;
 
     /**
      * Check if two ModelCombinations can be built from distinct resources
@@ -90,10 +109,10 @@ protected:
     void prepare();
 
     /**
-     * Compute the functionality maps for the combination of models from a
-     * limited set of available models
+     * Get the functionality maps for the combination of models from a
+     * (limited) set of available models
      */
-    void computeFunctionalityMaps(const ModelPool& modelPool);
+     FunctionalityMapping getFunctionalityMapping(const ModelPool& modelPool) const;
 
     /**
      * Get the support vector for a given model
@@ -120,10 +139,8 @@ private:
     OrganizationModel::Ptr mpOrganizationModel;
     owlapi::model::OWLOntologyAsk mOntologyAsk;
 
-    /// Maps a combination to its supported functionality
-    Combination2FunctionMap mCombination2Function;
-    /// Maps a functionality to combination that support this functionality
-    Function2CombinationMap mFunction2Combination;
+    /// Maps a combination to its supported functionality and vice versa
+    FunctionalityMapping mFunctionalityMapping;
 
     /// Current pool of models, i.e.
     /// how many instances of type X,Y

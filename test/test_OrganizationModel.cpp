@@ -33,10 +33,11 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
 
     OrganizationModelAsk ask(om, items);
 
-    Combination2FunctionMap c2f = ask.getCombination2FunctionMap();
+    FunctionalityMapping fm = ask.getFunctionalityMapping();
+    Combination2FunctionMap c2f = fm.combination2Function;
     BOOST_TEST_MESSAGE("Combination to function: " << OrganizationModel::toString(c2f));
 
-    Function2CombinationMap f2c = ask.getFunction2CombinationMap();
+    Function2CombinationMap f2c = fm.function2Combination;
     BOOST_TEST_MESSAGE("Function to combination: " << OrganizationModel::toString(f2c));
 }
 
@@ -115,7 +116,11 @@ BOOST_AUTO_TEST_CASE(resource_support)
         //BOOST_REQUIRE_MESSAGE(combinations.size() > 1000, "Combinations that support stereo image provider, was " << combinations.size());
 
         {
-            std::set<ModelCombination> combinations = ask.getMinimalResourceSupport(services);
+            OrganizationModelAsk ask(om); 
+            ModelPool modelPoolBounded = ask.getFunctionalSaturationBound(services);
+
+            OrganizationModelAsk minimalAsk(om, modelPoolBounded);
+            std::set<ModelCombinationSet> combinations = minimalAsk.getResourceSupport(services);
             std::set<ModelCombination>::const_iterator cit = combinations.begin();
             for(; cit != combinations.end(); ++cit)
             {
