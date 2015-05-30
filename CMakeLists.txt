@@ -3,5 +3,5 @@
 cmake_minimum_required(VERSION 2.6)
 find_package(Rock)
 rock_init(organization_model 0.2)
-list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
+rock_activate_cxx11()
 rock_standard_layout()

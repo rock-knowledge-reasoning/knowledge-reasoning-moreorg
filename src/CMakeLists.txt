@@ -1,3 +1,4 @@
+find_package(Boost REQUIRED thread)
 rock_library(organization_model
     SOURCES
         Algebra.cpp
@@ -49,8 +50,8 @@ rock_library(organization_model
         utils/CoalitionStructureGeneration.hpp
         utils/CorrelationClustering.hpp
     DEPS_PKGCONFIG numeric pddl_planner owlapi
+    LIBS glpk ${Boost_THREAD_LIBRARY}
 )
-target_link_libraries(organization_model glpk)
 
 #rock_executable(organization_model_bin Main.cpp
 #    DEPS organization_model)
