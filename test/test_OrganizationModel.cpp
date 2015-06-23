@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         ServiceSet services;
         services.insert( Service(OM::resolve("StereoImageProvider") ) );
 
-        std::set<ModelCombinationSet> combinations = ask.getResourceSupport(services);
+        ModelCombinationSet combinations = ask.getResourceSupport(services);
 
         BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider");
     }
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         ServiceSet services;
         services.insert( Service(OM::resolve("StereoImageProvider") ) );
 
-        std::set<ModelCombinationSet> combinations = ask.getResourceSupport(services);
+        ModelCombinationSet combinations = ask.getResourceSupport(services);
 
         BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider");
     }
@@ -120,8 +120,8 @@ BOOST_AUTO_TEST_CASE(resource_support)
             ModelPool modelPoolBounded = ask.getFunctionalSaturationBound(services);
 
             OrganizationModelAsk minimalAsk(om, modelPoolBounded);
-            std::set<ModelCombinationSet> combinations = minimalAsk.getResourceSupport(services);
-            std::set<ModelCombination>::const_iterator cit = combinations.begin();
+            ModelCombinationSet combinations = minimalAsk.getResourceSupport(services);
+            ModelCombinationSet::const_iterator cit = combinations.begin();
             for(; cit != combinations.end(); ++cit)
             {
                 BOOST_TEST_MESSAGE("ModelCombination: " << ModelPoolDelta( OrganizationModel::combination2ModelPool(*cit)).toString() );

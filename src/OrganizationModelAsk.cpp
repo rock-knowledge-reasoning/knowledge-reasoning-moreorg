@@ -87,7 +87,7 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
     return functionalityMapping;
 }
 
-std::set<ModelCombination> OrganizationModelAsk::getResourceSupport(const ServiceSet& services) const
+ModelCombinationSet OrganizationModelAsk::getResourceSupport(const ServiceSet& services) const
 {
     /// Store the systems that support the functionality
     /// i.e. per requested function the combination of models that support it,
@@ -104,20 +104,37 @@ std::set<ModelCombination> OrganizationModelAsk::getResourceSupport(const Servic
                 serviceProviders[serviceModel] = fit->second;
             } else {
                 LOG_DEBUG_S << "Could not find resource support for service: '" << serviceModel;
-                return std::set<ModelCombination>();
+                return ModelCombinationSet();
             }
         }
     }
 
-    // If looking for a combined system that can provide the service
-    // Intersection of the sects is the solution
-
+    // If looking for a combined system that can provide all the services
+    // requested, then the intersection of the sects is the solution of this
+    // request
+    bool init = true;
     std::set<ModelCombination> resultSet;
     Function2CombinationMap::const_iterator cit = serviceProviders.begin();
     for(; cit != serviceProviders.end(); ++cit)
     {
-        std::set_intersection(
+        std::set<ModelCombination> lastResult;
+        const std::set<ModelCombination>& currentSet = cit->second;
+        if(init)
+        {
+            lastResult = currentSet;
+            init = false;
+            continue;
+        } else {
+            lastResult = resultSet;
+        }
+
+        resultSet.clear();
+        std::set_intersection(currentSet.begin(), currentSet.end(), lastResult.begin(), lastResult.end(),
+                std::inserter(resultSet, resultSet.begin()));
+
     }
+
+    return resultSet;
 
     //// Use ModelCombination here in order to generate
     //std::set<ModelCombination> resources;
@@ -414,7 +431,7 @@ bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelC
 bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const ServiceSet& services) const
 {
     ServiceSet::const_iterator cit = services.begin();
-    ModelCombinationList previousCombinations;
+    ModelCombinationSet previousCombinations;
     bool init = true;
     for(; cit != services.end(); ++cit)
     {
@@ -426,7 +443,7 @@ bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const Service
                     could not find service '" + service.getModel().toString() + "'");
         }
 
-        const ModelCombinationList& combination = cit->second;
+        const ModelCombinationSet& combination = cit->second;
         if(init)
         {
             previousCombinations = combination;
@@ -434,17 +451,14 @@ bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const Service
             continue;
         }
 
-        ModelCombinationList resultList;
-        ModelCombinationList::iterator it;
-        it = std::set_intersection(combination.begin(), combination.end(),
+        ModelCombinationSet resultList;
+        std::set_intersection(combination.begin(), combination.end(),
                 previousCombinations.begin(), previousCombinations.end(),
-                resultList.begin());
-         resultList.resize(it - resultList.begin());
-
-         previousCombinations = resultList;
+                std::inserter(resultList, resultList.begin()) );
+         previousCombinations.insert(resultList.begin(), resultList.end());
     }
 
-    ModelCombinationList::const_iterator pit = std::find(previousCombinations.begin(), previousCombinations.end(), c);
+    ModelCombinationSet::const_iterator pit = std::find(previousCombinations.begin(), previousCombinations.end(), c);
     if(pit != previousCombinations.end())
     {
         return true;

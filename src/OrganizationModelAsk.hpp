@@ -38,7 +38,7 @@ public:
      * \param services should be a set of services / service models
      * \return available resources to support this set of services
      */
-    std::set<ModelCombination> getResourceSupport(const ServiceSet& services);
+    ModelCombinationSet getResourceSupport(const ServiceSet& services) const;
 
     /**
      * Check how a service is supported by a model if given cardinality

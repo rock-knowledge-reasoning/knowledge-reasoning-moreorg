@@ -31,21 +31,21 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
 
         Service service(stereoImageProvider);
         {
-            uint32_t saturationPoint = ask.getFunctionalSaturationPoint(service, sherpa);
+            uint32_t saturationPoint = ask.getFunctionalSaturationBound(service, sherpa);
             BOOST_REQUIRE_MESSAGE(saturationPoint == 1, "1 Sherpa sufficient for StereoImageProvider: was " << saturationPoint);
 
             algebra::SupportType supportType = ask.getSupportType(service, sherpa, saturationPoint);
             BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from sherpa for StereoImageProvider at saturation point");
         }
         {
-            uint32_t saturationPoint = ask.getFunctionalSaturationPoint(service, payload);
+            uint32_t saturationPoint = ask.getFunctionalSaturationBound(service, payload);
             BOOST_REQUIRE_MESSAGE(saturationPoint == 0, "0 Payload sufficient for StereoImageProvider: was " << saturationPoint);
 
             algebra::SupportType supportType = ask.getSupportType(service, payload, saturationPoint);
             BOOST_REQUIRE_MESSAGE(supportType == algebra::NO_SUPPORT, "No support from payload for StereoImageProvider");
         }
         {
-            uint32_t saturationPoint = ask.getFunctionalSaturationPoint(service, payloadCamera);
+            uint32_t saturationPoint = ask.getFunctionalSaturationBound(service, payloadCamera);
             BOOST_REQUIRE_MESSAGE(saturationPoint == 2, "2 PayloadCamera sufficient for StereoImageProvider: was" << saturationPoint);
 
             algebra::SupportType supportType = ask.getSupportType(service, payloadCamera, saturationPoint);

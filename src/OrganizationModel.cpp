@@ -53,9 +53,9 @@ std::string OrganizationModel::toString(const Function2CombinationMap& functionC
         ss << "    function:    " << cit->first.getFragment() << std::endl;
         ss << "        supported by:" << std::endl;
 
-        const ModelCombinationList& combinationsList = cit->second;
-        ModelCombinationList::const_iterator comIt = combinationsList.begin();
-        for(; comIt != combinationsList.end(); ++comIt)
+        const ModelCombinationSet& combinationsSet = cit->second;
+        ModelCombinationSet::const_iterator comIt = combinationsSet.begin();
+        for(; comIt != combinationsSet.end(); ++comIt)
         {
             ss << "        combination:    " << IRI::toString(*comIt, true) << std::endl;
         }
