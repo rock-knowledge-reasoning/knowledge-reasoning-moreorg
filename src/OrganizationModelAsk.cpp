@@ -19,18 +19,18 @@ namespace organization_model {
 OrganizationModelAsk::OrganizationModelAsk(OrganizationModel::Ptr om, const ModelPool& modelPool)
     : mpOrganizationModel(om)
     , mOntologyAsk(om->ontology())
-    , mModelPool(modelPool)
 {
     if(!modelPool.empty())
     {
-        prepare();
+        prepare(modelPool);
     } else {
         LOG_WARN_S << "No model pool provided: did not prepare functionality mappings";
     }
 }
 
-void OrganizationModelAsk::prepare()
+void OrganizationModelAsk::prepare(const ModelPool& modelPool)
 {
+    mModelPool = modelPool;
     mFunctionalityMapping = getFunctionalityMapping(mModelPool);
 }
 

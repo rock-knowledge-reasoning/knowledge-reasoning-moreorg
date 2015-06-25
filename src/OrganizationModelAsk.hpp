@@ -107,11 +107,11 @@ public:
      */
     std::string toString() const;
 
-protected:
     /**
      * Prepare the organization model for a given set of available models
      */
-    void prepare();
+    void prepare(const ModelPool& modelPool);
+protected:
 
     /**
      * Get the functionality maps for the combination of models from a
