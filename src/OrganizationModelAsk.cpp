@@ -548,6 +548,17 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std:
     return algebra::ResourceSupportVector(vector, labels);
 }
 
+std::string OrganizationModelAsk::toString() const
+{
+    std::stringstream ss;
+    ss << "FunctionalityMapping:" << std::endl;
+    ss << mFunctionalityMapping.toString() << std::endl;
+
+    ModelPoolDelta mp(mModelPool);
+    ss << mp.toString() << std::endl;
+    return ss.str();
+}
+
 //owlapi::model::IRIList OrganizationModelAsk::filterSupportedModels(const owlapi::model::IRIList& combinations,
 //        const owlapi::model::IRIList& serviceModels)
 //{

@@ -102,6 +102,11 @@ public:
 
     bool isSupporting(const ModelCombination& c, const ServiceSet& services) const;
 
+    /**
+     * Provide debug information about the status of this object
+     */
+    std::string toString() const;
+
 protected:
     /**
      * Prepare the organization model for a given set of available models
