@@ -124,6 +124,22 @@ ModelCombination OrganizationModel::modelPool2Combination(const ModelPool& pool)
     return combination;
 }
 
+std::string OrganizationModel::toString(const ModelCombinationSet& combinations)
+{
+    std::stringstream ss;
+    ModelCombinationSet::const_iterator cit = combinations.begin();
+    for(; cit != combinations.end();)
+    {
+        ss << owlapi::model::IRI::toString(*cit, true);
+        ++cit;
+        if(cit != combinations.end())
+        {
+            ss << ",";
+        }
+    }
+    return ss.str();
+}
+
 OrganizationModel::Ptr OrganizationModel::getInstance(const std::string& filename)
 {
     return boost::make_shared<OrganizationModel>(filename);

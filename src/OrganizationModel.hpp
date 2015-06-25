@@ -110,11 +110,11 @@ public:
     OrganizationModel copy() const;
 
     static std::string toString(const Combination2FunctionMap& combinationFunctionMap);
-
     static std::string toString(const Function2CombinationMap& functionCombinationMap);
 
     static ModelPool combination2ModelPool(const ModelCombination& combination);
     static ModelCombination modelPool2Combination(const ModelPool& pool);
+    static std::string toString(const ModelCombinationSet& combinations);
 
     static OrganizationModel::Ptr getInstance(const std::string& filename = "");
 
