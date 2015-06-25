@@ -24,6 +24,8 @@ OrganizationModelAsk::OrganizationModelAsk(OrganizationModel::Ptr om, const Mode
     if(!modelPool.empty())
     {
         prepare();
+    } else {
+        LOG_WARN_S << "No model pool provided: did not prepare functionality mappings";
     }
 }
 
@@ -89,8 +91,15 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
 
 ModelCombinationSet OrganizationModelAsk::getResourceSupport(const ServiceSet& services) const
 {
+    if(services.empty())
+    {
+        std::invalid_argument("organization_model::OrganizationModelAsk::getResourceSupport:"
+                " no service given in request");
+    }
+
     /// Store the systems that support the functionality
     /// i.e. per requested function the combination of models that support it,
+    LOG_DEBUG_S << "FunctionalityMap: " << mFunctionalityMapping.toString();
     Function2CombinationMap serviceProviders;
     {
         ServiceSet::const_iterator cit = services.begin();
@@ -108,20 +117,27 @@ ModelCombinationSet OrganizationModelAsk::getResourceSupport(const ServiceSet& s
             }
         }
     }
+    LOG_DEBUG_S << "Found service providers: " << OrganizationModel::toString(serviceProviders);
+
+    // Only requested one service
+    if(services.size() == 1)
+    {
+        return serviceProviders.begin()->second;
+    }
 
     // If looking for a combined system that can provide all the services
     // requested, then the intersection of the sects is the solution of this
     // request
     bool init = true;
     std::set<ModelCombination> resultSet;
+    std::set<ModelCombination> lastResult;
     Function2CombinationMap::const_iterator cit = serviceProviders.begin();
     for(; cit != serviceProviders.end(); ++cit)
     {
-        std::set<ModelCombination> lastResult;
         const std::set<ModelCombination>& currentSet = cit->second;
         if(init)
         {
-            lastResult = currentSet;
+            resultSet = currentSet;
             init = false;
             continue;
         } else {
@@ -129,9 +145,11 @@ ModelCombinationSet OrganizationModelAsk::getResourceSupport(const ServiceSet& s
         }
 
         resultSet.clear();
+        LOG_DEBUG_S << "Intersection: current set: " << OrganizationModel::toString(currentSet);
+        LOG_DEBUG_S << "Intersection: last set: " << OrganizationModel::toString(lastResult);
         std::set_intersection(currentSet.begin(), currentSet.end(), lastResult.begin(), lastResult.end(),
                 std::inserter(resultSet, resultSet.begin()));
-
+        LOG_DEBUG_S << "Intersection: result" << OrganizationModel::toString(resultSet);
     }
 
     return resultSet;
