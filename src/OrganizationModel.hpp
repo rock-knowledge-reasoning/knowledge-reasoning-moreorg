@@ -24,6 +24,8 @@ struct FunctionalityMapping
 {
     Combination2FunctionMap combination2Function;
     Function2CombinationMap function2Combination;
+
+    std::string toString() const;
 };
 
 class Service
