@@ -65,8 +65,8 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         std::sort(combination.begin(), combination.end());
 
         LOG_WARN_S << "Check combination #" << ++count;
-        LOG_WARN_S << "    --> combination:             " << combination;
-        LOG_WARN_S << "    --> possible service models: " << serviceModels;
+        LOG_WARN_S << "   | --> combination:             " << combination;
+        LOG_WARN_S << "   | --> possible service models: " << serviceModels;
 
         base::Time startTime = base::Time::now();
         // Filter the serviceModel (from the existing set) which are supported
@@ -74,7 +74,7 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         IRIList supportedServiceModels = owlapi::csp::ResourceMatch::filterSupportedModels(combination, serviceModels, mpOrganizationModel->ontology());
 
         base::Time stopTime = base::Time::now();
-        LOG_WARN_S << "    --> required time: " << (stopTime - startTime).toSeconds();
+        LOG_WARN_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
         // Update the mapping functions - forward and inverse mapping from
         // model/combination to function
         functionalityMapping.combination2Function[combination] = supportedServiceModels;
@@ -282,6 +282,9 @@ ModelCombinationSet OrganizationModelAsk::applyUpperBound(const ModelCombination
             boundedCombinations.insert(combination);
         }
     }
+    LOG_DEBUG_S << "Bound set of resources: " << std::endl
+        << organization_model::ModelPoolDelta(upperBound).toString() << std::endl
+        << OrganizationModel::toString(boundedCombinations);
     return boundedCombinations;
 }
 
