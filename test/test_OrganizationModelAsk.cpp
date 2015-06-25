@@ -20,15 +20,10 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
     IRI payload = OM::resolve("Payload");
     IRI payloadCamera = OM::resolve("PayloadCamera");
 
+    IRI stereoImageProvider = OM::resolve("StereoImageProvider");
+
     OrganizationModelAsk ask(om);
     {
-
-        IRI sherpa = OM::resolve("Sherpa");
-        IRI payload = OM::resolve("Payload");
-        IRI payloadCamera = OM::resolve("PayloadCamera");
-
-        IRI stereoImageProvider = OM::resolve("StereoImageProvider");
-
         Service service(stereoImageProvider);
         {
             uint32_t saturationPoint = ask.getFunctionalSaturationBound(service, sherpa);
@@ -51,6 +46,21 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
             algebra::SupportType supportType = ask.getSupportType(service, payloadCamera, saturationPoint);
             BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from payload camera for StereoImageProvider at saturation point");
         }
+    }
+
+    {
+        ModelPool modelPool;
+        modelPool[sherpa] = 1;
+        modelPool[crex] = 1;
+
+        ask.prepare(modelPool);
+
+        ServiceSet serviceSet;
+        Service service(stereoImageProvider);
+        serviceSet.insert(service);
+
+        ModelCombinationSet combinations = ask.getBoundedResourceSupport(serviceSet);
+        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << OrganizationModel::toString(combinations) << "'");
     }
 }
 
