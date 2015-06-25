@@ -261,6 +261,30 @@ ModelCombinationSet OrganizationModelAsk::getResourceSupport(const ServiceSet& s
     //return resources;
 }
 
+ModelCombinationSet OrganizationModelAsk::getBoundedResourceSupport(const ServiceSet& services) const
+{
+    ModelCombinationSet combinations = getResourceSupport(services);
+    ModelPool bound = getFunctionalSaturationBound(services);
+    return applyUpperBound(combinations, bound);
+}
+
+ModelCombinationSet OrganizationModelAsk::applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBound) const
+{
+    ModelCombinationSet boundedCombinations;
+    ModelCombinationSet::const_iterator cit = combinations.begin();
+    for(; cit != combinations.end(); ++cit)
+    {
+        const ModelCombination& combination = *cit;
+        ModelPool modelPool = OrganizationModel::combination2ModelPool(combination);
+        ModelPoolDelta delta = Algebra::delta(upperBound, modelPool);
+        if(delta.isNegative())
+        {
+            boundedCombinations.insert(combination);
+        }
+    }
+    return boundedCombinations;
+}
+
 
 //std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport(const ServiceSet& services) const
 //{

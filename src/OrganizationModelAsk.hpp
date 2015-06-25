@@ -41,6 +41,15 @@ public:
     ModelCombinationSet getResourceSupport(const ServiceSet& services) const;
 
     /**
+     * Get the set of resources that should support a given list of services, 
+     * bounded by the FunctionalSaturationBound
+     * \return bound set of combinations
+     */
+    ModelCombinationSet getBoundedResourceSupport(const ServiceSet& services) const;
+
+    ModelCombinationSet applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBounds) const;
+
+    /**
      * Check how a service is supported by a model if given cardinality
      * of this model is provided
      * \see getFunctionalSaturationBound in order to find the minimum number
@@ -65,13 +74,18 @@ public:
 
     /**
      * Compute the upper bound for the cardinality of each resource model
+     * for a given service
+     * This function does take into account the model pool, but computes
+     * a global bound
      * \return Cardinality bound for resource models
      */
     ModelPool getFunctionalSaturationBound(const Service& service) const;
 
     /**
      * Compute the upper bound for the cardinality of each resource model
-     * to support the given set of services
+     * to support the given set of services (union of services)
+     * This function does take into account the model pool, but computes
+     * a global bound
      * \return Cardinality bound for resource models
      */
     ModelPool getFunctionalSaturationBound(const ServiceSet& services) const;
