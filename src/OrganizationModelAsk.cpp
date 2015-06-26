@@ -271,20 +271,29 @@ ModelCombinationSet OrganizationModelAsk::getBoundedResourceSupport(const Servic
 ModelCombinationSet OrganizationModelAsk::applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBound) const
 {
     ModelCombinationSet boundedCombinations;
+    ModelCombination boundedCombination = OrganizationModel::modelPool2Combination(upperBound);
+    std::sort(boundedCombination.begin(), boundedCombination.end());
+
     ModelCombinationSet::const_iterator cit = combinations.begin();
     for(; cit != combinations.end(); ++cit)
     {
-        const ModelCombination& combination = *cit;
-        ModelPool modelPool = OrganizationModel::combination2ModelPool(combination);
-        ModelPoolDelta delta = Algebra::delta(upperBound, modelPool);
-        if(delta.isNegative())
+        ModelCombination combination = *cit;
+        std::sort(combination.begin(), combination.end());
+
+        if( std::includes(boundedCombination.begin(), boundedCombination.end(),
+            combination.begin(), combination.end()) )
         {
+            LOG_DEBUG_S << "Includes" << std::endl
+                << "bounded: " << boundedCombination << std::endl
+                << "tested: " << combination << std::endl;
             boundedCombinations.insert(combination);
         }
     }
+
     LOG_DEBUG_S << "Bound set of resources: " << std::endl
-        << organization_model::ModelPoolDelta(upperBound).toString() << std::endl
-        << OrganizationModel::toString(boundedCombinations);
+        << "prev: " << OrganizationModel::toString(combinations) << std::endl
+        << "bound: " << ModelPoolDelta(upperBound).toString() << std::endl
+        << "bounded: " << OrganizationModel::toString(boundedCombinations);
     return boundedCombinations;
 }
 
