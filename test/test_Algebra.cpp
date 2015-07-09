@@ -1,5 +1,4 @@
 #include <boost/test/unit_test.hpp>
-#include <organization_model/algebra/ResourceSupport.hpp>
 #include <organization_model/OrganizationModel.hpp>
 #include <organization_model/OrganizationModelAsk.hpp>
 #include "test_utils.hpp"
