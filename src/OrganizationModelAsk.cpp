@@ -380,6 +380,12 @@ uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const Service& servi
 
 ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Service& service) const
 {
+    if(mModelPool.empty())
+    {
+        throw std::invalid_argument("organization_model::OrganizationModelAsk::getFunctionalSaturationBound:"
+                " model pool is empty. Call OrganizationModelAsk::prepare with model pool");
+    }
+
     ModelPool upperBounds;
     ModelPool::const_iterator cit = mModelPool.begin();
     for(; cit != mModelPool.end(); ++cit)

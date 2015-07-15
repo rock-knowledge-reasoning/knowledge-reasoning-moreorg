@@ -77,6 +77,8 @@ public:
      * for a given service
      * This function does take into account the model pool, but computes
      * a global bound
+     * \param service for which the functional saturation bound needs to
+     * be computed
      * \return Cardinality bound for resource models
      */
     ModelPool getFunctionalSaturationBound(const Service& service) const;
@@ -86,7 +88,10 @@ public:
      * to support the given set of services (union of services)
      * This function does take into account the model pool, but computes
      * a global bound
+     * \param set of services for which the functional saturation bound needs to
+     * be computed
      * \return Cardinality bound for resource models
+     * \throw std::invalid_argument when the model pool is empty
      */
     ModelPool getFunctionalSaturationBound(const ServiceSet& services) const;
 

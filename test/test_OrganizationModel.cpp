@@ -116,7 +116,11 @@ BOOST_AUTO_TEST_CASE(resource_support)
         //BOOST_REQUIRE_MESSAGE(combinations.size() > 1000, "Combinations that support stereo image provider, was " << combinations.size());
 
         {
-            OrganizationModelAsk ask(om); 
+            OrganizationModelAsk ask(om);
+            BOOST_REQUIRE_THROW(ask.getFunctionalSaturationBound(services), std::invalid_argument);
+        }
+        {
+            OrganizationModelAsk ask(om, items);
             ModelPool modelPoolBounded = ask.getFunctionalSaturationBound(services);
 
             OrganizationModelAsk minimalAsk(om, modelPoolBounded);
@@ -127,7 +131,8 @@ BOOST_AUTO_TEST_CASE(resource_support)
                 BOOST_TEST_MESSAGE("ModelCombination: " << ModelPoolDelta( OrganizationModel::combination2ModelPool(*cit)).toString() );
             }
 
-            BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, was " << combinations.size());
+            BOOST_REQUIRE_MESSAGE(combinations.size() >= 4, "Two combinations that support stereo image provider, image provider and emi power provider, was " << combinations.size()
+                    << "\nBounded model pool: " << ModelPoolDelta(modelPoolBounded).toString());
         }
     }
 }
