@@ -3,8 +3,22 @@
 
 namespace organization_model {
 
-ModelPoolDelta::ModelPoolDelta()
-{}
+void ModelPool::setResourceCount(const owlapi::model::IRI& resource, size_t count)
+{
+    (*this)[resource] = count;
+}
+
+std::string ModelPool::toString() const
+{
+    std::stringstream ss;
+    ModelPool::const_iterator cit = this->begin();
+    ss << "ModelPool:" << std::endl;
+    for(; cit != this->end(); ++cit)
+    {
+        ss << "    " << cit->first << " : " << cit->second << std::endl;
+    }
+    return ss.str();
+}
 
 ModelPoolDelta::ModelPoolDelta(const ModelPool& pool)
 {
@@ -49,7 +63,7 @@ std::string ModelPoolDelta::toString() const
 {
     std::stringstream ss;
     ModelPoolDelta::const_iterator cit = this->begin();
-    ss << "ModelPool:" << std::endl;
+    ss << "ModelPoolDelta:" << std::endl;
     for(; cit != this->end(); ++cit)
     {
         ss << "    " << cit->first << " : " << cit->second << std::endl;

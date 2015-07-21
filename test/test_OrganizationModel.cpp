@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
 
     OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.6.owl"));
 
-    std::map<owlapi::model::IRI, size_t> items;
+    ModelPool items;
     items[OM::resolve("Sherpa")] = 3;
     items[OM::resolve("CREX")] = 2;
     items[OM::resolve("Payload")] = 5;
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
     OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.6.owl"));
 
     {
-        std::map<owlapi::model::IRI, size_t> items;
+        ModelPool items;
         items[OM::resolve("CREX")] = 1;
 
         OrganizationModelAsk ask(om, items);
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider");
     }
     {
-        std::map<owlapi::model::IRI, size_t> items;
+        ModelPool items;
         items[OM::resolve("Sherpa")] = 1;
         items[OM::resolve("CREX")] = 1;
 
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider");
     }
     {
-        std::map<owlapi::model::IRI, size_t> items;
+        ModelPool items;
         items[OM::resolve("Sherpa")] = 3;
         items[OM::resolve("CREX")] = 2;
         items[OM::resolve("Payload")] = 10;

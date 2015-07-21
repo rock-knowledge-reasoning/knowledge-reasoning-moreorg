@@ -6,12 +6,21 @@
 
 namespace organization_model {
 
-typedef std::map<owlapi::model::IRI, size_t> ModelPool;
-
-struct ModelPoolDelta : std::map<owlapi::model::IRI, int>
+class ModelPool : public std::map<owlapi::model::IRI, size_t>
 {
-    ModelPoolDelta();
-    ModelPoolDelta(const ModelPool& pool);
+    public:
+        void setResourceCount(const owlapi::model::IRI& resource, size_t count);
+
+        /**
+         * Stringify object
+         */
+        std::string toString() const;
+};
+
+class ModelPoolDelta : public std::map<owlapi::model::IRI, int>
+{
+public:
+    ModelPoolDelta(const ModelPool& pool = ModelPool());
 
     /**
      * Check if the pool assignment contains any negative values
