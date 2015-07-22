@@ -64,9 +64,9 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         // Make sure we have a consistent ordering
         std::sort(combination.begin(), combination.end());
 
-        LOG_WARN_S << "Check combination #" << ++count;
-        LOG_WARN_S << "   | --> combination:             " << combination;
-        LOG_WARN_S << "   | --> possible service models: " << serviceModels;
+        LOG_INFO_S << "Check combination #" << ++count;
+        LOG_INFO_S << "   | --> combination:             " << combination;
+        LOG_INFO_S << "   | --> possible service models: " << serviceModels;
 
         base::Time startTime = base::Time::now();
         // Filter the serviceModel (from the existing set) which are supported
@@ -74,7 +74,7 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         IRIList supportedServiceModels = owlapi::csp::ResourceMatch::filterSupportedModels(combination, serviceModels, mpOrganizationModel->ontology());
 
         base::Time stopTime = base::Time::now();
-        LOG_WARN_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
+        LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
         // Update the mapping functions - forward and inverse mapping from
         // model/combination to function
         functionalityMapping.combination2Function[combination] = supportedServiceModels;
@@ -546,6 +546,8 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std:
 
     base::VectorXd vector;
     std::vector<IRI> labels;
+
+    LOG_DEBUG_S << "Filter labels: " << filterLabels;
 
     if(filterLabels.empty())
     {
