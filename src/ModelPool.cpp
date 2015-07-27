@@ -20,6 +20,24 @@ std::string ModelPool::toString() const
     return ss.str();
 }
 
+
+ModelPool ModelPool::applyUpperBound(const ModelPool& upperBounds) const
+{
+    ModelPool modelPool;
+
+    ModelPool::const_iterator cit = this->begin();
+    for(; cit != this->end(); ++cit)
+    {
+        owlapi::model::IRI& model = cit->first;
+        ModelPool::const_iterator bit = upperBounds.find(model);
+        if(bit != upperBounds.end())
+        {
+            modelPool[model] = std::min(cit->second, bit->second);
+        }
+    }
+    return modelPool;
+}
+
 ModelPoolDelta::ModelPoolDelta(const ModelPool& pool)
 {
     ModelPool::const_iterator cit = pool.begin();

@@ -15,6 +15,8 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          * Stringify object
          */
         std::string toString() const;
+
+        ModelPool applyUpperBound(const ModelPool& upperBounds) const;
 };
 
 class ModelPoolDelta : public std::map<owlapi::model::IRI, int>

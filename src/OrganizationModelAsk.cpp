@@ -16,22 +16,25 @@ using namespace owlapi::vocabulary;
 
 namespace organization_model {
 
-OrganizationModelAsk::OrganizationModelAsk(OrganizationModel::Ptr om, const ModelPool& modelPool)
+OrganizationModelAsk::OrganizationModelAsk(OrganizationModel::Ptr om,
+        const ModelPool& modelPool,
+        bool applyFunctionalSaturationBound)
     : mpOrganizationModel(om)
     , mOntologyAsk(om->ontology())
+    , mApplyFunctionalSaturationBound(applyFunctionalSaturationBound)
 {
     if(!modelPool.empty())
     {
-        prepare(modelPool);
+        prepare(modelPool, applyFunctionalSaturationBound);
     } else {
         LOG_WARN_S << "No model pool provided: did not prepare functionality mappings";
     }
 }
 
-void OrganizationModelAsk::prepare(const ModelPool& modelPool)
+void OrganizationModelAsk::prepare(const ModelPool& modelPool, bool applyFunctionalSaturationBound)
 {
     mModelPool = modelPool;
-    mFunctionalityMapping = getFunctionalityMapping(mModelPool);
+    mFunctionalityMapping = getFunctionalityMapping(mModelPool, applyFunctionalSaturationBound);
 }
 
 owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
@@ -51,18 +54,51 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
                 " cannot compute functionality map for empty model pool");
     }
 
-    numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(modelPool,
-            numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(modelPool), numeric::MAX);
-
     IRIList serviceModels = getServiceModels();
+
     std::pair<Combination2FunctionMap, Function2CombinationMap> functionalityMaps;
+
+
+    ModelPool boundedModelPool;
+    // TODO: create an bound on the model pool based on the given service
+    // models based on the FunctionalSaturation -- avoids computing unnecessary
+    // combination as function mappings
+    //
+    // LocationImageProvider: CREX --> 1, Sherpa --> 1
+    if(mApplyFunctionalSaturationBound)
+    {
+        ServiceSet services;
+        {
+            IRIList::const_iterator cit = serviceModels.begin();
+            for(; cit != serviceModels.end(); ++cit)
+            {
+                const IRI& serviceModel = *cit;
+                services.insert( Service(serviceModel) );
+            }
+        }
+        mFunctionalSaturationBound = getFunctionalSaturationBound(services);
+        boundedModelPool = modelPool.applyUpperBound(mFunctionalSaturationBound);
+    } else {
+        boundedModelPool = modelPool;
+    }
+
+
+    numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(boundedModelPool,
+            numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(boundedModelPool), numeric::MAX);
+
 
     uint32_t count = 0;
     do {
         // Get the current model combination
         IRIList combination = limitedCombination.current();
         // Make sure we have a consistent ordering
-        std::sort(combination.begin(), combination.end());
+        LOG_INFO_S << "Sort";
+        {
+            base::Time startTime = base::Time::now();
+            std::sort(combination.begin(), combination.end());
+            base::Time stopTime = base::Time::now();
+            LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
+        }
 
         LOG_INFO_S << "Check combination #" << ++count;
         LOG_INFO_S << "   | --> combination:             " << combination;
@@ -75,14 +111,20 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
 
         base::Time stopTime = base::Time::now();
         LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
-        // Update the mapping functions - forward and inverse mapping from
-        // model/combination to function
-        functionalityMapping.combination2Function[combination] = supportedServiceModels;
-        IRIList::const_iterator cit = supportedServiceModels.begin();
-        for(; cit != supportedServiceModels.end(); ++cit)
+        LOG_INFO_S << "Update";
         {
-            IRI iri = *cit;
-            functionalityMapping.function2Combination[iri].insert(combination);
+            base::Time startTime = base::Time::now();
+            // Update the mapping functions - forward and inverse mapping from
+            // model/combination to function
+            functionalityMapping.combination2Function[combination] = supportedServiceModels;
+            IRIList::const_iterator cit = supportedServiceModels.begin();
+            for(; cit != supportedServiceModels.end(); ++cit)
+            {
+                IRI iri = *cit;
+                functionalityMapping.function2Combination[iri].insert(combination);
+            }
+            base::Time stopTime = base::Time::now();
+            LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
         }
     } while(limitedCombination.next());
 

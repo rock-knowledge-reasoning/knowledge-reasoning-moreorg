@@ -12,10 +12,12 @@ class OrganizationModelAsk
 {
     friend class algebra::ResourceSupportVector;
 
-public:
+üublic:
     typedef boost::shared_ptr<OrganizationModelAsk> Ptr;
 
-    OrganizationModelAsk(OrganizationModel::Ptr om, const ModelPool& modelPool = ModelPool());
+    OrganizationModelAsk(OrganizationModel::Ptr om,
+            const ModelPool& modelPool = ModelPool(),
+            bool applyFunctionalSaturationBound = false);
 
     /**
      * Retrieve the list of all known service models
@@ -129,7 +131,7 @@ public:
     /**
      * Prepare the organization model for a given set of available models
      */
-    void prepare(const ModelPool& modelPool);
+    void prepare(const ModelPool& modelPool, bool applyFunctionalSaturationBound = false);
 protected:
 
     /**
@@ -167,6 +169,7 @@ protected:
 private:
     OrganizationModel::Ptr mpOrganizationModel;
     owlapi::model::OWLOntologyAsk mOntologyAsk;
+    bool mApplyFunctionalSaturationBound;
 
     /// Maps a combination to its supported functionality and vice versa
     FunctionalityMapping mFunctionalityMapping;
@@ -175,6 +178,7 @@ private:
     /// how many instances of type X,Y
     /// to be considered
     ModelPool mModelPool;
+    ModelPool mFunctionalSaturationBound;
 };
 
 } // end namespace organization_model
