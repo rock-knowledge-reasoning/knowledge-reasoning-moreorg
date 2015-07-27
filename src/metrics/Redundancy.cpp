@@ -61,6 +61,8 @@ double Redundancy::computeModelBasedProbabilityOfSurvival(const owlapi::model::I
 
 double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& required, const std::vector<OWLCardinalityRestriction::Ptr>& available)
 {
+    throw std::runtime_error("organization_model::metrics::Redundancy::compute requires update due to API change in owlapi");
+    /*
     // Strategies to compute redundancy:
     // 1. account for relevant functionality only
     //
@@ -196,6 +198,8 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
     }
 
     return fullModelSurvival;
+
+    */
 }
 
 IRISurvivabilityMap Redundancy::compute()

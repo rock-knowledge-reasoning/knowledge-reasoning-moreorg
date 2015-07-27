@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.6.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.8.owl"));
 
     {
         ModelPool items;
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
 
         ModelCombinationSet combinations = ask.getResourceSupport(services);
 
-        BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider");
+        BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider expected 0 was " << combinations.size());
     }
     {
         ModelPool items;
@@ -137,6 +137,32 @@ BOOST_AUTO_TEST_CASE(resource_support)
     }
 }
 
+BOOST_AUTO_TEST_CASE(resource_support_crex)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.8.owl"));
+
+    {
+        ModelPool items;
+        items[OM::resolve("CREX")] = 1;
+//        items[OM::resolve("Sherpa")] = 1;
+
+        OrganizationModelAsk ask(om, items);
+
+        // http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider
+        // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
+        // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
+
+        ServiceSet services;
+        services.insert( Service(OM::resolve("StereoImageProvider") ) );
+
+        ModelCombinationSet combinations = ask.getResourceSupport(services);
+
+        BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider expected 0 was " << combinations.size());
+    }
+}
 BOOST_AUTO_TEST_SUITE_END()
 
 //BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
