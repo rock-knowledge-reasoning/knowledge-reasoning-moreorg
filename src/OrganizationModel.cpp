@@ -8,37 +8,6 @@ using namespace owlapi::model;
 
 namespace organization_model {
 
-std::string FunctionalityMapping::toString() const
-{
-    std::stringstream ss;
-    {
-        Combination2FunctionMap::const_iterator cit = combination2Function.begin();
-        ss << "Combination --> Functions:" << std::endl;
-        for(; cit != combination2Function.end(); ++cit)
-        {
-            ss << "   - combination: " << owlapi::model::IRI::toString(cit->first, true) << std::endl;
-            ss << "     function: " << owlapi::model::IRI::toString(cit->second, true) << std::endl;
-        }
-    }
-    {
-        Function2CombinationMap::const_iterator cit = function2Combination.begin();
-        ss << "Function --> Combination:" << std::endl;
-        for(; cit != function2Combination.end(); ++cit)
-        {
-            ss << "   - function: " << cit->first.toString() << std::endl;
-            ss << "     combinations: " << std::endl;
-            const ModelCombinationSet& combinations = cit->second;
-            ModelCombinationSet::const_iterator sit = combinations.begin();
-            for(; sit != combinations.end(); ++sit)
-            {
-                ss << "        " << owlapi::model::IRI::toString(*sit, true) << std::endl;
-            }
-        }
-    }
-
-    return ss.str();
-}
-
 bool Service::operator<(const Service& other) const
 {
     return this->getModel() < other.getModel();

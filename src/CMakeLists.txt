@@ -12,6 +12,7 @@ rock_library(organization_model
         ccf/LinkType.cpp
         ccf/Scenario.cpp
         exporter/PDDLExporter.cpp
+        FunctionalityMapping.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
         ModelPool.cpp
@@ -36,6 +37,7 @@ rock_library(organization_model
         ccf/LinkType.hpp
         ccf/Scenario.hpp
         exporter/PDDLExporter.hpp
+        FunctionalityMapping.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
         ModelPool.hpp

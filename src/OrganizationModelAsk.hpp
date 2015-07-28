@@ -12,7 +12,7 @@ class OrganizationModelAsk
 {
     friend class algebra::ResourceSupportVector;
 
-üublic:
+public:
     typedef boost::shared_ptr<OrganizationModelAsk> Ptr;
 
     OrganizationModelAsk(OrganizationModel::Ptr om,
@@ -30,7 +30,7 @@ class OrganizationModelAsk
      * Get the functionality mapping for the model pool this object was
      * initialized with
      */
-    const FunctionalityMapping& getFunctionalityMapping() const { return mFunctionalityMapping; }
+    FunctionalityMapping getFunctionalityMapping(const ModelPool& pool, bool applyFunctionalSaturationBound = false) const;
 
     /**
      * Get the set of resources (as combination of models) that should support a given
@@ -178,7 +178,6 @@ private:
     /// how many instances of type X,Y
     /// to be considered
     ModelPool mModelPool;
-    ModelPool mFunctionalSaturationBound;
 };
 
 } // end namespace organization_model

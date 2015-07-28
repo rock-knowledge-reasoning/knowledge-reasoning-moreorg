@@ -25,7 +25,7 @@ OrganizationModelAsk::OrganizationModelAsk(OrganizationModel::Ptr om,
 {
     if(!modelPool.empty())
     {
-        prepare(modelPool, applyFunctionalSaturationBound);
+        prepare(modelPool, mApplyFunctionalSaturationBound);
     } else {
         LOG_WARN_S << "No model pool provided: did not prepare functionality mappings";
     }
@@ -44,10 +44,8 @@ owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
     return subclasses;
 }
 
-FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPool& modelPool) const
+FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPool& modelPool, bool applyFunctionalSaturationBound) const
 {
-    FunctionalityMapping functionalityMapping;
-
     if(modelPool.empty())
     {
         throw std::invalid_argument("organization_model::OrganizationModel::getFunctionalityMaps"
@@ -55,17 +53,15 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
     }
 
     IRIList serviceModels = getServiceModels();
-
     std::pair<Combination2FunctionMap, Function2CombinationMap> functionalityMaps;
 
-
-    ModelPool boundedModelPool;
+    ModelPool functionalSaturationBound;
     // TODO: create an bound on the model pool based on the given service
     // models based on the FunctionalSaturation -- avoids computing unnecessary
     // combination as function mappings
     //
     // LocationImageProvider: CREX --> 1, Sherpa --> 1
-    if(mApplyFunctionalSaturationBound)
+    if(applyFunctionalSaturationBound)
     {
         ServiceSet services;
         {
@@ -76,16 +72,35 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
                 services.insert( Service(serviceModel) );
             }
         }
-        mFunctionalSaturationBound = getFunctionalSaturationBound(services);
-        boundedModelPool = modelPool.applyUpperBound(mFunctionalSaturationBound);
+   
+        // Compute the bound for all services
+        functionalSaturationBound = getFunctionalSaturationBound(services);
+        // Merge with the existing model pool
+        functionalSaturationBound = modelPool.applyUpperBound(functionalSaturationBound);
     } else {
-        boundedModelPool = modelPool;
+       functionalSaturationBound = modelPool; 
     }
 
+    if(modelPool.empty())
+    {
+        throw std::runtime_error("organization_model::OrganizationModelAsk::getFunctionalityMapping: provided model pool empty");
+    } else if(serviceModels.empty())
+    {
+        throw std::runtime_error("organization_model::OrganizationModelAsk::getFunctionalityMapping: available services empty");
+    } else if(functionalSaturationBound.empty())
+    {
+        std::string msg = "organization_model::OrganizationModelAsk::getFunctionalityMapping: provided empty functionalSaturationBound";
+        msg += modelPool.toString() + "\n";
+        msg += owlapi::model::IRI::toString(serviceModels) + "\n";
+        msg += functionalSaturationBound.toString() + "\n";
+        throw std::runtime_error(msg);
+    }
 
+    FunctionalityMapping functionalityMapping(modelPool, serviceModels, functionalSaturationBound);
+
+    const ModelPool& boundedModelPool = functionalityMapping.getFunctionalSaturationBound();
     numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(boundedModelPool,
             numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(boundedModelPool), numeric::MAX);
-
 
     uint32_t count = 0;
     do {
@@ -116,13 +131,7 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
             base::Time startTime = base::Time::now();
             // Update the mapping functions - forward and inverse mapping from
             // model/combination to function
-            functionalityMapping.combination2Function[combination] = supportedServiceModels;
-            IRIList::const_iterator cit = supportedServiceModels.begin();
-            for(; cit != supportedServiceModels.end(); ++cit)
-            {
-                IRI iri = *cit;
-                functionalityMapping.function2Combination[iri].insert(combination);
-            }
+            functionalityMapping.add(combination, supportedServiceModels);
             base::Time stopTime = base::Time::now();
             LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
         }
@@ -149,11 +158,10 @@ ModelCombinationSet OrganizationModelAsk::getResourceSupport(const ServiceSet& s
         {
             const Service& service = *cit;
             const owlapi::model::IRI& serviceModel =  service.getModel();
-            Function2CombinationMap::const_iterator fit = mFunctionalityMapping.function2Combination.find(serviceModel);
-            if(fit != mFunctionalityMapping.function2Combination.end())
+            try {
+                serviceProviders[serviceModel] = mFunctionalityMapping.getCombinations(serviceModel);
+            } catch(const std::invalid_argument& e)
             {
-                serviceProviders[serviceModel] = fit->second;
-            } else {
                 LOG_DEBUG_S << "Could not find resource support for service: '" << serviceModel;
                 return ModelCombinationSet();
             }
@@ -538,26 +546,28 @@ bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const Service
     for(; cit != services.end(); ++cit)
     {
         const Service& service = *cit;
-        Function2CombinationMap::const_iterator cit = mFunctionalityMapping.function2Combination.find(service.getModel());
-        if(cit != mFunctionalityMapping.function2Combination.end())
+        try {
+            const ModelCombinationSet& combination = mFunctionalityMapping.getCombinations(service.getModel());
+
+            if(init)
+            {
+                previousCombinations = combination;
+                init = false;
+                continue;
+            }
+
+            ModelCombinationSet resultList;
+            std::set_intersection(combination.begin(), combination.end(),
+                    previousCombinations.begin(), previousCombinations.end(),
+                    std::inserter(resultList, resultList.begin()) );
+             previousCombinations.insert(resultList.begin(), resultList.end());
+
+        } catch(const std::invalid_argument& e)
         {
             throw std::runtime_error("organization_model::OrganizationModelAsk::isSupporting \
                     could not find service '" + service.getModel().toString() + "'");
         }
 
-        const ModelCombinationSet& combination = cit->second;
-        if(init)
-        {
-            previousCombinations = combination;
-            init = false;
-            continue;
-        }
-
-        ModelCombinationSet resultList;
-        std::set_intersection(combination.begin(), combination.end(),
-                previousCombinations.begin(), previousCombinations.end(),
-                std::inserter(resultList, resultList.begin()) );
-         previousCombinations.insert(resultList.begin(), resultList.end());
     }
 
     ModelCombinationSet::const_iterator pit = std::find(previousCombinations.begin(), previousCombinations.end(), c);

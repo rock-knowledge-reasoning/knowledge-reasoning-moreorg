@@ -6,9 +6,15 @@
 
 namespace organization_model {
 
+typedef owlapi::model::IRIList ModelCombination;
+
 class ModelPool : public std::map<owlapi::model::IRI, size_t>
 {
     public:
+        ModelPool();
+
+        ModelPool(const ModelCombination& modelCombination);
+
         void setResourceCount(const owlapi::model::IRI& resource, size_t count);
 
         /**
@@ -17,6 +23,8 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
         std::string toString() const;
 
         ModelPool applyUpperBound(const ModelPool& upperBounds) const;
+
+        ModelCombination toModelCombination() const;
 };
 
 class ModelPoolDelta : public std::map<owlapi::model::IRI, int>

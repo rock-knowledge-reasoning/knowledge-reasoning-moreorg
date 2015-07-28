@@ -3,6 +3,21 @@
 
 namespace organization_model {
 
+ModelPool::ModelPool()
+    : std::map<owlapi::model::IRI, size_t>()
+{}
+
+ModelPool::ModelPool(const ModelCombination& modelCombination)
+    : std::map<owlapi::model::IRI, size_t>()
+{
+    ModelCombination::const_iterator cit = modelCombination.begin();
+    for(; cit != modelCombination.end(); ++cit)
+    {
+        const owlapi::model::IRI& model = *cit;
+        (*this)[model] += 1;
+    }
+}
+
 void ModelPool::setResourceCount(const owlapi::model::IRI& resource, size_t count)
 {
     (*this)[resource] = count;
@@ -28,7 +43,7 @@ ModelPool ModelPool::applyUpperBound(const ModelPool& upperBounds) const
     ModelPool::const_iterator cit = this->begin();
     for(; cit != this->end(); ++cit)
     {
-        owlapi::model::IRI& model = cit->first;
+        const owlapi::model::IRI& model = cit->first;
         ModelPool::const_iterator bit = upperBounds.find(model);
         if(bit != upperBounds.end())
         {
@@ -36,6 +51,20 @@ ModelPool ModelPool::applyUpperBound(const ModelPool& upperBounds) const
         }
     }
     return modelPool;
+}
+
+ModelCombination ModelPool::toModelCombination() const
+{
+    ModelCombination combination;
+    ModelPool::const_iterator cit = this->begin();
+    for(; cit != this->end(); ++cit)
+    {
+        for(size_t i = 0; i < cit->second; ++i)
+        {
+            combination.push_back(cit->first);
+        }
+    }
+    return combination;
 }
 
 ModelPoolDelta::ModelPoolDelta(const ModelPool& pool)

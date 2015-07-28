@@ -1,32 +1,14 @@
 #ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
 #define ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
 
-#include <set>
 #include <stdint.h>
-#include <organization_model/ModelPool.hpp>
 #include <owlapi/model/OWLOntology.hpp>
+#include <organization_model/FunctionalityMapping.hpp>
 
 namespace organization_model {
 
 class OrganizationModelAsk;
 class OrganizationModelTell;
-
-typedef owlapi::model::IRIList ModelCombination;
-typedef std::vector<ModelCombination> ModelCombinationList;
-typedef std::set<ModelCombination> ModelCombinationSet;
-
-/// Maps a 'combined system' to the functionality it can 'theoretically'
-/// provide when looking at its resources
-typedef std::map<ModelCombination, owlapi::model::IRIList> Combination2FunctionMap;
-typedef std::map<owlapi::model::IRI, ModelCombinationSet > Function2CombinationMap;
-
-struct FunctionalityMapping
-{
-    Combination2FunctionMap combination2Function;
-    Function2CombinationMap function2Combination;
-
-    std::string toString() const;
-};
 
 class Service
 {

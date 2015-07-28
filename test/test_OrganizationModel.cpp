@@ -33,12 +33,8 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
 
     OrganizationModelAsk ask(om, items);
 
-    FunctionalityMapping fm = ask.getFunctionalityMapping();
-    Combination2FunctionMap c2f = fm.combination2Function;
-    BOOST_TEST_MESSAGE("Combination to function: " << OrganizationModel::toString(c2f));
-
-    Function2CombinationMap f2c = fm.function2Combination;
-    BOOST_TEST_MESSAGE("Function to combination: " << OrganizationModel::toString(f2c));
+    FunctionalityMapping fm = ask.getFunctionalityMapping(items, true);
+    BOOST_TEST_MESSAGE("FunctionalityMapping " << fm.toString());
 }
 
 BOOST_AUTO_TEST_CASE(resource_support)
