@@ -205,9 +205,9 @@ double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& re
 IRISurvivabilityMap Redundancy::compute()
 {
     IRISurvivabilityMap survivabilityMap;
-    IRIList actorModels = mpAsk->allSubclassesOf( OM::Actor() );
+    IRIList actorModels = mpAsk->allSubClassesOf( OM::Actor() );
 
-    IRIList services = mpAsk->allSubclassesOf( OM::Service() );
+    IRIList services = mpAsk->allSubClassesOf( OM::Service() );
 
     BOOST_FOREACH(const IRI& actorModel, actorModels)
     {

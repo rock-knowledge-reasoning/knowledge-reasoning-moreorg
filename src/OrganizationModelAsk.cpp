@@ -40,7 +40,7 @@ void OrganizationModelAsk::prepare(const ModelPool& modelPool, bool applyFunctio
 owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
 {
     bool directSubclassOnly = false;
-    IRIList subclasses = mOntologyAsk.allSubclassesOf(OM::Service(), directSubclassOnly);
+    IRIList subclasses = mOntologyAsk.allSubClassesOf(OM::Service(), directSubclassOnly);
     return subclasses;
 }
 
@@ -634,7 +634,7 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std:
                 LOG_DEBUG_S << "Check model support for " << dimensionLabel << "  from " << modelDimensionLabel;
 
                 // Sum the requirement/availability of this model type
-                if(dimensionLabel == modelDimensionLabel || mOntologyAsk.isSubclassOf(modelDimensionLabel, dimensionLabel))
+                if(dimensionLabel == modelDimensionLabel || mOntologyAsk.isSubClassOf(modelDimensionLabel, dimensionLabel))
                 {
                     if(useMaxCardinality)
                     {

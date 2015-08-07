@@ -137,10 +137,10 @@ ResourceSupportVector ResourceSupportVector::embedClassRelationship(const Organi
         {
             IRI a_model = labels[a];
 
-            if(ask.ontology().isSubclassOf(i_model, a_model))
+            if(ask.ontology().isSubClassOf(i_model, a_model))
             {
                 supportVector(a) += supportVector(i);
-            } else if(ask.ontology().isSubclassOf(a_model, i_model))
+            } else if(ask.ontology().isSubClassOf(a_model, i_model))
             {
                 supportVector(i) += supportVector(a);
             }

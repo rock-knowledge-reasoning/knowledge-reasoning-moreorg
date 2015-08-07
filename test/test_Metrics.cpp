@@ -35,8 +35,8 @@ BOOST_AUTO_TEST_CASE(it_should_handle_redundancy_metrics)
     OWLClass::Ptr c = tell.klass("http://klass/base-derived-derived");
     OWLObjectProperty::Ptr property = tell.objectProperty("http://property/has");
 
-    tell.subclassOf(c,b);
-    tell.subclassOf(b,a);
+    tell.subClassOf(c,b);
+    tell.subClassOf(b,a);
     om.ontology()->refresh();
 
     std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
