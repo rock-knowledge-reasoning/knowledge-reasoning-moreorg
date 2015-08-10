@@ -12,6 +12,7 @@ rock_library(organization_model
         ccf/LinkType.cpp
         ccf/Scenario.cpp
         exporter/PDDLExporter.cpp
+        facets/Robot.cpp
         FunctionalityMapping.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
@@ -37,6 +38,7 @@ rock_library(organization_model
         ccf/LinkType.hpp
         ccf/Scenario.hpp
         exporter/PDDLExporter.hpp
+        facets/Robot.hpp
         FunctionalityMapping.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
@@ -51,6 +53,7 @@ rock_library(organization_model
         organization_model/Statistics.hpp
         utils/CoalitionStructureGeneration.hpp
         utils/CorrelationClustering.hpp
+        vocabularies/Robot.hpp
     DEPS_PKGCONFIG numeric pddl_planner owlapi
     LIBS glpk ${Boost_THREAD_LIBRARY}
 )
