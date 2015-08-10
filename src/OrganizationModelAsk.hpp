@@ -8,6 +8,14 @@
 
 namespace organization_model {
 
+/**
+ * \class OrganizationModelAsk
+ * \brief This class allows to create query object to reason about and retrieve information 
+ * from an organization model
+ *
+ * \details
+ * The ModelPool describes a set of countable (reusable) resources
+ */
 class OrganizationModelAsk
 {
     friend class algebra::ResourceSupportVector;
@@ -21,9 +29,16 @@ public:
 
     /**
      * Retrieve the list of all known service models
+     * \return list of all known service models
      */
     owlapi::model::IRIList getServiceModels() const;
 
+    /**
+     * Set the model pool
+     * A currently set model pool is required for some queries to the
+     * organization model
+     *
+     */
     void setModelPool(const ModelPool& modelPool) { mModelPool = modelPool; }
 
     /**
@@ -33,22 +48,30 @@ public:
     FunctionalityMapping getFunctionalityMapping(const ModelPool& pool, bool applyFunctionalSaturationBound = false) const;
 
     /**
-     * Get the set of resources (as combination of models) that should support a given
-     * list of services
+     * Get the set of resources (or combination thereof) that support a given
+     * union of services
      * That means, that services are either supported by separate systems or 
      * combined systems
      * \param services should be a set of services / service models
-     * \return available resources to support this set of services
+     * \return available resources (or combination thereof) to support this set of services
      */
     ModelCombinationSet getResourceSupport(const ServiceSet& services) const;
 
     /**
-     * Get the set of resources that should support a given list of services, 
-     * bounded by the FunctionalSaturationBound
+     * Get the set of resources that should support a given union of services, 
+     * bounded by the FunctionalSaturationBound, i.e., the minimum combination
+     * of resources that support the given union of services
      * \return bound set of combinations
      */
     ModelCombinationSet getBoundedResourceSupport(const ServiceSet& services) const;
 
+    /**
+     * Apply an upper bound of resources to an existing Set of model
+     * combinations
+     * \param upperBounds Bounding ModelPool 
+     * \return all combinations that operate within the bounds of the given
+     * ModelPool
+     */
     ModelCombinationSet applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBounds) const;
 
     /**
@@ -125,11 +148,16 @@ public:
 
     /**
      * Provide debug information about the status of this object
+     * \return String representation of this query object
      */
     std::string toString() const;
 
     /**
      * Prepare the organization model for a given set of available models
+     * \param modelPool Provide a ModelPool and use the second parameter to
+     * decided whether to use it for inferring the functional saturation bound
+     * \param applyFunctionalSaturationBound Set to true if all queries to this
+     * object should take into account the functional saturation bound
      */
     void prepare(const ModelPool& modelPool, bool applyFunctionalSaturationBound = false);
 protected:
@@ -153,6 +181,14 @@ protected:
         const owlapi::model::IRIList& filterLabels = owlapi::model::IRIList(),
         bool useMaxCardinality = false) const;
 
+    /**
+     * Get the support vector provided some MinMax bounds
+     *
+     * \param filterLabels Model names corresponding to the dimensions of the
+     * support vector
+     * \param useMaxCardinality If true, the support vector consists of all max
+     * cardinality value, if false, min values are uses
+     */
     algebra::ResourceSupportVector getSupportVector(const std::map<owlapi::model::IRI,
         owlapi::model::OWLCardinalityRestriction::MinMax>& modelBounds,
         const owlapi::model::IRIList& filterLabels = owlapi::model::IRIList(),
@@ -163,6 +199,7 @@ protected:
 
     /**
      * Return ontology that relates to this Ask object
+     * \return underlying OWLOntologyAsk object
      */
     owlapi::model::OWLOntologyAsk ontology() const { return mOntologyAsk; }
 
