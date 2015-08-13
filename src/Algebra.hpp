@@ -15,6 +15,17 @@ public:
      */
     static ModelPool merge(const ModelPool& a, const ModelPool& b);
 
+    /**
+     * Compute the maximum of each entry
+     */
+    static ModelPool max(const ModelPool& a, const ModelPool& b);
+
+    /**
+     *
+     * Compute the minimum of each entry
+     */
+    static ModelPool min(const ModelPool& a, const ModelPool& b);
+
     static ModelPool merge(const ModelCombinationSet& a, const ModelCombination& b);
 
     static ModelPool merge(const std::set<ModelPool>& pool);

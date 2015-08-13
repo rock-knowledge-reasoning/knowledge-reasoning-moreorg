@@ -76,6 +76,47 @@ ModelPool Algebra::merge(const std::set<ModelCombination>& a, const ModelCombina
     return merge(modelPoolSet);
 }
 
+ModelPool Algebra::max(const ModelPool& a, const ModelPool& b)
+{
+    ModelPool resultPool = a;
+    ModelPool::const_iterator bit = b.begin();
+    for(; bit != b.end(); ++bit)
+    {
+        const owlapi::model::IRI& model = bit->first;
+        uint32_t cardinality = bit->second;
+
+        ModelPool::iterator rit = resultPool.find(model);
+        if(rit != resultPool.end())
+        {
+            rit->second = std::max( bit->second, rit->second );
+        } else {
+            resultPool.insert(ModelPool::value_type(model, cardinality));
+        }
+
+    }
+    return resultPool;
+}
+
+ModelPool Algebra::min(const ModelPool& a, const ModelPool& b)
+{
+    ModelPool resultPool = a;
+    ModelPool::const_iterator bit = b.begin();
+    for(; bit != b.end(); ++bit)
+    {
+        const owlapi::model::IRI& model = bit->first;
+        uint32_t cardinality = bit->second;
+
+        ModelPool::iterator rit = resultPool.find(model);
+        if(rit != resultPool.end())
+        {
+            rit->second = std::min( bit->second, rit->second );
+        } else {
+            resultPool.insert(ModelPool::value_type(model, cardinality));
+        }
+
+    }
+    return resultPool;
+}
 
 ModelPool Algebra::merge(const std::set<ModelPool>& modelPoolSet)
 {
