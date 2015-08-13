@@ -160,6 +160,12 @@ public:
      * object should take into account the functional saturation bound
      */
     void prepare(const ModelPool& modelPool, bool applyFunctionalSaturationBound = false);
+
+    /**
+     * Return ontology that relates to this Ask object
+     * \return underlying OWLOntologyAsk object
+     */
+    owlapi::model::OWLOntologyAsk ontology() const { return mOntologyAsk; }
 protected:
 
     /**
@@ -196,12 +202,6 @@ protected:
 
     owlapi::model::IRIList filterSupportedModels(const owlapi::model::IRIList& combinations,
         const owlapi::model::IRIList& serviceModels);
-
-    /**
-     * Return ontology that relates to this Ask object
-     * \return underlying OWLOntologyAsk object
-     */
-    owlapi::model::OWLOntologyAsk ontology() const { return mOntologyAsk; }
 
 private:
     OrganizationModel::Ptr mpOrganizationModel;
