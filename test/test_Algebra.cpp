@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <organization_model/OrganizationModel.hpp>
 #include <organization_model/OrganizationModelAsk.hpp>
+#include <organization_model/Algebra.hpp>
 #include "test_utils.hpp"
 #include <owlapi/Vocabulary.hpp>
 
@@ -8,6 +9,36 @@ using namespace organization_model;
 using namespace organization_model::algebra;
 
 BOOST_AUTO_TEST_SUITE(algebra)
+
+BOOST_AUTO_TEST_CASE(max)
+{
+    ModelPool a;
+    a["a"] = 1;
+    a["b"] = 1;
+
+    ModelPool b;
+    b["a"] = 2;
+    b["b"] = 1;
+    b["c"] = 2;
+
+    ModelPool c = Algebra::max(a,b);
+    BOOST_REQUIRE_MESSAGE( c["a"] == 2 && c["b"] == 1 && c["c"] == 2, "ModelPool max: expected, a:2,b:1,c:2 got " << c.toString());
+}
+
+BOOST_AUTO_TEST_CASE(min)
+{
+    ModelPool a;
+    a["a"] = 1;
+    a["b"] = 1;
+
+    ModelPool b;
+    b["a"] = 2;
+    b["b"] = 0;
+    b["c"] = 2;
+
+    ModelPool c = Algebra::min(a,b);
+    BOOST_REQUIRE_MESSAGE( c["a"] == 1 && c["b"] == 0 && c["c"] == 2, "ModelPool min: expected, a:1,b:0,c:2 got " << c.toString());
+}
 
 BOOST_AUTO_TEST_CASE(resource_support)
 {
