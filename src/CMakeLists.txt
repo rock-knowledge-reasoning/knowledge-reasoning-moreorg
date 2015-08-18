@@ -38,6 +38,7 @@ rock_library(organization_model
         ccf/LinkType.hpp
         ccf/Scenario.hpp
         exporter/PDDLExporter.hpp
+        facets/Facet.hpp
         facets/Robot.hpp
         FunctionalityMapping.hpp
         metrics/Redundancy.hpp
