@@ -419,7 +419,7 @@ IntegerPartition CoalitionStructureGeneration::selectIntegerPartition(const Coal
     }
     if(value == 0.0)
     {
-        throw std::runtime_error("No integer partition found greater than the given maximum bound");
+        throw std::runtime_error("CoalitionStructureGeneration::selectIntegerPartition: No integer partition found greater than the given maximum bound");
     } else {
         return partition;
     }
