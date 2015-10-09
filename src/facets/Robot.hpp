@@ -35,6 +35,8 @@ public:
      * Available Energy W
      */
     double getEnergyCapacity() const { return mEnergyCapacity; }
+    uint32_t getPayloadTransportCapacity() const { return mPayloadTransportCapacity; }
+
     /**
      * Empirical information
      * P_n = W/t
@@ -68,6 +70,7 @@ private:
     double mEnergyCapacity;
     double mNominalPowerConsumption;
 
+    uint32_t mPayloadTransportCapacity;
 
     owlapi::model::IRI mActorModel;
 };

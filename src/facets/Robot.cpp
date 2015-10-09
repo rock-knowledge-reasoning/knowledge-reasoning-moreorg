@@ -31,6 +31,15 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModel::Ptr&
 
         throw std::runtime_error("organization_model::facets::Robot loading of model '" + actorModel.toString() + "' failed: " + e.what());
     }
+
+    // optional values
+    try {
+        mPayloadTransportCapacity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::payloadTransportCapacity())->getInteger();
+    } catch(const std::exception& e)
+    {
+        LOG_INFO_S << e.what();
+        mPayloadTransportCapacity = 0;
+    }
 }
 
 double Robot::estimatedEnergyCost(double distanceInM) const

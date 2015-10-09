@@ -25,6 +25,7 @@ public:
     VOCABULARY_ADD_WORD(energyCapacity);
     VOCABULARY_ADD_WORD(supplyVoltage);
     VOCABULARY_ADD_WORD(nominalPowerConsumption);
+    VOCABULARY_ADD_WORD(payloadTransportCapacity);
 
     VOCABULARY_ADD_WORD(mass);
 };
