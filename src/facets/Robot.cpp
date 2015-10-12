@@ -10,18 +10,17 @@ namespace facets {
 
 Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModel::Ptr& organizationModel)
     : Facet(organizationModel)
+    , mMinAcceleration(0.0)
+    , mMaxAcceleration(0.0)
+    , mNominalAcceleration(0.0)
+    , mMinVelocity(0.0)
+    , mMaxVelocity(0.0)
+    , mNominalVelocity(0.0)
+    , mPayloadTransportCapacity(0)
 {
 
     try {
-        mMinAcceleration = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::minAcceleration())->getDouble();
-        mMaxAcceleration = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::maxAcceleration())->getDouble();
-
-        mNominalAcceleration = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalAcceleration())->getDouble();
-        mNominalVelocity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalVelocity())->getDouble();
         mNominalPowerConsumption = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalPowerConsumption())->getDouble();
-
-        mMinVelocity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::minVelocity())->getDouble();
-        mMaxVelocity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::maxVelocity())->getDouble();
         mMass = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::mass())->getDouble();
         mSupplyVoltage = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::supplyVoltage())->getDouble();
         mEnergyCapacity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::energyCapacity())->getDouble();
@@ -32,13 +31,28 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModel::Ptr&
         throw std::runtime_error("organization_model::facets::Robot loading of model '" + actorModel.toString() + "' failed: " + e.what());
     }
 
-    // optional values
+    // optional base mobility
+    try {
+        mMinAcceleration = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::minAcceleration())->getDouble();
+        mMaxAcceleration = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::maxAcceleration())->getDouble();
+        mNominalAcceleration = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalAcceleration())->getDouble();
+
+
+        mMinVelocity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::minVelocity())->getDouble();
+        mMaxVelocity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::maxVelocity())->getDouble();
+        mNominalVelocity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalVelocity())->getDouble();
+    } catch(const std::exception& e)
+    {
+        LOG_INFO_S << e.what();
+    }
+
+
+    // optional transport capability
     try {
         mPayloadTransportCapacity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::payloadTransportCapacity())->getInteger();
     } catch(const std::exception& e)
     {
         LOG_INFO_S << e.what();
-        mPayloadTransportCapacity = 0;
     }
 }
 
