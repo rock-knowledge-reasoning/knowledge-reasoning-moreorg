@@ -1,7 +1,7 @@
 #include "OrganizationModel.hpp"
 #include "OrganizationModelAsk.hpp"
 #include "OrganizationModelTell.hpp"
-#include <owlapi/model/OWLOntologyReader.hpp>
+#include <owlapi/io/OWLOntologyIO.hpp>
 #include <boost/make_shared.hpp>
 
 using namespace owlapi::model;
@@ -18,8 +18,7 @@ OrganizationModel::OrganizationModel(const std::string& filename)
 {
     if(!filename.empty())
     {
-        OWLOntologyReader reader;
-        mpOntology = reader.fromFile(filename);
+        mpOntology = owlapi::io::OWLOntologyIO::fromFile(filename);
     }
 }
 
