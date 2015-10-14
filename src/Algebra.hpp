@@ -8,7 +8,15 @@ namespace organization_model {
 class Algebra
 {
 public:
-    static ModelPoolDelta delta(const ModelPoolDelta& a, const ModelPoolDelta& b);
+    /**
+     * Compute delta as b - a
+     */
+    static ModelPoolDelta delta(const ModelPoolDelta& a, const ModelPoolDelta& b) { return substract(a,b); }
+
+    /**
+     * Substract a from b
+     */
+    static ModelPoolDelta substract(const ModelPoolDelta& a, const ModelPoolDelta& b);
     static ModelPoolDelta sum(const ModelPoolDelta& a, const ModelPoolDelta& b);
     /**
      * Merge two systems, i.e. when they are identical M o M = M, M o N = M+N

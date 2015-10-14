@@ -2,7 +2,7 @@
 
 namespace organization_model {
 
-ModelPoolDelta Algebra::delta(const ModelPoolDelta& a, const ModelPoolDelta& b)
+ModelPoolDelta Algebra::substract(const ModelPoolDelta& a, const ModelPoolDelta& b)
 {
     ModelPoolDelta delta;
 

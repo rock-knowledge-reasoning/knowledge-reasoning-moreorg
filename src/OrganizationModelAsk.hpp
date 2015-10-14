@@ -75,6 +75,15 @@ public:
     ModelCombinationSet applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBounds) const;
 
     /**
+     * Apply a lower bound of resources to an existing set of model
+     * combinations
+     * \param lowerBounds Bounding ModelPool
+     * \return all combinations that operate within the bounds of the given
+     * ModelPool
+     */
+    ModelCombinationSet applyLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBounds) const;
+
+    /**
      * Check how a service is supported by a model if given cardinality
      * of this model is provided
      * \see getFunctionalSaturationBound in order to find the minimum number
