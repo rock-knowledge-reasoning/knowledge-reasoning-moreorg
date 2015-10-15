@@ -47,6 +47,8 @@ public:
      * s = v*t <=> t = s/v_n
      * 
      * W = P_n*t = P_n*s/v_n
+     *
+     * \return energy cost in Wh
      */
     double estimatedEnergyCost(double distanceInM) const;
 
@@ -54,6 +56,12 @@ public:
      * Energy cost relative to the total capacity
      */
     double estimatedRelativeEnergyCost(double distanceInM) const;
+
+    /**
+     * Create a string object that list all system
+     * charateristics
+     */
+    std::string toString() const;
 
 private:
     double mMinAcceleration;

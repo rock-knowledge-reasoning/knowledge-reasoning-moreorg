@@ -58,12 +58,32 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModel::Ptr&
 
 double Robot::estimatedEnergyCost(double distanceInM) const
 {
-    return mNominalPowerConsumption*distanceInM/mNominalVelocity;
+    // W * m/ (m/s)
+    // 1 Ws = 1/3600 Wh => Wh = Ws*3600
+    //
+    return (mNominalPowerConsumption*distanceInM/mNominalVelocity) / 3600.0;
 }
 
 double Robot::estimatedRelativeEnergyCost(double distanceInM) const
 {
     return estimatedEnergyCost(distanceInM) / mEnergyCapacity;
+}
+
+std::string Robot::toString() const
+{
+    std::stringstream ss;
+    ss << "Robot: " << mActorModel.toString() << std::endl;
+    ss << "    mass (kg):                     " << mMass << std::endl;
+    ss << "    supply voltage (V):            " << mSupplyVoltage << std::endl;
+    ss << "    energy capacity (Wh):          " << mEnergyCapacity << std::endl;
+    ss << "    nominal power consumption (W): " << mNominalPowerConsumption << std::endl;
+    ss << "    min accelleration (m/s):       " << mMinAcceleration << std::endl;
+    ss << "    max accelleration (m/s):       " << mMaxAcceleration << std::endl;
+    ss << "    nominal accelleration (m/s):   " << mNominalAcceleration << std::endl;
+    ss << "    min velocity (m/s):            " << mMinVelocity << std::endl;
+    ss << "    max velocity (m/s):            " << mMaxVelocity << std::endl;
+    ss << "    nominal velocity (m/s):        " << mNominalVelocity << std::endl;
+    return ss.str();
 }
 
 
