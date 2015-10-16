@@ -364,6 +364,27 @@ ModelCombinationSet OrganizationModelAsk::applyLowerBound(const ModelCombination
     return boundedCombinations;
 }
 
+ModelCombinationSet OrganizationModelAsk::expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBound) const
+{
+    ModelCombinationSet boundedCombinations;
+    ModelCombinationSet::const_iterator cit = combinations.begin();
+    for(; cit != combinations.end(); ++cit)
+    {
+        ModelPool modelPool = OrganizationModel::combination2ModelPool(*cit);
+        // enforce minimum requirement
+        modelPool = Algebra::max(lowerBound, modelPool);
+        ModelCombination expandedCombination = OrganizationModel::modelPool2Combination(modelPool);
+
+        boundedCombinations.insert(expandedCombination);
+    }
+
+    LOG_DEBUG_S << "Lower bound expanded on resources: " << std::endl
+        << "prev: " << OrganizationModel::toString(combinations) << std::endl
+        << "bound: " << ModelPoolDelta(lowerBound).toString() << std::endl
+        << "bounded: " << OrganizationModel::toString(boundedCombinations);
+    return boundedCombinations;
+}
+
 
 //std::set<ModelCombination> OrganizationModelAsk::getMinimalResourceSupport(const ServiceSet& services) const
 //{
