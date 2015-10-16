@@ -10,7 +10,7 @@ namespace organization_model {
 
 /**
  * \class OrganizationModelAsk
- * \brief This class allows to create query object to reason about and retrieve information 
+ * \brief This class allows to create query object to reason about and retrieve information
  * from an organization model
  *
  * \details
@@ -50,7 +50,7 @@ public:
     /**
      * Get the set of resources (or combination thereof) that support a given
      * union of services
-     * That means, that services are either supported by separate systems or 
+     * That means, that services are either supported by separate systems or
      * combined systems
      * \param services should be a set of services / service models
      * \return available resources (or combination thereof) to support this set of services
@@ -58,7 +58,7 @@ public:
     ModelCombinationSet getResourceSupport(const ServiceSet& services) const;
 
     /**
-     * Get the set of resources that should support a given union of services, 
+     * Get the set of resources that should support a given union of services,
      * bounded by the FunctionalSaturationBound, i.e., the minimum combination
      * of resources that support the given union of services
      * \return bound set of combinations
@@ -68,7 +68,7 @@ public:
     /**
      * Apply an upper bound of resources to an existing Set of model
      * combinations
-     * \param upperBounds Bounding ModelPool 
+     * \param upperBounds Bounding ModelPool
      * \return all combinations that operate within the bounds of the given
      * ModelPool
      */
@@ -76,7 +76,9 @@ public:
 
     /**
      * Apply a lower bound of resources to an existing set of model
-     * combinations
+     * combinations, i.e., remove ModelCombinations that operate below the lower
+     * bound
+     * \param combinations
      * \param lowerBounds Bounding ModelPool
      * \return all combinations that operate within the bounds of the given
      * ModelPool
@@ -95,6 +97,7 @@ public:
      */
     ModelCombinationSet expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBounds) const;
 
+
     /**
      * Check how a service is supported by a model if given cardinality
      * of this model is provided
@@ -111,9 +114,11 @@ public:
      *  1. when all required resources (FULL_SUPPORT) are provided by the model:
      *     -- check how many instances are required of this model to achieve
      *     full functionality
-     *  2. when only a partial set of resource are provided (PARTIAL_SUPPORT)
+     *  2. when only a partial set of resources is provided (PARTIAL_SUPPORT)
      *     -- check how many instances are actually contributing to enable the
      *     functionality (and when switching into providing redundancy only)
+     *  \param service Service to check the saturation bound for
+     *  \param model Model Model IRI for which the saturation bound is computed
      *  \return number of instances required for functional saturation
      */
     uint32_t getFunctionalSaturationBound(const Service& service, const owlapi::model::IRI& model) const;
@@ -149,7 +154,7 @@ public:
 
     ///**
     // * This function computes the minimal resource support for a set of services
-    // * by analyzing the existing ResourceSupport for each service and 
+    // * by analyzing the existing ResourceSupport for each service and
     // */
     //std::set<ModelCombination> getMinimalResourceSupport_v1(const ServiceSet& services) const;
     //std::set<ModelCombination> getMinimalResourceSupport_v2(const ServiceSet& services) const;
