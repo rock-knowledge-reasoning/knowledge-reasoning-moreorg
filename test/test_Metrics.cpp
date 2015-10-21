@@ -11,22 +11,11 @@ using namespace organization_model;
 using namespace owlapi;
 using namespace owlapi::model;
 
-BOOST_AUTO_TEST_SUITE(redundancy_metrics)
+BOOST_AUTO_TEST_SUITE(model_metrics)
 
-BOOST_AUTO_TEST_CASE(it_should_handle_redundancy_metrics)
+BOOST_AUTO_TEST_CASE(redundancy)
 {
-    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.6.owl" );
-
-    //using namespace owlapi::vocabulary;
-    //{
-    //    owlapi::model::IRI instance = om.createNewInstance(OM::resolve("Sherpa"), true);
-    //    om.createNewInstance(OM::resolve("PayloadCamera"), true);
-
-    //    BOOST_TEST_MESSAGE("Created new from model" << instance);
-    //    owlapi::model::OWLOntologyAsk ask(om.ontology());
-    //    bool isInstance = ask.isInstanceOf(instance, OM::Actor());
-    //    BOOST_REQUIRE_MESSAGE(isInstance, "New model instance of Actor");
-    //}
+    OrganizationModel om( getOMSchema() );
 
     OWLOntologyTell tell(om.ontology());
 
@@ -50,38 +39,44 @@ BOOST_AUTO_TEST_CASE(it_should_handle_redundancy_metrics)
     }
 
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 3, b->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, b->getIRI()));
         resourcePool.push_back(restriction);
     }
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 3, c->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, c->getIRI()));
         resourcePool.push_back(restriction);
     }
 
     metrics::Redundancy redundancy(om);
+    // Serial connection of two parallel a 0.5
+    // [ [ 0.5 ] --- [ 0.5 ] ]  --- [ [ 0.5 ] --- [ 0.5 ] ]
+    //
+    // each serial system has a survivability of: 0.5*0.5 = 0.25
+    // overall serial system: 0.25*0.25 = 0.0625
+    double expected = 0.0625;
     double redundancyVal = redundancy.compute(query, resourcePool);
-    BOOST_TEST_MESSAGE("Redundancy test: " << redundancyVal); 
+    BOOST_REQUIRE_MESSAGE(redundancyVal == expected, "Redundancy expected: " << expected << " but got " << redundancyVal);
 }
 
-BOOST_AUTO_TEST_CASE(it_should_handle_metric_map_computation)
+BOOST_AUTO_TEST_CASE(metric_map_computation)
 {
-    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.6.owl" );
+    OrganizationModel om( getOMSchema() );
     om.ontology()->refresh();
     metrics::Redundancy redundancy(om);
 
-    metrics::IRISurvivabilityMap survivability = redundancy.compute();
+    MetricMap survivability = redundancy.getMetricMap();
 
-    BOOST_TEST_MESSAGE("Survivability: \n" << metrics::Redundancy::toString(survivability));
+    //BOOST_TEST_MESSAGE("Survivability: \n" << metrics::Redundancy::toString(survivability));
 
     {
         IRI locationImageProvider("http://www.rock-robotics.org/2014/01/om-schema#ImageProvider");
         IRI sherpa("http://www.rock-robotics.org/2014/01/om-schema#Sherpa");
 
-        std::map<IRI, uint32_t> models;
+        ModelPool modelPool;
         for(int i = 1; i <= 3; ++i)
         {
-            models[sherpa] = i;
-            double pSurvivability = redundancy.computeModelBasedProbabilityOfSurvival(locationImageProvider, models);
+            modelPool[sherpa] = i;
+            double pSurvivability = redundancy.computeModelBasedProbabilityOfSurvival(locationImageProvider, modelPool);
             BOOST_TEST_MESSAGE("Survivability for #" << i << " " << sherpa << ": \n" << pSurvivability);
         }
     }
@@ -89,12 +84,34 @@ BOOST_AUTO_TEST_CASE(it_should_handle_metric_map_computation)
         IRI locationImageProvider("http://www.rock-robotics.org/2014/01/om-schema#LocationImageProvider");
         IRI crex("http://www.rock-robotics.org/2014/01/om-schema#CREX");
 
-        std::map<IRI, uint32_t> models;
+        ModelPool modelPool;
         for(int i = 1; i <= 3; ++i)
         {
-            models[crex] = i;
-            double pSurvivability = redundancy.computeModelBasedProbabilityOfSurvival(locationImageProvider, models);
-            BOOST_TEST_MESSAGE("Survivability for #" << i << " " << crex << ": \n" << pSurvivability);
+            modelPool[crex] = i;
+
+            //    required: 
+            //            ModelBound::List
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Camera' (1, 1000000)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Localization' (1, 1000000)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Locomotion' (1, 1000000)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Mapping' (1, 1000000)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Power' (1, 1000000)
+            //
+            //    available: 
+            //            ModelBound::List
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Camera' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#EmiPassive' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#LaserScanner' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Localization' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Locomotion' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Mapping' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Power' (0, 3)
+
+            double redundancyLevel = i;
+            double parallel = 1 - pow((1-0.5),redundancyLevel);
+            double expected = pow(parallel,5);
+            double pSurvivability = redundancy.compute(locationImageProvider, modelPool);
+            BOOST_REQUIRE_MESSAGE(pSurvivability == expected, "Survivability for #" << i << " " << crex << ": \n" << pSurvivability << " (expected: " << expected << ")");
         }
     }
 }

@@ -16,6 +16,7 @@ rock_library(organization_model
         FunctionalityMapping.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
+        Metric.cpp
         ModelPool.cpp
         OrganizationModel.cpp
         OrganizationModelAsk.cpp
@@ -43,6 +44,7 @@ rock_library(organization_model
         FunctionalityMapping.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
+        Metric.hpp
         ModelPool.hpp
         OrganizationModel.hpp
         OrganizationModelAsk.hpp

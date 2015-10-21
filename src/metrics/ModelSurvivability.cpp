@@ -3,35 +3,42 @@
 namespace organization_model {
 namespace metrics {
 
-ModelSurvivability::ModelSurvivability(owlapi::model::OWLCardinalityRestriction::Ptr restriction, double modelProbability, double redundancy)
-    : restriction(restriction)
-    , modelProbability(modelProbability)
-    , redundancy(redundancy)
+ModelSurvivability::ModelSurvivability(const owlapi::model::OWLCardinalityRestriction::Ptr& restriction, double modelProbability, double redundancy)
+    : mRestriction(restriction)
+    , mModelProbabilityOfSurvival(modelProbability)
+    , mRedundancy(redundancy)
 {}
 
 double ModelSurvivability::getProbabilityOfSurvival() const
 {
-    return 1 - pow(1-modelProbability, redundancy);
+    // The cardinality gives the number of components which have to be in serial
+    // for this model to work
+    // e.g. stereo camera: 2 cameras
+    //
+    // Redundancy provides the information about the overall redundancy, e.g.,
+    // if 4 cameras are available, we assume a redundancy of 2
+    double pSerialSystem = pow(mModelProbabilityOfSurvival, getCardinality());
+    return 1 - pow(1-pSerialSystem, mRedundancy);
 }
 
 owlapi::model::IRI ModelSurvivability::getQualification() const
 {
-    return restriction->getQualification();
+    return mRestriction->getQualification();
 }
 
 uint32_t ModelSurvivability::getCardinality() const 
 { 
-    return restriction->getCardinality();
+    return mRestriction->getCardinality();
 }
 
 std::string ModelSurvivability::toString() const 
 {
     std::stringstream ss;
     ss << " ModelSurvivability: " << std::endl;
-    ss << "    modelProbability: " << modelProbability << std::endl;
-    ss << "    redundancy: " << redundancy << std::endl;
+    ss << "    modelProbability:      " << mModelProbabilityOfSurvival << std::endl;
+    ss << "    redundancy:            " << mRedundancy << std::endl;
     ss << "    probabilityOfSurvival: " << getProbabilityOfSurvival() << std::endl;
-    ss << "  > " << restriction->toString();
+    ss << "  > " << mRestriction->toString();
     return ss.str();
 }
 

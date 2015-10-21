@@ -1,5 +1,5 @@
-#ifndef OM_TEST_UTILS
-#define OM_TEST_UTILS
+#ifndef ORGANIZATION_MODEL_TEST_UTILS
+#define ORGANIZATION_MODEL_TEST_UTILS
 
 #include <string>
 /**
@@ -7,4 +7,6 @@
  * returns /../organization_model/ as path
  */
 std::string getRootDir();
+
+std::string getOMSchema();
 #endif
