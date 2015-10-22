@@ -2,7 +2,6 @@
 #define ORGANIZATION_MODEL_METRICS_REDUNDANCY_HPP
 
 #include <organization_model/OrganizationModel.hpp>
-#include <owlapi/model/OWLCardinalityRestriction.hpp>
 #include <organization_model/Metric.hpp>
 
 namespace organization_model {
@@ -30,29 +29,11 @@ class Redundancy : public Metric
 public:
     Redundancy(const OrganizationModel& organization);
 
-    virtual double compute(const owlapi::model::IRI& function, const owlapi::model::IRI& model) const;
-
-    virtual double compute(const owlapi::model::IRI& function, const ModelPool& modelPool) const;
-
-    /**
-     * Compute the probability of survival for a service/capability with respect to a given model
-     *
-     * It use the assigned restriction on that model to infer what is available
-     * and matches this to the service requirements accordingly
-     *
-     */
-    double computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const owlapi::model::IRI& model) const;
-
-    /**
-     * Compute the probability of survival for the function of the system with
-     * respect to a given set of composite actor model -- which is defined by a set of atomic
-     * actor models
-     */
-    double computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const ModelPool& models) const;
-
-
-    double compute(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
+    double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
             const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const;
+
+    double computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const;
+    double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ModelPool& modelPool, bool sharedUse = true) const;
 
     /**
      * Compute survivability a parallel system
@@ -65,6 +46,12 @@ public:
      * \param probabilities vector of probability of survival values
      */
     static double serial(const std::vector<double>& probabilities);
+
+    /**
+     * Compute metric interpretation when individual <function,model> tuples are
+     * used sequentially
+     */
+    double sequentialUse(const std::vector<double>& values) const { return serial(values); }
 };
 
 } // end namespace metrics

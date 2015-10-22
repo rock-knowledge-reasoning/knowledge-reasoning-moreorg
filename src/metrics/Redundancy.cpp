@@ -15,57 +15,48 @@ Redundancy::Redundancy(const OrganizationModel& organization)
     : Metric(organization, REDUNDANCY)
 {}
 
-
-double Redundancy::compute(const owlapi::model::IRI& function, const owlapi::model::IRI& model) const
+double Redundancy::computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const
 {
-    return computeModelBasedProbabilityOfSurvival(function, model);
-}
-
-double Redundancy::compute(const owlapi::model::IRI& function, const ModelPool& modelPool) const
-{
-    return computeModelBasedProbabilityOfSurvival(function, modelPool);
-}
-
-double Redundancy::computeModelBasedProbabilityOfSurvival(const IRI& function, const IRI& model) const
-{
-    // Get minimal requirements to maintain the function
-    std::vector<OWLCardinalityRestriction::Ptr> requirements = mpAsk->getCardinalityRestrictions(function);
-    // Get model restrictions, i.e. in effect what has to be available
-    std::vector<OWLCardinalityRestriction::Ptr> availableResources = mpAsk->getCardinalityRestrictions(model);
-
-    return compute(requirements, availableResources);
-}
-
-double Redundancy::computeModelBasedProbabilityOfSurvival(const owlapi::model::IRI& function, const ModelPool& modelPool) const
-{
-    // Get minimal requirements to maintain the function
-    std::vector<OWLCardinalityRestriction::Ptr> requirements = mpAsk->getCardinalityRestrictions(function);
-
-    // Get model restrictions, i.e. in effect what has to be available for the
-    // given models
-    ModelPool::const_iterator mit = modelPool.begin();
-    std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources;
-    for(; mit != modelPool.end(); ++mit)
+    using namespace owlapi::model;
+    std::vector<double> metrics;
+    IRIList::const_iterator cit = functions.begin();
+    for(; cit != functions.end(); ++cit)
     {
-        IRI model = mit->first;
-        uint32_t modelCount = mit->second;
-
-        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mpAsk->getCardinalityRestrictions(model);
-        std::vector<OWLCardinalityRestriction::Ptr>::iterator cit = availableResources.begin();
-        for(; cit != availableResources.end(); ++cit)
-        {
-            OWLCardinalityRestriction::Ptr restriction = *cit;
-            // Update the cardinality with the actual model count
-            uint32_t cardinality = modelCount*restriction->getCardinality();
-            restriction->setCardinality(cardinality);
-        }
-
-        allAvailableResources = owlapi::model::OWLCardinalityRestriction::join(allAvailableResources, availableResources);
+        const IRI& function = *cit;
+        double metric;
+        metric = Metric::compute(function, modelPool);
+        LOG_DEBUG_S << "Function: '" << function.toString() << "' --> metric: " << metric;
+        metrics.push_back(metric);
     }
-    return compute(requirements, allAvailableResources);
+
+    // serial connection of all functions
+    return serial(metrics);
 }
 
-double Redundancy::compute(const std::vector<OWLCardinalityRestriction::Ptr>& required, const std::vector<OWLCardinalityRestriction::Ptr>& available) const
+double Redundancy::computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ModelPool& modelPool, bool sharedUse) const
+{
+    using namespace owlapi::model;
+    std::vector<double> metrics;
+    std::vector<IRISet>::const_iterator cit = functionalRequirement.begin();
+    for(; cit != functionalRequirement.end(); ++cit)
+    {
+        const IRISet& functions = *cit;
+        double metric;
+        if(sharedUse)
+        {
+            metric = Metric::computeSharedUse(functions, modelPool);
+        } else {
+            metric = Metric::computeExclusiveUse(functions, modelPool);
+        }
+        LOG_DEBUG_S << "Function: '" << functions << "' --> metric: " << metric;
+        metrics.push_back(metric);
+    }
+
+    // serial connection of all functions
+    return serial(metrics);
+}
+
+double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Ptr>& required, const std::vector<OWLCardinalityRestriction::Ptr>& available) const
 {
     using namespace owlapi::model;
 

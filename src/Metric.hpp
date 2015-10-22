@@ -5,6 +5,7 @@
 #include <boost/shared_ptr.hpp>
 #include <organization_model/ModelPool.hpp>
 #include <organization_model/OrganizationModel.hpp>
+#include <owlapi/model/OWLCardinalityRestriction.hpp>
 
 namespace organization_model {
 
@@ -50,16 +51,46 @@ public:
      * Compute the metric for a given function (service) and an actor model
      * \return computed metric
      */
-    virtual double compute(const owlapi::model::IRI& function, const owlapi::model::IRI& model) const { throw std::runtime_error("organization_model::metrics::Metric::compute(function,model) not implemented"); }
+    double compute(const owlapi::model::IRI& function, const owlapi::model::IRI& model) const;
+    double compute(const owlapi::model::IRI& function, const ModelPool& modelPool) const;
+    /**
+     * Compute the metric for a given set of functions (services)
+     * \param functions Set of function that require
+     * the exclusive use of available resource, i.e., function requirements
+     * add(!) up
+     * \param modelPool describing a composite actor
+     * \return metric
+     */
+    double computeExclusiveUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const;
 
     /**
-     * Compute the metric for a given function (service) and a model pool
-     * describing a composite actor
+     * Compute the metric for a given set of functions (services)
+     * \param functions Set of function that allow
+     * a shared use of available resource, i.e., function requirements
+     * do not add up, but are lower bounds
+     * \param modelPool describing a composite actor
+     * \return metric
      */
-    virtual double compute(const owlapi::model::IRI& function, const ModelPool& modelPool) const { throw std::runtime_error("organization_model::metrics::Metric::compute(function,modelPool) not implemented"); }
+    double computeSharedUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const;
 
+    virtual double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const { throw std::runtime_error("organization_model::metrics::Metric::compute: not implemented"); }
+
+    /**
+     * Compute the metric for a given list of single functions (services) that are
+     * used sequentially and a model pool describing a composite actor that has
+     * to provide this functions
+     */
+    virtual double computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const { throw std::runtime_error("organization_model::metrics::Metric::computeSequential(IRIList,ModelPool) not implemented"); }
+
+    /**
+     * Compute the metric for a sequential application of distinct function sets
+     * by a composite actor which is described by the modelPool
+     */
+    virtual double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ModelPool& modelPool, bool sharedUse = true) const { throw std::runtime_error("organization_model::metrics::Metric::compute(functions,modelPool) not implemented"); }
 
     static std::string toString(const MetricMap& map, uint32_t indent = 0);
+
+    virtual double sequentialUse(const std::vector<double>& values) const { throw std::runtime_error("organization_model::metrics::Metric::sequentialUse  not implemented"); }
 
 protected:
     OrganizationModel mOrganizationModel;

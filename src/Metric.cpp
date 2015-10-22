@@ -52,6 +52,78 @@ MetricMap Metric::getMetricMap() const
     return metricMap;
 }
 
+double Metric::compute(const owlapi::model::IRI& function, const owlapi::model::IRI& model) const
+{
+    ModelPool modelPool;
+    modelPool[model] = 1;
+
+    return compute(function, modelPool);
+}
+
+double Metric::compute(const owlapi::model::IRI& function, const ModelPool& modelPool) const
+{
+    using namespace owlapi::model;
+    IRISet functionSet;
+    functionSet.insert(function);
+
+    return computeExclusiveUse(functionSet, modelPool);
+}
+
+double Metric::computeSharedUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const
+{
+    using namespace owlapi::model;
+
+    std::vector<double> values;
+    IRISet::const_iterator fit = functions.begin();
+    for(; fit != functions.end(); ++fit)
+    {
+        const IRI& function = *fit;
+        values.push_back( compute(function, modelPool) );
+    }
+
+    return sequentialUse(values);
+}
+
+double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const
+{
+    using namespace owlapi::model;
+
+    std::vector<OWLCardinalityRestriction::Ptr> requirements;
+    IRISet::const_iterator fit = functions.begin();
+    for(; fit != functions.end(); ++fit)
+    {
+        const IRI& function = *fit;
+        // Get minimal requirements to maintain the function
+        std::vector<OWLCardinalityRestriction::Ptr> functionRequirements = mpAsk->getCardinalityRestrictions(function);
+        requirements.insert(requirements.end(), functionRequirements.begin(), functionRequirements.end());
+    }
+    requirements = OWLCardinalityRestriction::compact(requirements);
+
+    // Get model restrictions, i.e. in effect what has to be available for the
+    // given models
+    ModelPool::const_iterator mit = modelPool.begin();
+    std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources;
+    for(; mit != modelPool.end(); ++mit)
+    {
+        IRI model = mit->first;
+        uint32_t modelCount = mit->second;
+
+        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mpAsk->getCardinalityRestrictions(model);
+        std::vector<OWLCardinalityRestriction::Ptr>::iterator cit = availableResources.begin();
+        for(; cit != availableResources.end(); ++cit)
+        {
+            OWLCardinalityRestriction::Ptr restriction = *cit;
+            // Update the cardinality with the actual model count
+            uint32_t cardinality = modelCount*restriction->getCardinality();
+            restriction->setCardinality(cardinality);
+        }
+
+        allAvailableResources = owlapi::model::OWLCardinalityRestriction::join(allAvailableResources, availableResources);
+    }
+
+    return computeMetric(requirements, allAvailableResources);
+}
+
 std::string Metric::toString(const MetricMap& map, uint32_t indent)
 {
     std::string hspace(indent,' ');

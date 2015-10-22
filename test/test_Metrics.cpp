@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(redundancy)
     // each serial system has a survivability of: 0.5*0.5 = 0.25
     // overall serial system: 0.25*0.25 = 0.0625
     double expected = 0.0625;
-    double redundancyVal = redundancy.compute(query, resourcePool);
+    double redundancyVal = redundancy.computeMetric(query, resourcePool);
     BOOST_REQUIRE_MESSAGE(redundancyVal == expected, "Redundancy expected: " << expected << " but got " << redundancyVal);
 }
 
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(metric_map_computation)
         for(int i = 1; i <= 3; ++i)
         {
             modelPool[sherpa] = i;
-            double pSurvivability = redundancy.computeModelBasedProbabilityOfSurvival(locationImageProvider, modelPool);
+            double pSurvivability = redundancy.compute(locationImageProvider, modelPool);
             BOOST_TEST_MESSAGE("Survivability for #" << i << " " << sherpa << ": \n" << pSurvivability);
         }
     }
@@ -112,6 +112,47 @@ BOOST_AUTO_TEST_CASE(metric_map_computation)
             double expected = pow(parallel,5);
             double pSurvivability = redundancy.compute(locationImageProvider, modelPool);
             BOOST_REQUIRE_MESSAGE(pSurvivability == expected, "Survivability for #" << i << " " << crex << ": \n" << pSurvivability << " (expected: " << expected << ")");
+        }
+    }
+    {
+        IRI locationImageProvider("http://www.rock-robotics.org/2014/01/om-schema#LocationImageProvider");
+        IRI stereoCamera("http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider");
+
+        IRISet services;
+        services.insert(locationImageProvider);
+        services.insert(stereoCamera);
+
+        IRI robot("http://www.rock-robotics.org/2014/01/om-schema#Sherpa");
+        ModelPool modelPool;
+        for(int i = 1; i <= 3; ++i)
+        {
+            modelPool[robot] = i;
+
+            //    required: 
+            //            ModelBound::List
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Camera' (1, 1000000)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Localization' (1, 1000000)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Locomotion' (1, 1000000)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Mapping' (1, 1000000)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Power' (1, 1000000)
+            //
+            //    available: 
+            //            ModelBound::List
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Camera' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#EmiPassive' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#LaserScanner' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Localization' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Locomotion' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Mapping' (0, 3)
+            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Power' (0, 3)
+
+            double redundancyLevel = i;
+            double parallel = 1 - pow((1-0.5),redundancyLevel);
+            double expected = pow(parallel,5);
+
+            double pSurvivability = redundancy.computeSharedUse(services, modelPool);
+            BOOST_TEST_MESSAGE("Survivability for #" << i << " " << robot << ": \n" << pSurvivability);
+            //BOOST_REQUIRE_MESSAGE(pSurvivability == expected, "Survivability for #" << i << " " << crex << ": \n" << pSurvivability << " (expected: " << expected << ")");
         }
     }
 }
