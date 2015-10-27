@@ -16,7 +16,7 @@ using namespace owlapi::vocabulary;
 
 namespace organization_model {
 
-OrganizationModelAsk::OrganizationModelAsk(OrganizationModel::Ptr om,
+OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
         const ModelPool& modelPool,
         bool applyFunctionalSaturationBound)
     : mpOrganizationModel(om)
@@ -25,6 +25,10 @@ OrganizationModelAsk::OrganizationModelAsk(OrganizationModel::Ptr om,
 {
     if(!modelPool.empty())
     {
+        if(!mApplyFunctionalSaturationBound)
+        {
+            LOG_WARN_S << "No functional saturation bound requested: this might take some time to prepare the functionality mappings";
+        }
         prepare(modelPool, mApplyFunctionalSaturationBound);
     } else {
         LOG_WARN_S << "No model pool provided: did not prepare functionality mappings";
@@ -63,6 +67,7 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
     // LocationImageProvider: CREX --> 1, Sherpa --> 1
     if(applyFunctionalSaturationBound)
     {
+        // Compute service set of all known services
         ServiceSet services;
         {
             IRIList::const_iterator cit = serviceModels.begin();
@@ -72,13 +77,19 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
                 services.insert( Service(serviceModel) );
             }
         }
-   
+
         // Compute the bound for all services
         functionalSaturationBound = getFunctionalSaturationBound(services);
+        LOG_INFO_S << "Functional saturation bound for '" << serviceModels << "' is "
+            << functionalSaturationBound.toString();
+
         // Merge with the existing model pool
         functionalSaturationBound = modelPool.applyUpperBound(functionalSaturationBound);
+        LOG_INFO_S << "After accounting for given model pool the functional saturation bound for '" << serviceModels << "' is "
+            << functionalSaturationBound.toString();
     } else {
-       functionalSaturationBound = modelPool; 
+        LOG_WARN_S << "No functional saturation bound applied";
+        functionalSaturationBound = modelPool;
     }
 
     if(modelPool.empty())
@@ -252,7 +263,7 @@ ModelCombinationSet OrganizationModelAsk::getResourceSupport(const ServiceSet& s
     //                        // not enough resources
     //                        LOG_DEBUG_S << "Not enough resources";
     //                    } else {
-    //                        updatedResources.insert(  
+    //                        updatedResources.insert(
     //                    }
     //                }
     //            }
@@ -429,7 +440,7 @@ ModelCombinationSet OrganizationModelAsk::expandToLowerBound(const ModelCombinat
 algebra::SupportType OrganizationModelAsk::getSupportType(const Service& service, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
 {
     algebra::ResourceSupportVector serviceSupportVector = getSupportVector(service.getModel(), IRIList(), false /*useMaxCardinality*/);
-    algebra::ResourceSupportVector modelSupportVector = 
+    algebra::ResourceSupportVector modelSupportVector =
         getSupportVector(model, serviceSupportVector.getLabels(), true /*useMaxCardinality*/)*
         static_cast<double>(cardinalityOfModel);
 
@@ -438,17 +449,25 @@ algebra::SupportType OrganizationModelAsk::getSupportType(const Service& service
 
 uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const Service& service, const owlapi::model::IRI& model) const
 {
+    // Collect requirements, i.e., max cardinalities
     algebra::ResourceSupportVector serviceSupportVector = getSupportVector(service.getModel(), IRIList(), false /*useMaxCardinality*/);
+
+    // Collect available resources -- and limit to the required ones
+    // (getSupportVector will accumulate all (subclass) models)
     algebra::ResourceSupportVector modelSupportVector = getSupportVector(model, serviceSupportVector.getLabels(), true /*useMaxCardinality*/);
 
+    // Expand the support vectors to account for subclasses within the required
+    // scope
     serviceSupportVector = serviceSupportVector.embedClassRelationship(*this);
     modelSupportVector = modelSupportVector.embedClassRelationship(*this);
 
+    // Compute the support ratios
     algebra::ResourceSupportVector ratios = serviceSupportVector.getRatios(modelSupportVector);
 
     LOG_DEBUG_S << "Service: " << serviceSupportVector.toString();
     LOG_DEBUG_S << "Provider: " << modelSupportVector.toString();
     LOG_DEBUG_S << "Ratios: " << ratios.toString();
+
     // max in the set of ratio tells us how many model instances
     // contribute to fulfill this service (even partially)
     double max = 0.0;
@@ -637,10 +656,9 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std:
     base::VectorXd vector;
     std::vector<IRI> labels;
 
-    LOG_DEBUG_S << "Filter labels: " << filterLabels;
-
     if(filterLabels.empty())
     {
+        // Create zero vector: each row maps to a model
         vector = base::VectorXd::Zero(modelBounds.size());
 
         std::map<IRI, OWLCardinalityRestriction::MinMax>::const_iterator cit = modelBounds.begin();
@@ -657,40 +675,42 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std:
             }
         }
     } else {
-        vector = base::VectorXd::Zero(filterLabels.size());
         labels = filterLabels;
+    }
 
-        std::vector<IRI>::const_iterator cit = filterLabels.begin();
-        uint32_t dimension = 0;
-        for(; cit != filterLabels.end(); ++cit)
+    LOG_DEBUG_S << "Use labels: " << labels;
+    vector = base::VectorXd::Zero(labels.size());
+
+    std::vector<IRI>::const_iterator cit = labels.begin();
+    uint32_t dimension = 0;
+    for(; cit != labels.end(); ++cit)
+    {
+        const IRI& dimensionLabel = *cit;
+        std::map<IRI, OWLCardinalityRestriction::MinMax>::const_iterator mit = modelBounds.begin();
+        for(; mit != modelBounds.end(); ++mit)
         {
-            const IRI& dimensionLabel = *cit;
-            std::map<IRI, OWLCardinalityRestriction::MinMax>::const_iterator mit = modelBounds.begin();
-            for(; mit != modelBounds.end(); ++mit)
-            {
-                const IRI& modelDimensionLabel = mit->first;
-                LOG_DEBUG_S << "Check model support for " << dimensionLabel << "  from " << modelDimensionLabel;
+            const IRI& modelDimensionLabel = mit->first;
+            LOG_DEBUG_S << "Check model support for " << dimensionLabel << "  from " << modelDimensionLabel;
 
-                // Sum the requirement/availability of this model type
-                if(dimensionLabel == modelDimensionLabel || mOntologyAsk.isSubClassOf(modelDimensionLabel, dimensionLabel))
+            // Sum the requirement/availability of this model type
+            if(dimensionLabel == modelDimensionLabel || mOntologyAsk.isSubClassOf(modelDimensionLabel, dimensionLabel))
+            {
+                if(useMaxCardinality)
                 {
-                    if(useMaxCardinality)
-                    {
-                        LOG_DEBUG_S << "update " << dimension << " with " << mit->second.second << " -- min is "<< mit->second.first;
-                        // using max value
-                        vector(dimension) += mit->second.second;
-                    } else {
-                        // using min value
-                        LOG_DEBUG_S << "update " << dimension << " with min " << mit->second.first << " -- max is "<< mit->second.second;
-                        vector(dimension) += mit->second.first;
-                    }
+                    LOG_DEBUG_S << "update " << dimension << " with " << mit->second.second << " -- min is "<< mit->second.first;
+                    // using max value
+                    vector(dimension) += mit->second.second;
                 } else {
-                    LOG_DEBUG_S << "No support";
-                    // nothing to do
+                    // using min value
+                    LOG_DEBUG_S << "update " << dimension << " with min " << mit->second.first << " -- max is "<< mit->second.second;
+                    vector(dimension) += mit->second.first;
                 }
+            } else {
+                LOG_DEBUG_S << "No support";
+                // nothing to do
             }
-            ++dimension;
         }
+        ++dimension;
     }
 
     LOG_DEBUG_S << "Get support vector" << std::endl

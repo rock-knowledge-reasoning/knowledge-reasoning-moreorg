@@ -23,7 +23,15 @@ class OrganizationModelAsk
 public:
     typedef boost::shared_ptr<OrganizationModelAsk> Ptr;
 
-    OrganizationModelAsk(OrganizationModel::Ptr om,
+    /**
+     * Default constructor of the organization model ask
+     * \param om OrganizationModel that is used as database
+     * \param modelPool ModelPool that is used for bounding
+     * \param applyFunctionalSaturationBound Set bounding in order to
+     * reduce computed combinations to the functional saturation bound --
+     * otherwise all feasible combinations are computed
+     */
+    OrganizationModelAsk(const OrganizationModel::Ptr& om,
             const ModelPool& modelPool = ModelPool(),
             bool applyFunctionalSaturationBound = false);
 
@@ -166,10 +174,19 @@ public:
     //uint32_t minRequiredCardinality(const ServiceSet& services, const owlapi::model::IRI& model) const;
 
     /**
-     * Check if two ModelCombinations can be built from distinct resources
+     * Check if two ModelCombinations can be built from distinct resources,
+     * i.e. check if the current model pool provides enough resources for both
+     * combinations
+     * \return True if both model combinations can be maintained in parallel by
+     * the existing model pool
      */
     bool canBeDistinct(const ModelCombination& a, const ModelCombination& b) const;
 
+    /**
+     * Check is the model combination supports a given set of services
+     * \return True if the combination support the set of services, false
+     * otherwise
+     */
     bool isSupporting(const ModelCombination& c, const ServiceSet& services) const;
 
     /**
@@ -201,13 +218,15 @@ protected:
      FunctionalityMapping getFunctionalityMapping(const ModelPool& modelPool) const;
 
     /**
-     * Get the support vector for a given model
+     * Get the ResourceSupportVector for a given model
+     *
      * Does not (!) account for (sub)class relationship
      * \param model Name of the model
      * \param filterLabels Model names corresponding to the dimensions of the
-     * support vector
+     * support vector (resulting vector will be limited to these filterLabels (subclasses of this model will be included in the cardinality))
      * \param useMaxCardinality If true, the support vector consists of all max
      * cardinality value, if false, min values are uses
+     * \see algebra::ResourceSupportVector
      */
     algebra::ResourceSupportVector getSupportVector(const owlapi::model::IRI& model,
         const owlapi::model::IRIList& filterLabels = owlapi::model::IRIList(),

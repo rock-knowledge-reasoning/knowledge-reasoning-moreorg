@@ -196,4 +196,22 @@ BOOST_AUTO_TEST_CASE(apply_upper_bound)
     BOOST_REQUIRE_MESSAGE(boundedSet.size() == 2, "BoundedSet: expected size: 2 was " << boundedSet.size() << ": " << OrganizationModel::toString(boundedSet) );
 }
 
+BOOST_AUTO_TEST_CASE(to_string)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.12.owl"));
+    ModelPool pool;
+    pool.setResourceCount( OM::resolve("Sherpa"), 3);
+    pool.setResourceCount( OM::resolve("CREX"), 2);
+    pool.setResourceCount( OM::resolve("CoyoteIII"), 3);
+    pool.setResourceCount( OM::resolve("BaseCamp"), 5);
+    pool.setResourceCount( OM::resolve("Payload"), 10);
+
+    bool applyFunctionalSaturationBound = true;
+    OrganizationModelAsk ask(om, pool, applyFunctionalSaturationBound);
+    BOOST_TEST_MESSAGE(ask.toString());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
