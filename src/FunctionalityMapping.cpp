@@ -12,7 +12,14 @@ FunctionalityMapping::FunctionalityMapping(const ModelPool& modelPool,
     : mModelPool(modelPool)
     , mServices(services)
     , mFunctionalSaturationBound(functionalSaturationBound)
-{}
+{
+    owlapi::model::IRIList::const_iterator cit = mServices.begin();
+    for(; cit != mServices.end(); ++cit)
+    {
+        // initialize the set of functionalities
+        mFunction2Combination[*cit] = ModelCombinationSet();
+    }
+}
 
 const owlapi::model::IRIList& FunctionalityMapping::getFunction(const ModelCombination& combination) const
 {
