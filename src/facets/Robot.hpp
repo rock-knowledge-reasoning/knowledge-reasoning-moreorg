@@ -10,7 +10,7 @@ class Robot : public Facet
 {
 
 public:
-    Robot(const owlapi::model::IRI& actorModel, const OrganizationModel::Ptr& organizationModel);
+    Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& organizationModelAsk);
 
     double getMinAcceleration() const { return mMinAcceleration; }
     double getMaxAcceleration() const { return mMaxAcceleration; }
@@ -62,6 +62,11 @@ public:
      * charateristics
      */
     std::string toString() const;
+
+    /**
+     * Return if robot is mobile
+     */
+    bool isMobile() const;
 
 private:
     double mMinAcceleration;

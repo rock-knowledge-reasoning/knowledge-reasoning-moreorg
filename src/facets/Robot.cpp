@@ -1,5 +1,6 @@
 #include "Robot.hpp"
 #include <organization_model/vocabularies/Robot.hpp>
+#include <owlapi/Vocabulary.hpp>
 #include <base/Logging.hpp>
 
 using namespace owlapi::model;
@@ -8,8 +9,9 @@ using namespace owlapi::model;
 namespace organization_model {
 namespace facets {
 
-Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModel::Ptr& organizationModel)
-    : Facet(organizationModel)
+Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& organizationModelAsk)
+    : Facet(organizationModelAsk)
+    , mActorModel(actorModel)
     , mMinAcceleration(0.0)
     , mMaxAcceleration(0.0)
     , mNominalAcceleration(0.0)
@@ -84,6 +86,13 @@ std::string Robot::toString() const
     ss << "    max velocity (m/s):            " << mMaxVelocity << std::endl;
     ss << "    nominal velocity (m/s):        " << mNominalVelocity << std::endl;
     return ss.str();
+}
+
+bool Robot::isMobile() const
+{
+    owlapi::model::IRI moveTo = owlapi::vocabulary::OM::resolve("MoveTo");
+    bool supporting = organizationAsk().isSupporting(mActorModel, moveTo);
+    return supporting;
 }
 
 

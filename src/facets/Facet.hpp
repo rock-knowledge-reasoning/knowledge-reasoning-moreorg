@@ -10,9 +10,9 @@ namespace facets {
 class Facet
 {
 public:
-    Facet(const OrganizationModel::Ptr& organizationModel)
-        : mOrganizationModelAsk(organizationModel)
-        , mOWLOntologyAsk(organizationModel->ontology())
+    Facet(const OrganizationModelAsk& organizationModelAsk)
+        : mOrganizationModelAsk(organizationModelAsk)
+        , mOWLOntologyAsk(mOrganizationModelAsk.getOrganizationModel()->ontology())
     {}
 
 protected:
