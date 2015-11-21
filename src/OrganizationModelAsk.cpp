@@ -31,7 +31,7 @@ OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
         }
         prepare(modelPool, mApplyFunctionalSaturationBound);
     } else {
-        LOG_WARN_S << "No model pool provided: did not prepare functionality mappings";
+        LOG_INFO_S << "No model pool provided: did not prepare functionality mappings";
     }
 }
 
@@ -48,6 +48,14 @@ owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
     return subclasses;
 }
 
+owlapi::model::IRIList OrganizationModelAsk::getFunctionalities() const
+{
+    bool directSubclassOnly = false;
+    IRIList subclasses = mOntologyAsk.allSubClassesOf(OM::Functionality(), directSubclassOnly);
+    LOG_DEBUG_S << "Functionalities: " << subclasses;
+    return subclasses;
+}
+
 FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPool& modelPool, bool applyFunctionalSaturationBound) const
 {
     if(modelPool.empty())
@@ -56,7 +64,8 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
                 " cannot compute functionality map for empty model pool");
     }
 
-    IRIList serviceModels = getServiceModels();
+    // TODO: rename serviceModels --> functionalities
+    IRIList serviceModels = getFunctionalities();
     std::pair<Combination2FunctionMap, Function2CombinationMap> functionalityMaps;
 
     ModelPool functionalSaturationBound;
@@ -79,6 +88,7 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         }
 
         // Compute the bound for all services
+        LOG_INFO_S << "Get functional saturation bound for '" << serviceModels;
         functionalSaturationBound = getFunctionalSaturationBound(services);
         LOG_INFO_S << "Functional saturation bound for '" << serviceModels << "' is "
             << functionalSaturationBound.toString();
@@ -378,6 +388,10 @@ ModelCombinationSet OrganizationModelAsk::applyLowerBound(const ModelCombination
 ModelCombinationSet OrganizationModelAsk::expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBound) const
 {
     ModelCombinationSet boundedCombinations;
+    if(combinations.empty())
+    {
+        boundedCombinations.insert(OrganizationModel::modelPool2Combination(lowerBound));
+    }
     ModelCombinationSet::const_iterator cit = combinations.begin();
     for(; cit != combinations.end(); ++cit)
     {
@@ -449,12 +463,24 @@ algebra::SupportType OrganizationModelAsk::getSupportType(const Service& service
 
 uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const Service& service, const owlapi::model::IRI& model) const
 {
+    LOG_DEBUG_S << "Get functional saturation bound for " << service.getModel() << " for model '" << model << "'";
     // Collect requirements, i.e., max cardinalities
     algebra::ResourceSupportVector serviceSupportVector = getSupportVector(service.getModel(), IRIList(), false /*useMaxCardinality*/);
-
+    if(serviceSupportVector.isNull())
+    {
+        owlapi::model::IRIList labels;
+        labels.push_back(service.getModel());
+        base::VectorXd required(1);
+        required(0) = 1;
+        serviceSupportVector = algebra::ResourceSupportVector(required, labels);
+        LOG_DEBUG_S << "functionality support vector is null : using " << serviceSupportVector.toString();
+    } else {
+        LOG_DEBUG_S << "Get model support vector";
+    }
     // Collect available resources -- and limit to the required ones
     // (getSupportVector will accumulate all (subclass) models)
     algebra::ResourceSupportVector modelSupportVector = getSupportVector(model, serviceSupportVector.getLabels(), true /*useMaxCardinality*/);
+    LOG_DEBUG_S << "Retrieved model support vector";
 
     // Expand the support vectors to account for subclasses within the required
     // scope
@@ -636,14 +662,41 @@ bool OrganizationModelAsk::isSupporting(const ModelCombination& c, const Service
     }
 }
 
+bool OrganizationModelAsk::isSupporting(const owlapi::model::IRI& model, const Service& serviceModel) const
+{
+    ModelPool modelPool;
+    modelPool.setResourceCount(model, 1);
+
+    ServiceSet services;
+    services.insert(serviceModel);
+    if( isSupporting(modelPool.toModelCombination(), services) )
+    {
+        LOG_DEBUG_S << "model '" << model << "' supports '" << serviceModel.getModel() << "'";
+        return true;
+    } else {
+        LOG_DEBUG_S << "model '" << model << "' does not support '" << serviceModel.getModel() << "'";
+        return false;
+    }  
+}
+
 algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owlapi::model::IRI& model,
         const owlapi::model::IRIList& filterLabels,
         bool useMaxCardinality) const
 {
     using namespace owlapi::model;
     std::vector<OWLCardinalityRestriction::Ptr> restrictions = mOntologyAsk.getCardinalityRestrictions(model);
-    std::map<IRI, OWLCardinalityRestriction::MinMax> modelCount = OWLCardinalityRestriction::getBounds(restrictions);
-    return getSupportVector(modelCount, filterLabels, useMaxCardinality);
+    if(restrictions.empty())
+    {
+        return algebra::ResourceSupportVector();
+    } else {
+        std::map<IRI, OWLCardinalityRestriction::MinMax> modelCount = OWLCardinalityRestriction::getBounds(restrictions);
+        LOG_WARN_S << "ModelCount: "<< modelCount.size() << ", restrictions: " << restrictions.size();
+        if(restrictions.size() == 1)
+        {
+            LOG_WARN_S << restrictions[0]->toString();
+        }
+        return getSupportVector(modelCount, filterLabels, useMaxCardinality);
+    }
 
 }
 
@@ -651,6 +704,11 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std:
     owlapi::model::OWLCardinalityRestriction::MinMax>& modelBounds,
     const owlapi::model::IRIList& filterLabels, bool useMaxCardinality) const
 {
+    if(modelBounds.size() == 0)
+    {
+        throw std::invalid_argument("organization_model::OrganizationModelAsk::getSupportVector: no model bounds given");
+    }
+
     using namespace owlapi::model;
 
     base::VectorXd vector;

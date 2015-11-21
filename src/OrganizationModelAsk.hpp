@@ -42,6 +42,12 @@ public:
     owlapi::model::IRIList getServiceModels() const;
 
     /**
+     * Retrieve the list of all known functionalities
+     * \return list of all known funtionalities
+     */
+    owlapi::model::IRIList getFunctionalities() const;
+
+    /**
      * Set the model pool
      * A currently set model pool is required for some queries to the
      * organization model
@@ -189,6 +195,13 @@ public:
      */
     bool isSupporting(const ModelCombination& c, const ServiceSet& services) const;
 
+
+    /**
+     * Check if the model supports a service
+     * \return true if the robot supports the set of services
+     */
+    bool isSupporting(const owlapi::model::IRI& model, const Service& service) const;
+
     /**
      * Provide debug information about the status of this object
      * \return String representation of this query object
@@ -209,6 +222,12 @@ public:
      * \return underlying OWLOntologyAsk object
      */
     owlapi::model::OWLOntologyAsk ontology() const { return mOntologyAsk; }
+
+    /**
+     * Return organization model that relates to this ask object
+     * \return underlying OWLOrganizationModelAsk object
+     */
+    OrganizationModel::Ptr getOrganizationModel() const { return mpOrganizationModel; }
 protected:
 
     /**

@@ -43,7 +43,7 @@ enum SupportType { NO_SUPPORT, PARTIAL_SUPPORT, FULL_SUPPORT };
 class ResourceSupportVector
 {
 public:
-    ResourceSupportVector() {}
+    ResourceSupportVector();
 
     /**
      * Construct ResourceSupportVector

@@ -7,6 +7,11 @@
 namespace organization_model {
 namespace algebra {
 
+ResourceSupportVector::ResourceSupportVector()
+    : mSizes()
+    , mLabels(0)
+{}
+
 ResourceSupportVector::ResourceSupportVector(const base::VectorXd& sizes,
     const owlapi::model::IRIList& labels)
     : mSizes(sizes)
@@ -81,6 +86,7 @@ SupportType ResourceSupportVector::getSupportFrom(const ResourceSupportVector& o
 
 ResourceSupportVector ResourceSupportVector::getRatios(const ResourceSupportVector& other) const
 {
+    assert(other.size() != 0);
     uint32_t maxDimensions = other.size();
     ResourceSupportVector ratio( base::VectorXd::Zero(maxDimensions), mLabels);
     for(uint32_t dim = 0; dim < maxDimensions; ++dim)
