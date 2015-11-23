@@ -2,8 +2,9 @@
 #include <math.h>
 #include <vector>
 #include <base/Logging.hpp>
-#include <owlapi/csp/ResourceMatch.hpp>
+#include <organization_model/reasoning/ResourceMatch.hpp>
 #include <organization_model/metrics/ModelSurvivability.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 
 using namespace owlapi::model;
 using namespace owlapi::vocabulary;
@@ -79,7 +80,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
     // Firstly -- we need to find a proper match of required resources to
     // available resources, thus defining here a small Constraint Satisfaction
     // Problem already
-    using namespace owlapi::csp;
+    using namespace organization_model::reasoning;
 
     ModelBound::List modelBoundRemaining = ResourceMatch::toModelBoundList(available);
     ModelBound::List modelBoundRequired = ResourceMatch::toModelBoundList(required);
@@ -134,7 +135,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         double probabilityOfSurvival = 0;
         try {
             // SCHOKO: Model should have an associated probability of failure
-            OWLLiteral::Ptr value = mpAsk->getDataValue(qualification, OM::probabilityOfFailure());
+            OWLLiteral::Ptr value = mpAsk->getDataValue(qualification, vocabulary::OM::probabilityOfFailure());
             LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
             probabilityOfSurvival = 1 - value->getDouble();
         } catch(...)

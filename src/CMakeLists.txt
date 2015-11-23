@@ -26,6 +26,8 @@ rock_library(organization_model
         organization_model/Grounding.cpp
         organization_model/InterfaceConnection.cpp
         organization_model/Statistics.cpp
+        reasoning/ModelBound.cpp
+        reasoning/ResourceMatch.cpp
         utils/CoalitionStructureGeneration.cpp
     HEADERS
         Algebra.hpp
@@ -54,12 +56,32 @@ rock_library(organization_model
         organization_model/Grounding.hpp
         organization_model/InterfaceConnection.hpp
         organization_model/Statistics.hpp
+        reasoning/ModelBound.hpp
+        reasoning/ResourceMatch.hpp
         utils/CoalitionStructureGeneration.hpp
         utils/CorrelationClustering.hpp
+        vocabularies/OM.hpp
         vocabularies/Robot.hpp
     DEPS_PKGCONFIG numeric pddl_planner owlapi
     LIBS glpk ${Boost_THREAD_LIBRARY}
 )
+
+find_library(gecode0 NAMES gecodeflatzinc   PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode1 NAMES gecodedriver     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode2 NAMES gecodegist       PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode3 NAMES gecodesearch     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode4 NAMES gecodeminimodel  PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode5 NAMES gecodeset        PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode6 NAMES gecodefloat      PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode7 NAMES gecodeint        PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode8 NAMES gecodekernel     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode9 NAMES gecodesupport    PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+
+set(GECODE_LIBRARIES
+    ${gecode0} ${gecode1} ${gecode2} ${gecode3} ${gecode4} ${gecode5} ${gecode6} ${gecode7} ${gecode8} ${gecode9}
+)
+target_link_libraries(organization_model ${GECODE_LIBRARIES})
+
 
 #rock_executable(organization_model_bin Main.cpp
 #    DEPS organization_model)

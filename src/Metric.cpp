@@ -2,6 +2,7 @@
 #include <sstream>
 #include <boost/foreach.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 #include <base/Logging.hpp>
 
 namespace organization_model {
@@ -19,8 +20,8 @@ MetricMap Metric::getMetricMap() const
 
     MetricMap metricMap;
 
-    IRIList actorModels = mpAsk->allSubClassesOf( OM::Actor() );
-    IRIList services = mpAsk->allSubClassesOf( OM::Service() );
+    IRIList actorModels = mpAsk->allSubClassesOf( vocabulary::OM::Actor() );
+    IRIList services = mpAsk->allSubClassesOf( vocabulary::OM::Service() );
 
     BOOST_FOREACH(const IRI& actorModel, actorModels)
     {

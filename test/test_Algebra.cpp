@@ -3,7 +3,7 @@
 #include <organization_model/OrganizationModelAsk.hpp>
 #include <organization_model/Algebra.hpp>
 #include "test_utils.hpp"
-#include <owlapi/Vocabulary.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 
 using namespace organization_model;
 using namespace organization_model::algebra;
@@ -44,6 +44,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
 {
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
+    using namespace organization_model::vocabulary;
 
     OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.7.owl"));
     OrganizationModelAsk ask(om);

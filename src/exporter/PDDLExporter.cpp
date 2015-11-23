@@ -4,8 +4,8 @@
 #include <boost/foreach.hpp>
 #include <base/Logging.hpp>
 #include <pddl_planner/representation/Domain.hpp>
-#include <owlapi/Vocabulary.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 
 using namespace owlapi::model;
 
@@ -14,6 +14,7 @@ namespace organization_model {
 pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationModel& model)
 {
     using namespace owlapi::vocabulary;
+    using namespace organization_model::vocabulary;
     using namespace pddl_planner;
 
     pddl_planner::representation::Domain domain("om");
@@ -187,6 +188,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
 pddl_planner::representation::Problem PDDLExporter::toProblem(const OrganizationModel& model)
 {
     using namespace owlapi::vocabulary;
+    using namespace organization_model::vocabulary;
 
     using namespace pddl_planner;
     using namespace pddl_planner::representation;

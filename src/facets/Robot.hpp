@@ -69,6 +69,9 @@ public:
     bool isMobile() const;
 
 private:
+
+    owlapi::model::IRI mActorModel;
+
     double mMinAcceleration;
     double mMaxAcceleration;
     double mNominalAcceleration;
@@ -84,8 +87,6 @@ private:
     double mNominalPowerConsumption;
 
     uint32_t mPayloadTransportCapacity;
-
-    owlapi::model::IRI mActorModel;
 };
 
 } // end namespace facets

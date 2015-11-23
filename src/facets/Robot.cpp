@@ -1,6 +1,6 @@
 #include "Robot.hpp"
+#include <organization_model/vocabularies/OM.hpp>
 #include <organization_model/vocabularies/Robot.hpp>
-#include <owlapi/Vocabulary.hpp>
 #include <base/Logging.hpp>
 
 using namespace owlapi::model;
@@ -90,7 +90,7 @@ std::string Robot::toString() const
 
 bool Robot::isMobile() const
 {
-    owlapi::model::IRI moveTo = owlapi::vocabulary::OM::resolve("MoveTo");
+    owlapi::model::IRI moveTo = vocabulary::OM::resolve("MoveTo");
     bool supporting = organizationAsk().isSupporting(mActorModel, moveTo);
     return supporting;
 }

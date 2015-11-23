@@ -1,11 +1,13 @@
 #include <boost/test/unit_test.hpp>
 #include <organization_model/OrganizationModel.hpp>
 #include <organization_model/OrganizationModelAsk.hpp>
-
-#include <owlapi/csp/ResourceMatch.hpp>
+#include <organization_model/reasoning/ResourceMatch.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 #include "test_utils.hpp"
 
 using namespace organization_model;
+using namespace organization_model::reasoning;
+using namespace organization_model::vocabulary;
 
 BOOST_AUTO_TEST_SUITE(organization_model_ask)
 
@@ -14,7 +16,7 @@ BOOST_AUTO_TEST_CASE(recursive_resolution)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.8.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
     IRI sherpa = OM::resolve("Sherpa");
     IRI locationImageProvider = OM::resolve("LocationImageProvider");
 
@@ -27,7 +29,7 @@ BOOST_AUTO_TEST_CASE(recursive_resolution)
     IRIList services;
     services.push_back(service.getModel());
 
-    IRIList supportedServiceModels = owlapi::csp::ResourceMatch::filterSupportedModels(combination, services, om->ontology());
+    IRIList supportedServiceModels = ResourceMatch::filterSupportedModels(combination, services, om->ontology());
 
     OWLOntologyAsk oAsk(om->ontology());
     std::vector<OWLCardinalityRestriction::Ptr> restrictions = oAsk.getCardinalityRestrictions(locationImageProvider);
@@ -48,7 +50,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.8.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
 
     IRI sherpa = OM::resolve("Sherpa");
     IRI crex = OM::resolve("CREX");
@@ -115,7 +117,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.8.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
 
     IRI sherpa = OM::resolve("Sherpa");
     IRI crex = OM::resolve("CREX");
@@ -158,7 +160,7 @@ BOOST_AUTO_TEST_CASE(apply_upper_bound)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.8.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
 
     IRI sherpa = OM::resolve("Sherpa");
     IRI crex = OM::resolve("CREX");
@@ -201,7 +203,7 @@ BOOST_AUTO_TEST_CASE(to_string)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.12.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
     ModelPool pool;
     pool.setResourceCount( OM::resolve("Sherpa"), 3);
     pool.setResourceCount( OM::resolve("CREX"), 2);
@@ -212,6 +214,10 @@ BOOST_AUTO_TEST_CASE(to_string)
     bool applyFunctionalSaturationBound = true;
     OrganizationModelAsk ask(om, pool, applyFunctionalSaturationBound);
     BOOST_TEST_MESSAGE(ask.toString());
+}
+
+BOOST_AUTO_TEST_CASE(transport)
+{
 }
 
 BOOST_AUTO_TEST_SUITE_END()

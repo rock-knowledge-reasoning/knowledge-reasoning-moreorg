@@ -6,8 +6,10 @@
 #include <organization_model/exporter/PDDLExporter.hpp>
 #include <numeric/Combinatorics.hpp>
 #include <organization_model/metrics/Redundancy.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 
 using namespace organization_model;
+using namespace organization_model::vocabulary;
 
 BOOST_AUTO_TEST_SUITE(organization_model)
 
@@ -23,7 +25,7 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.6.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.13.owl"));
 
     ModelPool items;
     items[OM::resolve("Sherpa")] = 3;
@@ -42,7 +44,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.8.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
 
     {
         ModelPool items;
@@ -138,7 +140,7 @@ BOOST_AUTO_TEST_CASE(resource_support_crex)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.8.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
 
     {
         ModelPool items;

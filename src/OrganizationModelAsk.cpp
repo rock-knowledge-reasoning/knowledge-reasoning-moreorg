@@ -1,15 +1,15 @@
 #include "OrganizationModelAsk.hpp"
 #include "Algebra.hpp"
 #include <sstream>
-
-#include <owlapi/model/OWLOntologyAsk.hpp>
-#include <owlapi/model/OWLOntologyTell.hpp>
-#include <owlapi/csp/ResourceMatch.hpp>
+#include <base/Logging.hpp>
 #include <base/Time.hpp>
 #include <numeric/LimitedCombination.hpp>
+#include <owlapi/model/OWLOntologyAsk.hpp>
+#include <owlapi/model/OWLOntologyTell.hpp>
 #include <owlapi/Vocabulary.hpp>
+#include <organization_model/reasoning/ResourceMatch.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 
-#include <base/Logging.hpp>
 
 using namespace owlapi::model;
 using namespace owlapi::vocabulary;
@@ -44,14 +44,14 @@ void OrganizationModelAsk::prepare(const ModelPool& modelPool, bool applyFunctio
 owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
 {
     bool directSubclassOnly = false;
-    IRIList subclasses = mOntologyAsk.allSubClassesOf(OM::Service(), directSubclassOnly);
+    IRIList subclasses = mOntologyAsk.allSubClassesOf(vocabulary::OM::Service(), directSubclassOnly);
     return subclasses;
 }
 
 owlapi::model::IRIList OrganizationModelAsk::getFunctionalities() const
 {
     bool directSubclassOnly = false;
-    IRIList subclasses = mOntologyAsk.allSubClassesOf(OM::Functionality(), directSubclassOnly);
+    IRIList subclasses = mOntologyAsk.allSubClassesOf(vocabulary::OM::Functionality(), directSubclassOnly);
     LOG_DEBUG_S << "Functionalities: " << subclasses;
     return subclasses;
 }
@@ -143,7 +143,7 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         base::Time startTime = base::Time::now();
         // Filter the serviceModel (from the existing set) which are supported
         // by this very combination
-        IRIList supportedServiceModels = owlapi::csp::ResourceMatch::filterSupportedModels(combination, serviceModels, mpOrganizationModel->ontology());
+        IRIList supportedServiceModels = reasoning::ResourceMatch::filterSupportedModels(combination, serviceModels, mpOrganizationModel->ontology());
 
         base::Time stopTime = base::Time::now();
         LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
