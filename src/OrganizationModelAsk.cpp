@@ -27,7 +27,7 @@ OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
     {
         if(!mApplyFunctionalSaturationBound)
         {
-            LOG_WARN_S << "No functional saturation bound requested: this might take some time to prepare the functionality mappings";
+            LOG_INFO_S << "No functional saturation bound requested: this might take some time to prepare the functionality mappings";
         }
         prepare(modelPool, mApplyFunctionalSaturationBound);
     } else {
@@ -88,9 +88,9 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         }
 
         // Compute the bound for all services
-        LOG_INFO_S << "Get functional saturation bound for '" << serviceModels;
+        LOG_DEBUG_S << "Get functional saturation bound for '" << serviceModels;
         functionalSaturationBound = getFunctionalSaturationBound(services);
-        LOG_INFO_S << "Functional saturation bound for '" << serviceModels << "' is "
+        LOG_DEBUG_S << "Functional saturation bound for '" << serviceModels << "' is "
             << functionalSaturationBound.toString();
 
         // Merge with the existing model pool
@@ -98,7 +98,7 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         LOG_INFO_S << "After accounting for given model pool the functional saturation bound for '" << serviceModels << "' is "
             << functionalSaturationBound.toString();
     } else {
-        LOG_WARN_S << "No functional saturation bound applied";
+        LOG_DEBUG_S << "No functional saturation bound applied (since bounding has not been requested)";
         functionalSaturationBound = modelPool;
     }
 

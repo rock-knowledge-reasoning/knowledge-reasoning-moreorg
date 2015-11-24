@@ -15,13 +15,12 @@ namespace algebra {
  * A ResourceSupportVector describes resource availability as a vector
  * Each dimension stands for a specific resource type
  * The values provides the cardinality i.e. availability
- * of the resource which corresponding to that dimension
+ * of the resource which corresponds to that dimension.
  *
  * The ResourceSupportVector can accurately describe interdependencies
  * only when there are no overlapping dimensions, e.g., when
- * one dimension is the superclass of another computing the redunancy
- * needs to be done differently (and with a potential error).
- *
+ * one dimension is the superclass of another computing the redundancy
+ * will potentially contain an error, e.g.,
  * Assuming the following situation:
  *
  * Required resources are described by a vector: [1 1 1]^T, where
@@ -32,12 +31,16 @@ namespace algebra {
  * However, using the dot product will fail since there is no exact match.
  * Thus, we update the required resources that each dimension takes into
  * account the required subclass instances:
- * [(1+2) (1+1) 1] = [3 2 1], and available accordingly [3 3 3].
+ * [(1+2) (1+1) 1] = [3 2 1], i.e. three class of A are required two of B and 1
+ * of C, and available accordingly [3 3 3].
  * It can be easily seen that the maximum achievable redundancy will be
  * exceeded with this update vector, thus we bound it based on the maximum
  * to be expected redundancy (0+0+3)/(1+1+1) = 1
  *
  */
+
+/// The SupportType reflect the functional support provided by a set of
+/// countable resources given some requirements
 enum SupportType { NO_SUPPORT, PARTIAL_SUPPORT, FULL_SUPPORT };
 
 class ResourceSupportVector
@@ -58,6 +61,10 @@ public:
      */
     double& operator()(uint32_t dimension) { return mSizes(dimension); }
 
+    /**
+     * Retrieve the support value of a given dimension
+     * \return support value entry
+     */
     const double& operator()(uint32_t dimension) const { return mSizes(dimension); }
 
     /**
@@ -100,6 +107,10 @@ public:
      */
     ResourceSupportVector missingSupportFrom(const ResourceSupportVector& other) const;
 
+    /**
+     * Test if this ResourceSupportVector refers to a null vector (norm of the
+     * underlying vector equals 0)
+     */
     bool isNull() const { return mSizes.norm() == 0; }
 
     /**
@@ -108,8 +119,14 @@ public:
      */
     owlapi::model::IRIList getLabels() const { return mLabels; }
 
+    /**
+     * Stringify object
+     */
     std::string toString() const;
 
+    /**
+     * Get the size of this vector
+     */
     size_t size() const { return mSizes.size(); }
 
     /**
@@ -154,7 +171,10 @@ protected:
 
 
 private:
+    /// Vector where each dimension refers to a distinct resource model
+    /// the actual values refer to the availability
     base::VectorXd mSizes;
+    /// Labels of the models that correspond to each dimension
     owlapi::model::IRIList mLabels;
 
 };
