@@ -8,11 +8,6 @@ using namespace owlapi::model;
 
 namespace organization_model {
 
-bool Service::operator<(const Service& other) const
-{
-    return this->getModel() < other.getModel();
-}
-
 OrganizationModel::OrganizationModel(const std::string& filename)
     : mpOntology( new OWLOntology())
 {
@@ -29,35 +24,29 @@ OrganizationModel OrganizationModel::copy() const
     return om;
 }
 
-std::string OrganizationModel::toString(const Combination2FunctionMap& combinationFunctionMap)
+std::string OrganizationModel::toString(const Pool2FunctionMap& combinationFunctionMap)
 {
     std::stringstream ss;
-    ss << "combination --> functions: " << std::endl;
-    Combination2FunctionMap::const_iterator cit = combinationFunctionMap.begin();
+    ss << "pool --> functions: " << std::endl;
+    Pool2FunctionMap::const_iterator cit = combinationFunctionMap.begin();
     for(; cit != combinationFunctionMap.end(); ++cit)
     {
-        ss << "    combination:    " << IRI::toString(cit->first, true) << std::endl;
+        ss << "    pool:    " << IRI::toString((cit->first).toModelCombination(), true) << std::endl;
         ss << "      --> functions: " << IRI::toString(cit->second, true) << std::endl;
     }
     return ss.str();
 }
 
-std::string OrganizationModel::toString(const Function2CombinationMap& functionCombinationMap)
+std::string OrganizationModel::toString(const Function2PoolMap& functionCombinationMap)
 {
     std::stringstream ss;
     ss << "function --> combinations: ";
-    Function2CombinationMap::const_iterator cit = functionCombinationMap.begin();
+    Function2PoolMap::const_iterator cit = functionCombinationMap.begin();
     for(; cit != functionCombinationMap.end(); ++cit)
     {
         ss << "    function:    " << cit->first.getFragment() << std::endl;
         ss << "        supported by:" << std::endl;
-
-        const ModelCombinationSet& combinationsSet = cit->second;
-        ModelCombinationSet::const_iterator comIt = combinationsSet.begin();
-        for(; comIt != combinationsSet.end(); ++comIt)
-        {
-            ss << "        combination:    " << IRI::toString(*comIt, true) << std::endl;
-        }
+        ss << "        combination:    " << ModelPool::toString(cit->second) << std::endl;
     }
 
     return ss.str();
@@ -91,6 +80,7 @@ ModelCombination OrganizationModel::modelPool2Combination(const ModelPool& pool)
     std::sort(combination.begin(), combination.end());
     return combination;
 }
+
 
 std::string OrganizationModel::toString(const ModelCombinationSet& combinations)
 {

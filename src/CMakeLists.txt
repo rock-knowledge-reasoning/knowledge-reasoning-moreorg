@@ -13,6 +13,7 @@ rock_library(organization_model
         ccf/Scenario.cpp
         exporter/PDDLExporter.cpp
         facets/Robot.cpp
+        Functionality.cpp
         FunctionalityMapping.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
@@ -28,6 +29,7 @@ rock_library(organization_model
         organization_model/Statistics.cpp
         reasoning/ModelBound.cpp
         reasoning/ResourceMatch.cpp
+        Service.cpp
         utils/CoalitionStructureGeneration.cpp
     HEADERS
         Algebra.hpp
@@ -43,6 +45,7 @@ rock_library(organization_model
         exporter/PDDLExporter.hpp
         facets/Facet.hpp
         facets/Robot.hpp
+        Functionality.hpp
         FunctionalityMapping.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
@@ -56,6 +59,7 @@ rock_library(organization_model
         organization_model/Grounding.hpp
         organization_model/InterfaceConnection.hpp
         organization_model/Statistics.hpp
+        Service.hpp
         reasoning/ModelBound.hpp
         reasoning/ResourceMatch.hpp
         utils/CoalitionStructureGeneration.hpp

@@ -18,30 +18,44 @@ BOOST_AUTO_TEST_CASE(recursive_resolution)
 
     OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
     IRI sherpa = OM::resolve("Sherpa");
+    IRI basecamp = OM::resolve("BaseCamp");
     IRI locationImageProvider = OM::resolve("LocationImageProvider");
 
     OrganizationModelAsk ask(om);
-    Service service(locationImageProvider);
+    Functionality functionality(locationImageProvider);
 
-    IRIList combination;
-    combination.push_back(sherpa);
+    typedef std::pair<uint32_t, algebra::SupportType> ExpectedResult;
+    std::vector<ExpectedResult> expected;
+    IRIList agents;
 
-    IRIList services;
-    services.push_back(service.getModel());
+    agents.push_back(sherpa);
+    expected.push_back( ExpectedResult(1,algebra::FULL_SUPPORT) );
 
-    IRIList supportedServiceModels = ResourceMatch::filterSupportedModels(combination, services, om->ontology());
+    agents.push_back(basecamp);
+    expected.push_back( ExpectedResult(0, algebra::NO_SUPPORT) );
 
-    OWLOntologyAsk oAsk(om->ontology());
-    std::vector<OWLCardinalityRestriction::Ptr> restrictions = oAsk.getCardinalityRestrictions(locationImageProvider);
-    BOOST_TEST_MESSAGE("Cardinality: " << OWLCardinalityRestriction::toString(restrictions));
-    BOOST_REQUIRE_MESSAGE(!supportedServiceModels.empty(), "Supported serviced models: " << services << " models where: " << supportedServiceModels);
 
+    for(int i = 0; i < agents.size(); ++i)
     {
-        uint32_t saturationPoint = ask.getFunctionalSaturationBound(service, sherpa);
-        BOOST_REQUIRE_MESSAGE(saturationPoint == 1, "1 Sherpa sufficient for LocationImageProvider: was " << saturationPoint);
+        IRI agent = agents[i];
+        IRIList combination;
+        combination.push_back(agent);
 
-        algebra::SupportType supportType = ask.getSupportType(service, sherpa, saturationPoint);
-        BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from sherpa for LocationImageProvider at saturation point");
+        IRIList functionalities;
+        functionalities.push_back(functionality.getModel());
+
+        IRIList supportedFunctionalityModels = ResourceMatch::filterSupportedModels(combination, functionalities, om->ontology());
+
+        OWLOntologyAsk oAsk(om->ontology());
+        std::vector<OWLCardinalityRestriction::Ptr> restrictions = oAsk.getCardinalityRestrictions(locationImageProvider);
+        BOOST_TEST_MESSAGE("Cardinality: " << OWLCardinalityRestriction::toString(restrictions));
+        {
+            uint32_t saturationPoint = ask.getFunctionalSaturationBound(functionality.getModel(), agent);
+            BOOST_REQUIRE_MESSAGE(saturationPoint == expected[i].first,  expected[i].first << " expected as saturation point for " << agent.getFragment() << " sufficient for LocationImageProvider: was " << saturationPoint);
+
+            algebra::SupportType supportType = ask.getSupportType(functionality, agent, saturationPoint);
+            BOOST_REQUIRE_MESSAGE(supportType == expected[i].second, "Support from " << agent.getFragment() << " for LocationImageProvider at saturation point: expected " << expected[i].second << " was " << supportType);
+        }
     }
 }
 
@@ -62,36 +76,36 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
 
     OrganizationModelAsk ask(om);
     {
-        Service service(stereoImageProvider);
+        IRI functionality = stereoImageProvider;
         {
-            uint32_t saturationPoint = ask.getFunctionalSaturationBound(service, sherpa);
+            uint32_t saturationPoint = ask.getFunctionalSaturationBound(functionality, sherpa);
             BOOST_REQUIRE_MESSAGE(saturationPoint == 1, "1 Sherpa sufficient for StereoImageProvider: was " << saturationPoint);
 
-            algebra::SupportType supportType = ask.getSupportType(service, sherpa, saturationPoint);
+            algebra::SupportType supportType = ask.getSupportType(functionality, sherpa, saturationPoint);
             BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from sherpa for StereoImageProvider at saturation point");
         }
         {
-            uint32_t saturationPoint = ask.getFunctionalSaturationBound(service, payload);
+            uint32_t saturationPoint = ask.getFunctionalSaturationBound(functionality, payload);
             BOOST_REQUIRE_MESSAGE(saturationPoint == 0, "0 Payload sufficient for StereoImageProvider: was " << saturationPoint);
 
-            algebra::SupportType supportType = ask.getSupportType(service, payload, saturationPoint);
+            algebra::SupportType supportType = ask.getSupportType(functionality, payload, saturationPoint);
             BOOST_REQUIRE_MESSAGE(supportType == algebra::NO_SUPPORT, "No support from payload for StereoImageProvider");
         }
         {
-            uint32_t saturationPoint = ask.getFunctionalSaturationBound(service, payloadCamera);
+            uint32_t saturationPoint = ask.getFunctionalSaturationBound(functionality, payloadCamera);
             BOOST_REQUIRE_MESSAGE(saturationPoint == 2, "2 PayloadCamera sufficient for StereoImageProvider: was" << saturationPoint);
 
-            algebra::SupportType supportType = ask.getSupportType(service, payloadCamera, saturationPoint);
+            algebra::SupportType supportType = ask.getSupportType(functionality, payloadCamera, saturationPoint);
             BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from payload camera for StereoImageProvider at saturation point");
         }
     }
     {
-        Service service(locationImageProvider);
+        IRI functionality = locationImageProvider;
         {
-            uint32_t saturationPoint = ask.getFunctionalSaturationBound(service, sherpa);
+            uint32_t saturationPoint = ask.getFunctionalSaturationBound(functionality, sherpa);
             BOOST_REQUIRE_MESSAGE(saturationPoint == 1, "1 Sherpa sufficient for StereoImageProvider: was " << saturationPoint);
 
-            algebra::SupportType supportType = ask.getSupportType(service, sherpa, saturationPoint);
+            algebra::SupportType supportType = ask.getSupportType(functionality, sherpa, saturationPoint);
             BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from sherpa for StereoImageProvider at saturation point");
         }
     }
@@ -103,12 +117,12 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
 
         ask.prepare(modelPool);
 
-        ServiceSet serviceSet;
-        Service service(stereoImageProvider);
-        serviceSet.insert(service);
+        FunctionalitySet functionalitySet;
+        Functionality functionality(stereoImageProvider);
+        functionalitySet.insert(functionality);
 
-        ModelCombinationSet combinations = ask.getBoundedResourceSupport(serviceSet);
-        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << OrganizationModel::toString(combinations) << "'");
+        ModelPoolSet combinations = ask.getBoundedResourceSupport(functionalitySet);
+        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << ModelPool::toString(combinations) << "'");
     }
 }
 
@@ -129,12 +143,12 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         modelPool[sherpa] = 1;
 
         OrganizationModelAsk ask(om, modelPool);
-        IRI serviceModel = OM::resolve("ImageProvider");
-        ServiceSet services;
-        services.insert( Service(serviceModel) );
+        IRI functionalityModel = OM::resolve("ImageProvider");
+        FunctionalitySet functionalities;
+        functionalities.insert( Functionality(functionalityModel) );
 
-        ModelCombinationSet combinations = ask.getResourceSupport(services);
-        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting : " << serviceModel.toString() << ": '" << OrganizationModel::toString(combinations) << "'");
+        ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting : " << functionalityModel.toString() << ": '" << ModelPool::toString(combinations) << "'");
     }
 
     {
@@ -143,15 +157,15 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         modelPool[crex] = 1;
 
         OrganizationModelAsk ask(om, modelPool);
-        ServiceSet services;
+        FunctionalitySet functionalities;
 
         IRI imageProvider = OM::resolve("ImageProvider");
         IRI emiPowerProvider = OM::resolve("EmiPowerProvider");
-        services.insert( Service(imageProvider) );
-        services.insert( Service(emiPowerProvider) );
+        functionalities.insert( Functionality(imageProvider) );
+        functionalities.insert( Functionality(emiPowerProvider) );
 
-        ModelCombinationSet combinations = ask.getResourceSupport(services);
-        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting : " << imageProvider.toString() << " and " << emiPowerProvider.toString() << ": '" << OrganizationModel::toString(combinations) << "'");
+        ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting : " << imageProvider.toString() << " and " << emiPowerProvider.toString() << ": '" << ModelPool::toString(combinations) << "'");
     }
 }
 

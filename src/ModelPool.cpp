@@ -1,5 +1,7 @@
 #include "ModelPool.hpp"
 #include <sstream>
+#include <numeric/LimitedCombination.hpp>
+#include <organization_model/OrganizationModel.hpp>
 
 namespace organization_model {
 
@@ -67,6 +69,23 @@ ModelCombination ModelPool::toModelCombination() const
     return combination;
 }
 
+ModelPoolSet ModelPool::allCombinations() const
+{
+    ModelPoolSet allCombinations;
+
+    ModelCombination modelCombinationBound = toModelCombination();
+    numeric::LimitedCombination<owlapi::model::IRI> combinations(*this,
+            numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(*this), numeric::MAX);
+
+    do {
+        owlapi::model::IRIList combination = combinations.current();
+        ModelPool modelPool = OrganizationModel::combination2ModelPool(combination);
+        allCombinations.insert(modelPool);
+    } while(combinations.next());
+
+    return allCombinations;
+}
+
 ModelPoolDelta::ModelPoolDelta(const ModelPool& pool)
 {
     ModelPool::const_iterator cit = pool.begin();
@@ -128,5 +147,25 @@ std::vector<owlapi::model::IRI> ModelPoolDelta::getModels(const ModelPool& model
     }
     return models;
 }
+
+std::string ModelPool::toString(const ModelPoolSet& modelPoolSet, uint32_t indent)
+{
+    std::string hspace(indent,' ');
+    std::stringstream ss;
+    ss << hspace;
+
+    ModelPoolSet::const_iterator cit = modelPoolSet.begin();
+    for(; cit != modelPoolSet.end();++cit)
+    {
+        ModelCombination combination = cit->toModelCombination();
+        ss << owlapi::model::IRI::toString(combination, true);
+        if(cit != modelPoolSet.end())
+        {
+            ss << ",";
+        }
+    }
+    return ss.str();
+}
+
 
 } // end namespace organization_model

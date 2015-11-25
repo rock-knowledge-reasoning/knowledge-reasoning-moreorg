@@ -66,10 +66,10 @@ public:
      * union of services
      * That means, that services are either supported by separate systems or
      * combined systems
-     * \param services should be a set of services / service models
-     * \return available resources (or combination thereof) to support this set of services
+     * \param functionalities should be a set of functionalities / functionality models
+     * \return available resources (or combination thereof) to support this set of functionalities
      */
-    ModelCombinationSet getResourceSupport(const ServiceSet& services) const;
+    ModelPoolSet getResourceSupport(const FunctionalitySet& functionalities) const;
 
     /**
      * Get the set of resources that should support a given union of services,
@@ -77,7 +77,7 @@ public:
      * of resources that support the given union of services
      * \return bound set of combinations
      */
-    ModelCombinationSet getBoundedResourceSupport(const ServiceSet& services) const;
+    ModelPoolSet getBoundedResourceSupport(const FunctionalitySet& functionalities) const;
 
     /**
      * Apply an upper bound of resources to an existing Set of model
@@ -89,6 +89,16 @@ public:
     ModelCombinationSet applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBounds) const;
 
     /**
+     * Apply an upper bound of resources to an existing Set of model
+     * combinations
+     * \param modelPoolSet Set of modelPools
+     * \param upperBounds Bounding ModelPool
+     * \return all combinations that operate within the bounds of the given
+     * ModelPool
+     */
+    ModelPoolSet applyUpperBound(const ModelPoolSet& modelPoolSet, const ModelPool& upperBounds) const;
+
+    /**
      * Apply a lower bound of resources to an existing set of model
      * combinations, i.e., remove ModelCombinations that operate below the lower
      * bound
@@ -98,6 +108,17 @@ public:
      * ModelPool
      */
     ModelCombinationSet applyLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBounds) const;
+
+    /**
+     * Apply a lower bound of resources to an existing set of model
+     * combinations, i.e., remove ModelCombinations that operate below the lower
+     * bound
+     * \param combinations
+     * \param lowerBounds Bounding ModelPool
+     * \return all combinations that operate within the bounds of the given
+     * ModelPool
+     */
+    ModelPoolSet applyLowerBound(const ModelPoolSet& modelPools, const ModelPool& lowerBounds) const;
 
     /*
      * Enforces the minimum requirement by expanding missing models to
@@ -111,14 +132,29 @@ public:
      */
     ModelCombinationSet expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBounds) const;
 
+    /*
+     * Enforces the minimum requirement by expanding missing models to
+     * a model combination to fulfill the requirement,
+     * Apply a lower bound of resources to an existing set of model
+     * combinations
+     * \param combinations
+     * \param lowerBounds Bounding ModelPool
+     * \return all combinations that operate now within the bounds of the given
+     * ModelPool
+     */
+    ModelPoolSet expandToLowerBound(const ModelPoolSet& modelPools, const ModelPool& lowerBounds) const;
 
     /**
      * Check how a service is supported by a model if given cardinality
      * of this model is provided
+     * \param functionality Functionality to be available
+     * \param model Model that is tested for support of this functionality
+     * \param cardinalityOfModel Allow to specify a support for quantified
+     * number of these services, i.e., factor of resources to be available
      * \see getFunctionalSaturationBound in order to find the minimum number
      * \return required to provide the functionality (if full support can be achieved)
      */
-    algebra::SupportType getSupportType(const Service& service,
+    algebra::SupportType getSupportType(const Functionality& functionality,
             const owlapi::model::IRI& model,
             uint32_t cardinalityOfModel = 1) const;
 
@@ -131,34 +167,34 @@ public:
      *  2. when only a partial set of resources is provided (PARTIAL_SUPPORT)
      *     -- check how many instances are actually contributing to enable the
      *     functionality (and when switching into providing redundancy only)
-     *  \param service Service to check the saturation bound for
-     *  \param model Model Model IRI for which the saturation bound is computed
+     *  \param requirementModel model that defines the requirement to check for
+     *  \param model Provider model for which the saturation bound is computed
      *  \return number of instances required for functional saturation
      */
-    uint32_t getFunctionalSaturationBound(const Service& service, const owlapi::model::IRI& model) const;
+    uint32_t getFunctionalSaturationBound(const owlapi::model::IRI& requirementModel, const owlapi::model::IRI& model) const;
 
     /**
      * Compute the upper bound for the cardinality of each resource model
      * for a given service
      * This function does take into account the model pool, but computes
      * a global bound
-     * \param service for which the functional saturation bound needs to
+     * \param functionality for which the functional saturation bound needs to
      * be computed
      * \return Cardinality bound for resource models
      */
-    ModelPool getFunctionalSaturationBound(const Service& service) const;
+    ModelPool getFunctionalSaturationBound(const Functionality& functionality) const;
 
     /**
      * Compute the upper bound for the cardinality of each resource model
      * to support the given set of services (union of services)
      * This function does take into account the model pool, but computes
      * a global bound
-     * \param set of services for which the functional saturation bound needs to
+     * \param functionalities set of functionalities for which the functional saturation bound needs to
      * be computed
      * \return Cardinality bound for resource models
      * \throw std::invalid_argument when the model pool is empty
      */
-    ModelPool getFunctionalSaturationBound(const ServiceSet& services) const;
+    ModelPool getFunctionalSaturationBound(const FunctionalitySet& functionalities) const;
 
     ///**
     // * Get the set of resources
@@ -193,14 +229,14 @@ public:
      * \return True if the combination support the set of services, false
      * otherwise
      */
-    bool isSupporting(const ModelCombination& c, const ServiceSet& services) const;
+    bool isSupporting(const ModelPool& modelPool, const FunctionalitySet& functionalities) const;
 
 
     /**
      * Check if the model supports a service
      * \return true if the robot supports the set of services
      */
-    bool isSupporting(const owlapi::model::IRI& model, const Service& service) const;
+    bool isSupporting(const owlapi::model::IRI& model, const Functionality& functionality) const;
 
     /**
      * Provide debug information about the status of this object

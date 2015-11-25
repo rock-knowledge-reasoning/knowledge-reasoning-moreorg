@@ -7,64 +7,60 @@ FunctionalityMapping::FunctionalityMapping()
 {}
 
 FunctionalityMapping::FunctionalityMapping(const ModelPool& modelPool,
-        const owlapi::model::IRIList& services,
+        const owlapi::model::IRIList& functionalities,
         const ModelPool& functionalSaturationBound)
     : mModelPool(modelPool)
-    , mServices(services)
+    , mFunctionalities(functionalities)
     , mFunctionalSaturationBound(functionalSaturationBound)
 {
-    owlapi::model::IRIList::const_iterator cit = mServices.begin();
-    for(; cit != mServices.end(); ++cit)
+    owlapi::model::IRIList::const_iterator cit = mFunctionalities.begin();
+    for(; cit != mFunctionalities.end(); ++cit)
     {
         // initialize the set of functionalities
-        mFunction2Combination[*cit] = ModelCombinationSet();
+        mFunction2Pool[*cit] = ModelPoolSet();
     }
 }
 
-const owlapi::model::IRIList& FunctionalityMapping::getFunction(const ModelCombination& combination) const
+const owlapi::model::IRIList& FunctionalityMapping::getFunction(const ModelPool& modelPool) const
 {
-    // TODO: consider using ModelPool as representation for ModelCombination
-    ModelPool modelPool(combination);
     ModelPool boundedPool = modelPool.applyUpperBound(mFunctionalSaturationBound);
-    ModelCombination boundedCombination = boundedPool.toModelCombination();
-
-    Combination2FunctionMap::const_iterator cit = mCombination2Function.find(boundedCombination);
-    if(cit != mCombination2Function.end())
+    Pool2FunctionMap::const_iterator cit = mPool2Function.find(boundedPool);
+    if(cit != mPool2Function.end())
     {
         return cit->second;
     } else {
         throw std::invalid_argument("organization_model::FunctionalityMapping::getFunction: could not find"
-                " model combination: " + owlapi::model::IRI::toString(boundedCombination, true));
+                " model pool: " + boundedPool.toString());
     }
 }
 
-const ModelCombinationSet& FunctionalityMapping::getCombinations(const owlapi::model::IRI& iri) const
+const ModelPoolSet& FunctionalityMapping::getModelPools(const owlapi::model::IRI& iri) const
 {
-    Function2CombinationMap::const_iterator cit = mFunction2Combination.find(iri);
-    if(cit != mFunction2Combination.end())
+    Function2PoolMap::const_iterator cit = mFunction2Pool.find(iri);
+    if(cit != mFunction2Pool.end())
     {
         return cit->second;
     } else {
-        throw std::invalid_argument("organization_model::FunctionalityMapping::getCombinations: could not find"
-                " model combinations with function: " + iri.toString());
+        throw std::invalid_argument("organization_model::FunctionalityMapping::getModelPools: could not find"
+                " model pools with function: " + iri.toString());
     }
 }
 
-void FunctionalityMapping::addFunction(const ModelCombination& combination,
+void FunctionalityMapping::addFunction(const ModelPool& modelPool,
         const owlapi::model::IRIList& functionModels)
 {
-    mCombination2Function[combination] = functionModels;
+    mPool2Function[modelPool] = functionModels;
 }
 
-void FunctionalityMapping::add(const ModelCombination& combination, const owlapi::model::IRIList& functionModels)
+void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRIList& functionModels)
 {
     using namespace owlapi::model;
-    addFunction(combination, functionModels);
+    addFunction(modelPool, functionModels);
     IRIList::const_iterator cit = functionModels.begin();
     for(; cit != functionModels.end(); ++cit)
     {
         IRI iri = *cit;
-        mFunction2Combination[iri].insert(combination);
+        mFunction2Pool[iri].insert(modelPool);
     }
 }
 
@@ -78,27 +74,23 @@ std::string FunctionalityMapping::toString() const
     ss << mFunctionalSaturationBound.toString() << std::endl;
 
     {
-        Combination2FunctionMap::const_iterator cit = mCombination2Function.begin();
-        ss << "Combination --> Functions:" << std::endl;
-        for(; cit != mCombination2Function.end(); ++cit)
+        Pool2FunctionMap::const_iterator cit = mPool2Function.begin();
+        ss << "Pool --> Functions:" << std::endl;
+        for(; cit != mPool2Function.end(); ++cit)
         {
-            ss << "   - combination: " << owlapi::model::IRI::toString(cit->first, true) << std::endl;
+            ss << "   - pool: " << owlapi::model::IRI::toString((cit->first).toModelCombination(), true) << std::endl;
             ss << "     function: " << owlapi::model::IRI::toString(cit->second, true) << std::endl;
         }
     }
     {
-        Function2CombinationMap::const_iterator cit = mFunction2Combination.begin();
-        ss << "Function --> Combination:" << std::endl;
-        for(; cit != mFunction2Combination.end(); ++cit)
+        Function2PoolMap::const_iterator cit = mFunction2Pool.begin();
+        ss << "Function --> Pool:" << std::endl;
+        for(; cit != mFunction2Pool.end(); ++cit)
         {
             ss << "   - function: " << cit->first.toString() << std::endl;
-            ss << "     combinations: " << std::endl;
-            const ModelCombinationSet& combinations = cit->second;
-            ModelCombinationSet::const_iterator sit = combinations.begin();
-            for(; sit != combinations.end(); ++sit)
-            {
-                ss << "        " << owlapi::model::IRI::toString(*sit, true) << std::endl;
-            }
+            ss << "     pools: " << std::endl;
+            const ModelPoolSet& modelPoolSet = cit->second;
+            ss << "        " << ModelPool::toString(cit->second) << std::endl;
         }
     }
 

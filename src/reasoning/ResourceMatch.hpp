@@ -7,6 +7,7 @@
 
 #include <owlapi/model/OWLOntology.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
+#include <organization_model/ModelPool.hpp>
 #include <organization_model/reasoning/ModelBound.hpp>
 #include <base/Logging.hpp>
 
@@ -181,6 +182,14 @@ public:
     static bool isSupporting(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& providerRestrictions,
             const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& serviceRestrictions,
             owlapi::model::OWLOntology::Ptr ontology);
+
+    /**
+     * Compute for a given model pool and possible models, the available
+     * set of supported models, i.e., fulfilling the restrictions
+     * \return List of provided services
+     */
+    static owlapi::model::IRIList filterSupportedModels(const ModelPool& modelPool,
+            const owlapi::model::IRIList& serviceModels, owlapi::model::OWLOntology::Ptr ontology);
     /**
      * Compute for a given set of model and possible models, the available
      * set of supported models, i.e., fulfilling the restrictions

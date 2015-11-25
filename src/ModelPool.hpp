@@ -2,6 +2,7 @@
 #define ORGANIZATION_MODEL_MODEL_POOL_HPP
 
 #include <map>
+#include <set>
 #include <owlapi/model/IRI.hpp>
 
 namespace organization_model {
@@ -25,6 +26,10 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
         ModelPool applyUpperBound(const ModelPool& upperBounds) const;
 
         ModelCombination toModelCombination() const;
+
+        static std::string toString(const std::set<ModelPool>& modelPoolSet, uint32_t indent = 0);
+
+        std::set<ModelPool> allCombinations() const;
 };
 
 class ModelPoolDelta : public std::map<owlapi::model::IRI, int>
@@ -50,6 +55,8 @@ public:
      */
     static std::vector<owlapi::model::IRI> getModels(const ModelPool& modelPool);
 };
+
+typedef std::set<ModelPool> ModelPoolSet;
 
 } // end namespace organization_model
 #endif // ORGANIZATION_MODEL_MODEL_POOL_HPP

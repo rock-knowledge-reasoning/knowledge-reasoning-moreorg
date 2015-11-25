@@ -307,6 +307,13 @@ bool ResourceMatch::isSupporting(const std::vector<owlapi::model::OWLCardinality
     }
 }
 
+
+owlapi::model::IRIList ResourceMatch::filterSupportedModels(const ModelPool& modelPool,
+        const owlapi::model::IRIList& resourceModels, owlapi::model::OWLOntology::Ptr ontology)
+{
+    return filterSupportedModels(modelPool.toModelCombination(), resourceModels, ontology);
+}
+
 owlapi::model::IRIList ResourceMatch::filterSupportedModels(const owlapi::model::IRIList& combinations,
         const owlapi::model::IRIList& resourceModels, owlapi::model::OWLOntology::Ptr ontology)
 {

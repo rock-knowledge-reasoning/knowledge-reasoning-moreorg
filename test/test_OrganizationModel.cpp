@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_SUITE(organization_model)
 
 BOOST_AUTO_TEST_CASE(load_file)
 {
-    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
+    OrganizationModel om( getOMSchema() );
     BOOST_TEST_MESSAGE("Loaded model");
 }
 
@@ -25,15 +25,19 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.13.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()) );
 
     ModelPool items;
     items[OM::resolve("Sherpa")] = 3;
     items[OM::resolve("CREX")] = 2;
-    items[OM::resolve("Payload")] = 5;
-    items[OM::resolve("PayloadCamera")] = 5;
+    items[OM::resolve("CoyoteIII")] = 3;
+    items[OM::resolve("Payload")] = 25;
+    items[OM::resolve("BaseCamp")] = 10;
 
-    OrganizationModelAsk ask(om, items);
+    ModelPoolSet modelPoolSet = items.allCombinations();
+    BOOST_TEST_MESSAGE("All combinations: " << ModelPool::toString(modelPoolSet) );
+
+    OrganizationModelAsk ask(om, items, true);
 
     FunctionalityMapping fm = ask.getFunctionalityMapping(items, true);
     BOOST_TEST_MESSAGE("FunctionalityMapping " << fm.toString());
@@ -56,12 +60,11 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        ServiceSet services;
-        services.insert( Service(OM::resolve("StereoImageProvider") ) );
+        FunctionalitySet functionalities;
+        functionalities.insert( Functionality(OM::resolve("StereoImageProvider")) );
 
-        ModelCombinationSet combinations = ask.getResourceSupport(services);
-
-        BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider expected 0 was " << combinations.size());
+        ModelPoolSet modelPools = ask.getResourceSupport(functionalities);
+        BOOST_REQUIRE_MESSAGE(modelPools.size() == 0, "No combinations that support stereo image provider expected 0 was " << modelPools.size());
     }
     {
         ModelPool items;
@@ -74,12 +77,11 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        ServiceSet services;
-        services.insert( Service(OM::resolve("StereoImageProvider") ) );
+        FunctionalitySet functionalities;
+        functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
-        ModelCombinationSet combinations = ask.getResourceSupport(services);
-
-        BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider");
+        ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+        BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, but were " << combinations.size());
     }
     {
         ModelPool items;
@@ -93,10 +95,10 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        ServiceSet services;
-        services.insert( Service(OM::resolve("StereoImageProvider") ) );
-        services.insert( Service(OM::resolve("ImageProvider") ) );
-        services.insert( Service(OM::resolve("EmiPowerProvider") ) );
+        FunctionalitySet functionalities;
+        functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
+        functionalities.insert( Functionality(OM::resolve("ImageProvider") ) );
+        functionalities.insert( Functionality(OM::resolve("EmiPowerProvider") ) );
 
         //std::set<ModelCombinationSet> combinations = ask.getResourceSupport(services);
         //std::set<ModelCombinationSet>::const_iterator cit = combinations.begin();
@@ -115,18 +117,18 @@ BOOST_AUTO_TEST_CASE(resource_support)
 
         {
             OrganizationModelAsk ask(om);
-            BOOST_REQUIRE_THROW(ask.getFunctionalSaturationBound(services), std::invalid_argument);
+            BOOST_REQUIRE_THROW(ask.getFunctionalSaturationBound(functionalities), std::invalid_argument);
         }
         {
             OrganizationModelAsk ask(om, items);
-            ModelPool modelPoolBounded = ask.getFunctionalSaturationBound(services);
+            ModelPool modelPoolBounded = ask.getFunctionalSaturationBound(functionalities);
 
             OrganizationModelAsk minimalAsk(om, modelPoolBounded);
-            ModelCombinationSet combinations = minimalAsk.getResourceSupport(services);
-            ModelCombinationSet::const_iterator cit = combinations.begin();
+            ModelPoolSet combinations = minimalAsk.getResourceSupport(functionalities);
+            std::set<ModelPool>::const_iterator cit = combinations.begin();
             for(; cit != combinations.end(); ++cit)
             {
-                BOOST_TEST_MESSAGE("ModelCombination: " << ModelPoolDelta( OrganizationModel::combination2ModelPool(*cit)).toString() );
+                BOOST_TEST_MESSAGE("ModelCombination: " << cit->toString() );
             }
 
             BOOST_REQUIRE_MESSAGE(combinations.size() >= 4, "Two combinations that support stereo image provider, image provider and emi power provider, was " << combinations.size()
@@ -153,10 +155,10 @@ BOOST_AUTO_TEST_CASE(resource_support_crex)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        ServiceSet services;
-        services.insert( Service(OM::resolve("StereoImageProvider") ) );
+        FunctionalitySet functionalities;
+        functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
-        ModelCombinationSet combinations = ask.getResourceSupport(services);
+        ModelPoolSet combinations = ask.getResourceSupport(functionalities);
 
         BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider expected 0 was " << combinations.size());
     }

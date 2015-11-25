@@ -4,40 +4,13 @@
 #include <stdint.h>
 #include <owlapi/model/OWLOntology.hpp>
 #include <organization_model/FunctionalityMapping.hpp>
+#include <organization_model/Functionality.hpp>
+#include <organization_model/Service.hpp>
 
 namespace organization_model {
 
 class OrganizationModelAsk;
 class OrganizationModelTell;
-
-class Service
-{
-public:
-    typedef double QualityOfService;
-    typedef double Duration;
-    typedef double Safety;
-
-    Service(const owlapi::model::IRI& model)
-        : mModel(model)
-    {}
-
-    const owlapi::model::IRI& getModel() const { return mModel; }
-
-    bool operator<(const Service& other) const;
-
-private:
-    owlapi::model::IRI mModel;
-    /// How good shall be the quality
-    QualityOfService mQos;
-    /// How low shall the service be provided
-    Duration mDurationInS;
-    /// How safe (redundancy level, etc. shall be the execution)
-    Safety mSafety;
-};
-
-typedef std::vector<Service> ServiceList;
-typedef std::set<Service> ServiceSet;
-
 
 typedef std::vector<owlapi::model::IRIList> CandidatesList;
 
@@ -91,8 +64,8 @@ public:
      */
     OrganizationModel copy() const;
 
-    static std::string toString(const Combination2FunctionMap& combinationFunctionMap);
-    static std::string toString(const Function2CombinationMap& functionCombinationMap);
+    static std::string toString(const Pool2FunctionMap& poolFunctionMap);
+    static std::string toString(const Function2PoolMap& functionPoolMap);
 
     static ModelPool combination2ModelPool(const ModelCombination& combination);
     static ModelCombination modelPool2Combination(const ModelPool& pool);
