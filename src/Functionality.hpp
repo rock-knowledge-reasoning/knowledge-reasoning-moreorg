@@ -18,6 +18,8 @@ public:
 
     static std::set<Functionality> toFunctionalitySet(const owlapi::model::IRIList& model);
 
+    std::string toString() const { return mModel.getFragment(); }
+
 private:
     owlapi::model::IRI mModel;
 };
