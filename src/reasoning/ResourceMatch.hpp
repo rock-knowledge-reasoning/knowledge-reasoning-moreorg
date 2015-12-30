@@ -7,6 +7,7 @@
 
 #include <owlapi/model/OWLOntology.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
+#include <organization_model/SharedPtr.hpp>
 #include <organization_model/ModelPool.hpp>
 #include <organization_model/reasoning/ModelBound.hpp>
 #include <base/Logging.hpp>
@@ -98,7 +99,7 @@ protected:
 
 public:
 
-    typedef boost::shared_ptr<ResourceMatch> Ptr;
+    typedef shared_ptr<ResourceMatch> Ptr;
     class Solution
     {
     public:

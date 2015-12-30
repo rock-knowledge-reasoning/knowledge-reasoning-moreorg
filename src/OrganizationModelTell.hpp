@@ -8,7 +8,7 @@ namespace organization_model {
 class OrganizationModelTell
 {
 public:
-    typedef boost::shared_ptr<OrganizationModelTell> Ptr;
+    typedef shared_ptr<OrganizationModelTell> Ptr;
 
     OrganizationModelTell(OrganizationModel::Ptr om);
 

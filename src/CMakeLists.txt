@@ -60,6 +60,7 @@ rock_library(organization_model
         organization_model/InterfaceConnection.hpp
         organization_model/Statistics.hpp
         Service.hpp
+        SharedPtr.hpp
         reasoning/ModelBound.hpp
         reasoning/ResourceMatch.hpp
         utils/CoalitionStructureGeneration.hpp

@@ -2,7 +2,6 @@
 #define ORGANIZATION_MODEL_METRIC_HPP
 
 #include <stdexcept>
-#include <boost/shared_ptr.hpp>
 #include <organization_model/ModelPool.hpp>
 #include <organization_model/OrganizationModel.hpp>
 #include <owlapi/model/OWLCardinalityRestriction.hpp>
@@ -39,7 +38,7 @@ public:
 
     virtual ~Metric() {}
 
-    typedef boost::shared_ptr<Metric> Ptr;
+    typedef shared_ptr<Metric> Ptr;
 
     /**
      * Compute all metrics for all combinations of services and atomic actors
@@ -94,7 +93,7 @@ public:
 
 protected:
     OrganizationModel mOrganizationModel;
-    boost::shared_ptr<owlapi::model::OWLOntologyAsk> mpAsk;
+    shared_ptr<owlapi::model::OWLOntologyAsk> mpAsk;
 
     metrics::Type mType;
 };

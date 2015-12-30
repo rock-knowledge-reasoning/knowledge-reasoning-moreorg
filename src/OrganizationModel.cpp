@@ -2,7 +2,6 @@
 #include "OrganizationModelAsk.hpp"
 #include "OrganizationModelTell.hpp"
 #include <owlapi/io/OWLOntologyIO.hpp>
-#include <boost/make_shared.hpp>
 
 using namespace owlapi::model;
 
@@ -20,7 +19,7 @@ OrganizationModel::OrganizationModel(const std::string& filename)
 OrganizationModel OrganizationModel::copy() const
 {
     OrganizationModel om;
-    om.mpOntology = boost::make_shared<OWLOntology>(*ontology().get());
+    om.mpOntology = make_shared<OWLOntology>(*ontology().get());
     return om;
 }
 
@@ -100,7 +99,7 @@ std::string OrganizationModel::toString(const ModelCombinationSet& combinations)
 
 OrganizationModel::Ptr OrganizationModel::getInstance(const std::string& filename)
 {
-    return boost::make_shared<OrganizationModel>(filename);
+    return make_shared<OrganizationModel>(filename);
 }
 
 } // end namespace organization_model

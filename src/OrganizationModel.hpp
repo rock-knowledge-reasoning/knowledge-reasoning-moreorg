@@ -2,6 +2,7 @@
 #define ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
 
 #include <stdint.h>
+#include <organization_model/SharedPtr.hpp>
 #include <owlapi/model/OWLOntology.hpp>
 #include <organization_model/FunctionalityMapping.hpp>
 #include <organization_model/Functionality.hpp>
@@ -45,7 +46,7 @@ class OrganizationModel
     friend class OrganizationModelTell;
 
 public:
-    typedef boost::shared_ptr<OrganizationModel> Ptr;
+    typedef shared_ptr<OrganizationModel> Ptr;
 
     /**
      * Constructor to create an OrganizationModel from an existing description file

@@ -1,6 +1,7 @@
 #ifndef ORGANIZATION_MODEL_ASK_HPP
 #define ORGANIZATION_MODEL_ASK_HPP
 
+#include <organization_model/SharedPtr.hpp>
 #include <owlapi/model/OWLCardinalityRestriction.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <organization_model/OrganizationModel.hpp>
@@ -21,7 +22,7 @@ class OrganizationModelAsk
     friend class algebra::ResourceSupportVector;
 
 public:
-    typedef boost::shared_ptr<OrganizationModelAsk> Ptr;
+    typedef shared_ptr<OrganizationModelAsk> Ptr;
 
     /**
      * Default constructor of the organization model ask
