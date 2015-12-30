@@ -542,10 +542,10 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owla
         return algebra::ResourceSupportVector();
     } else {
         std::map<IRI, OWLCardinalityRestriction::MinMax> modelCount = OWLCardinalityRestriction::getBounds(restrictions);
-        LOG_WARN_S << "ModelCount: "<< modelCount.size() << ", restrictions: " << restrictions.size();
+        LOG_DEBUG_S << "ModelCount: "<< modelCount.size() << ", restrictions: " << restrictions.size();
         if(restrictions.size() == 1)
         {
-            LOG_WARN_S << restrictions[0]->toString();
+            LOG_DEBUG_S << restrictions[0]->toString();
         }
         return getSupportVector(modelCount, filterLabels, useMaxCardinality);
     }
