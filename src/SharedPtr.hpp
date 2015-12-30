@@ -2,6 +2,10 @@
 #define ORGANIZATION_MODEL_SHARED_PTR_HPP
 
 #if __cplusplus <= 199711L
+#define USE_BOOST_SHARED_PTR
+#endif
+
+#ifdef USE_BOOST_SHARED_PTR
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 #include <boost/make_shared.hpp>
@@ -12,7 +16,7 @@
 
 namespace organization_model
 {
-#if __cplusplus <= 199711L
+#ifdef USE_BOOST_SHARED_PTR
     using ::boost::shared_ptr;
     using ::boost::make_shared;
     using ::boost::dynamic_pointer_cast;
