@@ -1,7 +1,7 @@
 #ifndef ORGANIZATION_MODEL_VOCABULARIES_ROBOT_HPP
 #define ORGANIZATION_MODEL_VOCABULARIES_ROBOT_HPP
 
-#include <owlapi/OWLApi.hpp>
+#include <owlapi/Vocabulary.hpp>
 
 namespace organization_model {
 namespace vocabulary {

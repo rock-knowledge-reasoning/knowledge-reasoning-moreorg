@@ -1,6 +1,8 @@
 #ifndef ORGANIZATION_MODEL_VOCABULARIES_OM_HPP
 #define ORGANIZATION_MODEL_VOCABULARIES_OM_HPP
 
+#include <owlapi/Vocabulary.hpp>
+
 namespace organization_model {
 namespace vocabulary {
 
