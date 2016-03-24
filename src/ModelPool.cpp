@@ -25,14 +25,15 @@ void ModelPool::setResourceCount(const owlapi::model::IRI& resource, size_t coun
     (*this)[resource] = count;
 }
 
-std::string ModelPool::toString() const
+std::string ModelPool::toString(uint32_t indent) const
 {
     std::stringstream ss;
+    std::string hspace(indent,' ');
     ModelPool::const_iterator cit = this->begin();
-    ss << "ModelPool:" << std::endl;
+    ss << hspace << "ModelPool:" << std::endl;
     for(; cit != this->end(); ++cit)
     {
-        ss << "    " << cit->first << " : " << cit->second << std::endl;
+        ss << "    " << hspace << cit->first << " : " << cit->second << std::endl;
     }
     return ss.str();
 }
@@ -125,14 +126,15 @@ ModelPool ModelPoolDelta::toModelPool() const
     return modelPool;
 }
 
-std::string ModelPoolDelta::toString() const
+std::string ModelPoolDelta::toString(uint32_t indent) const
 {
     std::stringstream ss;
+    std::string hspace(indent,' ');
     ModelPoolDelta::const_iterator cit = this->begin();
-    ss << "ModelPoolDelta:" << std::endl;
+    ss << hspace << "ModelPoolDelta:" << std::endl;
     for(; cit != this->end(); ++cit)
     {
-        ss << "    " << cit->first << " : " << cit->second << std::endl;
+        ss << "    " << hspace << cit->first << " : " << cit->second << std::endl;
     }
     return ss.str();
 }

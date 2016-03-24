@@ -21,7 +21,7 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
         /**
          * Stringify object
          */
-        std::string toString() const;
+        std::string toString(uint32_t indent = 0) const;
 
         ModelPool applyUpperBound(const ModelPool& upperBounds) const;
 
@@ -48,7 +48,7 @@ public:
      */
     ModelPool toModelPool() const;
 
-    std::string toString() const;
+    std::string toString(uint32_t indent = 0) const;
 
     /**
      * Get models, i.e. keys of the model pool
