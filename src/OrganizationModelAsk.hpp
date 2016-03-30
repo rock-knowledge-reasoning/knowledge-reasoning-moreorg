@@ -275,14 +275,13 @@ protected:
 
     /**
      * Get the ResourceSupportVector for a given model
-     *
-     * Does not (!) account for (sub)class relationship
      * \param model Name of the model
      * \param filterLabels Model names corresponding to the dimensions of the
      * support vector (resulting vector will be limited to these filterLabels (subclasses of this model will be included in the cardinality))
      * \param useMaxCardinality If true, the support vector consists of all max
      * cardinality value, if false, min values are uses
      * \see algebra::ResourceSupportVector
+     * \return  the support vector
      */
     algebra::ResourceSupportVector getSupportVector(const owlapi::model::IRI& model,
         const owlapi::model::IRIList& filterLabels = owlapi::model::IRIList(),

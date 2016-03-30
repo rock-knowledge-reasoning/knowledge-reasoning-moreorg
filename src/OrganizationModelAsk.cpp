@@ -539,7 +539,15 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owla
     std::vector<OWLCardinalityRestriction::Ptr> restrictions = mOntologyAsk.getCardinalityRestrictions(model);
     if(restrictions.empty())
     {
-        return algebra::ResourceSupportVector();
+        owlapi::model::IRIList labels;
+        labels.push_back(model);
+
+        base::VectorXd available(1);
+        available(0) = 1;
+
+        algebra::ResourceSupportVector supportVector(available, labels);
+        return supportVector;
+
     } else {
         std::map<IRI, OWLCardinalityRestriction::MinMax> modelCount = OWLCardinalityRestriction::getBounds(restrictions);
         LOG_DEBUG_S << "ModelCount: "<< modelCount.size() << ", restrictions: " << restrictions.size();
