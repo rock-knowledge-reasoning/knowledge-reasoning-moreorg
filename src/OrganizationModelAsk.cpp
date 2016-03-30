@@ -233,10 +233,14 @@ ModelPoolSet OrganizationModelAsk::applyUpperBound(const ModelPoolSet& modelPool
     {
         const ModelPool& modelPool = *cit;
 
-        LOG_DEBUG_S << "DELTA lva: " << ModelPoolDelta(upperBound).toString();
-        LOG_DEBUG_S << "DELTA rval: " << ModelPoolDelta(modelPool).toString();
+        LOG_DEBUG_S << "DELTA lval: " << std::endl
+            << ModelPoolDelta(upperBound).toString(4);
+        LOG_DEBUG_S << "DELTA rval: " << std::endl
+            << ModelPoolDelta(modelPool).toString(4);
         ModelPoolDelta delta = Algebra::substract(modelPool, upperBound);
-        LOG_DEBUG_S << "RESULT: " << delta.toString();
+        LOG_DEBUG_S << "RESULT: " << std::endl
+            << delta.toString(4);
+
         if(!delta.isNegative())
         {
             boundedModelPools.insert(modelPool);
@@ -369,7 +373,7 @@ ModelCombinationSet OrganizationModelAsk::expandToLowerBound(const ModelCombinat
 
 algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
 {
-    algebra::ResourceSupportVector functionalitySupportVector = getSupportVector(functionality.getModel(), IRIList(), false /*useMaxCardinality*/);
+    algebra::ResourceSupportVector functionalitySupportVector = getSupportVector(functionality.getModel(), IRIList() /*filter labels*/, false /*useMaxCardinality*/);
     algebra::ResourceSupportVector modelSupportVector =
         getSupportVector(model, functionalitySupportVector.getLabels(), true /*useMaxCardinality*/)*
         static_cast<double>(cardinalityOfModel);
@@ -528,7 +532,7 @@ bool OrganizationModelAsk::isSupporting(const owlapi::model::IRI& model, const F
     } else {
         LOG_DEBUG_S << "model '" << model << "' does not support '" << functionality.getModel() << "'";
         return false;
-    }  
+    }
 }
 
 algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owlapi::model::IRI& model,
