@@ -111,6 +111,8 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
     FunctionalityMapping functionalityMapping(modelPool, functionalityModels, functionalSaturationBound);
     const ModelPool& boundedModelPool = functionalityMapping.getFunctionalSaturationBound();
 
+    // Compute now all feasible combinations (which have been bounded by the
+    // functionality saturation bound)
     numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(boundedModelPool,
             numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(boundedModelPool), numeric::MAX);
 
@@ -142,9 +144,48 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         //LOG_INFO_S << "Update";
         {
             base::Time startTime = base::Time::now();
-            // Update the mapping functions - forward and inverse mapping from
-            // model/combination to function
-            functionalityMapping.add(combinationModelPool, supportedFunctionalityModels);
+
+            // REMOVE REDUNDANT COMBINATIONS -- this in not yet complete
+            // only filters out combination where there is at least one
+            // system that already provides full support for this functionality
+            IRIList availableFunctionalities;
+            owlapi::model::IRIList::const_iterator cit = supportedFunctionalityModels.begin();
+            for(; cit != supportedFunctionalityModels.end(); ++cit)
+            {
+                bool hasFullSupport = false;
+                ModelPool::const_iterator mit = combinationModelPool.begin();
+                for(; mit != combinationModelPool.end(); ++mit)
+                {
+                    algebra::SupportType type = getSupportType(*cit, mit->first, mit->second);
+                    switch(type)
+                    {
+                        case algebra::FULL_SUPPORT:
+                            hasFullSupport = true;
+                            break;
+                        case algebra::PARTIAL_SUPPORT:
+                            break;
+                        case algebra::NO_SUPPORT:
+                            break;
+                    }
+                }
+                if(hasFullSupport)
+                {
+                    if(combinationModelPool.size() == 1)
+                    {
+                        // that is ok
+                    } else {
+                        // this is a redundant combination
+                        continue;
+                    }
+                }
+                availableFunctionalities.push_back(*cit);
+            }
+            if(!availableFunctionalities.empty())
+            {
+                // Update the mapping functions - forward and inverse mapping from
+                // model/combination to function
+                functionalityMapping.add(combinationModelPool, availableFunctionalities);
+            }
             base::Time stopTime = base::Time::now();
             LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
         }
