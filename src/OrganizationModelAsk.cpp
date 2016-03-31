@@ -132,29 +132,26 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         LOG_INFO_S << "Check combination #" << ++count;
         LOG_INFO_S << "   | --> combination:             " << combination;
         LOG_INFO_S << "   | --> possible functionality models: " << functionalityModels;
-
-        base::Time startTime = base::Time::now();
-        // Filter the functionalityModel (from the existing set) which are supported
-        // by this very combination
-        ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
-        IRIList supportedFunctionalityModels = reasoning::ResourceMatch::filterSupportedModels(combinationModelPool, functionalityModels, mpOrganizationModel->ontology());
-
-        //base::Time stopTime = base::Time::now();
-        //LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
-        //LOG_INFO_S << "Update";
         {
-            base::Time startTime = base::Time::now();
+            ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
+            IRIList supportedFunctionalityModels = reasoning::ResourceMatch::filterSupportedModels(combinationModelPool, functionalityModels, mpOrganizationModel->ontology());
 
             // REMOVE REDUNDANT COMBINATIONS -- this in not yet complete
             // only filters out combination where there is at least one
             // system that already provides full support for this functionality
-            IRIList availableFunctionalities;
             owlapi::model::IRIList::const_iterator cit = supportedFunctionalityModels.begin();
             for(; cit != supportedFunctionalityModels.end(); ++cit)
             {
+                owlapi::model::IRI functionality = *cit;
+                // Filter the functionalityModel (from the existing set) which are supported
+                // by this very combination
+
+                ModelPool bound = getFunctionalSaturationBound(functionality);
+                ModelPool boundCombination = combinationModelPool.applyUpperBound(bound);
+
                 bool hasFullSupport = false;
-                ModelPool::const_iterator mit = combinationModelPool.begin();
-                for(; mit != combinationModelPool.end(); ++mit)
+                ModelPool::const_iterator mit = boundCombination.begin();
+                for(; mit != boundCombination.end(); ++mit)
                 {
                     algebra::SupportType type = getSupportType(*cit, mit->first, mit->second);
                     switch(type)
@@ -178,16 +175,8 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
                         continue;
                     }
                 }
-                availableFunctionalities.push_back(*cit);
+                functionalityMapping.add(boundCombination, functionality);
             }
-            if(!availableFunctionalities.empty())
-            {
-                // Update the mapping functions - forward and inverse mapping from
-                // model/combination to function
-                functionalityMapping.add(combinationModelPool, availableFunctionalities);
-            }
-            base::Time stopTime = base::Time::now();
-            LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
         }
     } while(limitedCombination.next());
 
