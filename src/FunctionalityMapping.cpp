@@ -1,5 +1,6 @@
 #include "FunctionalityMapping.hpp"
 #include <sstream>
+#include <algorithm>
 
 namespace organization_model {
 
@@ -47,20 +48,40 @@ const ModelPoolSet& FunctionalityMapping::getModelPools(const owlapi::model::IRI
 }
 
 void FunctionalityMapping::addFunction(const ModelPool& modelPool,
+        const owlapi::model::IRI& function)
+{
+    owlapi::model::IRIList& functions = mPool2Function[modelPool];
+    owlapi::model::IRIList::const_iterator cit = std::find(functions.begin(), functions.end(), function);
+    if(cit != functions.end())
+    {
+        mPool2Function[modelPool].push_back(function);
+    }
+}
+
+void FunctionalityMapping::addFunction(const ModelPool& modelPool,
         const owlapi::model::IRIList& functionModels)
 {
-    mPool2Function[modelPool] = functionModels;
+    owlapi::model::IRIList::const_iterator cit = functionModels.begin();
+    for(; cit != functionModels.end(); ++cit)
+    {
+        addFunction(modelPool, *cit);
+    }
+}
+
+void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRI& functionModel)
+{
+    addFunction(modelPool, functionModel);
+    mFunction2Pool[functionModel].insert(modelPool);
 }
 
 void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRIList& functionModels)
 {
     using namespace owlapi::model;
-    addFunction(modelPool, functionModels);
     IRIList::const_iterator cit = functionModels.begin();
     for(; cit != functionModels.end(); ++cit)
     {
-        IRI iri = *cit;
-        mFunction2Pool[iri].insert(modelPool);
+        IRI functionModel = *cit;
+        add(modelPool, functionModel);
     }
 }
 

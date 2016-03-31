@@ -46,8 +46,10 @@ public:
     void setFunctionalSaturationBound(const ModelPool& bounds) { mFunctionalSaturationBound = bounds; }
     const ModelPool& getFunctionalSaturationBound() const { return mFunctionalSaturationBound; }
 
+    void addFunction(const ModelPool& modelPool, const owlapi::model::IRI& function);
     void addFunction(const ModelPool& modelPool, const owlapi::model::IRIList& functionModels);
 
+    void add(const ModelPool& modelPool, const owlapi::model::IRI& functionModel);
     void add(const ModelPool& modelPool, const owlapi::model::IRIList& functionModels);
 
     std::string toString() const;
