@@ -67,6 +67,24 @@ ResourceSupportVector ResourceSupportVector::operator*(double factor) const
     return scaledVector;
 }
 
+ResourceSupportVector ResourceSupportVector::operator+(const ResourceSupportVector& other) const
+{
+    ResourceSupportVector summedVector = *this;
+    summedVector += other;
+    return summedVector;
+}
+
+ResourceSupportVector& ResourceSupportVector::operator+=(const ResourceSupportVector& other)
+{
+    if(other.mLabels != this->mLabels)
+    {
+        throw std::invalid_argument("organization_mode::algebra::ResourceSupportVector::operator+"
+                " cannot sum vectors since labels differ");
+    }
+    mSizes += other.mSizes;
+    return *this;
+}
+
 SupportType ResourceSupportVector::getSupportFrom(const ResourceSupportVector& other,
         const OrganizationModelAsk& ask) const
 {

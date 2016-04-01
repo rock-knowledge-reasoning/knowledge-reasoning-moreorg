@@ -38,7 +38,8 @@ OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
 void OrganizationModelAsk::prepare(const ModelPool& modelPool, bool applyFunctionalSaturationBound)
 {
     mModelPool = modelPool;
-    mFunctionalityMapping = getFunctionalityMapping(mModelPool, applyFunctionalSaturationBound);
+    mFunctionalityMapping = computeFunctionalityMapping(mModelPool, applyFunctionalSaturationBound);
+    LOG_WARN_S << mFunctionalityMapping.toString();
 }
 
 owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
@@ -53,53 +54,56 @@ owlapi::model::IRIList OrganizationModelAsk::getFunctionalities() const
     bool directSubclassOnly = false;
     IRIList subclasses = mOntologyAsk.allSubClassesOf(vocabulary::OM::Functionality(), directSubclassOnly);
     LOG_DEBUG_S << "Functionalities: " << subclasses;
+
     return subclasses;
 }
 
-FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPool& modelPool, bool applyFunctionalSaturationBound) const
+FunctionalityMapping OrganizationModelAsk::computeFunctionalityMapping(const ModelPool& modelPool, bool applyFunctionalSaturationBound) const
 {
     if(modelPool.empty())
     {
-        throw std::invalid_argument("organization_model::OrganizationModel::getFunctionalityMaps"
+        throw std::invalid_argument("organization_model::OrganizationModel::computeFunctionalityMaps"
                 " cannot compute functionality map for empty model pool");
     }
 
     IRIList functionalityModels = getFunctionalities();
+    if(functionalityModels.empty())
+    {
+        throw std::runtime_error("organization_model::OrganizationModelAsk::computeFunctionalityMapping: available functionalities empty");
+    }
+
+    if(applyFunctionalSaturationBound)
+    {
+        return computeBoundedFunctionalityMapping(modelPool, functionalityModels);
+    } else {
+        return computeUnboundedFunctionalityMapping(modelPool, functionalityModels);
+    }
+}
+
+FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(const ModelPool& modelPool, const IRIList& functionalityModels) const
+{
     std::pair<Pool2FunctionMap, Function2PoolMap> functionalityMaps;
 
-    ModelPool functionalSaturationBound;
     // TODO: create an bound on the model pool based on the given service
     // models based on the FunctionalSaturation -- avoids computing unnecessary
     // combination as function mappings
     //
     // LocationImageProvider: CREX --> 1, Sherpa --> 1
-    if(applyFunctionalSaturationBound)
-    {
-        // Compute service set of all known functionalities
-        FunctionalitySet functionalities = Functionality::toFunctionalitySet(functionalityModels);
+    // Compute service set of all known functionalities
+    FunctionalitySet functionalities = Functionality::toFunctionalitySet(functionalityModels);
 
-        // Compute the bound for all services
-        LOG_DEBUG_S << "Get functional saturation bound for '" << functionalityModels;
-        functionalSaturationBound = getFunctionalSaturationBound(functionalities);
-        LOG_DEBUG_S << "Functional saturation bound for '" << functionalityModels << "' is "
-            << functionalSaturationBound.toString();
+    // Compute the bound for all services
+    LOG_DEBUG_S << "Get functional saturation bound for '" << functionalityModels;
+    ModelPool functionalSaturationBound = getFunctionalSaturationBound(functionalities);
+    LOG_DEBUG_S << "Functional saturation bound for '" << functionalityModels << "' is "
+        << functionalSaturationBound.toString();
 
-        // Apply bound to the existing model pool
-        functionalSaturationBound = modelPool.applyUpperBound(functionalSaturationBound);
-        LOG_INFO_S << "Model pool after applying the functional saturation bound for '" << functionalityModels << "' is "
-            << functionalSaturationBound.toString();
-    } else {
-        LOG_DEBUG_S << "No functional saturation bound applied (since bounding has not been requested)";
-        functionalSaturationBound = modelPool;
-    }
+    // Apply bound to the existing model pool
+    functionalSaturationBound = modelPool.applyUpperBound(functionalSaturationBound);
+    LOG_INFO_S << "Model pool after applying the functional saturation bound for '" << functionalityModels << "' is "
+        << functionalSaturationBound.toString();
 
-    if(modelPool.empty())
-    {
-        throw std::runtime_error("organization_model::OrganizationModelAsk::getFunctionalityMapping: provided model pool empty");
-    } else if(functionalityModels.empty())
-    {
-        throw std::runtime_error("organization_model::OrganizationModelAsk::getFunctionalityMapping: available functionalities empty");
-    } else if(functionalSaturationBound.empty())
+    if(functionalSaturationBound.empty())
     {
         std::string msg = "organization_model::OrganizationModelAsk::getFunctionalityMapping: provided empty functionalSaturationBound";
         msg += modelPool.toString() + "\n";
@@ -107,6 +111,98 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
         msg += functionalSaturationBound.toString() + "\n";
         throw std::runtime_error(msg);
     }
+
+    FunctionalityMapping functionalityMapping(modelPool, functionalityModels, functionalSaturationBound);
+    FunctionalitySet::const_iterator fit = functionalities.begin();
+    for(; fit != functionalities.end(); ++fit)
+    {
+        const Functionality& functionality = *fit;
+        ModelPool bound = getFunctionalSaturationBound(functionality);
+        LOG_WARN_S << "MODEL POOL is: " << functionalSaturationBound.toString();
+        ModelPool boundedModelPool = functionalSaturationBound.applyUpperBound(bound);
+        if(boundedModelPool.empty())
+        {
+            continue;
+        }
+
+        LOG_WARN_S << "MODEL POOL is: " << boundedModelPool.toString() << " for " << functionality.toString();
+        uint32_t numberOfAtoms = numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(boundedModelPool);
+        if(numberOfAtoms == 0)
+        {
+            LOG_WARN_S << "No support for " << functionality.toString();
+            continue;
+        }
+
+        numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(boundedModelPool, numberOfAtoms, numeric::MAX);
+        do {
+            IRIList combination = limitedCombination.current();
+            ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
+            algebra::SupportType supportType = getSupportType(functionality, combinationModelPool);
+            if(algebra::FULL_SUPPORT != supportType)
+            {
+                continue;
+            }
+
+            bool hasFullSupport = false;
+            bool hasPartialSupport = false;
+            // gather all models that provide only partial support
+            ModelPool partialSupport;
+            ModelPool::const_iterator mit = combinationModelPool.begin();
+            for(; mit != combinationModelPool.end(); ++mit)
+            {
+                algebra::SupportType type = getSupportType(functionality, mit->first, mit->second);
+                switch(type)
+                {
+                    case algebra::FULL_SUPPORT:
+                        hasFullSupport = true;
+                        break;
+                    case algebra::PARTIAL_SUPPORT:
+                        hasPartialSupport = true;
+                        partialSupport.insert(*mit);
+                        break;
+                    case algebra::NO_SUPPORT:
+                        break;
+                }
+            }
+            if(hasFullSupport)
+            {
+                if(combinationModelPool.size() == 1)
+                {
+                    // that is ok, since that is only a single systems
+                } else {
+                    // this is a redundant combination
+                    continue;
+                }
+            } else if(hasPartialSupport)
+            {
+                // has partial support, thus check that for that particular
+                // combination that it contains no redundancies, i.e. we cannot
+                // remove any model instance to provide full support
+                ModelPool::const_iterator pit = partialSupport.begin();
+                for(; pit != partialSupport.end(); ++pit)
+                {
+                    ModelPool reduced = partialSupport;
+                    --reduced[pit->first];
+
+                    algebra::SupportType reducedSupport = getSupportType(functionality, reduced);
+                    if(reducedSupport == algebra::FULL_SUPPORT)
+                    {
+                        // redundant combination
+                        continue;
+                    }
+                }
+            }
+            functionalityMapping.add(combinationModelPool, functionality.getModel());
+        } while(limitedCombination.next());
+    } // end for functionalities
+
+    return functionalityMapping;
+}
+
+FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(const ModelPool& modelPool, const IRIList& functionalityModels) const
+{
+    std::pair<Pool2FunctionMap, Function2PoolMap> functionalityMaps;
+    ModelPool functionalSaturationBound = modelPool;
 
     FunctionalityMapping functionalityMapping(modelPool, functionalityModels, functionalSaturationBound);
     const ModelPool& boundedModelPool = functionalityMapping.getFunctionalSaturationBound();
@@ -129,53 +225,21 @@ FunctionalityMapping OrganizationModelAsk::getFunctionalityMapping(const ModelPo
             LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
         }
 
-        LOG_INFO_S << "Check combination #" << ++count;
-        LOG_INFO_S << "   | --> combination:             " << combination;
-        LOG_INFO_S << "   | --> possible functionality models: " << functionalityModels;
+        LOG_WARN_S << "Check combination #" << ++count;
+        LOG_WARN_S << "   | --> combination:             " << combination;
+        LOG_WARN_S << "   | --> possible functionality models: " << functionalityModels;
+
+        ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
+
+        // system that already provides full support for this functionality
+        owlapi::model::IRIList::const_iterator cit = functionalityModels.begin();
+        for(; cit != functionalityModels.end(); ++cit)
         {
-            ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
-            IRIList supportedFunctionalityModels = reasoning::ResourceMatch::filterSupportedModels(combinationModelPool, functionalityModels, mpOrganizationModel->ontology());
-
-            // REMOVE REDUNDANT COMBINATIONS -- this in not yet complete
-            // only filters out combination where there is at least one
-            // system that already provides full support for this functionality
-            owlapi::model::IRIList::const_iterator cit = supportedFunctionalityModels.begin();
-            for(; cit != supportedFunctionalityModels.end(); ++cit)
+            const Functionality& functionality = *cit;
+            algebra::SupportType supportType = getSupportType(*cit, combinationModelPool);
+            if(algebra::FULL_SUPPORT == supportType)
             {
-                owlapi::model::IRI functionality = *cit;
-                // Filter the functionalityModel (from the existing set) which are supported
-                // by this very combination
-
-                ModelPool bound = getFunctionalSaturationBound(functionality);
-                ModelPool boundCombination = combinationModelPool.applyUpperBound(bound);
-
-                bool hasFullSupport = false;
-                ModelPool::const_iterator mit = boundCombination.begin();
-                for(; mit != boundCombination.end(); ++mit)
-                {
-                    algebra::SupportType type = getSupportType(*cit, mit->first, mit->second);
-                    switch(type)
-                    {
-                        case algebra::FULL_SUPPORT:
-                            hasFullSupport = true;
-                            break;
-                        case algebra::PARTIAL_SUPPORT:
-                            break;
-                        case algebra::NO_SUPPORT:
-                            break;
-                    }
-                }
-                if(hasFullSupport)
-                {
-                    if(combinationModelPool.size() == 1)
-                    {
-                        // that is ok
-                    } else {
-                        // this is a redundant combination
-                        continue;
-                    }
-                }
-                functionalityMapping.add(boundCombination, functionality);
+                functionalityMapping.add(combinationModelPool, functionality.getModel());
             }
         }
     } while(limitedCombination.next());
@@ -403,12 +467,37 @@ ModelCombinationSet OrganizationModelAsk::expandToLowerBound(const ModelCombinat
 
 algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
 {
+    // Define what is required
     algebra::ResourceSupportVector functionalitySupportVector = getSupportVector(functionality.getModel(), IRIList() /*filter labels*/, false /*useMaxCardinality*/);
+    // Retrieve what is available
     algebra::ResourceSupportVector modelSupportVector =
         getSupportVector(model, functionalitySupportVector.getLabels(), true /*useMaxCardinality*/)*
         static_cast<double>(cardinalityOfModel);
 
     return functionalitySupportVector.getSupportFrom(modelSupportVector, *this);
+}
+
+algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const ModelPool& modelPool) const
+{
+    // Define what is required
+    algebra::ResourceSupportVector functionalitySupportVector = getSupportVector(functionality.getModel(), IRIList() /*filter labels*/, false /*useMaxCardinality*/);
+    const IRIList& labels = functionalitySupportVector.getLabels();
+
+    base::VectorXd zeroSupport(labels.size());
+    algebra::ResourceSupportVector modelPoolSupportVector(zeroSupport, labels);
+
+    // Gather what is available
+    ModelPool::const_iterator cit = modelPool.begin();
+    for(; cit != modelPool.end(); ++cit)
+    {
+        const IRI& model = cit->first;
+        const uint32_t& cardinality = cit->second;
+
+        algebra::ResourceSupportVector support = getSupportVector(model, labels, true)*static_cast<double>(cardinality);
+        modelPoolSupportVector += support;
+    }
+
+    return functionalitySupportVector.getSupportFrom(modelPoolSupportVector, *this);
 }
 
 uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const owlapi::model::IRI& requirementModel, const owlapi::model::IRI& model) const
@@ -509,6 +598,8 @@ bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelC
 
 bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const FunctionalitySet& functionalities) const
 {
+    // Requires the functionality mapping to be properly initialized
+
     FunctionalitySet::const_iterator cit = functionalities.begin();
     ModelPoolSet previousModelPools;
     bool init = true;

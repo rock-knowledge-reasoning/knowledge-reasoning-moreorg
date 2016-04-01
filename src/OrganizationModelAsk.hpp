@@ -57,10 +57,10 @@ public:
     void setModelPool(const ModelPool& modelPool) { mModelPool = modelPool; }
 
     /**
-     * Get the functionality mapping for the model pool this object was
+     * Compute the functionality mapping for the model pool this object was
      * initialized with
      */
-    FunctionalityMapping getFunctionalityMapping(const ModelPool& pool, bool applyFunctionalSaturationBound = false) const;
+    FunctionalityMapping computeFunctionalityMapping(const ModelPool& pool, bool applyFunctionalSaturationBound = false) const;
 
     /**
      * Get the set of resources (or combination thereof) that support a given
@@ -158,6 +158,17 @@ public:
     algebra::SupportType getSupportType(const Functionality& functionality,
             const owlapi::model::IRI& model,
             uint32_t cardinalityOfModel = 1) const;
+
+    /**
+     * Check how a functionality is supported by a model if a given cardinality
+     * of models is provided
+     * \param functionality Functionality to be available
+     * \param models ModelPool that is available or represent the combination of
+     * systems
+     * \return type of support
+     */
+    algebra::SupportType getSupportType(const Functionality& functionality,
+            const ModelPool& models) const;
 
     /**
      *  Depending on the contribution of a model to the service the functional
@@ -302,6 +313,9 @@ protected:
 
     owlapi::model::IRIList filterSupportedModels(const owlapi::model::IRIList& combinations,
         const owlapi::model::IRIList& serviceModels);
+
+    FunctionalityMapping computeBoundedFunctionalityMapping(const ModelPool& pool, const owlapi::model::IRIList& functionalityModels) const;
+    FunctionalityMapping computeUnboundedFunctionalityMapping(const ModelPool& pool, const owlapi::model::IRIList& functionalityModels) const;
 
 private:
     OrganizationModel::Ptr mpOrganizationModel;

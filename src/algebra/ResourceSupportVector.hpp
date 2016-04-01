@@ -143,6 +143,16 @@ public:
      */
     ResourceSupportVector operator*(double factor) const;
 
+    /**
+     * Add two resource support vectors
+     */
+    ResourceSupportVector operator+(const ResourceSupportVector& other) const;
+
+    /**
+     * Add two resource support vectors
+     */
+    ResourceSupportVector& operator+=(const ResourceSupportVector& other);
+
 protected:
     /**
      * Check if two ResourceSupportVector have the same dimension

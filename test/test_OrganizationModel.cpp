@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
 
     OrganizationModelAsk ask(om, items, true);
 
-    FunctionalityMapping fm = ask.getFunctionalityMapping(items, true);
+    FunctionalityMapping fm = ask.computeFunctionalityMapping(items, true);
     BOOST_TEST_MESSAGE("FunctionalityMapping " << fm.toString());
 }
 
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         items[OM::resolve("Sherpa")] = 1;
         items[OM::resolve("CREX")] = 1;
 
-        OrganizationModelAsk ask(om, items);
+        OrganizationModelAsk ask(om, items, false);
 
         // http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
@@ -122,17 +122,34 @@ BOOST_AUTO_TEST_CASE(resource_support)
         {
             OrganizationModelAsk ask(om, items);
             ModelPool modelPoolBounded = ask.getFunctionalSaturationBound(functionalities);
+            BOOST_TEST_MESSAGE("ModelPoolBounded: " << modelPoolBounded.toString());
 
-            OrganizationModelAsk minimalAsk(om, modelPoolBounded);
-            ModelPoolSet combinations = minimalAsk.getResourceSupport(functionalities);
-            std::set<ModelPool>::const_iterator cit = combinations.begin();
-            for(; cit != combinations.end(); ++cit)
             {
-                BOOST_TEST_MESSAGE("ModelCombination: " << cit->toString() );
-            }
+                OrganizationModelAsk minimalAsk(om, modelPoolBounded, false);
+                ModelPoolSet combinations = minimalAsk.getResourceSupport(functionalities);
+                std::set<ModelPool>::const_iterator cit = combinations.begin();
+                for(; cit != combinations.end(); ++cit)
+                {
+                    BOOST_TEST_MESSAGE("ModelCombination: " << cit->toString() );
+                }
 
-            BOOST_REQUIRE_MESSAGE(combinations.size() >= 4, "Two combinations that support stereo image provider, image provider and emi power provider, was " << combinations.size()
-                    << "\nBounded model pool: " << ModelPoolDelta(modelPoolBounded).toString());
+                BOOST_CHECK_MESSAGE(combinations.size() == 8, "Without functional saturation bound: eight combinations that support stereo image provider, image provider and emi power provider, was " << combinations.size() << " "
+                        << ModelPool::toString(combinations, 4) << " "
+                        << "\nBounded model pool: " << ModelPoolDelta(modelPoolBounded).toString());
+            }
+            {
+                OrganizationModelAsk minimalAsk(om, modelPoolBounded, true);
+                ModelPoolSet combinations = minimalAsk.getResourceSupport(functionalities);
+                std::set<ModelPool>::const_iterator cit = combinations.begin();
+                for(; cit != combinations.end(); ++cit)
+                {
+                    BOOST_TEST_MESSAGE("ModelCombination: " << cit->toString() );
+                }
+
+                BOOST_CHECK_MESSAGE(combinations.size() == 1, "With functional saturation bound: one combinations that support stereo image provider, image provider and emi power provider, was " << combinations.size() << " "
+                        << ModelPool::toString(combinations, 4) << " "
+                        << "\nBounded model pool: " << ModelPoolDelta(modelPoolBounded).toString());
+            }
         }
     }
 }
@@ -503,7 +520,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //
 //
 //    std::set< std::vector<ActorModelLink> > actorSet;
-//    // Extra 
+//    // Extra
 //    {
 //        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiActive-requirement-0");
 //        EndpointModel modelB("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
@@ -513,7 +530,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //        std::sort(compositeActor.begin(), compositeActor.end());
 //        actorSet.insert(compositeActor);
 //    }
-//    // Extra 
+//    // Extra
 //    {
 //        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
 //        EndpointModel modelB("http://test#Sherpa", "http://test#EmiActive-requirement-0");
@@ -523,7 +540,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //        std::sort(compositeActor.begin(), compositeActor.end());
 //        actorSet.insert(compositeActor);
 //    }
-//    // Extra 
+//    // Extra
 //    {
 //        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
 //        EndpointModel modelB("http://test#Sherpa", "http://test#EmiActive-requirement-1");
@@ -533,7 +550,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //        std::sort(compositeActor.begin(), compositeActor.end());
 //        actorSet.insert(compositeActor);
 //    }
-//    // Extra 
+//    // Extra
 //    {
 //        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiActive-requirement-0");
 //        EndpointModel modelB("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
