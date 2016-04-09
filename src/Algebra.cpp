@@ -137,4 +137,45 @@ ModelPool Algebra::merge(const std::set<ModelPool>& modelPoolSet)
     return mergedPool.toModelPool();
 }
 
+ModelPoolSet Algebra::maxCompositions(const ModelPool& a, const ModelPool& b)
+{
+    ModelPoolSet aPool;
+    aPool.insert(a);
+
+    ModelPoolSet bPool;
+    bPool.insert(b);
+
+    return maxCompositions(aPool, bPool);
+}
+
+ModelPoolSet Algebra::maxCompositions(const ModelPoolSet& a, const ModelPoolSet& b)
+{
+    ModelPoolSet maxCompositions;
+    // Handle corner cases
+    if(a.empty())
+    {
+        return b;
+    }
+
+    if(b.empty())
+    {
+        return a;
+    }
+
+    ModelPoolSet::const_iterator ait = a.begin();
+    for(; ait != a.end(); ++ait)
+    {
+        const ModelPool& aPool = *ait;
+        ModelPoolSet::const_iterator bit = b.begin();
+        for(; bit != b.end(); ++bit)
+        {
+            const ModelPool& bPool = *bit;
+            ModelPool composition = max(aPool, bPool);
+            maxCompositions.insert(composition);
+        }
+    }
+
+    return maxCompositions;
+}
+
 } // end namespace organization_model

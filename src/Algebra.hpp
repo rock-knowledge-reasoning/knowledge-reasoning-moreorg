@@ -37,6 +37,29 @@ public:
     static ModelPool merge(const ModelCombinationSet& a, const ModelCombination& b);
 
     static ModelPool merge(const std::set<ModelPool>& pool);
+
+    /**
+     * Apply cartesian product like:
+     * a = {(0,1),(1,1),(2,0)}
+     * b = {(0,0),(1,2),(2,0)}
+     *
+     * a [max] b = {(0,1),(1,2),(2,0)}
+     */
+    static ModelPoolSet maxCompositions(const ModelPool& a, const ModelPool& b);
+
+    /**
+     * Apply cartesian product like
+     *
+     * a = {{(0,1),(1,1),(2,0)}, {(0,3)} }
+     * b = {(0,0),(1,2),(2,0)}
+     *
+     * but use the max function to compute the resulting model pool
+     *
+     * We define this as [max] operator
+     *
+     * a [max] b = { {(0,3),(1,1),(2,0)}, {(0,3),(1,2),(2,0)} }
+     */
+    static ModelPoolSet maxCompositions(const ModelPoolSet& a, const ModelPoolSet& b);
 };
 
 } // end namespace organization_model
