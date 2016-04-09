@@ -26,4 +26,23 @@ FunctionalitySet Functionality::toFunctionalitySet(const owlapi::model::IRIList&
     return functionalities;
 }
 
+std::string Functionality::toString(const std::set<Functionality>& functionalities)
+{
+    std::string s;
+    s += "[";
+    FunctionalitySet::const_iterator cit = functionalities.begin();
+    for(; cit != functionalities.end();)
+    {
+        s += cit->toString();
+        ++cit;
+
+        if( cit != functionalities.end())
+        {
+            s += ", ";
+        }
+    }
+    s += "]";
+    return s;
+}
+
 } // end namespace organization_model

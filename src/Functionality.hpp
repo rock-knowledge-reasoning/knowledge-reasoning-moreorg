@@ -16,9 +16,22 @@ public:
 
     bool operator<(const Functionality& other) const;
 
+    /**
+     * Convert list of models to functionality set
+     */
     static std::set<Functionality> toFunctionalitySet(const owlapi::model::IRIList& model);
 
+    /**
+     * Stringify functionality
+     * \return string representing the corresponding model
+     */
     std::string toString() const { return mModel.getFragment(); }
+
+    /**
+     * Stringify functionality set
+     * \return string representing the set: "[<f0>, <f1>, ..., <fn>]"
+     */
+    static std::string toString(const std::set<Functionality>& set);
 
 private:
     owlapi::model::IRI mModel;
