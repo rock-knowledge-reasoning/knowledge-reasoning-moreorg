@@ -17,6 +17,8 @@
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2014/01/om-schema#">
         <rdfs:comment>Changelog:
+* 0.16
+ * add soil sampler 
 * 0.15
  * introduce modularization, i.e. move robot specific entries to their own ontology and using import statements
 * 0.14

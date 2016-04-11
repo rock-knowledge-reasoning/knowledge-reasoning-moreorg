@@ -6,19 +6,23 @@
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY robots "http://www.rock-robotics.org/2015/12/robots#" >
     <!ENTITY om-schema "http://www.rock-robotics.org/2014/01/om-schema#" >
 ]>
 
 
 <rdf:RDF xmlns="http://www.rock-robotics.org/2015/12/robots/Payload#"
      xml:base="http://www.rock-robotics.org/2015/12/robots/Payload"
+     xmlns:robots="http://www.rock-robotics.org/2015/12/robots#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#">
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload">
-        <rdfs:comment>* 0.1
+        <rdfs:comment>* 0.2
+ * adapt base uri to om-schema
+* 0.1
  * Add PayloadCamera, PayloadBattery and PayloadSoilSampler as individuals</rdfs:comment>
         <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#"/>
     </owl:Ontology>
@@ -36,32 +40,10 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2015/12/robots/Payload#Payload -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PayloadBattery -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#Payload">
-        <rdfs:subClassOf rdf:resource="&om-schema;Actor"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;EmiActive"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;EmiPassive"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-    </owl:Class>
-    
-
-
-    <!-- http://www.rock-robotics.org/2015/12/robots/Payload#PayloadBattery -->
-
-    <owl:Class rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadBattery">
-        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2015/12/robots/Payload#Payload"/>
+    <owl:Class rdf:about="&om-schema;PayloadBattery">
+        <rdfs:subClassOf rdf:resource="om-schema:Payload"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
@@ -73,10 +55,10 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2015/12/robots/Payload#PayloadCamera -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PayloadCamera -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadCamera">
-        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2015/12/robots/Payload#Payload"/>
+    <owl:Class rdf:about="&om-schema;PayloadCamera">
+        <rdfs:subClassOf rdf:resource="om-schema:Payload"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
@@ -88,14 +70,36 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2015/12/robots/Payload#PayloadSoilSampler -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PayloadSoilSampler -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadSoilSampler">
-        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2015/12/robots/Payload#Payload"/>
+    <owl:Class rdf:about="&om-schema;PayloadSoilSampler">
+        <rdfs:subClassOf rdf:resource="om-schema:Payload"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
                 <owl:onClass rdf:resource="&om-schema;SoilSampler"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- om-schema:Payload -->
+
+    <owl:Class rdf:about="om-schema:Payload">
+        <rdfs:subClassOf rdf:resource="&om-schema;Actor"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;EmiPassive"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;EmiActive"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -114,56 +118,37 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2015/12/robots/Payload#Payload -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PayloadBattery -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#Payload">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2015/12/robots/Payload#Payload"/>
-        <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">0.0</om-schema:maxEnergyCapacity>
-        <om-schema:energyCapacity rdf:datatype="&xsd;double">0.0</om-schema:energyCapacity>
-        <om-schema:nominalHeight rdf:datatype="&xsd;double">0.15</om-schema:nominalHeight>
-        <om-schema:nominalWidth rdf:datatype="&xsd;double">0.15</om-schema:nominalWidth>
-        <om-schema:minWidth rdf:datatype="&xsd;double">0.15</om-schema:minWidth>
-        <om-schema:maxWidth rdf:datatype="&xsd;double">0.15</om-schema:maxWidth>
-        <om-schema:maxHeight rdf:datatype="&xsd;double">0.15</om-schema:maxHeight>
-        <om-schema:minHeight rdf:datatype="&xsd;double">0.15</om-schema:minHeight>
-        <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">25.0</om-schema:nominalPowerConsumption>
-        <om-schema:mass rdf:datatype="&xsd;double">3.0</om-schema:mass>
-        <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.rock-robotics.org/2015/12/robots/Payload#PayloadBattery -->
-
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadBattery">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadBattery"/>
-        <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">0.0</om-schema:maxEnergyCapacity>
+    <owl:NamedIndividual rdf:about="&om-schema;PayloadBattery">
+        <rdf:type rdf:resource="&om-schema;PayloadBattery"/>
         <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">0.0</om-schema:nominalPowerConsumption>
         <om-schema:energyCapacity rdf:datatype="&xsd;double">0.0</om-schema:energyCapacity>
+        <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">0.0</om-schema:maxEnergyCapacity>
         <om-schema:maxWidth rdf:datatype="&xsd;double">0.15</om-schema:maxWidth>
-        <om-schema:minWidth rdf:datatype="&xsd;double">0.15</om-schema:minWidth>
-        <om-schema:nominalWidth rdf:datatype="&xsd;double">0.15</om-schema:nominalWidth>
-        <om-schema:maxHeight rdf:datatype="&xsd;double">0.15</om-schema:maxHeight>
         <om-schema:nominalHeight rdf:datatype="&xsd;double">0.15</om-schema:nominalHeight>
         <om-schema:minHeight rdf:datatype="&xsd;double">0.15</om-schema:minHeight>
+        <om-schema:minWidth rdf:datatype="&xsd;double">0.15</om-schema:minWidth>
+        <om-schema:maxHeight rdf:datatype="&xsd;double">0.15</om-schema:maxHeight>
+        <om-schema:nominalWidth rdf:datatype="&xsd;double">0.15</om-schema:nominalWidth>
         <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>
         <om-schema:mass rdf:datatype="&xsd;double">5.0</om-schema:mass>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.rock-robotics.org/2015/12/robots/Payload#PayloadCamera -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PayloadCamera -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadCamera">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadCamera"/>
+    <owl:NamedIndividual rdf:about="&om-schema;PayloadCamera">
+        <rdf:type rdf:resource="&om-schema;PayloadCamera"/>
         <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">0.0</om-schema:maxEnergyCapacity>
         <om-schema:energyCapacity rdf:datatype="&xsd;double">0.0</om-schema:energyCapacity>
+        <om-schema:minHeight rdf:datatype="&xsd;double">0.15</om-schema:minHeight>
         <om-schema:maxWidth rdf:datatype="&xsd;double">0.15</om-schema:maxWidth>
-        <om-schema:maxHeight rdf:datatype="&xsd;double">0.15</om-schema:maxHeight>
+        <om-schema:nominalWidth rdf:datatype="&xsd;double">0.15</om-schema:nominalWidth>
         <om-schema:minWidth rdf:datatype="&xsd;double">0.15</om-schema:minWidth>
         <om-schema:nominalHeight rdf:datatype="&xsd;double">0.15</om-schema:nominalHeight>
-        <om-schema:minHeight rdf:datatype="&xsd;double">0.15</om-schema:minHeight>
-        <om-schema:nominalWidth rdf:datatype="&xsd;double">0.15</om-schema:nominalWidth>
+        <om-schema:maxHeight rdf:datatype="&xsd;double">0.15</om-schema:maxHeight>
         <om-schema:mass rdf:datatype="&xsd;double">4.0</om-schema:mass>
         <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>
         <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">50.0</om-schema:nominalPowerConsumption>
@@ -171,20 +156,39 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2015/12/robots/Payload#PayloadSoilSampler -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PayloadSoilSampler -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadSoilSampler">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadSoilSampler"/>
-        <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">0.0</om-schema:maxEnergyCapacity>
+    <owl:NamedIndividual rdf:about="&om-schema;PayloadSoilSampler">
+        <rdf:type rdf:resource="&om-schema;PayloadSoilSampler"/>
         <om-schema:energyCapacity rdf:datatype="&xsd;double">0.0</om-schema:energyCapacity>
-        <om-schema:maxWidth rdf:datatype="&xsd;double">0.15</om-schema:maxWidth>
-        <om-schema:minWidth rdf:datatype="&xsd;double">0.15</om-schema:minWidth>
-        <om-schema:nominalHeight rdf:datatype="&xsd;double">0.15</om-schema:nominalHeight>
-        <om-schema:nominalWidth rdf:datatype="&xsd;double">0.15</om-schema:nominalWidth>
-        <om-schema:maxHeight rdf:datatype="&xsd;double">0.15</om-schema:maxHeight>
+        <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">0.0</om-schema:maxEnergyCapacity>
         <om-schema:minHeight rdf:datatype="&xsd;double">0.15</om-schema:minHeight>
+        <om-schema:nominalWidth rdf:datatype="&xsd;double">0.15</om-schema:nominalWidth>
+        <om-schema:nominalHeight rdf:datatype="&xsd;double">0.15</om-schema:nominalHeight>
+        <om-schema:minWidth rdf:datatype="&xsd;double">0.15</om-schema:minWidth>
+        <om-schema:maxWidth rdf:datatype="&xsd;double">0.15</om-schema:maxWidth>
+        <om-schema:maxHeight rdf:datatype="&xsd;double">0.15</om-schema:maxHeight>
         <om-schema:mass rdf:datatype="&xsd;double">3.5</om-schema:mass>
         <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">30.0</om-schema:nominalPowerConsumption>
+        <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- om-schema:Payload -->
+
+    <owl:NamedIndividual rdf:about="om-schema:Payload">
+        <rdf:type rdf:resource="om-schema:Payload"/>
+        <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">0.0</om-schema:maxEnergyCapacity>
+        <om-schema:energyCapacity rdf:datatype="&xsd;double">0.0</om-schema:energyCapacity>
+        <om-schema:minHeight rdf:datatype="&xsd;double">0.15</om-schema:minHeight>
+        <om-schema:maxHeight rdf:datatype="&xsd;double">0.15</om-schema:maxHeight>
+        <om-schema:nominalHeight rdf:datatype="&xsd;double">0.15</om-schema:nominalHeight>
+        <om-schema:maxWidth rdf:datatype="&xsd;double">0.15</om-schema:maxWidth>
+        <om-schema:nominalWidth rdf:datatype="&xsd;double">0.15</om-schema:nominalWidth>
+        <om-schema:minWidth rdf:datatype="&xsd;double">0.15</om-schema:minWidth>
+        <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">25.0</om-schema:nominalPowerConsumption>
+        <om-schema:mass rdf:datatype="&xsd;double">3.0</om-schema:mass>
         <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>
     </owl:NamedIndividual>
 </rdf:RDF>

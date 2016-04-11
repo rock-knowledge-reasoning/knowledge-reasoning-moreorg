@@ -7,6 +7,11 @@ using namespace owlapi::model;
 
 namespace organization_model {
 
+OrganizationModel::OrganizationModel(const owlapi::model::IRI& iri)
+{
+    mpOntology = owlapi::io::OWLOntologyIO::load(iri);
+}
+
 OrganizationModel::OrganizationModel(const std::string& filename)
     : mpOntology( new OWLOntology())
 {

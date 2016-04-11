@@ -48,6 +48,14 @@ class OrganizationModel
 public:
     typedef shared_ptr<OrganizationModel> Ptr;
 
+
+    /**
+     * Constructor to create an organization model from a given model description
+     * identified through an IRI
+     * \see owlapi::model::OWLOntologyIO::load
+     */
+    OrganizationModel(const owlapi::model::IRI& iri);
+
     /**
      * Constructor to create an OrganizationModel from an existing description file
      * \param filename File name to an rdf/xml formatted ontology description file
