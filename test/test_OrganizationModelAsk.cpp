@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(recursive_resolution)
     expected.push_back( ExpectedResult(0, algebra::NO_SUPPORT) );
 
 
-    for(int i = 0; i < agents.size(); ++i)
+    for(size_t i = 0; i < agents.size(); ++i)
     {
         IRI agent = agents[i];
         IRIList combination;
@@ -73,6 +73,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
 
     IRI stereoImageProvider = OM::resolve("StereoImageProvider");
     IRI locationImageProvider = OM::resolve("LocationImageProvider");
+    IRI emiPowerProvider = OM::resolve("EmiPowerProvider");
 
     OrganizationModelAsk ask(om);
     {
@@ -103,11 +104,52 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
         IRI functionality = locationImageProvider;
         {
             uint32_t saturationPoint = ask.getFunctionalSaturationBound(functionality, sherpa);
-            BOOST_REQUIRE_MESSAGE(saturationPoint == 1, "1 Sherpa sufficient for StereoImageProvider: was " << saturationPoint);
+            BOOST_REQUIRE_MESSAGE(saturationPoint == 1, "1 Sherpa sufficient for '" << functionality << "' : was " << saturationPoint);
 
             algebra::SupportType supportType = ask.getSupportType(functionality, sherpa, saturationPoint);
-            BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from sherpa for StereoImageProvider at saturation point");
+            BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from sherpa for '" << functionality << "' at saturation point");
         }
+    }
+    {
+        IRI functionality = emiPowerProvider;
+        {
+            {
+                IRI system = sherpa;
+                uint32_t saturationPoint = ask.getFunctionalSaturationBound(functionality, system);
+                BOOST_REQUIRE_MESSAGE(saturationPoint == 1, "1 '" << system << "' sufficient for '" << functionality << "' : was " << saturationPoint);
+
+                algebra::SupportType supportType = ask.getSupportType(functionality, system, saturationPoint);
+                BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from '" << system << "' for '" << functionality << "' at saturation point");
+            }
+            {
+                IRI system = crex;
+                uint32_t saturationPoint = ask.getFunctionalSaturationBound(functionality, system);
+                BOOST_REQUIRE_MESSAGE(saturationPoint == 1, "1 '" << system << "' sufficient for '" << functionality << "' : was " << saturationPoint);
+
+                algebra::SupportType supportType = ask.getSupportType(functionality, system, saturationPoint);
+                BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from '" << system << "' for '" << functionality << "' at saturation point");
+
+            }
+        }
+    }
+    {
+        ModelPool modelPool;
+        modelPool[sherpa] = 1;
+
+        ask.prepare(modelPool);
+
+        FunctionalitySet functionalitySet;
+        Functionality functionality(stereoImageProvider);
+        functionalitySet.insert(functionality);
+
+        ModelPoolSet combinations = ask.getBoundedResourceSupport(functionalitySet);
+        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << ModelPool::toString(combinations) << "'");
+
+        BOOST_REQUIRE_MESSAGE(ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
+
+        functionalitySet.insert( Functionality(emiPowerProvider) );
+        functionalitySet.insert( Functionality(locationImageProvider) );
+        BOOST_REQUIRE_MESSAGE(ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
     }
 
     {
@@ -123,6 +165,59 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
 
         ModelPoolSet combinations = ask.getBoundedResourceSupport(functionalitySet);
         BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << ModelPool::toString(combinations) << "'");
+
+        BOOST_REQUIRE_MESSAGE(!ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is not minimal");
+
+        functionalitySet.insert( Functionality(emiPowerProvider) );
+        functionalitySet.insert( Functionality(locationImageProvider) );
+
+        FunctionalitySet intermediateCheck;
+        intermediateCheck.insert(Functionality(emiPowerProvider));
+        algebra::SupportType support0= ask.getSupportType(intermediateCheck, modelPool);
+        algebra::SupportType support1= ask.getSupportType(functionalitySet, modelPool);
+
+        BOOST_REQUIRE_MESSAGE(!ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is not minimal: support was " << algebra::SupportTypeTxt[support0] << " vs. " << algebra::SupportTypeTxt[support1] );
+
+    }
+    {
+        ModelPool modelPool;
+        modelPool[crex] = 2;
+        modelPool[sherpa] = 1;
+
+        ask.prepare(modelPool);
+
+        FunctionalitySet functionalitySet;
+        Functionality functionality(stereoImageProvider);
+        functionalitySet.insert(functionality);
+
+        ModelPoolSet combinations = ask.getBoundedResourceSupport(functionalitySet);
+        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << ModelPool::toString(combinations) << "'");
+
+        BOOST_REQUIRE_MESSAGE(!ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
+
+        functionalitySet.insert( Functionality(emiPowerProvider) );
+        functionalitySet.insert( Functionality(locationImageProvider) );
+        BOOST_REQUIRE_MESSAGE(!ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
+    }
+
+    {
+        ModelPool modelPool;
+        modelPool[crex] = 2;
+
+        ask.prepare(modelPool);
+
+        FunctionalitySet functionalitySet;
+        Functionality functionality(stereoImageProvider);
+        functionalitySet.insert(functionality);
+
+        ModelPoolSet combinations = ask.getBoundedResourceSupport(functionalitySet);
+        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << ModelPool::toString(combinations) << "'");
+
+        BOOST_REQUIRE_MESSAGE(ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
+
+        functionalitySet.insert( Functionality(emiPowerProvider) );
+        functionalitySet.insert( Functionality(locationImageProvider) );
+        BOOST_REQUIRE_MESSAGE(ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
     }
 }
 

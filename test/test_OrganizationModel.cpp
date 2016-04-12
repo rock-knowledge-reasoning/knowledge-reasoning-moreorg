@@ -15,8 +15,11 @@ BOOST_AUTO_TEST_SUITE(organization_model)
 
 BOOST_AUTO_TEST_CASE(load_file)
 {
-    OrganizationModel om( getOMSchema() );
-    BOOST_TEST_MESSAGE("Loaded model");
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()) );
+
+    OrganizationModelAsk ask(om, ModelPool(), false);
+    owlapi::model::OWLOntologyAsk ontologyAsk(om->ontology());
+    BOOST_TEST_MESSAGE("Loaded model" << ontologyAsk.allClasses());
 }
 
 
@@ -28,16 +31,30 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
     OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()) );
 
     ModelPool items;
-    items[OM::resolve("Sherpa")] = 3;
-    items[OM::resolve("CREX")] = 2;
-    items[OM::resolve("CoyoteIII")] = 3;
-    items[OM::resolve("Payload")] = 25;
-    items[OM::resolve("BaseCamp")] = 10;
-
-    ModelPoolSet modelPoolSet = items.allCombinations();
-    BOOST_TEST_MESSAGE("All combinations: " << ModelPool::toString(modelPoolSet) );
+    items[OM::resolve("BaseCamp")] = 1;
 
     OrganizationModelAsk ask(om, items, true);
+    {
+        algebra::SupportType supportType = ask.getSupportType(OM::resolve("PayloadLogisticHub"), items);
+        BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support for payload logistic hub");
+    }
+    {
+        algebra::SupportType supportType = ask.getSupportType(OM::resolve("TransportService"), items);
+        BOOST_REQUIRE_MESSAGE(supportType == algebra::PARTIAL_SUPPORT, "Partial support for transport service expected, but is : " << algebra::SupportTypeTxt[supportType]);
+    }
+
+    items[OM::resolve("Sherpa")] = 3;
+    items[OM::resolve("CREX")] = 3;
+    items[OM::resolve("CoyoteIII")] = 3;
+
+    ModelPoolSet modelPoolSet = items.allCombinations();
+    BOOST_TEST_MESSAGE("All combinations of three agent types with cardinality 3: " << ModelPool::toString(modelPoolSet) );
+
+    items[OM::resolve("Payload")] = 2;
+    items[OM::resolve("PayloadCamera")] = 5;
+    items[OM::resolve("PayloadBattery")] = 5;
+    items[OM::resolve("PayloadSoilSampler")] = 1;
+    items[OM::resolve("BaseCamp")] = 3;
 
     FunctionalityMapping fm = ask.computeFunctionalityMapping(items, true);
     BOOST_TEST_MESSAGE("FunctionalityMapping " << fm.toString());
@@ -139,7 +156,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
             }
             {
                 OrganizationModelAsk minimalAsk(om, modelPoolBounded, true);
-                ModelPoolSet combinations = minimalAsk.getResourceSupport(functionalities);
+                ModelPoolSet combinations = minimalAsk.getBoundedResourceSupport(functionalities);
                 std::set<ModelPool>::const_iterator cit = combinations.begin();
                 for(; cit != combinations.end(); ++cit)
                 {
@@ -148,7 +165,8 @@ BOOST_AUTO_TEST_CASE(resource_support)
 
                 BOOST_CHECK_MESSAGE(combinations.size() == 1, "With functional saturation bound: one combinations that support stereo image provider, image provider and emi power provider, was " << combinations.size() << " "
                         << ModelPool::toString(combinations, 4) << " "
-                        << "\nBounded model pool: " << ModelPoolDelta(modelPoolBounded).toString());
+                        << "\nBounded model pool: " << ModelPoolDelta(modelPoolBounded).toString()
+                        << "\nFunctionality: " << minimalAsk.getFunctionalityMapping().toString());
             }
         }
     }
@@ -164,7 +182,6 @@ BOOST_AUTO_TEST_CASE(resource_support_crex)
     {
         ModelPool items;
         items[OM::resolve("CREX")] = 1;
-//        items[OM::resolve("Sherpa")] = 1;
 
         OrganizationModelAsk ask(om, items);
 
