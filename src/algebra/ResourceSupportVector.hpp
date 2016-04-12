@@ -43,6 +43,8 @@ namespace algebra {
 /// countable resources given some requirements
 enum SupportType { NO_SUPPORT, PARTIAL_SUPPORT, FULL_SUPPORT };
 
+extern std::map<SupportType, std::string> SupportTypeTxt;
+
 class ResourceSupportVector
 {
 public:
@@ -121,8 +123,10 @@ public:
 
     /**
      * Stringify object
+     * \param indent Indentation in number of spaces
+     * \return stringified object
      */
-    std::string toString() const;
+    std::string toString(uint32_t indent = 0) const;
 
     /**
      * Get the size of this vector

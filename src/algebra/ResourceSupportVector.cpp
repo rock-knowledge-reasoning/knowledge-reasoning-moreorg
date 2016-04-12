@@ -3,9 +3,16 @@
 #include <sstream>
 #include <base/Logging.hpp>
 #include <organization_model/OrganizationModelAsk.hpp>
+#include <boost/assign/list_of.hpp>
 
 namespace organization_model {
 namespace algebra {
+
+std::map<SupportType, std::string> SupportTypeTxt = boost::assign::map_list_of
+    (NO_SUPPORT, "no support")
+    (PARTIAL_SUPPORT, "partial support")
+    (FULL_SUPPORT, "full support")
+    ;
 
 ResourceSupportVector::ResourceSupportVector()
     : mSizes()
@@ -79,7 +86,9 @@ ResourceSupportVector& ResourceSupportVector::operator+=(const ResourceSupportVe
     if(other.mLabels != this->mLabels)
     {
         throw std::invalid_argument("organization_mode::algebra::ResourceSupportVector::operator+"
-                " cannot sum vectors since labels differ");
+                " cannot sum vectors since labels differ: '" +
+                owlapi::model::IRI::toString(mLabels) + "' vs '" +
+                owlapi::model::IRI::toString(other.mLabels) + "'");
     }
     mSizes += other.mSizes;
     return *this;
@@ -137,12 +146,15 @@ ResourceSupportVector ResourceSupportVector::missingSupportFrom(const ResourceSu
     return delta;
 }
 
-std::string ResourceSupportVector::toString() const
+std::string ResourceSupportVector::toString(uint32_t indent) const
 {
     std::stringstream ss;
-    ss << "ResourceSupportVector: ";
-    ss << mLabels << ", ";
-    ss << mSizes;
+    std::string hspace(indent,' ');
+    ss << hspace << "ResourceSupportVector: " << std::endl;
+    for(size_t i = 0; i < mLabels.size(); ++i)
+    {
+        ss << hspace << "    " << mLabels[i] << ": " << mSizes(i) << std::endl;
+    }
     return ss.str();
 }
 
@@ -177,8 +189,14 @@ void ResourceSupportVector::checkDimensions(const ResourceSupportVector& a, cons
 {
     if(a.getNumberOfDimensions() != b.getNumberOfDimensions())
     {
+        LOG_WARN_S << "organization_model::algebra::ResourceSupportVector::intersection "
+                << " cannot compute intersection since number of dimensions differ: "
+                << a.toString() << " vs. "
+                << b.toString();
+
         throw std::invalid_argument("organization_model::algebra::ResourceSupportVector::intersection \
-                cannot compute intersection since number of dimensions differ");
+                cannot compute intersection since number of dimensions differ: " + a.toString() + " vs. "
+                + b.toString());
     }
 }
 
