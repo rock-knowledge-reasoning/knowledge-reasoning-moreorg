@@ -142,4 +142,87 @@ BOOST_AUTO_TEST_CASE(resource_support_vector)
     }
 }
 
+BOOST_AUTO_TEST_CASE(composition)
+{
+    ModelPool empty;
+
+    ModelPool a;
+    a["http://model#a"] = 1;
+    a["http://model#b"] = 4;
+    a["http://model#c"] = 3;
+
+    {
+        ModelPoolSet aSet;
+        aSet.insert(a);
+        ModelPoolSet rSet = Algebra::maxCompositions(a, empty);
+        BOOST_REQUIRE_MESSAGE(rSet == aSet, "Composition with model pool and empty set results in first argument");
+    }
+    {
+        ModelPoolSet aSet;
+        aSet.insert(a);
+        ModelPoolSet rSet = Algebra::maxCompositions(empty,a);
+        BOOST_REQUIRE_MESSAGE(rSet == aSet, "Composition with empty set and model pool results in second argument");
+    }
+
+    ModelPool b;
+    b["http://model#a"] = 2;
+    b["http://model#b"] = 4;
+    b["http://model#c"] = 1;
+
+    {
+        ModelPoolSet aSet;
+        aSet.insert(a);
+
+        ModelPoolSet bSet;
+        bSet.insert(b);
+
+        // With min operator
+        ModelPoolSet cSet = Algebra::maxCompositions(a,b);
+        BOOST_REQUIRE_MESSAGE(cSet.size() == 1, "1 composition expected: was " << cSet.size());
+        ModelPool c = *cSet.begin();
+        BOOST_REQUIRE_MESSAGE(c["http://model#a"] == 2, "Composition entry a->2 expected, was a->" << c["http://model#a"]);
+        BOOST_REQUIRE_MESSAGE(c["http://model#b"] == 4, "Composition entry b->4 expected, was b->" << c["http://model#b"]);
+        BOOST_REQUIRE_MESSAGE(c["http://model#c"] == 3, "Composition entry c->3 expected, was c->" << c["http://model#c"]);
+    }
+    {
+        ModelPoolSet aSet;
+        aSet.insert(a);
+
+        ModelPoolSet bSet;
+        bSet.insert(a);
+        bSet.insert(b);
+        ModelPoolSet cSet = Algebra::maxCompositions(aSet,bSet);
+        BOOST_REQUIRE_MESSAGE(cSet.size() == 2, "2 compositions expected: was 2 " << cSet.size() << ModelPool::toString(cSet));
+
+        ModelPool e0 = a;
+        BOOST_REQUIRE_MESSAGE(cSet.find(e0) != cSet.end(), "Compositions contains 'a[+]a'");
+
+        ModelPool e1;
+        e1["http://model#a"] = 2;
+        e1["http://model#b"] = 4;
+        e1["http://model#c"] = 3;
+        BOOST_REQUIRE_MESSAGE(cSet.find(e1) != cSet.end(), "Compositions contains 'a[+]b'");
+    }
+    // Identical set
+    {
+        ModelPoolSet bSet;
+        bSet.insert(a);
+        bSet.insert(b);
+        ModelPoolSet cSet = Algebra::maxCompositions(bSet,bSet);
+        BOOST_REQUIRE_MESSAGE(cSet.size() == 3, "3 compositions expected: was 3 " << cSet.size() << ModelPool::toString(cSet));
+
+        ModelPool e0 = a;
+        BOOST_REQUIRE_MESSAGE(cSet.find(e0) != cSet.end(), "Compositions contains 'a[+]a'");
+
+        ModelPool e1;
+        e1["http://model#a"] = 2;
+        e1["http://model#b"] = 4;
+        e1["http://model#c"] = 3;
+        BOOST_REQUIRE_MESSAGE(cSet.find(e1) != cSet.end(), "Compositions contains 'a[+]b'");
+
+        ModelPool e2 = b;
+        BOOST_REQUIRE_MESSAGE(cSet.find(e1) != cSet.end(), "Compositions contains 'b[+]b'");
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
