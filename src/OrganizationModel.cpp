@@ -28,29 +28,32 @@ OrganizationModel OrganizationModel::copy() const
     return om;
 }
 
-std::string OrganizationModel::toString(const Pool2FunctionMap& combinationFunctionMap)
+std::string OrganizationModel::toString(const Pool2FunctionMap& combinationFunctionMap, uint32_t indent)
 {
     std::stringstream ss;
-    ss << "pool --> functions: " << std::endl;
+    std::string hspace(indent,' ');
+    ss << hspace << "pool --> functions: " << std::endl;
     Pool2FunctionMap::const_iterator cit = combinationFunctionMap.begin();
     for(; cit != combinationFunctionMap.end(); ++cit)
     {
-        ss << "    pool:    " << IRI::toString((cit->first).toModelCombination(), true) << std::endl;
-        ss << "      --> functions: " << IRI::toString(cit->second, true) << std::endl;
+        ss << hspace << "    pool:    " << IRI::toString((cit->first).toModelCombination(), true) << std::endl;
+        ss << hspace << "      --> functions: " << IRI::toString(cit->second, true) << std::endl;
     }
     return ss.str();
 }
 
-std::string OrganizationModel::toString(const Function2PoolMap& functionCombinationMap)
+std::string OrganizationModel::toString(const Function2PoolMap& functionCombinationMap, uint32_t indent)
 {
     std::stringstream ss;
-    ss << "function --> combinations: ";
+    std::string hspace(indent,' ');
+
+    ss << hspace << "function --> combinations: ";
     Function2PoolMap::const_iterator cit = functionCombinationMap.begin();
     for(; cit != functionCombinationMap.end(); ++cit)
     {
-        ss << "    function:    " << cit->first.getFragment() << std::endl;
-        ss << "        supported by:" << std::endl;
-        ss << "        combination:    " << ModelPool::toString(cit->second) << std::endl;
+        ss << hspace << "    function:    " << cit->first.getFragment() << std::endl;
+        ss << hspace << "        supported by combination:" << std::endl;
+        ss << ModelPool::toString(cit->second,  indent + 8) << std::endl;
     }
 
     return ss.str();

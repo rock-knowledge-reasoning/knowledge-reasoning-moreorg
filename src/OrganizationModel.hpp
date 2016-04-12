@@ -21,10 +21,10 @@ typedef std::vector<owlapi::model::IRIList> CandidatesList;
  * The main purpose of the organization model is to describe (reconfigurable)
  * multirobot systems so that one can reason about structure and funtion.
  * The organization model relies on a basic system
- * description -- provided in OWL -- to infer system combinations from it. 
+ * description -- provided in OWL -- to infer system combinations from it.
  *
  * These system combinations (coalition / composite actors) have quantifiable
- * requirements. These requirements are defined by the combination of 
+ * requirements. These requirements are defined by the combination of
  * restrictions which apply to the model of atomic actors.
  *
  * The organization model allows to augment an organization model for a given
@@ -67,14 +67,14 @@ public:
     const owlapi::model::OWLOntology::Ptr ontology() const { return mpOntology; }
 
     /**
-     * Perform a deep copy of the OrganizationModel, thus 
+     * Perform a deep copy of the OrganizationModel, thus
      * changes on the copy will not affect the current model instance
      * \return Copy of this OrganizationModel
      */
     OrganizationModel copy() const;
 
-    static std::string toString(const Pool2FunctionMap& poolFunctionMap);
-    static std::string toString(const Function2PoolMap& functionPoolMap);
+    static std::string toString(const Pool2FunctionMap& poolFunctionMap, uint32_t indent = 0);
+    static std::string toString(const Function2PoolMap& functionPoolMap, uint32_t indent = 0);
 
     static ModelPool combination2ModelPool(const ModelCombination& combination);
     static ModelCombination modelPool2Combination(const ModelPool& pool);
