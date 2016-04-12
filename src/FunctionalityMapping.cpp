@@ -22,19 +22,6 @@ FunctionalityMapping::FunctionalityMapping(const ModelPool& modelPool,
     }
 }
 
-const owlapi::model::IRIList& FunctionalityMapping::getFunction(const ModelPool& modelPool) const
-{
-    ModelPool boundedPool = modelPool.applyUpperBound(mFunctionalSaturationBound);
-    Pool2FunctionMap::const_iterator cit = mPool2Function.find(boundedPool);
-    if(cit != mPool2Function.end())
-    {
-        return cit->second;
-    } else {
-        throw std::invalid_argument("organization_model::FunctionalityMapping::getFunction: could not find"
-                " model pool: " + boundedPool.toString());
-    }
-}
-
 const ModelPoolSet& FunctionalityMapping::getModelPools(const owlapi::model::IRI& iri) const
 {
     Function2PoolMap::const_iterator cit = mFunction2Pool.find(iri);
@@ -47,31 +34,9 @@ const ModelPoolSet& FunctionalityMapping::getModelPools(const owlapi::model::IRI
     }
 }
 
-void FunctionalityMapping::addFunction(const ModelPool& modelPool,
-        const owlapi::model::IRI& function)
+void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRI& function)
 {
-    owlapi::model::IRIList& functions = mPool2Function[modelPool];
-    owlapi::model::IRIList::const_iterator cit = std::find(functions.begin(), functions.end(), function);
-    if(cit != functions.end())
-    {
-        mPool2Function[modelPool].push_back(function);
-    }
-}
-
-void FunctionalityMapping::addFunction(const ModelPool& modelPool,
-        const owlapi::model::IRIList& functionModels)
-{
-    owlapi::model::IRIList::const_iterator cit = functionModels.begin();
-    for(; cit != functionModels.end(); ++cit)
-    {
-        addFunction(modelPool, *cit);
-    }
-}
-
-void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRI& functionModel)
-{
-    addFunction(modelPool, functionModel);
-    mFunction2Pool[functionModel].insert(modelPool);
+    mFunction2Pool[function].insert(modelPool);
 }
 
 void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRIList& functionModels)
@@ -86,32 +51,24 @@ void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::
 }
 
 
-std::string FunctionalityMapping::toString() const
+std::string FunctionalityMapping::toString(uint32_t indent) const
 {
     std::stringstream ss;
-    ss << "FunctionalityMapping:" << std::endl;
-    ss << mModelPool.toString() << std::endl;
-    ss << "FunctionalSaturationBound -- ";
-    ss << mFunctionalSaturationBound.toString() << std::endl;
+    std::string hspace(indent,' ');
+    ss << hspace << "FunctionalityMapping:" << std::endl;
+    ss << mModelPool.toString(indent) << std::endl;
+    ss << hspace << "FunctionalSaturationBound -- ";
+    ss << mFunctionalSaturationBound.toString(indent) << std::endl;
 
     {
-        Pool2FunctionMap::const_iterator cit = mPool2Function.begin();
-        ss << "Pool --> Functions:" << std::endl;
-        for(; cit != mPool2Function.end(); ++cit)
-        {
-            ss << "   - pool: " << owlapi::model::IRI::toString((cit->first).toModelCombination(), true) << std::endl;
-            ss << "     function: " << owlapi::model::IRI::toString(cit->second, true) << std::endl;
-        }
-    }
-    {
         Function2PoolMap::const_iterator cit = mFunction2Pool.begin();
-        ss << "Function --> Pool:" << std::endl;
+        ss << hspace << "Function --> Pool:" << std::endl;
         for(; cit != mFunction2Pool.end(); ++cit)
         {
-            ss << "   - function: " << cit->first.toString() << std::endl;
-            ss << "     pools: " << std::endl;
+            ss << hspace << "   - function: " << cit->first.toString() << std::endl;
+            ss << hspace << "     pools: " << std::endl;
             const ModelPoolSet& modelPoolSet = cit->second;
-            ss << "        " << ModelPool::toString(cit->second) << std::endl;
+            ss << ModelPool::toString(cit->second, indent + 8) << std::endl;
         }
     }
 
