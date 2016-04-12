@@ -146,6 +146,20 @@ public:
     ModelPoolSet expandToLowerBound(const ModelPoolSet& modelPools, const ModelPool& lowerBounds) const;
 
     /**
+     * Check how a list of functionalities is supported by a model if given cardinality
+     * of this model is provided
+     * \param functionalities Functionality to be available
+     * \param model Model that is tested for support of this functionality
+     * \param cardinalityOfModel Allow to specify a support for quantified
+     * number of these services, i.e., factor of resources to be available
+     * \see getFunctionalSaturationBound in order to find the minimum number
+     * \return required to provide the functionality (if full support can be achieved)
+     */
+    algebra::SupportType getSupportType(const FunctionalitySet& functionality,
+            const owlapi::model::IRI& model,
+            uint32_t cardinalityOfModel = 1) const;
+
+    /**
      * Check how a service is supported by a model if given cardinality
      * of this model is provided
      * \param functionality Functionality to be available
@@ -160,8 +174,19 @@ public:
             uint32_t cardinalityOfModel = 1) const;
 
     /**
-     * Check how a functionality is supported by a model if a given cardinality
-     * of models is provided
+     * Check how a functionality is supported by a model pool, i.e. number of
+     * models with cardinalities provided
+     * \param functionality Functionality to be available
+     * \param models ModelPool that is available or represent the combination of
+     * systems
+     * \return type of support
+     */
+    algebra::SupportType getSupportType(const FunctionalitySet& functionalities,
+            const ModelPool& models) const;
+
+    /**
+     * Check how a functionality is supported by a model pool, i.e. number of
+     * models with cardinalities provided
      * \param functionality Functionality to be available
      * \param models ModelPool that is available or represent the combination of
      * systems
@@ -276,13 +301,33 @@ public:
      * \return underlying OWLOrganizationModelAsk object
      */
     OrganizationModel::Ptr getOrganizationModel() const { return mpOrganizationModel; }
+
+    /**
+     * Get the functionality mapping of the current OrganizationModelAsk object
+     * \return FunctionalityMapping
+     */
+     const FunctionalityMapping& getFunctionalityMapping() { return mFunctionalityMapping; }
+
+    /**
+     * Check if a model pool exceeds the saturation bound with respect to a
+     * given functionality set
+     */
+    bool isMinimal(const ModelPool& modelPool, const FunctionalitySet& functionalities) const;
 protected:
 
     /**
-     * Get the functionality maps for the combination of models from a
-     * (limited) set of available models
+     * Get the ResourceSupportVector for a given list of functionality models
+     * \param functions Names of the function model
+     * \param filterLabels Model names corresponding to the dimensions of the
+     * support vector (resulting vector will be limited to these filterLabels (subclasses of this model will be included in the cardinality))
+     * \param useMaxCardinality If true, the support vector consists of all max
+     * cardinality value, if false, min values are uses
+     * \see algebra::ResourceSupportVector
+     * \return  the support vector
      */
-     FunctionalityMapping getFunctionalityMapping(const ModelPool& modelPool) const;
+    algebra::ResourceSupportVector getSupportVector(const owlapi::model::IRIList& functions,
+        const owlapi::model::IRIList& filterLabels = owlapi::model::IRIList(),
+        bool useMaxCardinality = false) const;
 
     /**
      * Get the ResourceSupportVector for a given model
@@ -316,6 +361,9 @@ protected:
 
     FunctionalityMapping computeBoundedFunctionalityMapping(const ModelPool& pool, const owlapi::model::IRIList& functionalityModels) const;
     FunctionalityMapping computeUnboundedFunctionalityMapping(const ModelPool& pool, const owlapi::model::IRIList& functionalityModels) const;
+
+
+    ModelPoolSet filterNonMinimal(const ModelPoolSet& modelPoolSet, const FunctionalitySet& functionalities) const;
 
 private:
     OrganizationModel::Ptr mpOrganizationModel;

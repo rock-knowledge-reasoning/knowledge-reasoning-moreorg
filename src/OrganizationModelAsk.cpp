@@ -39,7 +39,6 @@ void OrganizationModelAsk::prepare(const ModelPool& modelPool, bool applyFunctio
 {
     mModelPool = modelPool;
     mFunctionalityMapping = computeFunctionalityMapping(mModelPool, applyFunctionalSaturationBound);
-    LOG_WARN_S << mFunctionalityMapping.toString();
 }
 
 owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
@@ -105,7 +104,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
 
     if(functionalSaturationBound.empty())
     {
-        std::string msg = "organization_model::OrganizationModelAsk::getFunctionalityMapping: provided empty functionalSaturationBound";
+        std::string msg = "organization_model::OrganizationModelAsk::computeBoundedFunctionalityMapping: provided empty functionalSaturationBound";
         msg += modelPool.toString() + "\n";
         msg += owlapi::model::IRI::toString(functionalityModels) + "\n";
         msg += functionalSaturationBound.toString() + "\n";
@@ -118,14 +117,12 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
     {
         const Functionality& functionality = *fit;
         ModelPool bound = getFunctionalSaturationBound(functionality);
-        LOG_WARN_S << "MODEL POOL is: " << functionalSaturationBound.toString();
         ModelPool boundedModelPool = functionalSaturationBound.applyUpperBound(bound);
         if(boundedModelPool.empty())
         {
             continue;
         }
 
-        LOG_WARN_S << "MODEL POOL is: " << boundedModelPool.toString() << " for " << functionality.toString();
         uint32_t numberOfAtoms = numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(boundedModelPool);
         if(numberOfAtoms == 0)
         {
@@ -137,62 +134,22 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
         do {
             IRIList combination = limitedCombination.current();
             ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
-            algebra::SupportType supportType = getSupportType(functionality, combinationModelPool);
-            if(algebra::FULL_SUPPORT != supportType)
-            {
-                continue;
-            }
 
-            bool hasFullSupport = false;
-            bool hasPartialSupport = false;
-            // gather all models that provide only partial support
-            ModelPool partialSupport;
-            ModelPool::const_iterator mit = combinationModelPool.begin();
-            for(; mit != combinationModelPool.end(); ++mit)
-            {
-                algebra::SupportType type = getSupportType(functionality, mit->first, mit->second);
-                switch(type)
-                {
-                    case algebra::FULL_SUPPORT:
-                        hasFullSupport = true;
-                        break;
-                    case algebra::PARTIAL_SUPPORT:
-                        hasPartialSupport = true;
-                        partialSupport.insert(*mit);
-                        break;
-                    case algebra::NO_SUPPORT:
-                        break;
-                }
-            }
-            if(hasFullSupport)
-            {
-                if(combinationModelPool.size() == 1)
-                {
-                    // that is ok, since that is only a single systems
-                } else {
-                    // this is a redundant combination
-                    continue;
-                }
-            } else if(hasPartialSupport)
-            {
-                // has partial support, thus check that for that particular
-                // combination that it contains no redundancies, i.e. we cannot
-                // remove any model instance to provide full support
-                ModelPool::const_iterator pit = partialSupport.begin();
-                for(; pit != partialSupport.end(); ++pit)
-                {
-                    ModelPool reduced = partialSupport;
-                    --reduced[pit->first];
+            LOG_DEBUG_S << "Limited combination: " << std::endl
+                << combinationModelPool.toString(4);
 
-                    algebra::SupportType reducedSupport = getSupportType(functionality, reduced);
-                    if(reducedSupport == algebra::FULL_SUPPORT)
-                    {
-                        // redundant combination
-                        continue;
-                    }
-                }
+
+            FunctionalitySet functionalities;
+            functionalities.insert(functionality);
+            if(isMinimal(combinationModelPool, functionalities))
+            {
+                functionalityMapping.add(combinationModelPool, functionality.getModel());
+                LOG_DEBUG_S << "combination is minimal for " << functionality.getModel().toString() << std::endl
+                    << combinationModelPool.toString(4);
+            } else {
+                LOG_DEBUG_S << "combination is not minimal for " << functionality.getModel().toString() << std::endl
+                    << combinationModelPool.toString(4);
             }
-            functionalityMapping.add(combinationModelPool, functionality.getModel());
         } while(limitedCombination.next());
     } // end for functionalities
 
@@ -225,9 +182,9 @@ FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(
             LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
         }
 
-        LOG_WARN_S << "Check combination #" << ++count;
-        LOG_WARN_S << "   | --> combination:             " << combination;
-        LOG_WARN_S << "   | --> possible functionality models: " << functionalityModels;
+        LOG_DEBUG_S << "Check combination #" << ++count;
+        LOG_DEBUG_S << "   | --> combination:             " << combination;
+        LOG_DEBUG_S << "   | --> possible functionality models: " << functionalityModels;
 
         ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
 
@@ -247,6 +204,102 @@ FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(
     return functionalityMapping;
 }
 
+
+bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const FunctionalitySet& functionalities) const
+{
+    // Check overall support
+    algebra::SupportType supportType = getSupportType(functionalities, modelPool);
+    if(algebra::FULL_SUPPORT != supportType)
+    {
+        LOG_INFO_S << "No full support for " << Functionality::toString(functionalities);
+        return false;
+    }
+
+    LOG_DEBUG_S << "CheckMinimal: " << std::endl << modelPool.toString(4) << std::endl <<
+        "   " << functionalities.begin()->getModel().toString();
+    bool hasSingleModelFullSupport = false;
+    bool hasSingleModelPartialSupport = false;
+    // gather all models that provide only partial support
+    ModelPool partialSupport;
+    ModelPool::const_iterator mit = modelPool.begin();
+    for(; mit != modelPool.end(); ++mit)
+    {
+        algebra::SupportType type = getSupportType(functionalities, mit->first, mit->second);
+        LOG_INFO_S << "Suppot for: " << mit->first << " and " << mit->second << " is: "
+            << algebra::SupportTypeTxt[type];
+        switch(type)
+        {
+            case algebra::FULL_SUPPORT:
+                hasSingleModelFullSupport = true;
+                break;
+            case algebra::PARTIAL_SUPPORT:
+                hasSingleModelPartialSupport = true;
+                partialSupport.insert(*mit);
+                break;
+            case algebra::NO_SUPPORT:
+                break;
+        }
+    }
+    if(hasSingleModelFullSupport)
+    {
+        LOG_DEBUG_S << "Full support: " << std::endl
+            << modelPool.toString(4) << std::endl
+            << "    for " << std::endl
+            << "    " << Functionality::toString(functionalities);
+
+        if(modelPool.size() == 1)
+        {
+            // that is ok, since that is only a single systems
+            return true;
+        } else {
+            // this must be a redundant combination since one model is already
+            // providing full support
+            return false;
+        }
+    } else if(hasSingleModelPartialSupport)
+    {
+        LOG_DEBUG_S << "Partial support: " << std::endl
+            << modelPool.toString(4) << std::endl
+            << "    for " << std::endl
+            << "    " << Functionality::toString(functionalities);
+
+        // has partial support, thus check that for that particular
+        // combination that it contains no redundancies, i.e. we cannot
+        // remove any model instance to provide full support
+        ModelPool::const_iterator pit = partialSupport.begin();
+        for(; pit != partialSupport.end(); ++pit)
+        {
+            ModelPool reduced = partialSupport;
+            --reduced[pit->first];
+
+            algebra::SupportType reducedSupport = getSupportType(functionalities, reduced);
+            // Is reduced, but still has full support, i.e. must be exceeding
+            // saturation
+            if(reducedSupport == algebra::FULL_SUPPORT)
+            {
+                // redundant combination
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+ModelPoolSet OrganizationModelAsk::filterNonMinimal(const ModelPoolSet& modelPoolSet, const FunctionalitySet& functionalities) const
+{
+    ModelPoolSet filtered;
+    ModelPoolSet::const_iterator mit = modelPoolSet.begin();
+    for(; mit != modelPoolSet.end(); ++mit)
+    {
+        if(isMinimal(*mit, functionalities))
+        {
+            filtered.insert(*mit);
+        }
+    }
+    return filtered;
+}
+
 ModelPoolSet OrganizationModelAsk::getResourceSupport(const FunctionalitySet& functionalities) const
 {
     if(functionalities.empty())
@@ -255,10 +308,11 @@ ModelPoolSet OrganizationModelAsk::getResourceSupport(const FunctionalitySet& fu
                 " no functionality given in request");
     }
 
-    /// Store the systems that support the functionality
+    /// Retrieve the systems that support the functionalities and create
+    //'compositions'
     /// i.e. per requested function the combination of models that support it,
-    LOG_DEBUG_S << "FunctionalityMap: " << mFunctionalityMapping.toString();
     Function2PoolMap functionalityProviders;
+    ModelPoolSet supportingCompositions;
     {
         FunctionalitySet::const_iterator cit = functionalities.begin();
         for(; cit != functionalities.end(); ++cit)
@@ -266,7 +320,8 @@ ModelPoolSet OrganizationModelAsk::getResourceSupport(const FunctionalitySet& fu
             const Functionality& functionality = *cit;
             const owlapi::model::IRI& functionalityModel = functionality.getModel();
             try {
-                functionalityProviders[functionalityModel] = mFunctionalityMapping.getModelPools(functionalityModel);
+                 ModelPoolSet modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
+                 supportingCompositions = Algebra::maxCompositions(supportingCompositions, modelPoolSet);
             } catch(const std::invalid_argument& e)
             {
                 LOG_DEBUG_S << "Could not find resource support for service: '" << functionalityModel;
@@ -274,47 +329,13 @@ ModelPoolSet OrganizationModelAsk::getResourceSupport(const FunctionalitySet& fu
             }
         }
     }
-    LOG_DEBUG_S << "Found functionality providers: " << OrganizationModel::toString(functionalityProviders);
-
-    // Only requested one service
-    if(functionalities.size() == 1)
-    {
-        return functionalityProviders.begin()->second;
-    }
-
-    // If looking for a combined system that can provide all the functionalities
-    // requested, then the intersection of the sects is the solution of this
-    // request
-    bool init = true;
-    std::set<ModelPool> resultSet;
-    std::set<ModelPool> lastResult;
-    Function2PoolMap::const_iterator cit = functionalityProviders.begin();
-    for(; cit != functionalityProviders.end(); ++cit)
-    {
-        const ModelPoolSet& currentSet = cit->second;
-        if(init)
-        {
-            resultSet = currentSet;
-            init = false;
-            continue;
-        } else {
-            lastResult = resultSet;
-        }
-
-        resultSet.clear();
-        LOG_DEBUG_S << "Intersection: current set: " << ModelPool::toString(currentSet);
-        LOG_DEBUG_S << "Intersection: last set: " << ModelPool::toString(lastResult);
-        std::set_intersection(currentSet.begin(), currentSet.end(), lastResult.begin(), lastResult.end(),
-                std::inserter(resultSet, resultSet.begin()));
-        LOG_DEBUG_S << "Intersection: result" << ModelPool::toString(resultSet);
-    }
-
-    return resultSet;
+    return supportingCompositions;
 }
 
 ModelPoolSet OrganizationModelAsk::getBoundedResourceSupport(const FunctionalitySet& functionalities) const
 {
     ModelPoolSet modelPools = getResourceSupport(functionalities);
+    modelPools = filterNonMinimal(modelPools, functionalities);
     ModelPool bound = getFunctionalSaturationBound(functionalities);
     return applyUpperBound(modelPools, bound);
 }
@@ -332,7 +353,7 @@ ModelPoolSet OrganizationModelAsk::applyUpperBound(const ModelPoolSet& modelPool
         LOG_DEBUG_S << "DELTA rval: " << std::endl
             << ModelPoolDelta(modelPool).toString(4);
         ModelPoolDelta delta = Algebra::substract(modelPool, upperBound);
-        LOG_DEBUG_S << "RESULT: " << std::endl
+        LOG_DEBUG_S << "Result: " << std::endl
             << delta.toString(4);
 
         if(!delta.isNegative())
@@ -342,9 +363,9 @@ ModelPoolSet OrganizationModelAsk::applyUpperBound(const ModelPoolSet& modelPool
     }
 
     LOG_DEBUG_S << "Upper bound set on resources: " << std::endl
-        << "prev: " << ModelPool::toString(modelPools) << std::endl
-        << "bound: " << ModelPoolDelta(upperBound).toString() << std::endl
-        << "bounded: " << ModelPool::toString(boundedModelPools);
+        << "    prev: " << ModelPool::toString(modelPools,4) << std::endl
+        << "    bound: " << ModelPoolDelta(upperBound).toString(4) << std::endl
+        << "    bounded: " << ModelPool::toString(boundedModelPools,4);
     return boundedModelPools;
 }
 
@@ -356,10 +377,10 @@ ModelCombinationSet OrganizationModelAsk::applyUpperBound(const ModelCombination
     {
         ModelPool modelPool = OrganizationModel::combination2ModelPool(*cit);
 
-        LOG_DEBUG_S << "DELTA lva: " << ModelPoolDelta(upperBound).toString();
-        LOG_DEBUG_S << "DELTA rval: " << ModelPoolDelta(modelPool).toString();
+        LOG_DEBUG_S << "DELTA lva: " << ModelPoolDelta(upperBound).toString(4);
+        LOG_DEBUG_S << "DELTA rval: " << ModelPoolDelta(modelPool).toString(4);
         ModelPoolDelta delta = Algebra::substract(modelPool, upperBound);
-        LOG_DEBUG_S << "RESULT: " << delta.toString();
+        LOG_DEBUG_S << "Result: " << delta.toString(4);
         if(!delta.isNegative())
         {
             boundedCombinations.insert(*cit);
@@ -368,7 +389,7 @@ ModelCombinationSet OrganizationModelAsk::applyUpperBound(const ModelCombination
 
     LOG_DEBUG_S << "Upper bound set on resources: " << std::endl
         << "prev: " << OrganizationModel::toString(combinations) << std::endl
-        << "bound: " << ModelPoolDelta(upperBound).toString() << std::endl
+        << "bound: " << std::endl << ModelPoolDelta(upperBound).toString(4) << std::endl
         << "bounded: " << OrganizationModel::toString(boundedCombinations);
     return boundedCombinations;
 }
@@ -388,9 +409,9 @@ ModelPoolSet OrganizationModelAsk::applyLowerBound(const ModelPoolSet& modelPool
     }
 
     LOG_DEBUG_S << "Lower bound set on resources: " << std::endl
-        << "prev: " << ModelPool::toString(modelPools) << std::endl
-        << "bound: " << ModelPoolDelta(lowerBound).toString() << std::endl
-        << "bounded: " << ModelPool::toString(boundedModelPools);
+        << "prev: " << std::endl << ModelPool::toString(modelPools,4) << std::endl
+        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
+        << "bounded: " << std::endl << ModelPool::toString(boundedModelPools,4);
     return boundedModelPools;
 }
 
@@ -410,7 +431,7 @@ ModelCombinationSet OrganizationModelAsk::applyLowerBound(const ModelCombination
 
     LOG_DEBUG_S << "Lower bound set on resources: " << std::endl
         << "prev: " << OrganizationModel::toString(combinations) << std::endl
-        << "bound: " << ModelPoolDelta(lowerBound).toString() << std::endl
+        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString() << std::endl
         << "bounded: " << OrganizationModel::toString(boundedCombinations);
     return boundedCombinations;
 }
@@ -434,9 +455,9 @@ ModelPoolSet OrganizationModelAsk::expandToLowerBound(const ModelPoolSet& modelP
     }
 
     LOG_DEBUG_S << "Lower bound expanded on resources: " << std::endl
-        << "prev: " << ModelPool::toString(modelPools) << std::endl
-        << "bound: " << ModelPoolDelta(lowerBound).toString() << std::endl
-        << "bounded: " << ModelPool::toString(boundedModelPools);
+        << "prev: " << std::endl << ModelPool::toString(modelPools,4) << std::endl
+        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
+        << "bounded: " << std::endl << ModelPool::toString(boundedModelPools,4);
     return boundedModelPools;
 }
 
@@ -460,30 +481,39 @@ ModelCombinationSet OrganizationModelAsk::expandToLowerBound(const ModelCombinat
 
     LOG_DEBUG_S << "Lower bound expanded on resources: " << std::endl
         << "prev: " << OrganizationModel::toString(combinations) << std::endl
-        << "bound: " << ModelPoolDelta(lowerBound).toString() << std::endl
+        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
         << "bounded: " << OrganizationModel::toString(boundedCombinations);
     return boundedCombinations;
 }
 
-algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
+algebra::SupportType OrganizationModelAsk::getSupportType(const FunctionalitySet& functionalities, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
 {
-    // Define what is required
-    algebra::ResourceSupportVector functionalitySupportVector = getSupportVector(functionality.getModel(), IRIList() /*filter labels*/, false /*useMaxCardinality*/);
-    // Retrieve what is available
-    algebra::ResourceSupportVector modelSupportVector =
-        getSupportVector(model, functionalitySupportVector.getLabels(), true /*useMaxCardinality*/)*
-        static_cast<double>(cardinalityOfModel);
-
-    return functionalitySupportVector.getSupportFrom(modelSupportVector, *this);
+    ModelPool modelPool;
+    modelPool[model] = cardinalityOfModel;
+    return getSupportType(functionalities, modelPool);
 }
 
-algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const ModelPool& modelPool) const
+algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
 {
+    FunctionalitySet functionalities;
+    functionalities.insert(functionality);
+    return getSupportType(functionalities, model, cardinalityOfModel);
+}
+
+algebra::SupportType OrganizationModelAsk::getSupportType(const FunctionalitySet& functionalities, const ModelPool& modelPool) const
+{
+    IRIList functionalityModels;
+    FunctionalitySet::const_iterator fit = functionalities.begin();
+    for(; fit != functionalities.end(); ++fit)
+    {
+        functionalityModels.push_back(fit->getModel());
+    }
+
     // Define what is required
-    algebra::ResourceSupportVector functionalitySupportVector = getSupportVector(functionality.getModel(), IRIList() /*filter labels*/, false /*useMaxCardinality*/);
+    algebra::ResourceSupportVector functionalitySupportVector = getSupportVector(functionalityModels, IRIList() /*filter labels*/, false /*useMaxCardinality*/);
     const IRIList& labels = functionalitySupportVector.getLabels();
 
-    base::VectorXd zeroSupport(labels.size());
+    base::VectorXd zeroSupport = base::VectorXd::Zero(labels.size());
     algebra::ResourceSupportVector modelPoolSupportVector(zeroSupport, labels);
 
     // Gather what is available
@@ -497,7 +527,17 @@ algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& f
         modelPoolSupportVector += support;
     }
 
+    LOG_DEBUG_S << "Functionality support vector:" << functionalitySupportVector.toString(4);
+    LOG_DEBUG_S << "Model support vector:" << modelPoolSupportVector.toString(4);
+
     return functionalitySupportVector.getSupportFrom(modelPoolSupportVector, *this);
+}
+
+algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const ModelPool& modelPool) const
+{
+    FunctionalitySet functionalities;
+    functionalities.insert(functionality);
+    return getSupportType(functionalities, modelPool);
 }
 
 uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const owlapi::model::IRI& requirementModel, const owlapi::model::IRI& model) const
@@ -519,7 +559,7 @@ uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const owlapi::model:
     // Collect available resources -- and limit to the required ones
     // (getSupportVector will accumulate all (subclass) models)
     algebra::ResourceSupportVector modelSupportVector = getSupportVector(model, requirementSupportVector.getLabels(), true /*useMaxCardinality*/);
-    LOG_DEBUG_S << "Retrieved model support vector";
+    LOG_DEBUG_S << "Retrieved model support vector with labels: " << requirementSupportVector.getLabels();
 
     // Expand the support vectors to account for subclasses within the required
     // scope
@@ -529,9 +569,9 @@ uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const owlapi::model:
     // Compute the support ratios
     algebra::ResourceSupportVector ratios = requirementSupportVector.getRatios(modelSupportVector);
 
-    LOG_DEBUG_S << "Requirement: " << requirementSupportVector.toString();
-    LOG_DEBUG_S << "Provider: " << modelSupportVector.toString();
-    LOG_DEBUG_S << "Ratios: " << ratios.toString();
+    LOG_DEBUG_S << "Requirement: " << std::endl << requirementSupportVector.toString(4);
+    LOG_DEBUG_S << "Provider: " << std::endl << modelSupportVector.toString(4);
+    LOG_DEBUG_S << "Ratios: " << std::endl << ratios.toString(4);
 
     // max in the set of ratio tells us how many model instances
     // contribute to fulfill this service (even partially)
@@ -656,33 +696,73 @@ bool OrganizationModelAsk::isSupporting(const owlapi::model::IRI& model, const F
     }
 }
 
-algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owlapi::model::IRI& model,
+
+algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owlapi::model::IRIList& models,
         const owlapi::model::IRIList& filterLabels,
         bool useMaxCardinality) const
 {
+    LOG_WARN_S << "2maz: getSupportVector: models: " << models << ", " << std::endl
+        << "filterLabels: " << filterLabels << ", " << std::endl
+        << "useCardinality:" << useMaxCardinality;
+
     using namespace owlapi::model;
-    std::vector<OWLCardinalityRestriction::Ptr> restrictions = mOntologyAsk.getCardinalityRestrictions(model);
+    std::vector<OWLCardinalityRestriction::Ptr> restrictions = mOntologyAsk.getCardinalityRestrictions(models, OWLCardinalityRestriction::MAX_OP);
+
+    std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = restrictions.begin();
+    for(; cit != restrictions.end(); ++cit)
+    {
+        LOG_WARN_S << "Restriction: " << (*cit)->toString();
+    }
+
     if(restrictions.empty())
     {
-        owlapi::model::IRIList labels;
-        labels.push_back(model);
+        LOG_WARN_S << "No restrictions for models retrieved: " << models;
 
-        base::VectorXd available(1);
-        available(0) = 1;
+        owlapi::model::IRIList labels;
+        // Add only those models that are listed in the filterLabels list
+        // since these are the requested once
+        IRIList::const_iterator mit = models.begin();
+        for(; mit != models.end(); ++mit)
+        {
+            const IRI& model = *mit;
+            if(!filterLabels.empty())
+            {
+                IRIList::const_iterator lit = std::find(filterLabels.begin(), filterLabels.end(), model);
+                if(lit == filterLabels.end())
+                {
+                    // not in list
+                    continue;
+                }
+            }
+            labels.insert(labels.begin(), models.begin(), models.end());
+        }
+
+        base::VectorXd available(labels.size());
+        for(size_t i = 0; i < labels.size(); ++i)
+        {
+            available(i) = 1;
+        }
 
         algebra::ResourceSupportVector supportVector(available, labels);
         return supportVector;
 
     } else {
         std::map<IRI, OWLCardinalityRestriction::MinMax> modelCount = OWLCardinalityRestriction::getBounds(restrictions);
-        LOG_DEBUG_S << "ModelCount: "<< modelCount.size() << ", restrictions: " << restrictions.size();
-        if(restrictions.size() == 1)
-        {
-            LOG_DEBUG_S << restrictions[0]->toString();
-        }
-        return getSupportVector(modelCount, filterLabels, useMaxCardinality);
+        algebra::ResourceSupportVector supportVector = getSupportVector(modelCount, filterLabels, useMaxCardinality);
+        LOG_DEBUG_S << "ModelCount: "<< modelCount.size() << ", restrictions: " << OWLCardinalityRestriction::toString(restrictions) << std::endl
+            << supportVector.toString(4);
+        return supportVector;
     }
+}
 
+algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owlapi::model::IRI& model,
+        const owlapi::model::IRIList& filterLabels,
+        bool useMaxCardinality) const
+{
+    IRIList models;
+    models.push_back(model);
+
+    return getSupportVector(models, filterLabels, useMaxCardinality);
 }
 
 algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std::map<owlapi::model::IRI,
@@ -756,11 +836,9 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std:
         ++dimension;
     }
 
-    LOG_DEBUG_S << "Get support vector" << std::endl
-        << "    " << vector << std::endl
-        << "    " << labels;
-
-    return algebra::ResourceSupportVector(vector, labels);
+    algebra::ResourceSupportVector supportVector(vector, labels);
+    LOG_DEBUG_S << "Return support vector" << supportVector.toString(4);
+    return supportVector;
 }
 
 std::string OrganizationModelAsk::toString() const
