@@ -94,10 +94,10 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
         }
         {
             uint32_t saturationPoint = ask.getFunctionalSaturationBound(functionality, payloadCamera);
-            BOOST_REQUIRE_MESSAGE(saturationPoint == 2, "2 PayloadCamera sufficient for StereoImageProvider: was" << saturationPoint);
+            BOOST_REQUIRE_MESSAGE(saturationPoint == 2, "2 PayloadCamera requiremed for StereoImageProvider: was" << saturationPoint);
 
             algebra::SupportType supportType = ask.getSupportType(functionality, payloadCamera, saturationPoint);
-            BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support from payload camera for StereoImageProvider at saturation point");
+            BOOST_REQUIRE_MESSAGE(supportType == algebra::PARTIAL_SUPPORT, "Partial support from payload camera for StereoImageProvider at saturation point -- (Power required for full support)");
         }
     }
     {

@@ -66,7 +66,6 @@ BOOST_AUTO_TEST_CASE(resource_support)
     using namespace owlapi::model;
 
     OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
-
     {
         ModelPool items;
         items[OM::resolve("CREX")] = 1;
@@ -90,16 +89,43 @@ BOOST_AUTO_TEST_CASE(resource_support)
 
         OrganizationModelAsk ask(om, items, false);
 
-        // http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider
-        // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
-        // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
-
         FunctionalitySet functionalities;
         functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
         ModelPoolSet combinations = ask.getResourceSupport(functionalities);
-        BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, but were " << combinations.size());
+        BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, but were " << combinations.size()
+                << " "
+                << ModelPool::toString(combinations) );
     }
+    {
+        ModelPool items;
+        items[OM::resolve("PayloadBattery")] = 2;
+        items[OM::resolve("PayloadCamera")] = 2;
+
+        {
+            OrganizationModelAsk ask(om, items, false);
+
+            FunctionalitySet functionalities;
+            functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
+
+            ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+            BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, but were " << combinations.size()
+                    << " "
+                    << ModelPool::toString(combinations) );
+        }
+        {
+            OrganizationModelAsk ask(om, items, true);
+
+            FunctionalitySet functionalities;
+            functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
+
+            ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+            BOOST_REQUIRE_MESSAGE(combinations.size() == 1, "With functional bound only one combination that supports stereo image provider, but were " << combinations.size()
+                    << " "
+                    << ModelPool::toString(combinations) );
+        }
+    }
+
     {
         ModelPool items;
         items[OM::resolve("Sherpa")] = 3;
