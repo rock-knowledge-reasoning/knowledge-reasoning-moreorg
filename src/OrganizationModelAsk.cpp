@@ -9,6 +9,7 @@
 #include <owlapi/Vocabulary.hpp>
 #include <organization_model/reasoning/ResourceMatch.hpp>
 #include <organization_model/vocabularies/OM.hpp>
+#include <organization_model/algebra/Connectivity.hpp>
 
 
 using namespace owlapi::model;
@@ -143,9 +144,14 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
             functionalities.insert(functionality);
             if(isMinimal(combinationModelPool, functionalities))
             {
-                functionalityMapping.add(combinationModelPool, functionality.getModel());
                 LOG_DEBUG_S << "combination is minimal for " << functionality.getModel().toString() << std::endl
                     << combinationModelPool.toString(4);
+                if(algebra::Connectivity::isFeasible(combinationModelPool, *this))
+                {
+                    LOG_DEBUG_S << "combination is feasible " << std::endl
+                    << combinationModelPool.toString(4);
+                    functionalityMapping.add(combinationModelPool, functionality.getModel());
+                }
             } else {
                 LOG_DEBUG_S << "combination is not minimal for " << functionality.getModel().toString() << std::endl
                     << combinationModelPool.toString(4);
