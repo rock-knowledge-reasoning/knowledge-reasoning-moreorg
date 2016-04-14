@@ -126,7 +126,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
         uint32_t numberOfAtoms = numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(boundedModelPool);
         if(numberOfAtoms == 0)
         {
-            LOG_WARN_S << "No support for " << functionality.toString();
+            LOG_INFO_S << "No support for " << functionality.toString();
             continue;
         }
 
@@ -701,23 +701,12 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owla
         const owlapi::model::IRIList& filterLabels,
         bool useMaxCardinality) const
 {
-    LOG_WARN_S << "2maz: getSupportVector: models: " << models << ", " << std::endl
-        << "filterLabels: " << filterLabels << ", " << std::endl
-        << "useCardinality:" << useMaxCardinality;
-
     using namespace owlapi::model;
     std::vector<OWLCardinalityRestriction::Ptr> restrictions = mOntologyAsk.getCardinalityRestrictions(models, OWLCardinalityRestriction::MAX_OP);
 
     std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = restrictions.begin();
-    for(; cit != restrictions.end(); ++cit)
-    {
-        LOG_WARN_S << "Restriction: " << (*cit)->toString();
-    }
-
     if(restrictions.empty())
     {
-        LOG_WARN_S << "No restrictions for models retrieved: " << models;
-
         owlapi::model::IRIList labels;
         // Add only those models that are listed in the filterLabels list
         // since these are the requested once
