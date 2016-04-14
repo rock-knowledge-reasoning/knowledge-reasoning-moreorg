@@ -4,6 +4,7 @@
 #include <organization_model/Algebra.hpp>
 #include "test_utils.hpp"
 #include <organization_model/vocabularies/OM.hpp>
+#include <organization_model/algebra/Connectivity.hpp>
 
 using namespace organization_model;
 using namespace organization_model::algebra;
@@ -222,6 +223,44 @@ BOOST_AUTO_TEST_CASE(composition)
 
         ModelPool e2 = b;
         BOOST_REQUIRE_MESSAGE(cSet.find(e1) != cSet.end(), "Compositions contains 'b[+]b'");
+    }
+}
+
+BOOST_AUTO_TEST_CASE(connectivity)
+{
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()) );
+    OrganizationModelAsk ask(om);
+
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Payload")] = 2;
+
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Payload")] = 10;
+
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("CREX")] = 2;
+
+        BOOST_REQUIRE_MESSAGE( !Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 1;
+        modelPool[vocabulary::OM::resolve("CREX")] = 1;
+
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 2;
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
     }
 }
 

@@ -2,6 +2,7 @@ find_package(Boost REQUIRED thread)
 rock_library(organization_model
     SOURCES
         Algebra.cpp
+        algebra/Connectivity.cpp
         algebra/ResourceSupportVector.cpp
         ccf/Actor.cpp
         ccf/CombinedActor.cpp
@@ -33,6 +34,7 @@ rock_library(organization_model
         utils/CoalitionStructureGeneration.cpp
     HEADERS
         Algebra.hpp
+        algebra/Connectivity.hpp
         algebra/ResourceSupportVector.hpp
         ccf/Actor.hpp
         ccf/CombinedActor.hpp
