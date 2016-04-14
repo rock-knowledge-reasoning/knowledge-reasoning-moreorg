@@ -70,6 +70,13 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          * \return Set of modelpool representing all possible combinations
          */
         std::set<ModelPool> allCombinations() const;
+
+        /**
+         * Return the number of instances that are defined by this pool
+         * \return number of instances
+         */
+        uint32_t numberOfInstances() const { return toModelCombination().size(); }
+
 };
 
 /**
