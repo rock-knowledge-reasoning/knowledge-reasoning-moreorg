@@ -231,7 +231,7 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
     for(; mit != modelPool.end(); ++mit)
     {
         algebra::SupportType type = getSupportType(functionalities, mit->first, mit->second);
-        LOG_INFO_S << "Suppot for: " << mit->first << " and " << mit->second << " is: "
+        LOG_INFO_S << "Support for: " << mit->first << " and " << mit->second << " is: "
             << algebra::SupportTypeTxt[type];
         switch(type)
         {
