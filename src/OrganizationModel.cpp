@@ -110,4 +110,9 @@ OrganizationModel::Ptr OrganizationModel::getInstance(const std::string& filenam
     return make_shared<OrganizationModel>(filename);
 }
 
+OrganizationModel::Ptr OrganizationModel::getInstance(const owlapi::model::IRI& iri)
+{
+    return make_shared<OrganizationModel>(iri);
+}
+
 } // end namespace organization_model

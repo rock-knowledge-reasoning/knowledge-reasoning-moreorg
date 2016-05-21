@@ -81,6 +81,7 @@ public:
     static std::string toString(const ModelCombinationSet& combinations);
 
     static OrganizationModel::Ptr getInstance(const std::string& filename = "");
+    static OrganizationModel::Ptr getInstance(const owlapi::model::IRI& iri);
 
 private:
     /// Ontology that serves as basis for this organization model
