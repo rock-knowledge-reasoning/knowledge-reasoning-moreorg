@@ -36,7 +36,7 @@ Connectivity::Connectivity(const ModelPool& modelPool, const OrganizationModelAs
         if(interfaces.empty())
         {
             throw std::invalid_argument("organization_model::algebra::Connecticity:"
-                    " cannot construct problem since once model does not have any Electro-Mechanical-Interface");
+                    " cannot construct problem since model '" + model.toString() + "' does not have any Electro-Mechanical-Interface");
         }
 
         std::pair<IRI, IRIList> emis(model, interfaces);
@@ -156,20 +156,25 @@ bool Connectivity::isFeasible(const ModelPool& modelPool, const OrganizationMode
     {
         return true;
     }
-    Connectivity* connectivity = new Connectivity(modelPool, ask);
-    Gecode::BAB<Connectivity> searchEngine(connectivity);
+    try {
+        Connectivity* connectivity = new Connectivity(modelPool, ask);
+        Gecode::BAB<Connectivity> searchEngine(connectivity);
 
-    Connectivity* current = searchEngine.next();
-    if(current)
+        Connectivity* current = searchEngine.next();
+        if(current)
+        {
+            LOG_DEBUG_S << "Connection is feasible: found solution " << current->mConnections;
+            delete current;
+            delete connectivity;
+            return true;
+        }
+    } catch(const std::invalid_argument& e)
     {
-        LOG_DEBUG_S << "Connection is feasible: found solution " << current->mConnections;
-        delete current;
-        delete connectivity;
-        return true;
-    } else {
-        LOG_DEBUG_S << "Connection is not feasible";
+        // When there is no connection interface then the construction of
+        // connectivity fails, thus a connection is not feasible
+        LOG_DEBUG_S << e.what();
     }
-
+    LOG_DEBUG_S << "Connection is not feasible";
     return false;
 }
 
