@@ -1,9 +1,11 @@
-#include "ResourceMatch.hpp"
+
+#include <numeric/Combinatorics.hpp>
 #include <algorithm>
 #include <gecode/minimodel.hh>
 #include <gecode/gist.hh>
-#include <numeric/Combinatorics.hpp>
 #include <organization_model/vocabularies/OM.hpp>
+
+#include "ResourceMatch.hpp"
 
 using namespace owlapi::model;
 

@@ -5,9 +5,9 @@
 #include <gecode/int.hh>
 #include <gecode/search.hh>
 
+#include <organization_model/SharedPtr.hpp>
 #include <owlapi/model/OWLOntology.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
-#include <organization_model/SharedPtr.hpp>
 #include <organization_model/ModelPool.hpp>
 #include <organization_model/reasoning/ModelBound.hpp>
 #include <base-logging/Logging.hpp>
