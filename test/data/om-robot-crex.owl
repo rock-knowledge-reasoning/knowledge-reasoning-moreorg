@@ -43,13 +43,6 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;Mapping"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&om-schema;has"/>
                 <owl:onClass rdf:resource="&om-schema;Power"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
@@ -57,7 +50,14 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;LaserScanner"/>
+                <owl:onClass rdf:resource="&om-schema;Mapping"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;Localization"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -71,13 +71,6 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;Locomotion"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&om-schema;has"/>
                 <owl:onClass rdf:resource="&om-schema;Camera"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
@@ -85,7 +78,14 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;Localization"/>
+                <owl:onClass rdf:resource="&om-schema;Locomotion"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;LaserScanner"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -121,6 +121,7 @@
         <om-schema:minWidth rdf:datatype="&xsd;double">1.0</om-schema:minWidth>
         <om-schema:maxWidth rdf:datatype="&xsd;double">1.5</om-schema:maxWidth>
         <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">100.0</om-schema:nominalPowerConsumption>
+        <om-schema:payloadTransportSupplyDemand rdf:datatype="&xsd;integer">2</om-schema:payloadTransportSupplyDemand>
         <om-schema:payloadTransportCapacity rdf:datatype="&xsd;nonNegativeInteger">2</om-schema:payloadTransportCapacity>
         <om-schema:mass rdf:datatype="&xsd;double">27.0</om-schema:mass>
         <om-schema:maxHeight rdf:datatype="&xsd;double">4.0</om-schema:maxHeight>

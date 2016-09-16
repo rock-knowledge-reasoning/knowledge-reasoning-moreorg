@@ -122,6 +122,7 @@
 
     <owl:NamedIndividual rdf:about="&om-schema;Payload">
         <rdf:type rdf:resource="&om-schema;Payload"/>
+        <om-schema:payloadTransportSupplyDemand rdf:datatype="&xsd;integer">-1</om-schema:payloadTransportSupplyDemand>
         <om-schema:energyCapacity rdf:datatype="&xsd;double">0.0</om-schema:energyCapacity>
         <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">0.0</om-schema:maxEnergyCapacity>
         <om-schema:maxWidth rdf:datatype="&xsd;double">0.15</om-schema:maxWidth>

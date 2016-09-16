@@ -43,6 +43,20 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;Localization"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;Mapping"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
                 <owl:onClass rdf:resource="&om-schema;Locomotion"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
@@ -58,20 +72,6 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
                 <owl:onClass rdf:resource="&om-schema;Power"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;Mapping"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;Localization"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -108,10 +108,11 @@
         <om-schema:maxWidth rdf:datatype="&xsd;double">0.5</om-schema:maxWidth>
         <om-schema:maxAcceleration rdf:datatype="&xsd;double">1.0</om-schema:maxAcceleration>
         <om-schema:mass rdf:datatype="&xsd;double">15.0</om-schema:mass>
+        <om-schema:payloadTransportSupplyDemand rdf:datatype="&xsd;integer">4</om-schema:payloadTransportSupplyDemand>
+        <om-schema:payloadTransportCapacity rdf:datatype="&xsd;nonNegativeInteger">4</om-schema:payloadTransportCapacity>
         <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>
         <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">50.0</om-schema:nominalPowerConsumption>
         <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">7.2</om-schema:maxEnergyCapacity>
-        <om-schema:payloadTransportCapacity rdf:datatype="&xsd;nonNegativeInteger">8</om-schema:payloadTransportCapacity>
         <om-schema:energyCapacity rdf:datatype="&xsd;double">8.0</om-schema:energyCapacity>
     </owl:NamedIndividual>
 </rdf:RDF>

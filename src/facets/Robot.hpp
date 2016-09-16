@@ -35,6 +35,19 @@ public:
      * Available Energy W
      */
     double getEnergyCapacity() const { return mEnergyCapacity; }
+
+    /**
+     * Get the payload transport supply/demand
+     * Supply if it can transport payloads, demand if it requires a certain
+     * capacity to be carried
+     * Immobile system have to have a value less than 1 for demand
+     */
+    int32_t getPayloadTransportSupplyDemand() const { return mPayloadTransportSupplyDemand; }
+
+    /**
+     * The transport capacity of this agent / robot -- if is is mobile
+     * @deprecated
+     */
     uint32_t getPayloadTransportCapacity() const { return mPayloadTransportCapacity; }
 
     /**
@@ -45,7 +58,7 @@ public:
 
     /**
      * s = v*t <=> t = s/v_n
-     * 
+     *
      * W = P_n*t = P_n*s/v_n
      *
      * \return energy cost in Wh
@@ -87,6 +100,7 @@ private:
     double mNominalPowerConsumption;
 
     uint32_t mPayloadTransportCapacity;
+    int32_t mPayloadTransportSupplyDemand;
 };
 
 } // end namespace facets

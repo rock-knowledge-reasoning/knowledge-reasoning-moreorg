@@ -43,8 +43,8 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;Locomotion"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="&om-schema;Camera"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -57,15 +57,8 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;EmiPassive"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">4</owl:maxQualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;Camera"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="&om-schema;Locomotion"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -73,6 +66,13 @@
                 <owl:onProperty rdf:resource="&om-schema;has"/>
                 <owl:onClass rdf:resource="&om-schema;EmiActive"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;EmiPassive"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">4</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -117,6 +117,7 @@
         <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">0.8</om-schema:nominalPowerConsumption>
         <om-schema:maxVelocity rdf:datatype="&xsd;double">1.0</om-schema:maxVelocity>
         <om-schema:minHeight rdf:datatype="&xsd;double">1.5</om-schema:minHeight>
+        <om-schema:payloadTransportSupplyDemand rdf:datatype="&xsd;integer">10</om-schema:payloadTransportSupplyDemand>
         <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">10.0</om-schema:maxEnergyCapacity>
         <om-schema:energyCapacity rdf:datatype="&xsd;double">10.0</om-schema:energyCapacity>
         <om-schema:mass rdf:datatype="&xsd;double">160.0</om-schema:mass>

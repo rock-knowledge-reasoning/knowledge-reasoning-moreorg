@@ -19,6 +19,7 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
     , mMaxVelocity(0.0)
     , mNominalVelocity(0.0)
     , mPayloadTransportCapacity(0)
+    , mPayloadTransportSupplyDemand(0)
 {
 
     try {
@@ -51,6 +52,7 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
 
     // optional transport capability
     try {
+        mPayloadTransportSupplyDemand = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::payloadTransportSupplyDemand())->getInteger();
         mPayloadTransportCapacity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::payloadTransportCapacity())->getInteger();
     } catch(const std::exception& e)
     {
@@ -85,6 +87,7 @@ std::string Robot::toString() const
     ss << "    min velocity (m/s):            " << mMinVelocity << std::endl;
     ss << "    max velocity (m/s):            " << mMaxVelocity << std::endl;
     ss << "    nominal velocity (m/s):        " << mNominalVelocity << std::endl;
+    ss << "    payload supply/demand (units): " << mPayloadTransportSupplyDemand << std::endl;
     return ss.str();
 }
 
