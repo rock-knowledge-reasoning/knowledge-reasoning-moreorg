@@ -3,7 +3,7 @@
 #include <math.h>
 #include <boost/foreach.hpp>
 #include <base/Time.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 #include "CombinedActor.hpp"
 #include "Scenario.hpp"
 

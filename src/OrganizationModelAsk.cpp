@@ -1,7 +1,7 @@
 #include "OrganizationModelAsk.hpp"
 #include "Algebra.hpp"
 #include <sstream>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 #include <base/Time.hpp>
 #include <numeric/LimitedCombination.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>

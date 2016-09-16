@@ -6,7 +6,7 @@
 #include <boost/thread.hpp>
 #include <numeric/IntegerPartitioning.hpp>
 #include <base/Time.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 
 namespace multiagent {
 namespace utils {

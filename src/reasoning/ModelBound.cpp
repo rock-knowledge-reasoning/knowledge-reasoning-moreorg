@@ -1,7 +1,7 @@
 #include "ModelBound.hpp"
 #include <sstream>
 #include <limits>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 #include <gecode/int.hh>
 #include <algorithm>
 

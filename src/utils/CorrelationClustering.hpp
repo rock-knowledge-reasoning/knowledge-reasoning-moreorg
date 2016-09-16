@@ -3,7 +3,7 @@
 
 #include <glpk.h>
 #include <numeric/Combinatorics.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 
 namespace numeric {
 

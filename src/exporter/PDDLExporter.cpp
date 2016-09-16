@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <boost/foreach.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 #include <pddl_planner/representation/Domain.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <organization_model/vocabularies/OM.hpp>

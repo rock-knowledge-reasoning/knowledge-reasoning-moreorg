@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <numeric/Combinatorics.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 #include <base/Time.hpp>
 
 namespace multiagent {

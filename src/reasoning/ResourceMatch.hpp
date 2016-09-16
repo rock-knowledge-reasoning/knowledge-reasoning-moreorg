@@ -10,7 +10,7 @@
 #include <organization_model/SharedPtr.hpp>
 #include <organization_model/ModelPool.hpp>
 #include <organization_model/reasoning/ModelBound.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 
 namespace organization_model {
 namespace reasoning {

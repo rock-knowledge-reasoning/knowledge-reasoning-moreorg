@@ -1,7 +1,7 @@
 #include "ResourceSupportVector.hpp"
 #include <math.h>
 #include <sstream>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 #include <organization_model/OrganizationModelAsk.hpp>
 #include <boost/assign/list_of.hpp>
 

@@ -3,7 +3,7 @@
 #include <boost/foreach.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <organization_model/vocabularies/OM.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 
 namespace organization_model {
 

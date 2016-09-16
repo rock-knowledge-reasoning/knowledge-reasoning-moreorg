@@ -1,7 +1,7 @@
 #include "Robot.hpp"
 #include <organization_model/vocabularies/OM.hpp>
 #include <organization_model/vocabularies/Robot.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 
 using namespace owlapi::model;
 

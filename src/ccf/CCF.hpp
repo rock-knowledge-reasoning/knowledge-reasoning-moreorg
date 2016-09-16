@@ -7,7 +7,7 @@
 #include <sstream>
 #include <stdint.h>
 #include <boost/foreach.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 
 /**
  * This is an implementation of the Constrained Coalition Formation algorithm 

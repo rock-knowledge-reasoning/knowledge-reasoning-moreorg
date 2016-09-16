@@ -1,7 +1,7 @@
 #include "Redundancy.hpp"
 #include <math.h>
 #include <vector>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 #include <organization_model/reasoning/ResourceMatch.hpp>
 #include <organization_model/metrics/ModelSurvivability.hpp>
 #include <organization_model/vocabularies/OM.hpp>
