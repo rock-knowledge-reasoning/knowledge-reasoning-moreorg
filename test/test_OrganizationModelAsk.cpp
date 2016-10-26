@@ -325,6 +325,26 @@ BOOST_AUTO_TEST_CASE(to_string)
     BOOST_TEST_MESSAGE(ask.toString());
 }
 
+BOOST_AUTO_TEST_CASE(to_string_extended_scenario)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
+    ModelPool pool;
+    pool.setResourceCount( OM::resolve("Sherpa"), 3);
+    pool.setResourceCount( OM::resolve("CREX"), 2);
+    pool.setResourceCount( OM::resolve("CoyoteIII"), 3);
+    pool.setResourceCount( OM::resolve("BaseCamp"), 5);
+    pool.setResourceCount( OM::resolve("Payload"), 25);
+    pool.setResourceCount( OM::resolve("PayloadCamera"), 25);
+    pool.setResourceCount( OM::resolve("PayloadBattery"), 25);
+
+    bool applyFunctionalSaturationBound = true;
+    OrganizationModelAsk ask(om, pool, applyFunctionalSaturationBound);
+    BOOST_TEST_MESSAGE(ask.toString());
+}
+
 BOOST_AUTO_TEST_CASE(transport)
 {
 }
