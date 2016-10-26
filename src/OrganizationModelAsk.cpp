@@ -221,7 +221,7 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
         return false;
     }
 
-    LOG_DEBUG_S << "CheckMinimal: " << std::endl << modelPool.toString(4) << std::endl <<
+    LOG_INFO_S << "CheckMinimal: " << std::endl << modelPool.toString(4) << std::endl <<
         "   " << functionalities.begin()->getModel().toString();
     bool hasSingleModelFullSupport = false;
     bool hasSingleModelPartialSupport = false;
@@ -231,7 +231,7 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
     for(; mit != modelPool.end(); ++mit)
     {
         algebra::SupportType type = getSupportType(functionalities, mit->first, mit->second);
-        LOG_INFO_S << "Support for: " << mit->first << " and " << mit->second << " is: "
+        LOG_DEBUG_S << "Support from: #" << mit->second << " of type " << mit->first << " is: "
             << algebra::SupportTypeTxt[type];
         switch(type)
         {
@@ -248,16 +248,18 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
     }
     if(hasSingleModelFullSupport)
     {
-        LOG_DEBUG_S << "Full support: " << std::endl
+        LOG_INFO_S << "Full support: " << std::endl
             << modelPool.toString(4) << std::endl
             << "    for " << std::endl
             << "    " << Functionality::toString(functionalities);
 
         if(modelPool.size() == 1)
         {
+            LOG_DEBUG_S << "    -- is minimal";
             // that is ok, since that is only a single systems
             return true;
         } else {
+            LOG_DEBUG_S << "    -- is not minimal: one of the models is already providing full support";
             // this must be a redundant combination since one model is already
             // providing full support
             return false;
@@ -284,11 +286,13 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
             if(reducedSupport == algebra::FULL_SUPPORT)
             {
                 // redundant combination
+                LOG_DEBUG_S << "    -- is not minimal: it contains redundancies";
                 return false;
             }
         }
     }
 
+    LOG_DEBUG_S << "    -- is minimal: no redundancies identified";
     return true;
 }
 
