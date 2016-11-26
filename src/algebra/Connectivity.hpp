@@ -4,16 +4,24 @@
 #include <gecode/set.hh>
 #include <gecode/search.hh>
 #include <organization_model/OrganizationModelAsk.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 
 namespace organization_model {
 namespace algebra {
 
+/**
+ * \class Connectivity
+ * \brief Allow to check the feasibility of interfacing, i.e., whether or not
+ * there is a feasible connection for a set of agents
+ */
 class Connectivity : public Gecode::Space
 {
     /// Model pool which has to be checked for its connectivity
     ModelPool mModelPool;
     /// The organization model
     owlapi::model::OWLOntologyAsk mAsk;
+
+    owlapi::model::IRI mInterfaceBaseClass;
 
     ModelCombination mModelCombination;
     owlapi::model::IRIList mInterfaces;
@@ -26,7 +34,7 @@ class Connectivity : public Gecode::Space
     Gecode::IntVarArray mConnections;
 
 public:
-    Connectivity(const ModelPool& modelPool, const OrganizationModelAsk& ask);
+    Connectivity(const ModelPool& modelPool, const OrganizationModelAsk& ask, const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectoMechanicalInterface") );
 
     /**
      * Search support

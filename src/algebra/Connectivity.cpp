@@ -8,16 +8,18 @@ using namespace owlapi::model;
 namespace organization_model {
 namespace algebra {
 
-Connectivity::Connectivity(const ModelPool& modelPool, const OrganizationModelAsk& ask)
+Connectivity::Connectivity(const ModelPool& modelPool, const OrganizationModelAsk& ask, const owlapi::model::IRI& interfaceBaseClass)
     : mModelPool(modelPool)
     , mAsk(ask.ontology())
+    , mInterfaceBaseClass(interfaceBaseClass)
     , mModelCombination(mModelPool.toModelCombination())
 {
+    // Identify interfaces -- we assume here ElectoMechanicalInterface
     IRIList::const_iterator mit = mModelCombination.begin();
     for(; mit != mModelCombination.end(); ++mit)
     {
         const IRI& model = *mit;
-        std::vector<OWLCardinalityRestriction::Ptr> restrictions = mAsk.getCardinalityRestrictions(model, vocabulary::OM::resolve("ElectroMechanicalInterface"));
+        std::vector<OWLCardinalityRestriction::Ptr> restrictions = mAsk.getCardinalityRestrictions(model, mInterfaceBaseClass);
 
         owlapi::model::IRIList interfaces;
         std::vector<OWLCardinalityRestriction::Ptr>::const_iterator rit = restrictions.begin();
@@ -152,6 +154,7 @@ Gecode::Space* Connectivity::copy(bool share)
 
 bool Connectivity::isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask)
 {
+    // For a single system this check is trivially true
     if(modelPool.numberOfInstances() < 2)
     {
         return true;
