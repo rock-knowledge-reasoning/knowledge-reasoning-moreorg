@@ -1,0 +1,895 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE Ontology [
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY xml "http://www.w3.org/XML/1998/namespace" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.rock-robotics.org/2014/01/om-schema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     ontologyIRI="http://www.rock-robotics.org/2014/01/om-schema#">
+    <Prefix name="" IRI="http://www.rock-robotics.org/2014/01/om-schema#"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">Changelog:
+* 0.18
+  * change TransportService -&gt; TransportProvider and LogisticHub -&gt; LogisticHubProvider for consistency reasons
+* 0.17
+ * add property payloadTransportSupplyDemand
+* 0.16
+ * add soil sampler 
+* 0.15
+ * introduce modularization, i.e. move robot specific entries to their own ontology and using import statements
+* 0.14
+ * add TransportService
+* 0.13
+ * add concept functionality
+* 0.12
+ * add payloadTransportCapacity
+* 0.11
+ * update CREX
+  * change explicit dependency on MoveTo to addition of sub requirement
+ * added CoyoteIII
+ * changed BaseCamps to BaseCamp
+ * added LogisticHub (Capability) and PayloadLogisticHub (Service)
+* 0.10
+ * added data properties such as mass etc. for Sherpa, CREX, Payload
+ * add PayloadBattery</Literal>
+    </Annotation>
+    <Declaration>
+        <Class IRI="Actor"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Camera"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Capability"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="ElectricalInterface"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="ElectroMechanicalInterface"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="EmiActive"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="EmiPassive"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="EmiPowerProvider"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="ForceTorqueSensor"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Functionality"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="ImageProvider"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Interface"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="LaserScanner"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Link"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Localization"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Location"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="LocationImageProvider"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Locomotion"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="LogisticHubProvider"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Manipulation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="ManipulationProvider"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Manipulator"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Mapping"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="MechanicalInterface"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Mission"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="MoveTo"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="PayloadLogisticHub"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="PhysicalEntity"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Power"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Requirement"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Resource"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="Service"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="SoilSampler"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="SoilSamplingProvider"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="StereoImageProvider"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="TransportProvider"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="compatibleWith"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="dependsOn"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="fulfills"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="has"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="modelledBy"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="models"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="provides"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="uses"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="energyCapacity"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="energyProperty"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="locomotionProperty"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="mass"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="maxAcceleration"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="maxEnergyCapacity"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="maxHeight"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="maxVelocity"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="maxWidth"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="minAcceleration"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="minHeight"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="minVelocity"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="minWidth"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="nominalAcceleration"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="nominalHeight"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="nominalPowerConsumption"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="nominalVelocity"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="nominalWidth"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="payloadTransportCapacity"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="payloadTransportSupplyDemand"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="physicalProperty"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="probabilityOfFailure"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="safetyProperty"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="supplyVoltage"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="Actor"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="Capability"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="EmiActive"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="EmiPassive"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="Interface"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="Resource"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="Service"/>
+    </Declaration>
+    <SubClassOf>
+        <Class IRI="Actor"/>
+        <Class IRI="Resource"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Camera"/>
+        <Class IRI="PhysicalEntity"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Capability"/>
+        <Class IRI="Functionality"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="ElectricalInterface"/>
+        <Class IRI="Interface"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="ElectroMechanicalInterface"/>
+        <Class IRI="ElectricalInterface"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="ElectroMechanicalInterface"/>
+        <Class IRI="MechanicalInterface"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="EmiActive"/>
+        <Class IRI="ElectroMechanicalInterface"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="EmiPassive"/>
+        <Class IRI="ElectroMechanicalInterface"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="EmiPowerProvider"/>
+        <Class IRI="Service"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="EmiPowerProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="ElectroMechanicalInterface"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="EmiPowerProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Power"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="ForceTorqueSensor"/>
+        <Class IRI="PhysicalEntity"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Functionality"/>
+        <Class IRI="Resource"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="ImageProvider"/>
+        <Class IRI="Service"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="ImageProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Camera"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="ImageProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Power"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Interface"/>
+        <Class IRI="Resource"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="LaserScanner"/>
+        <Class IRI="PhysicalEntity"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Link"/>
+        <Class IRI="Resource"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Link"/>
+        <ObjectExactCardinality cardinality="2">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Interface"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Localization"/>
+        <Class IRI="Capability"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Location"/>
+        <Class IRI="Resource"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="LocationImageProvider"/>
+        <Class IRI="Service"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="LocationImageProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="ImageProvider"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="LocationImageProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="MoveTo"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Locomotion"/>
+        <Class IRI="Capability"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="LogisticHubProvider"/>
+        <Class IRI="Service"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Manipulation"/>
+        <Class IRI="Capability"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="ManipulationProvider"/>
+        <Class IRI="Service"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Manipulator"/>
+        <Class IRI="PhysicalEntity"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Mapping"/>
+        <Class IRI="Capability"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="MechanicalInterface"/>
+        <Class IRI="Interface"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Mission"/>
+        <Class IRI="Resource"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="MoveTo"/>
+        <Class IRI="Capability"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="MoveTo"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Localization"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="MoveTo"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Locomotion"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="MoveTo"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Mapping"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="MoveTo"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Power"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="PayloadLogisticHub"/>
+        <Class IRI="Service"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="PayloadLogisticHub"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="EmiPassive"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="PayloadLogisticHub"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="LogisticHubProvider"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="PhysicalEntity"/>
+        <Class IRI="Resource"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Power"/>
+        <Class IRI="PhysicalEntity"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="Service"/>
+        <Class IRI="Functionality"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="SoilSampler"/>
+        <Class IRI="PhysicalEntity"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="SoilSamplingProvider"/>
+        <Class IRI="Service"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="SoilSamplingProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="ForceTorqueSensor"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="SoilSamplingProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Manipulation"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="SoilSamplingProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Manipulator"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="SoilSamplingProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Power"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="SoilSamplingProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="SoilSampler"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="StereoImageProvider"/>
+        <Class IRI="Service"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="StereoImageProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Power"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="StereoImageProvider"/>
+        <ObjectMinCardinality cardinality="2">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="Camera"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="TransportProvider"/>
+        <Class IRI="Service"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="TransportProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="ElectroMechanicalInterface"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="TransportProvider"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="has"/>
+            <Class IRI="MoveTo"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <DisjointClasses>
+        <Class IRI="EmiActive"/>
+        <Class IRI="EmiPassive"/>
+    </DisjointClasses>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="compatibleWith"/>
+        <NamedIndividual IRI="EmiActive"/>
+        <NamedIndividual IRI="EmiPassive"/>
+    </ObjectPropertyAssertion>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="modelledBy"/>
+        <ObjectProperty IRI="models"/>
+    </InverseObjectProperties>
+    <SymmetricObjectProperty>
+        <ObjectProperty IRI="compatibleWith"/>
+    </SymmetricObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="dependsOn"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="has"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="modelledBy"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="provides"/>
+    </TransitiveObjectProperty>
+    <TransitiveObjectProperty>
+        <ObjectProperty IRI="uses"/>
+    </TransitiveObjectProperty>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="modelledBy"/>
+        <Class IRI="Resource"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="models"/>
+        <Class IRI="Resource"/>
+    </ObjectPropertyRange>
+    <SubDataPropertyOf>
+        <DataProperty IRI="energyCapacity"/>
+        <DataProperty IRI="energyProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="energyProperty"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="locomotionProperty"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="mass"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="maxAcceleration"/>
+        <DataProperty IRI="locomotionProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="maxEnergyCapacity"/>
+        <DataProperty IRI="energyProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="maxHeight"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="maxVelocity"/>
+        <DataProperty IRI="locomotionProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="maxWidth"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="minAcceleration"/>
+        <DataProperty IRI="locomotionProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="minHeight"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="minVelocity"/>
+        <DataProperty IRI="locomotionProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="minWidth"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="nominalAcceleration"/>
+        <DataProperty IRI="locomotionProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="nominalHeight"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="nominalPowerConsumption"/>
+        <DataProperty IRI="energyProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="nominalVelocity"/>
+        <DataProperty IRI="locomotionProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="nominalWidth"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="payloadTransportCapacity"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="payloadTransportSupplyDemand"/>
+        <DataProperty IRI="physicalProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="probabilityOfFailure"/>
+        <DataProperty IRI="safetyProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="supplyVoltage"/>
+        <DataProperty IRI="energyProperty"/>
+    </SubDataPropertyOf>
+    <FunctionalDataProperty>
+        <DataProperty IRI="energyCapacity"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="mass"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="maxAcceleration"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="maxEnergyCapacity"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="maxHeight"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="maxVelocity"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="maxWidth"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="minAcceleration"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="minHeight"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="minVelocity"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="minWidth"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="nominalHeight"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="nominalPowerConsumption"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="nominalVelocity"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="nominalWidth"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="probabilityOfFailure"/>
+    </FunctionalDataProperty>
+    <FunctionalDataProperty>
+        <DataProperty IRI="supplyVoltage"/>
+    </FunctionalDataProperty>
+    <DataPropertyDomain>
+        <DataProperty IRI="energyProperty"/>
+        <Class IRI="Actor"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="locomotionProperty"/>
+        <Class IRI="Actor"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="physicalProperty"/>
+        <Class IRI="Actor"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="safetyProperty"/>
+        <Class IRI="Actor"/>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="energyCapacity"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="energyProperty"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="locomotionProperty"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="mass"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="maxAcceleration"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="maxEnergyCapacity"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="maxHeight"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="maxVelocity"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="maxWidth"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="minAcceleration"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="minHeight"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="minVelocity"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="minWidth"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="nominalAcceleration"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="nominalHeight"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="nominalPowerConsumption"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="nominalVelocity"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="nominalWidth"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="payloadTransportCapacity"/>
+        <Datatype abbreviatedIRI="xsd:nonNegativeInteger"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="payloadTransportSupplyDemand"/>
+        <Datatype abbreviatedIRI="xsd:integer"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="physicalProperty"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="probabilityOfFailure"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="safetyProperty"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="supplyVoltage"/>
+        <Datatype abbreviatedIRI="xsd:double"/>
+    </DataPropertyRange>
+    <DisjointDataProperties>
+        <DataProperty IRI="energyProperty"/>
+        <DataProperty IRI="locomotionProperty"/>
+    </DisjointDataProperties>
+    <DisjointDataProperties>
+        <DataProperty IRI="energyProperty"/>
+        <DataProperty IRI="safetyProperty"/>
+    </DisjointDataProperties>
+    <DisjointDataProperties>
+        <DataProperty IRI="locomotionProperty"/>
+        <DataProperty IRI="safetyProperty"/>
+    </DisjointDataProperties>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>Actor</IRI>
+        <Literal datatypeIRI="&rdf;PlainLiteral">An actor is a physical or logical entity that can act, i.e. perform actions which have an effect</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>Capability</IRI>
+        <Literal datatypeIRI="&rdf;PlainLiteral">Capabililties represent &apos;soft&apos; resources that need to be available to provide services of perform actions</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>Service</IRI>
+        <Literal datatypeIRI="&rdf;PlainLiteral">A service is an offer to potential consumers.
+
+There is always only one instance of a service an actor can provide, e.g,
+a StereoImageProvider service cannot depends upon two instances of ImageProvider but need to associated directly with two camera</Literal>
+    </AnnotationAssertion>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 3.5.0) http://owlapi.sourceforge.net -->
+
