@@ -34,7 +34,7 @@ class Connectivity : public Gecode::Space
     Gecode::IntVarArray mConnections;
 
 public:
-    Connectivity(const ModelPool& modelPool, const OrganizationModelAsk& ask, const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectoMechanicalInterface") );
+    Connectivity(const ModelPool& modelPool, const OrganizationModelAsk& ask, const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface") );
 
     /**
      * Search support
@@ -56,6 +56,11 @@ public:
      * \return True if a connection is feasible, false otherwise
      */
     static bool isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask);
+
+    /**
+     * Convert solution to string
+     */
+    std::string toString() const;
 
 };
 

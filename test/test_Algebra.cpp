@@ -264,4 +264,59 @@ BOOST_AUTO_TEST_CASE(connectivity)
     }
 }
 
+BOOST_AUTO_TEST_CASE(connectivity_multiple_interfaces)
+{
+    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-multiple-interfaces.owl") );
+    OrganizationModelAsk ask(om);
+
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("RobotA")] = 2;
+
+        BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask), "RobotA 2 should not be a valid combination: ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("RobotB")] = 2;
+
+        BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("RobotC")] = 2;
+
+        BOOST_REQUIRE_MESSAGE( !Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("RobotA")] = 1;
+        modelPool[vocabulary::OM::resolve("RobotB")] = 1;
+
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("RobotA")] = 1;
+        modelPool[vocabulary::OM::resolve("RobotC")] = 1;
+
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("RobotB")] = 1;
+        modelPool[vocabulary::OM::resolve("RobotC")] = 1;
+
+        BOOST_REQUIRE_MESSAGE( !Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("RobotA")] = 1;
+        modelPool[vocabulary::OM::resolve("RobotB")] = 1;
+        modelPool[vocabulary::OM::resolve("RobotC")] = 1;
+
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
