@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(robot)
     using namespace owlapi::model;
     using namespace organization_model::vocabulary;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.14.owl"));
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
     IRI sherpa = OM::resolve("Sherpa");
     IRI payload = OM::resolve("Payload");
 
@@ -44,13 +44,13 @@ BOOST_AUTO_TEST_CASE(robot)
             BOOST_REQUIRE_MESSAGE(supporting, "Robot is supporting '" << f << "'");
         }
         {
-            owlapi::model::IRI f = vocabulary::OM::resolve("LogisticHub");
+            owlapi::model::IRI f = vocabulary::OM::resolve("LogisticHubProvider");
             bool supporting = ask.isSupporting(sherpa, f);
             BOOST_TEST_MESSAGE(ask.toString());
             BOOST_REQUIRE_MESSAGE(!supporting, "Robot is not supporting '" << f << "'");
         }
         {
-            owlapi::model::IRI f = vocabulary::OM::resolve("TransportService");
+            owlapi::model::IRI f = vocabulary::OM::resolve("TransportProvider");
             bool supporting = ask.isSupporting(sherpa, f);
             BOOST_TEST_MESSAGE(ask.toString());
             BOOST_REQUIRE_MESSAGE(supporting, "Robot is supporting '" << f << "'");
@@ -99,13 +99,13 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
             BOOST_REQUIRE_MESSAGE(supporting, "Robot is supporting '" << f << "'");
         }
         {
-            owlapi::model::IRI f = vocabulary::OM::resolve("LogisticHub");
+            owlapi::model::IRI f = vocabulary::OM::resolve("LogisticHubProvider");
             bool supporting = ask.isSupporting(sherpa, f);
             BOOST_TEST_MESSAGE(ask.toString());
             BOOST_REQUIRE_MESSAGE(!supporting, "Robot is not supporting '" << f << "'");
         }
         {
-            owlapi::model::IRI f = vocabulary::OM::resolve("TransportService");
+            owlapi::model::IRI f = vocabulary::OM::resolve("TransportProvider");
             bool supporting = ask.isSupporting(sherpa, f);
             BOOST_TEST_MESSAGE(ask.toString());
             BOOST_REQUIRE_MESSAGE(supporting, "Robot is supporting '" << f << "'");

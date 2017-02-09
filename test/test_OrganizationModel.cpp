@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
         BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support for payload logistic hub");
     }
     {
-        algebra::SupportType supportType = ask.getSupportType(OM::resolve("TransportService"), items);
+        algebra::SupportType supportType = ask.getSupportType(OM::resolve("TransportProvider"), items);
         BOOST_REQUIRE_MESSAGE(supportType == algebra::PARTIAL_SUPPORT, "Partial support for transport service expected, but is : " << algebra::SupportTypeTxt[supportType]);
     }
 
