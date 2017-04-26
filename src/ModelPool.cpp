@@ -169,5 +169,14 @@ std::string ModelPool::toString(const ModelPoolSet& modelPoolSet, uint32_t inden
     return ss.str();
 }
 
+size_t ModelPool::getValue(const owlapi::model::IRI& resource, size_t defaultVal) const
+{
+    std::map<owlapi::model::IRI, size_t>::const_iterator cit =  this->find(resource);
+    if(cit != this->end())
+    {
+        return cit->second;
+    }
+    return defaultVal;
+}
 
 } // end namespace organization_model

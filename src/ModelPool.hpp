@@ -77,6 +77,8 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          */
         uint32_t numberOfInstances() const { return toModelCombination().size(); }
 
+        size_t getValue(const owlapi::model::IRI& resource, size_t defaultVal) const;
+
 };
 
 /**
