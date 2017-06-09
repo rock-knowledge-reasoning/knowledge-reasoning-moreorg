@@ -119,6 +119,7 @@ public:
 
 /// The model pool set definition
 typedef std::set<ModelPool> ModelPoolSet;
+typedef std::vector<ModelPool> ModelPoolList;
 
 } // end namespace organization_model
 #endif // ORGANIZATION_MODEL_MODEL_POOL_HPP

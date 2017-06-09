@@ -22,8 +22,25 @@ BOOST_AUTO_TEST_CASE(max)
     b["b"] = 1;
     b["c"] = 2;
 
-    ModelPool c = Algebra::max(a,b);
-    BOOST_REQUIRE_MESSAGE( c["a"] == 2 && c["b"] == 1 && c["c"] == 2, "ModelPool max: expected, a:2,b:1,c:2 got " << c.toString());
+    {
+        ModelPool c = Algebra::max(a,b);
+        BOOST_REQUIRE_MESSAGE( c["a"] == 2 && c["b"] == 1 && c["c"] == 2, "ModelPool max: expected, a:2,b:1,c:2 got " << c.toString());
+    }
+
+    ModelPool c;
+    c["a"] = 4;
+    c["b"] = 0;
+    c["c"] = 1;
+    c["d"] = 1;
+
+    ModelPoolList poolList;
+    poolList.push_back(a);
+    poolList.push_back(b);
+    poolList.push_back(c);
+
+    ModelPool maxPool = Algebra::max(poolList);
+    BOOST_REQUIRE_MESSAGE(maxPool["a"] == 4 && maxPool["b"] == 1 && maxPool["c"] == 2 && maxPool["d"] == 1,
+            "ModelPool max of list: expected: a:4,b:1,c:2,d:1 got " << maxPool.toString());
 }
 
 BOOST_AUTO_TEST_CASE(min)
@@ -37,8 +54,25 @@ BOOST_AUTO_TEST_CASE(min)
     b["b"] = 0;
     b["c"] = 2;
 
-    ModelPool c = Algebra::min(a,b);
-    BOOST_REQUIRE_MESSAGE( c["a"] == 1 && c["b"] == 0 && c["c"] == 2, "ModelPool min: expected, a:1,b:0,c:2 got " << c.toString());
+    {
+        ModelPool c = Algebra::min(a,b);
+        BOOST_REQUIRE_MESSAGE( c["a"] == 1 && c["b"] == 0 && c["c"] == 2, "ModelPool min: expected, a:1,b:0,c:2 got " << c.toString());
+    }
+
+    ModelPool c;
+    c["a"] = 4;
+    c["b"] = 1;
+    c["c"] = 1;
+    c["d"] = 1;
+
+    ModelPoolList poolList;
+    poolList.push_back(a);
+    poolList.push_back(b);
+    poolList.push_back(c);
+
+    ModelPool minPool = Algebra::min(poolList);
+    BOOST_REQUIRE_MESSAGE(minPool["a"] == 1 && minPool["b"] == 0 && minPool["c"] == 1 && minPool["d"] == 1,
+            "ModelPool min of list: expected: a:1,b:0,c:1,d:1 got " << minPool.toString());
 }
 
 BOOST_AUTO_TEST_CASE(resource_support)

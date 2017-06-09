@@ -97,6 +97,24 @@ ModelPool Algebra::max(const ModelPool& a, const ModelPool& b)
     return resultPool;
 }
 
+ModelPool Algebra::max(const ModelPoolList& modelPoolList)
+{
+    if(modelPoolList.empty())
+    {
+        return ModelPool();
+    }
+
+    ModelPool resultPool = modelPoolList.front();
+
+    ModelPoolList::const_iterator cit = modelPoolList.begin();
+    for(++cit; cit != modelPoolList.end(); ++cit)
+    {
+        const ModelPool& currentModelPool = *cit;
+        resultPool = max(resultPool, currentModelPool);
+    }
+    return resultPool;
+}
+
 ModelPool Algebra::min(const ModelPool& a, const ModelPool& b)
 {
     ModelPool resultPool = a;
@@ -106,6 +124,8 @@ ModelPool Algebra::min(const ModelPool& a, const ModelPool& b)
         const owlapi::model::IRI& model = bit->first;
         uint32_t cardinality = bit->second;
 
+        // if result pool does not contain the entry, then use the only existing
+        // (min) requirement
         ModelPool::iterator rit = resultPool.find(model);
         if(rit != resultPool.end())
         {
@@ -114,6 +134,24 @@ ModelPool Algebra::min(const ModelPool& a, const ModelPool& b)
             resultPool.insert(ModelPool::value_type(model, cardinality));
         }
 
+    }
+    return resultPool;
+}
+
+ModelPool Algebra::min(const ModelPoolList& modelPoolList)
+{
+    if(modelPoolList.empty())
+    {
+        return ModelPool();
+    }
+
+    ModelPool resultPool = modelPoolList.front();
+
+    ModelPoolList::const_iterator cit = modelPoolList.begin();
+    for(++cit; cit != modelPoolList.end(); ++cit)
+    {
+        const ModelPool& currentModelPool = *cit;
+        resultPool = min(resultPool, currentModelPool);
     }
     return resultPool;
 }

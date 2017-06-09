@@ -24,15 +24,28 @@ public:
     static ModelPool merge(const ModelPool& a, const ModelPool& b);
 
     /**
-     * Compute the maximum of each entry
+     * Compute the maximum of each entry of two given ModelPool instances
+     * \return ModelPool that contains the maximum cardinalities
      */
     static ModelPool max(const ModelPool& a, const ModelPool& b);
 
     /**
-     *
-     * Compute the minimum of each entry
+     * Compute the maximum of each entry for a list of ModelPool instances
+     * \return ModelPool that contains the maximum cardinalities
+     */
+    static ModelPool max(const ModelPoolList& modelPoolList);
+
+    /**
+     * Compute the minimum of each entry of two given ModelPool instances
+     * \return ModelPool that contains the minimum cardinalities
      */
     static ModelPool min(const ModelPool& a, const ModelPool& b);
+
+    /**
+     * Compute the minimum of each entry for a list of ModelPool instances
+     * \return ModelPool that contains the minimum cardinalities
+     */
+    static ModelPool min(const ModelPoolList& modelPoolList);
 
     static ModelPool merge(const ModelCombinationSet& a, const ModelCombination& b);
 
