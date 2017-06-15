@@ -33,7 +33,7 @@ public:
      * Compute the maximum of each entry for a list of ModelPool instances
      * \return ModelPool that contains the maximum cardinalities
      */
-    static ModelPool max(const ModelPoolList& modelPoolList);
+    static ModelPool max(const ModelPool::List& modelPoolList);
 
     /**
      * Compute the minimum of each entry of two given ModelPool instances
@@ -45,7 +45,7 @@ public:
      * Compute the minimum of each entry for a list of ModelPool instances
      * \return ModelPool that contains the minimum cardinalities
      */
-    static ModelPool min(const ModelPoolList& modelPoolList);
+    static ModelPool min(const ModelPool::List& modelPoolList);
 
     static ModelPool merge(const ModelCombinationSet& a, const ModelCombination& b);
 
@@ -58,7 +58,7 @@ public:
      *
      * a [max] b = {(0,1),(1,2),(2,0)}
      */
-    static ModelPoolSet maxCompositions(const ModelPool& a, const ModelPool& b);
+    static ModelPool::Set maxCompositions(const ModelPool& a, const ModelPool& b);
 
     /**
      * Apply cartesian product like
@@ -72,7 +72,7 @@ public:
      *
      * a [max] b = { {(0,3),(1,1),(2,0)}, {(0,3),(1,2),(2,0)} }
      */
-    static ModelPoolSet maxCompositions(const ModelPoolSet& a, const ModelPoolSet& b);
+    static ModelPool::Set maxCompositions(const ModelPool::Set& a, const ModelPool::Set& b);
 };
 
 } // end namespace organization_model

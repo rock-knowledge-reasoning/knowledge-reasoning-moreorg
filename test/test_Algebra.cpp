@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(max)
     c["c"] = 1;
     c["d"] = 1;
 
-    ModelPoolList poolList;
+    ModelPool::List poolList;
     poolList.push_back(a);
     poolList.push_back(b);
     poolList.push_back(c);
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(min)
     c["c"] = 1;
     c["d"] = 1;
 
-    ModelPoolList poolList;
+    ModelPool::List poolList;
     poolList.push_back(a);
     poolList.push_back(b);
     poolList.push_back(c);
@@ -187,15 +187,15 @@ BOOST_AUTO_TEST_CASE(composition)
     a["http://model#c"] = 3;
 
     {
-        ModelPoolSet aSet;
+        ModelPool::Set aSet;
         aSet.insert(a);
-        ModelPoolSet rSet = Algebra::maxCompositions(a, empty);
+        ModelPool::Set rSet = Algebra::maxCompositions(a, empty);
         BOOST_REQUIRE_MESSAGE(rSet == aSet, "Composition with model pool and empty set results in first argument");
     }
     {
-        ModelPoolSet aSet;
+        ModelPool::Set aSet;
         aSet.insert(a);
-        ModelPoolSet rSet = Algebra::maxCompositions(empty,a);
+        ModelPool::Set rSet = Algebra::maxCompositions(empty,a);
         BOOST_REQUIRE_MESSAGE(rSet == aSet, "Composition with empty set and model pool results in second argument");
     }
 
@@ -205,14 +205,14 @@ BOOST_AUTO_TEST_CASE(composition)
     b["http://model#c"] = 1;
 
     {
-        ModelPoolSet aSet;
+        ModelPool::Set aSet;
         aSet.insert(a);
 
-        ModelPoolSet bSet;
+        ModelPool::Set bSet;
         bSet.insert(b);
 
         // With min operator
-        ModelPoolSet cSet = Algebra::maxCompositions(a,b);
+        ModelPool::Set cSet = Algebra::maxCompositions(a,b);
         BOOST_REQUIRE_MESSAGE(cSet.size() == 1, "1 composition expected: was " << cSet.size());
         ModelPool c = *cSet.begin();
         BOOST_REQUIRE_MESSAGE(c["http://model#a"] == 2, "Composition entry a->2 expected, was a->" << c["http://model#a"]);
@@ -220,13 +220,13 @@ BOOST_AUTO_TEST_CASE(composition)
         BOOST_REQUIRE_MESSAGE(c["http://model#c"] == 3, "Composition entry c->3 expected, was c->" << c["http://model#c"]);
     }
     {
-        ModelPoolSet aSet;
+        ModelPool::Set aSet;
         aSet.insert(a);
 
-        ModelPoolSet bSet;
+        ModelPool::Set bSet;
         bSet.insert(a);
         bSet.insert(b);
-        ModelPoolSet cSet = Algebra::maxCompositions(aSet,bSet);
+        ModelPool::Set cSet = Algebra::maxCompositions(aSet,bSet);
         BOOST_REQUIRE_MESSAGE(cSet.size() == 2, "2 compositions expected: was 2 " << cSet.size() << ModelPool::toString(cSet));
 
         ModelPool e0 = a;
@@ -240,10 +240,10 @@ BOOST_AUTO_TEST_CASE(composition)
     }
     // Identical set
     {
-        ModelPoolSet bSet;
+        ModelPool::Set bSet;
         bSet.insert(a);
         bSet.insert(b);
-        ModelPoolSet cSet = Algebra::maxCompositions(bSet,bSet);
+        ModelPool::Set cSet = Algebra::maxCompositions(bSet,bSet);
         BOOST_REQUIRE_MESSAGE(cSet.size() == 3, "3 compositions expected: was 3 " << cSet.size() << ModelPool::toString(cSet));
 
         ModelPool e0 = a;

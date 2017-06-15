@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
         Functionality functionality(stereoImageProvider);
         functionalitySet.insert(functionality);
 
-        ModelPoolSet combinations = ask.getBoundedResourceSupport(functionalitySet);
+        ModelPool::Set combinations = ask.getBoundedResourceSupport(functionalitySet);
         BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << ModelPool::toString(combinations) << "'");
 
         BOOST_REQUIRE_MESSAGE(ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
         Functionality functionality(stereoImageProvider);
         functionalitySet.insert(functionality);
 
-        ModelPoolSet combinations = ask.getBoundedResourceSupport(functionalitySet);
+        ModelPool::Set combinations = ask.getBoundedResourceSupport(functionalitySet);
         BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << ModelPool::toString(combinations) << "'");
 
         BOOST_REQUIRE_MESSAGE(!ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is not minimal");
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
         Functionality functionality(stereoImageProvider);
         functionalitySet.insert(functionality);
 
-        ModelPoolSet combinations = ask.getBoundedResourceSupport(functionalitySet);
+        ModelPool::Set combinations = ask.getBoundedResourceSupport(functionalitySet);
         BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << ModelPool::toString(combinations) << "'");
 
         BOOST_REQUIRE_MESSAGE(!ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
         Functionality functionality(stereoImageProvider);
         functionalitySet.insert(functionality);
 
-        ModelPoolSet combinations = ask.getBoundedResourceSupport(functionalitySet);
+        ModelPool::Set combinations = ask.getBoundedResourceSupport(functionalitySet);
         BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << ModelPool::toString(combinations) << "'");
 
         BOOST_REQUIRE_MESSAGE(ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         FunctionalitySet functionalities;
         functionalities.insert( Functionality(functionalityModel) );
 
-        ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+        ModelPool::Set combinations = ask.getResourceSupport(functionalities);
         BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting : " << functionalityModel.toString() << ": '" << ModelPool::toString(combinations) << "'");
     }
 
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         functionalities.insert( Functionality(imageProvider) );
         functionalities.insert( Functionality(emiPowerProvider) );
 
-        ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+        ModelPool::Set combinations = ask.getResourceSupport(functionalities);
         BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting : " << imageProvider.toString() << " and " << emiPowerProvider.toString() << ": '" << ModelPool::toString(combinations) << "'");
     }
 }

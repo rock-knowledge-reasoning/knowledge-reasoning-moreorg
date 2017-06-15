@@ -11,7 +11,7 @@ typedef std::set<ModelCombination> ModelCombinationSet;
 /// Maps a 'combined system' to the functionality it can 'theoretically'
 /// provide when looking at its resources
 typedef std::map<ModelPool, owlapi::model::IRIList> Pool2FunctionMap;
-typedef std::map<owlapi::model::IRI, ModelPoolSet > Function2PoolMap;
+typedef std::map<owlapi::model::IRI, ModelPool::Set > Function2PoolMap;
 
 /**
  * \class FunctionalityMapping
@@ -56,7 +56,7 @@ public:
      * \param functionModel IRI of the function model
      * \return set of ModelPool that support the function
      */
-    const ModelPoolSet& getModelPools(const owlapi::model::IRI& functionModel) const;
+    const ModelPool::Set& getModelPools(const owlapi::model::IRI& functionModel) const;
 
     /**
      * Set the model pool

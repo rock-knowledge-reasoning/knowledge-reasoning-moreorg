@@ -18,6 +18,9 @@ typedef owlapi::model::IRIList ModelCombination;
 class ModelPool : public std::map<owlapi::model::IRI, size_t>
 {
     public:
+        typedef std::vector<ModelPool> List;
+        typedef std::set<ModelPool> Set;
+
         /**
          * Default constructor
          */
@@ -56,7 +59,7 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
         ModelCombination toModelCombination() const;
 
         /**
-         * Stringify list a ModelPoolSet
+         * Stringify list a ModelPool::Set
          * \param modelPoolSet set to stringify
          * \param indent indentation level
          * \return stringified object
@@ -116,10 +119,6 @@ public:
      */
     static std::vector<owlapi::model::IRI> getModels(const ModelPool& modelPool);
 };
-
-/// The model pool set definition
-typedef std::set<ModelPool> ModelPoolSet;
-typedef std::vector<ModelPool> ModelPoolList;
 
 } // end namespace organization_model
 #endif // ORGANIZATION_MODEL_MODEL_POOL_HPP

@@ -97,7 +97,7 @@ ModelPool Algebra::max(const ModelPool& a, const ModelPool& b)
     return resultPool;
 }
 
-ModelPool Algebra::max(const ModelPoolList& modelPoolList)
+ModelPool Algebra::max(const ModelPool::List& modelPoolList)
 {
     if(modelPoolList.empty())
     {
@@ -106,7 +106,7 @@ ModelPool Algebra::max(const ModelPoolList& modelPoolList)
 
     ModelPool resultPool = modelPoolList.front();
 
-    ModelPoolList::const_iterator cit = modelPoolList.begin();
+    ModelPool::List::const_iterator cit = modelPoolList.begin();
     for(++cit; cit != modelPoolList.end(); ++cit)
     {
         const ModelPool& currentModelPool = *cit;
@@ -138,7 +138,7 @@ ModelPool Algebra::min(const ModelPool& a, const ModelPool& b)
     return resultPool;
 }
 
-ModelPool Algebra::min(const ModelPoolList& modelPoolList)
+ModelPool Algebra::min(const ModelPool::List& modelPoolList)
 {
     if(modelPoolList.empty())
     {
@@ -147,7 +147,7 @@ ModelPool Algebra::min(const ModelPoolList& modelPoolList)
 
     ModelPool resultPool = modelPoolList.front();
 
-    ModelPoolList::const_iterator cit = modelPoolList.begin();
+    ModelPool::List::const_iterator cit = modelPoolList.begin();
     for(++cit; cit != modelPoolList.end(); ++cit)
     {
         const ModelPool& currentModelPool = *cit;
@@ -175,20 +175,20 @@ ModelPool Algebra::merge(const std::set<ModelPool>& modelPoolSet)
     return mergedPool.toModelPool();
 }
 
-ModelPoolSet Algebra::maxCompositions(const ModelPool& a, const ModelPool& b)
+ModelPool::Set Algebra::maxCompositions(const ModelPool& a, const ModelPool& b)
 {
-    ModelPoolSet aPool;
+    ModelPool::Set aPool;
     aPool.insert(a);
 
-    ModelPoolSet bPool;
+    ModelPool::Set bPool;
     bPool.insert(b);
 
     return maxCompositions(aPool, bPool);
 }
 
-ModelPoolSet Algebra::maxCompositions(const ModelPoolSet& a, const ModelPoolSet& b)
+ModelPool::Set Algebra::maxCompositions(const ModelPool::Set& a, const ModelPool::Set& b)
 {
-    ModelPoolSet maxCompositions;
+    ModelPool::Set maxCompositions;
     // Handle corner cases
     if(a.empty())
     {
@@ -200,11 +200,11 @@ ModelPoolSet Algebra::maxCompositions(const ModelPoolSet& a, const ModelPoolSet&
         return a;
     }
 
-    ModelPoolSet::const_iterator ait = a.begin();
+    ModelPool::Set::const_iterator ait = a.begin();
     for(; ait != a.end(); ++ait)
     {
         const ModelPool& aPool = *ait;
-        ModelPoolSet::const_iterator bit = b.begin();
+        ModelPool::Set::const_iterator bit = b.begin();
         for(; bit != b.end(); ++bit)
         {
             const ModelPool& bPool = *bit;

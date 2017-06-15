@@ -70,9 +70,9 @@ ModelCombination ModelPool::toModelCombination() const
     return combination;
 }
 
-ModelPoolSet ModelPool::allCombinations() const
+ModelPool::Set ModelPool::allCombinations() const
 {
-    ModelPoolSet allCombinations;
+    ModelPool::Set allCombinations;
 
     ModelCombination modelCombinationBound = toModelCombination();
     numeric::LimitedCombination<owlapi::model::IRI> combinations(*this,
@@ -150,13 +150,13 @@ std::vector<owlapi::model::IRI> ModelPoolDelta::getModels(const ModelPool& model
     return models;
 }
 
-std::string ModelPool::toString(const ModelPoolSet& modelPoolSet, uint32_t indent)
+std::string ModelPool::toString(const ModelPool::Set& modelPoolSet, uint32_t indent)
 {
     std::string hspace(indent,' ');
     std::stringstream ss;
     ss << hspace;
 
-    ModelPoolSet::const_iterator cit = modelPoolSet.begin();
+    ModelPool::Set::const_iterator cit = modelPoolSet.begin();
     for(; cit != modelPoolSet.end();++cit)
     {
         ModelCombination combination = cit->toModelCombination();

@@ -75,7 +75,7 @@ public:
      * \param functionalities should be a set of functionalities / functionality models
      * \return available resources (or combination thereof) to support this set of functionalities
      */
-    ModelPoolSet getResourceSupport(const FunctionalitySet& functionalities) const;
+    ModelPool::Set getResourceSupport(const FunctionalitySet& functionalities) const;
 
     /**
      * Get the set of resources that should support a given union of services,
@@ -83,7 +83,7 @@ public:
      * of resources that support the given union of services
      * \return bound set of combinations
      */
-    ModelPoolSet getBoundedResourceSupport(const FunctionalitySet& functionalities) const;
+    ModelPool::Set getBoundedResourceSupport(const FunctionalitySet& functionalities) const;
 
     /**
      * Apply an upper bound of resources to an existing Set of model
@@ -102,7 +102,7 @@ public:
      * \return all combinations that operate within the bounds of the given
      * ModelPool
      */
-    ModelPoolSet applyUpperBound(const ModelPoolSet& modelPoolSet, const ModelPool& upperBounds) const;
+    ModelPool::Set applyUpperBound(const ModelPool::Set& modelPoolSet, const ModelPool& upperBounds) const;
 
     /**
      * Apply a lower bound of resources to an existing set of model
@@ -124,7 +124,7 @@ public:
      * \return all combinations that operate within the bounds of the given
      * ModelPool
      */
-    ModelPoolSet applyLowerBound(const ModelPoolSet& modelPools, const ModelPool& lowerBounds) const;
+    ModelPool::Set applyLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBounds) const;
 
     /*
      * Enforces the minimum requirement by expanding missing models to
@@ -148,7 +148,7 @@ public:
      * \return all combinations that operate now within the bounds of the given
      * ModelPool
      */
-    ModelPoolSet expandToLowerBound(const ModelPoolSet& modelPools, const ModelPool& lowerBounds) const;
+    ModelPool::Set expandToLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBounds) const;
 
     /**
      * Check how a list of functionalities is supported by a model if given cardinality
@@ -368,7 +368,7 @@ protected:
     FunctionalityMapping computeUnboundedFunctionalityMapping(const ModelPool& pool, const owlapi::model::IRIList& functionalityModels) const;
 
 
-    ModelPoolSet filterNonMinimal(const ModelPoolSet& modelPoolSet, const FunctionalitySet& functionalities) const;
+    ModelPool::Set filterNonMinimal(const ModelPool::Set& modelPoolSet, const FunctionalitySet& functionalities) const;
 
 private:
     OrganizationModel::Ptr mpOrganizationModel;

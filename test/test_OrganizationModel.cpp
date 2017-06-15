@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
     items[OM::resolve("CREX")] = 3;
     items[OM::resolve("CoyoteIII")] = 3;
 
-    ModelPoolSet modelPoolSet = items.allCombinations();
+    ModelPool::Set modelPoolSet = items.allCombinations();
     BOOST_TEST_MESSAGE("All combinations of three agent types with cardinality 3: " << ModelPool::toString(modelPoolSet) );
 
     items[OM::resolve("Payload")] = 2;
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         FunctionalitySet functionalities;
         functionalities.insert( Functionality(OM::resolve("StereoImageProvider")) );
 
-        ModelPoolSet modelPools = ask.getResourceSupport(functionalities);
+        ModelPool::Set modelPools = ask.getResourceSupport(functionalities);
         BOOST_REQUIRE_MESSAGE(modelPools.size() == 0, "No combinations that support stereo image provider expected 0 was " << modelPools.size());
     }
     {
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         FunctionalitySet functionalities;
         functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
-        ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+        ModelPool::Set combinations = ask.getResourceSupport(functionalities);
         BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, but were " << combinations.size()
                 << " "
                 << ModelPool::toString(combinations) );
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
             FunctionalitySet functionalities;
             functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
-            ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+            ModelPool::Set combinations = ask.getResourceSupport(functionalities);
             BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, but were " << combinations.size()
                     << " "
                     << ModelPool::toString(combinations) );
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
             FunctionalitySet functionalities;
             functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
-            ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+            ModelPool::Set combinations = ask.getResourceSupport(functionalities);
             BOOST_REQUIRE_MESSAGE(combinations.size() == 1, "With functional bound only one combination that supports stereo image provider, but were " << combinations.size()
                     << " "
                     << ModelPool::toString(combinations) );
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
 
             {
                 OrganizationModelAsk minimalAsk(om, modelPoolBounded, false);
-                ModelPoolSet combinations = minimalAsk.getResourceSupport(functionalities);
+                ModelPool::Set combinations = minimalAsk.getResourceSupport(functionalities);
                 std::set<ModelPool>::const_iterator cit = combinations.begin();
                 for(; cit != combinations.end(); ++cit)
                 {
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
             }
             {
                 OrganizationModelAsk minimalAsk(om, modelPoolBounded, true);
-                ModelPoolSet combinations = minimalAsk.getBoundedResourceSupport(functionalities);
+                ModelPool::Set combinations = minimalAsk.getBoundedResourceSupport(functionalities);
                 std::set<ModelPool>::const_iterator cit = combinations.begin();
                 for(; cit != combinations.end(); ++cit)
                 {
@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE(resource_support_crex)
         FunctionalitySet functionalities;
         functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
-        ModelPoolSet combinations = ask.getResourceSupport(functionalities);
+        ModelPool::Set combinations = ask.getResourceSupport(functionalities);
 
         BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider expected 0 was " << combinations.size());
     }

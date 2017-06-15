@@ -308,10 +308,10 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
     return true;
 }
 
-ModelPoolSet OrganizationModelAsk::filterNonMinimal(const ModelPoolSet& modelPoolSet, const FunctionalitySet& functionalities) const
+ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& modelPoolSet, const FunctionalitySet& functionalities) const
 {
-    ModelPoolSet filtered;
-    ModelPoolSet::const_iterator mit = modelPoolSet.begin();
+    ModelPool::Set filtered;
+    ModelPool::Set::const_iterator mit = modelPoolSet.begin();
     for(; mit != modelPoolSet.end(); ++mit)
     {
         if(isMinimal(*mit, functionalities))
@@ -322,7 +322,7 @@ ModelPoolSet OrganizationModelAsk::filterNonMinimal(const ModelPoolSet& modelPoo
     return filtered;
 }
 
-ModelPoolSet OrganizationModelAsk::getResourceSupport(const FunctionalitySet& functionalities) const
+ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& functionalities) const
 {
     if(functionalities.empty())
     {
@@ -334,7 +334,7 @@ ModelPoolSet OrganizationModelAsk::getResourceSupport(const FunctionalitySet& fu
     //'compositions'
     /// i.e. per requested function the combination of models that support it,
     Function2PoolMap functionalityProviders;
-    ModelPoolSet supportingCompositions;
+    ModelPool::Set supportingCompositions;
     {
         FunctionalitySet::const_iterator cit = functionalities.begin();
         for(; cit != functionalities.end(); ++cit)
@@ -342,30 +342,30 @@ ModelPoolSet OrganizationModelAsk::getResourceSupport(const FunctionalitySet& fu
             const Functionality& functionality = *cit;
             const owlapi::model::IRI& functionalityModel = functionality.getModel();
             try {
-                 ModelPoolSet modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
+                 ModelPool::Set modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
                  supportingCompositions = Algebra::maxCompositions(supportingCompositions, modelPoolSet);
             } catch(const std::invalid_argument& e)
             {
                 LOG_DEBUG_S << "Could not find resource support for service: '" << functionalityModel;
-                return ModelPoolSet();
+                return ModelPool::Set();
             }
         }
     }
     return supportingCompositions;
 }
 
-ModelPoolSet OrganizationModelAsk::getBoundedResourceSupport(const FunctionalitySet& functionalities) const
+ModelPool::Set OrganizationModelAsk::getBoundedResourceSupport(const FunctionalitySet& functionalities) const
 {
-    ModelPoolSet modelPools = getResourceSupport(functionalities);
+    ModelPool::Set modelPools = getResourceSupport(functionalities);
     modelPools = filterNonMinimal(modelPools, functionalities);
     ModelPool bound = getFunctionalSaturationBound(functionalities);
     return applyUpperBound(modelPools, bound);
 }
 
-ModelPoolSet OrganizationModelAsk::applyUpperBound(const ModelPoolSet& modelPools, const ModelPool& upperBound) const
+ModelPool::Set OrganizationModelAsk::applyUpperBound(const ModelPool::Set& modelPools, const ModelPool& upperBound) const
 {
-    ModelPoolSet boundedModelPools;
-    ModelPoolSet::const_iterator cit = modelPools.begin();
+    ModelPool::Set boundedModelPools;
+    ModelPool::Set::const_iterator cit = modelPools.begin();
     for(; cit != modelPools.end(); ++cit)
     {
         const ModelPool& modelPool = *cit;
@@ -416,10 +416,10 @@ ModelCombinationSet OrganizationModelAsk::applyUpperBound(const ModelCombination
     return boundedCombinations;
 }
 
-ModelPoolSet OrganizationModelAsk::applyLowerBound(const ModelPoolSet& modelPools, const ModelPool& lowerBound) const
+ModelPool::Set OrganizationModelAsk::applyLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBound) const
 {
-    ModelPoolSet boundedModelPools;
-    ModelPoolSet::const_iterator cit = modelPools.begin();
+    ModelPool::Set boundedModelPools;
+    ModelPool::Set::const_iterator cit = modelPools.begin();
     for(; cit != modelPools.end(); ++cit)
     {
         const ModelPool& modelPool = *cit;
@@ -458,16 +458,16 @@ ModelCombinationSet OrganizationModelAsk::applyLowerBound(const ModelCombination
     return boundedCombinations;
 }
 
-ModelPoolSet OrganizationModelAsk::expandToLowerBound(const ModelPoolSet& modelPools, const ModelPool& lowerBound) const
+ModelPool::Set OrganizationModelAsk::expandToLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBound) const
 {
-    ModelPoolSet boundedModelPools;
+    ModelPool::Set boundedModelPools;
     if(modelPools.empty())
     {
         boundedModelPools.insert(lowerBound);
         return boundedModelPools;
     }
 
-    ModelPoolSet::const_iterator cit = modelPools.begin();
+    ModelPool::Set::const_iterator cit = modelPools.begin();
     for(; cit != modelPools.end(); ++cit)
     {
         ModelPool modelPool = *cit;
@@ -663,13 +663,13 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functi
     // Requires the functionality mapping to be properly initialized
 
     FunctionalitySet::const_iterator cit = functionalities.begin();
-    ModelPoolSet previousModelPools;
+    ModelPool::Set previousModelPools;
     bool init = true;
     for(; cit != functionalities.end(); ++cit)
     {
         const Functionality& functionality = *cit;
         try {
-            const ModelPoolSet& modelPools = mFunctionalityMapping.getModelPools(functionality.getModel());
+            const ModelPool::Set& modelPools = mFunctionalityMapping.getModelPools(functionality.getModel());
 
             if(init)
             {
@@ -678,7 +678,7 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functi
                 continue;
             }
 
-            ModelPoolSet resultList;
+            ModelPool::Set resultList;
             std::set_intersection(modelPools.begin(), modelPools.end(),
                     previousModelPools.begin(), previousModelPools.end(),
                     std::inserter(resultList, resultList.begin()) );
@@ -692,7 +692,7 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functi
 
     }
 
-    ModelPoolSet::const_iterator pit = std::find(previousModelPools.begin(), previousModelPools.end(), modelPool);
+    ModelPool::Set::const_iterator pit = std::find(previousModelPools.begin(), previousModelPools.end(), modelPool);
     if(pit != previousModelPools.end())
     {
         return true;

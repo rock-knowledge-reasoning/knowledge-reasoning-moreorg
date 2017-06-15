@@ -18,11 +18,11 @@ FunctionalityMapping::FunctionalityMapping(const ModelPool& modelPool,
     for(; cit != mFunctionalities.end(); ++cit)
     {
         // initialize the set of functionalities
-        mFunction2Pool[*cit] = ModelPoolSet();
+        mFunction2Pool[*cit] = ModelPool::Set();
     }
 }
 
-const ModelPoolSet& FunctionalityMapping::getModelPools(const owlapi::model::IRI& iri) const
+const ModelPool::Set& FunctionalityMapping::getModelPools(const owlapi::model::IRI& iri) const
 {
     Function2PoolMap::const_iterator cit = mFunction2Pool.find(iri);
     if(cit != mFunction2Pool.end())
@@ -72,7 +72,7 @@ std::string FunctionalityMapping::toString(uint32_t indent) const
             ss << hspace << "   - function: " << cit->first.toString() << std::endl;
             ss << hspace << "     pools: " << std::endl;
 
-            const ModelPoolSet& modelPoolSet = cit->second;
+            const ModelPool::Set& modelPoolSet = cit->second;
             ss << ModelPool::toString(modelPoolSet, indent + 8) << std::endl;
         }
     }
