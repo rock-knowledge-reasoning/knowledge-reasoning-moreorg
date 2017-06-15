@@ -27,6 +27,8 @@ class FunctionalityMapping
     ModelPool mModelPool;
     /// The list of known functionalities
     owlapi::model::IRIList mFunctionalities;
+    owlapi::model::IRISet mSupportedFunctionalities;
+
     /// The global functional saturation bound (for all known/considered
     //functionalities))
     ModelPool mFunctionalSaturationBound;
@@ -96,6 +98,14 @@ public:
      * \return string representation of FunctionalityMapping
      */
     std::string toString(uint32_t indent = 0) const;
+
+
+    /**
+     * Compute the list of supported functionalities, i.e.
+     * when at least some combination of models supports this functionality
+     * \return list of supported functionalities
+     */
+    owlapi::model::IRISet getSupportedFunctionalities() const { return mSupportedFunctionalities; }
 };
 
 } // end namespace organization_model

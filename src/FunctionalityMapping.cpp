@@ -36,7 +36,11 @@ const ModelPoolSet& FunctionalityMapping::getModelPools(const owlapi::model::IRI
 
 void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRI& function)
 {
-    mFunction2Pool[function].insert(modelPool);
+    if(!modelPool.empty())
+    {
+        mFunction2Pool[function].insert(modelPool);
+        mSupportedFunctionalities.insert(function);
+    }
 }
 
 void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRIList& functionModels)
@@ -67,8 +71,9 @@ std::string FunctionalityMapping::toString(uint32_t indent) const
         {
             ss << hspace << "   - function: " << cit->first.toString() << std::endl;
             ss << hspace << "     pools: " << std::endl;
+
             const ModelPoolSet& modelPoolSet = cit->second;
-            ss << ModelPool::toString(cit->second, indent + 8) << std::endl;
+            ss << ModelPool::toString(modelPoolSet, indent + 8) << std::endl;
         }
     }
 

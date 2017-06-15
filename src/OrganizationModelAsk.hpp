@@ -49,6 +49,11 @@ public:
     owlapi::model::IRIList getFunctionalities() const;
 
     /**
+     * Retrieve the support of known functionalities
+     */
+    ModelPool getSupportedFunctionalities() const;
+
+    /**
      * Set the model pool
      * A currently set model pool is required for some queries to the
      * organization model

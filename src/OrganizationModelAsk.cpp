@@ -58,6 +58,18 @@ owlapi::model::IRIList OrganizationModelAsk::getFunctionalities() const
     return subclasses;
 }
 
+ModelPool OrganizationModelAsk::getSupportedFunctionalities() const
+{
+    ModelPool modelPool;
+    owlapi::model::IRISet mSupportedFunctionalities = mFunctionalityMapping.getSupportedFunctionalities();
+    owlapi::model::IRISet::const_iterator cit = mSupportedFunctionalities.begin();
+    for(; cit != mSupportedFunctionalities.end(); ++cit)
+    {
+        modelPool[*cit] = 1;
+    }
+    return modelPool;
+}
+
 FunctionalityMapping OrganizationModelAsk::computeFunctionalityMapping(const ModelPool& modelPool, bool applyFunctionalSaturationBound) const
 {
     if(modelPool.empty())

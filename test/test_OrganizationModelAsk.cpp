@@ -11,6 +11,20 @@ using namespace organization_model::vocabulary;
 
 BOOST_AUTO_TEST_SUITE(organization_model_ask)
 
+BOOST_AUTO_TEST_CASE(supported_functionalities)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
+    IRI sherpa = OM::resolve("Sherpa");
+    ModelPool modelPool;
+    modelPool[sherpa] = 1;
+
+    OrganizationModelAsk ask(om, modelPool, true);
+    BOOST_TEST_MESSAGE("Supported functionalities by " << sherpa << ": " <<  ask.getSupportedFunctionalities().toString() );
+}
+
 BOOST_AUTO_TEST_CASE(recursive_resolution)
 {
     using namespace owlapi::vocabulary;
