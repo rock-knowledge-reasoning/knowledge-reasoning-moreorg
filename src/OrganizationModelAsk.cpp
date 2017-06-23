@@ -686,8 +686,8 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functi
 
         } catch(const std::invalid_argument& e)
         {
-            throw std::runtime_error("organization_model::OrganizationModelAsk::isSupporting \
-                    could not find functionality '" + functionality.getModel().toString() + "'");
+            throw std::runtime_error("organization_model::OrganizationModelAsk::isSupporting"
+                    " could not find functionality '" + functionality.getModel().toString() + "'");
         }
 
     }
