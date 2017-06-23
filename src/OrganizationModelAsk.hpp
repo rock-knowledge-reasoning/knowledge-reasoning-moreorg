@@ -32,7 +32,7 @@ public:
      * reduce computed combinations to the functional saturation bound --
      * otherwise all feasible combinations are computed
      */
-    OrganizationModelAsk(const OrganizationModel::Ptr& om,
+    explicit OrganizationModelAsk(const OrganizationModel::Ptr& om,
             const ModelPool& modelPool = ModelPool(),
             bool applyFunctionalSaturationBound = false);
 
