@@ -686,6 +686,11 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functi
 
         } catch(const std::invalid_argument& e)
         {
+            LOG_WARN_S << "Could not find functionality: " << functionality.getModel().toString() << std::endl
+                << modelPool.toString(4) << std::endl
+                << "current functionality mappping: " << std::endl
+                << mFunctionalityMapping.toString(4);
+
             throw std::runtime_error("organization_model::OrganizationModelAsk::isSupporting"
                     " could not find functionality '" + functionality.getModel().toString() + "'");
         }
