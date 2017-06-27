@@ -26,12 +26,17 @@ class Connectivity : public Gecode::Space
     ModelCombination mModelCombination;
     owlapi::model::IRIList mInterfaces;
 
-    /// List interfaces and associate with corresponding model instance
+    // Index of interface mapping and interface index range correspond to the
+    // same model instance
+    //
+    /// List the interfaces and associate the list with corresponding model instance
     std::vector< std::pair<owlapi::model::IRI, owlapi::model::IRIList> > mInterfaceMapping;
     /// Register the interface index ranges
     typedef std::pair<uint32_t, uint32_t> IndexRange;
     std::vector< IndexRange > mInterfaceIndexRanges;
     Gecode::IntVarArray mConnections;
+
+    Gecode::Symmetries identifySymmetries(Gecode::IntVarArray& connections);
 
 public:
     Connectivity(const ModelPool& modelPool, const OrganizationModelAsk& ask, const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface") );

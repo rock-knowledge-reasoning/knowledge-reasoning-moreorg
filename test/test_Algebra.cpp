@@ -279,10 +279,51 @@ BOOST_AUTO_TEST_CASE(connectivity)
     }
     {
         ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Payload")] = 20;
+
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Payload")] = 40;
+
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("CREX")] = 1;
+
+        BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+
+    }
+    {
+        ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("CREX")] = 2;
 
         BOOST_REQUIRE_MESSAGE( !Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
 
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("CREX")] = 10;
+
+        BOOST_REQUIRE_MESSAGE( !Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 1;
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 2;
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 20;
+        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
     }
     {
         ModelPool modelPool;
@@ -293,8 +334,31 @@ BOOST_AUTO_TEST_CASE(connectivity)
     }
     {
         ModelPool modelPool;
-        modelPool[vocabulary::OM::resolve("Sherpa")] = 2;
-        BOOST_REQUIRE_MESSAGE( Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 1;
+        modelPool[vocabulary::OM::resolve("CREX")] = 10;
+
+        BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 4;
+        modelPool[vocabulary::OM::resolve("CREX")] = 3;
+
+        BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 10;
+        modelPool[vocabulary::OM::resolve("CREX")] = 10;
+
+        BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 18;
+        modelPool[vocabulary::OM::resolve("CREX")] = 20;
+
+        BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
     }
 }
 

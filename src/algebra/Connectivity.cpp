@@ -102,7 +102,7 @@ Connectivity::Connectivity(const ModelPool& modelPool, const OrganizationModelAs
         {
             IndexRange a1InterfaceIndexes = mInterfaceIndexRanges[a1];
 
-            Gecode::IntVarArgs interfaceUsage;
+            Gecode::IntVarArgs agentInterconnection;
 
             // Interfaces of Agent A
             for(size_t i0 = a0InterfaceIndexes.first; i0 <= a0InterfaceIndexes.second; ++i0)
@@ -115,7 +115,7 @@ Connectivity::Connectivity(const ModelPool& modelPool, const OrganizationModelAs
                     const IRI& interfaceModel1 = mInterfaces[i1];
 
                     Gecode::IntVar v = connectionMatrix(i0,i1);
-                    interfaceUsage << v;
+                    agentInterconnection << v;
 
                     if(a1 == a0) // same agent
                     {
@@ -131,22 +131,64 @@ Connectivity::Connectivity(const ModelPool& modelPool, const OrganizationModelAs
                         LOG_DEBUG_S << interfaceModel0.toString() << " isNotCompatibleWith " << interfaceModel1.toString();
                         rel(*this, v, Gecode::IRT_EQ, 0);
                     }
-
                 }
             }
-
             // There should be maximum one connection between two systems
-            rel(*this, sum( interfaceUsage ) <= 1);
+            rel(*this, sum( agentInterconnection ) <= 1);
+        }
+    }
+
+    // This constraint implicitly holds through the other constraints
+    // of # of overall links, agent interconnection and max one connection per
+    // interface
+    //for(size_t a = 0; a < mInterfaceIndexRanges.size(); ++a)
+    //{
+    //    IndexRange aInterfaceIndexes = mInterfaceIndexRanges[a];
+    //    Gecode::IntVarArgs agentConnections;
+    //    // Interfaces of Agent A
+    //    for(size_t i = aInterfaceIndexes.first; i <= aInterfaceIndexes.second; ++i)
+    //    {
+    //        agentConnections << connectionMatrix.col(i);
+    //    }
+
+    //    // there should be at least one outgoing connection to another system
+    //    rel(*this, sum(agentConnections) >= 1);
+    //}
+
+    // Maximum of one connection per interface
+    for(size_t c = 0; c < mInterfaces.size(); ++c)
+    {
+        Gecode::IntVarArgs interfaceUsage;
+
+        for(size_t r = 0; r < mInterfaces.size(); ++r)
+        {
+            Gecode::IntVar v = connectionMatrix(c,r);
+            interfaceUsage << v;
         }
 
+        // There should be maximum one connection per interface
+        rel(*this, sum( interfaceUsage ) <= 1);
     }
+
     mConnections = connections;
 
     LOG_INFO_S << "Connectivity: after initial propagation" << toString();
 
-    branch(*this, mConnections, Gecode::INT_VAR_SIZE_MAX(), Gecode::INT_VAL_SPLIT_MIN());
-    branch(*this, mConnections, Gecode::INT_VAR_MIN_MIN(), Gecode::INT_VAL_SPLIT_MIN());
-    branch(*this, mConnections, Gecode::INT_VAR_NONE(), Gecode::INT_VAL_SPLIT_MIN());
+    // Avoid computation of solutions that are redunant
+    // Gecode documentation says however in 8.10.2 that "Symmetry breaking by
+    // LDSB is not guaranteed to be complete. That is, a search may still return
+    // two distinct solutions that are symmetric."
+    //
+    Gecode::Symmetries symmetries = identifySymmetries(connections);
+
+    Gecode::Rnd r;
+    r.time();
+    branch(*this, mConnections, Gecode::INT_VAR_RND(r), Gecode::INT_VAL_RND(r), symmetries);
+
+    Gecode::IntAFC afc(*this, mConnections, 0.95);
+    branch(*this, mConnections, Gecode::INT_VAR_AFC_MAX(afc), Gecode::INT_VAL_RND(r), symmetries);
+
+    branch(*this, mConnections, Gecode::INT_VAR_NONE(), Gecode::INT_VAL_MIN(), symmetries);
 }
 
 Connectivity::Connectivity(bool share, Connectivity& other)
@@ -174,7 +216,7 @@ bool Connectivity::isFeasible(const ModelPool& modelPool, const OrganizationMode
     }
     try {
         Connectivity* connectivity = new Connectivity(modelPool, ask);
-        Gecode::BAB<Connectivity> searchEngine(connectivity);
+        Gecode::DFS<Connectivity> searchEngine(connectivity);
 
         Connectivity* current = searchEngine.next();
         if(current)
@@ -198,17 +240,78 @@ bool Connectivity::isFeasible(const ModelPool& modelPool, const OrganizationMode
 std::string Connectivity::toString() const
 {
     std::stringstream ss;
+    std::vector< std::pair<size_t, size_t> > links;
     Gecode::Matrix<Gecode::IntVarArray> connectionMatrix(mConnections, mInterfaces.size(), mInterfaces.size());
     for(uint32_t r = 0; r < mInterfaces.size(); ++r)
     {
         ss << std::endl << "interface #" << r << " " ;
-        for(uint32_t c = 0; c < mInterfaces.size(); ++c)
+        for(uint32_t c = r; c < mInterfaces.size(); ++c)
         {
-            ss << "(" << r << "/" << c << ")=" << connectionMatrix(r,c) << " ";
+            Gecode::IntVar var = connectionMatrix(r,c);
+            ss << "(" << r << "/" << c << ")=" << var << " ";
+            if(var.assigned() && var.val() == 1)
+            {
+                links.push_back(std::pair<size_t,size_t>(r,c));
+            }
         }
         ss << std::endl;
     }
+    ss << "Established links (" << links.size() << "):" << std::endl;
+    for(uint32_t r = 0; r < links.size(); ++r)
+    {
+        ss << links[r].first << "/" << links[r].second;
+        ss << std::endl;
+    }
     return ss.str();
+}
+
+Gecode::Symmetries Connectivity::identifySymmetries(Gecode::IntVarArray& connections)
+{
+    Gecode::Matrix<Gecode::IntVarArray> connectionMatrix(connections, mInterfaces.size(), mInterfaces.size());
+
+    Gecode::Symmetries symmetries;
+    // define interchangeable columns for roles of the same model type
+    for(const std::pair<IRI, uint32_t>& entry : mModelPool)
+    {
+        const IRI& currentModel = entry.first;
+        Gecode::IntVarArgs sameModel;
+
+        size_t numberOfVariables = 0;
+        for(size_t c = 0; c < mInterfaceMapping.size(); ++c)
+        {
+            // check the model of the interface
+            if( mInterfaceMapping[c].first == currentModel)
+            {
+                IndexRange interfaceIndexes = mInterfaceIndexRanges[c];
+                LOG_WARN_S << currentModel.toString() << " adding columns: " << interfaceIndexes.first << " -- " << interfaceIndexes.second;
+                for(size_t i = interfaceIndexes.first; i <= interfaceIndexes.second; ++i)
+                {
+                    // Since a single agents spans multiple columns with its
+                    // interface range, we have to dynamically create the length
+                    // field
+                    numberOfVariables += mInterfaces.size();
+                    sameModel << connectionMatrix.col(i);
+                }
+            }
+        }
+        symmetries << VariableSequenceSymmetry(sameModel, numberOfVariables);
+    }
+
+    Gecode::IntVarArgs rows;
+    for(int r = 0; r < connectionMatrix.height(); r++)
+    {
+        rows << connectionMatrix.row(r);
+    }
+    symmetries << VariableSequenceSymmetry(rows, connectionMatrix.width());
+
+    Gecode::IntVarArgs cols;
+    for(int c = 0; c < connectionMatrix.width(); c++)
+    {
+        cols << connectionMatrix.col(c);
+    }
+    symmetries << VariableSequenceSymmetry(cols, connectionMatrix.height());
+
+    return symmetries;
 }
 
 } // end namespace algebra
