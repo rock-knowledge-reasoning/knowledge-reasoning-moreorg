@@ -19,10 +19,13 @@ namespace organization_model {
 
 OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
         const ModelPool& modelPool,
-        bool applyFunctionalSaturationBound)
+        bool applyFunctionalSaturationBound,
+        double feasibilityCheckTimeoutInMs
+        )
     : mpOrganizationModel(om)
     , mOntologyAsk(om->ontology())
     , mApplyFunctionalSaturationBound(applyFunctionalSaturationBound)
+    , mFeasibilityCheckTimeoutInMs(feasibilityCheckTimeoutInMs)
 {
     if(!modelPool.empty())
     {
@@ -158,7 +161,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
             {
                 LOG_DEBUG_S << "combination is minimal for " << functionality.getModel().toString() << std::endl
                     << combinationModelPool.toString(4);
-                if(algebra::Connectivity::isFeasible(combinationModelPool, *this))
+                if(algebra::Connectivity::isFeasible(combinationModelPool, *this, mFeasibilityCheckTimeoutInMs))
                 {
                     LOG_DEBUG_S << "combination is feasible " << std::endl
                     << combinationModelPool.toString(4);

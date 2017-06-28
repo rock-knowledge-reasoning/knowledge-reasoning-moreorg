@@ -8,7 +8,10 @@ using namespace owlapi::model;
 namespace organization_model {
 namespace algebra {
 
-Connectivity::Connectivity(const ModelPool& modelPool, const OrganizationModelAsk& ask, const owlapi::model::IRI& interfaceBaseClass)
+Connectivity::Connectivity(const ModelPool& modelPool,
+        const OrganizationModelAsk& ask,
+        const owlapi::model::IRI& interfaceBaseClass
+        )
     : mModelPool(modelPool)
     , mAsk(ask.ontology())
     , mInterfaceBaseClass(interfaceBaseClass)
@@ -96,7 +99,6 @@ Connectivity::Connectivity(const ModelPool& modelPool, const OrganizationModelAs
     for(size_t a0 = 0; a0 < mInterfaceIndexRanges.size(); ++a0)
     {
         IndexRange a0InterfaceIndexes = mInterfaceIndexRanges[a0];
-
         // Agent B
         for(size_t a1 = a0; a1 < mInterfaceIndexRanges.size(); ++a1)
         {
@@ -181,14 +183,12 @@ Connectivity::Connectivity(const ModelPool& modelPool, const OrganizationModelAs
     //
     Gecode::Symmetries symmetries = identifySymmetries(connections);
 
-    Gecode::Rnd r;
-    r.time();
-    branch(*this, mConnections, Gecode::INT_VAR_RND(r), Gecode::INT_VAL_RND(r), symmetries);
+    // Ideally prefer the assignment of feasible 'connections' for a system,
+    // which is the MAX of the domain -> 1
+    // Propagation will set the other invalid connections to 0, thus speeding up
+    // the assignment process
+    branch(*this, mConnections, Gecode::INT_VAR_MAX_MAX(), Gecode::INT_VAL_MAX(), symmetries);
 
-    Gecode::IntAFC afc(*this, mConnections, 0.95);
-    branch(*this, mConnections, Gecode::INT_VAR_AFC_MAX(afc), Gecode::INT_VAL_RND(r), symmetries);
-
-    branch(*this, mConnections, Gecode::INT_VAR_NONE(), Gecode::INT_VAL_MIN(), symmetries);
 }
 
 Connectivity::Connectivity(bool share, Connectivity& other)
@@ -207,7 +207,9 @@ Gecode::Space* Connectivity::copy(bool share)
     return new Connectivity(share, *this);
 }
 
-bool Connectivity::isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask)
+bool Connectivity::isFeasible(const ModelPool& modelPool,
+        const OrganizationModelAsk& ask,
+        double timeoutInMs)
 {
     // For a single system this check is trivially true
     if(modelPool.numberOfInstances() < 2)
@@ -216,7 +218,12 @@ bool Connectivity::isFeasible(const ModelPool& modelPool, const OrganizationMode
     }
     try {
         Connectivity* connectivity = new Connectivity(modelPool, ask);
-        Gecode::DFS<Connectivity> searchEngine(connectivity);
+        Gecode::Search::Options options;
+        if(timeoutInMs > 0)
+        {
+            options.stop = Gecode::Search::Stop::time(timeoutInMs);
+        }
+        Gecode::DFS<Connectivity> searchEngine(connectivity, options);
 
         Connectivity* current = searchEngine.next();
         if(current)

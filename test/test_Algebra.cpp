@@ -355,8 +355,29 @@ BOOST_AUTO_TEST_CASE(connectivity)
     }
     {
         ModelPool modelPool;
-        modelPool[vocabulary::OM::resolve("Sherpa")] = 18;
-        modelPool[vocabulary::OM::resolve("CREX")] = 20;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 4;
+        modelPool[vocabulary::OM::resolve("CREX")] = 10;
+
+        BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 6;
+        modelPool[vocabulary::OM::resolve("CREX")] = 10;
+
+        BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask, 10000), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 8;
+        modelPool[vocabulary::OM::resolve("CREX")] = 10;
+
+        BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask, 10000), "ModelPool: " << modelPool.toString() );
+    }
+    {
+        ModelPool modelPool;
+        modelPool[vocabulary::OM::resolve("Sherpa")] = 9;
+        modelPool[vocabulary::OM::resolve("CREX")] = 10;
 
         BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask), "ModelPool: " << modelPool.toString() );
     }

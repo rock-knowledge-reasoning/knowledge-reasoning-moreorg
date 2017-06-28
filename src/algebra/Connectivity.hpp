@@ -58,9 +58,13 @@ public:
 
     /**
      * Check whether a model pool can be fully connected
+     * \param modelPool ModelPool to check if all agents can form a single unit
+     * \param ask OrganizationModel to use for information about available
+     * interfaces etc.
+     * \param timeoutInMs Timeout of the feasibility check
      * \return True if a connection is feasible, false otherwise
      */
-    static bool isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask);
+    static bool isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask, double timeoutInMs = 0);
 
     /**
      * Convert solution to string

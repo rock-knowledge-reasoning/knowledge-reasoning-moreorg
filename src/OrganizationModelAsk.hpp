@@ -34,7 +34,8 @@ public:
      */
     explicit OrganizationModelAsk(const OrganizationModel::Ptr& om,
             const ModelPool& modelPool = ModelPool(),
-            bool applyFunctionalSaturationBound = false);
+            bool applyFunctionalSaturationBound = false,
+            double feasibilityCheckTimeoutInMs = 20000);
 
     /**
      * Retrieve the list of all known service models
@@ -382,6 +383,8 @@ private:
     /// how many instances of type X,Y
     /// to be considered
     ModelPool mModelPool;
+
+    double mFeasibilityCheckTimeoutInMs;
 };
 
 } // end namespace organization_model
