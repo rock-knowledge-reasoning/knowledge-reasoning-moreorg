@@ -87,7 +87,7 @@ public:
      * Check if this resource support vector contains the other, i.e. if the
      * following holds
      \f[
-        V_{this}(i) \geq V_{other}(i) \for i = 1 \dots |V_{this}|
+        V_{this}(i) \geq V_{other}(i) \text{, where } i = 1 \dots |V_{this}|
      \f]
      */
     bool contains(const ResourceSupportVector& other) const;
