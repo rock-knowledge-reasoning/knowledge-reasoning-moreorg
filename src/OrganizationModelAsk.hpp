@@ -27,7 +27,8 @@ public:
     /**
      * Default constructor of the organization model ask
      * \param om OrganizationModel that is used as database
-     * \param modelPool ModelPool that is used for bounding
+     * \param modelPool ModelPool that is used for bounding -- only agent models
+     * will be considered
      * \param applyFunctionalSaturationBound Set bounding in order to
      * reduce computed combinations to the functional saturation bound --
      * otherwise all feasible combinations are computed

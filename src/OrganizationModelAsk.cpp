@@ -41,7 +41,14 @@ OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
 
 void OrganizationModelAsk::prepare(const ModelPool& modelPool, bool applyFunctionalSaturationBound)
 {
-    mModelPool = modelPool;
+    for(const ModelPool::value_type& value : modelPool)
+    {
+        const IRI& model = value.first;
+        if( mOntologyAsk.isSubClassOf(model, vocabulary::OM::Actor()))
+        {
+            mModelPool[model] = value.second;
+        }
+    }
     mFunctionalityMapping = computeFunctionalityMapping(mModelPool, applyFunctionalSaturationBound);
 }
 
