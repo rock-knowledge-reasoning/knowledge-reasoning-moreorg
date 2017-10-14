@@ -239,7 +239,7 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
     algebra::SupportType supportType = getSupportType(functionalities, modelPool);
     if(algebra::FULL_SUPPORT != supportType)
     {
-        LOG_INFO_S << "No full support for " << Functionality::toString(functionalities);
+        LOG_INFO_S << "No full support for " << Functionality::toString(functionalities) << " by " << std::endl << modelPool.toString(4);
         return false;
     }
 
