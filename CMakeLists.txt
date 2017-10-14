@@ -8,8 +8,10 @@ rock_standard_layout()
 
 find_package(owlapi)
 
+owlapi_install_ontology("http://www.rock-robotics.org/2017/08/om-base"
+    "test/data/om-base-v0.1.owl")
 owlapi_install_ontology("http://www.rock-robotics.org/2014/01/om-schema"
-    "test/data/om-schema-v0.18.owl")
+    "test/data/om-schema-v0.19.owl")
 owlapi_install_ontology("http://www.rock-robotics.org/2015/12/robots/BaseCamp"
     "test/data/om-robot-basecamp.owl")
 owlapi_install_ontology("http://www.rock-robotics.org/2015/12/robots/CoyoteIII"
