@@ -54,13 +54,13 @@ public:
      * identified through an IRI
      * \see owlapi::model::OWLOntologyIO::load
      */
-    OrganizationModel(const owlapi::model::IRI& iri);
+    explicit OrganizationModel(const owlapi::model::IRI& iri);
 
     /**
      * Constructor to create an OrganizationModel from an existing description file
      * \param filename File name to an rdf/xml formatted ontology description file
      */
-    OrganizationModel(const std::string& filename = "");
+    explicit OrganizationModel(const std::string& filename = "");
 
     owlapi::model::OWLOntology::Ptr ontology() { return mpOntology; }
 
@@ -81,6 +81,10 @@ public:
     static std::string toString(const ModelCombinationSet& combinations);
 
     static OrganizationModel::Ptr getInstance(const std::string& filename = "");
+    /**
+     * Get an organization model from a given IRI, i.e. check for existing
+     * (installed) organization model file and tries to retrieve them otherwise
+     */
     static OrganizationModel::Ptr getInstance(const owlapi::model::IRI& iri);
 
 private:
