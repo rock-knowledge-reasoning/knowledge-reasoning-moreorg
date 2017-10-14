@@ -290,7 +290,7 @@ Gecode::Symmetries Connectivity::identifySymmetries(Gecode::IntVarArray& connect
             if( mInterfaceMapping[c].first == currentModel)
             {
                 IndexRange interfaceIndexes = mInterfaceIndexRanges[c];
-                LOG_WARN_S << currentModel.toString() << " adding columns: " << interfaceIndexes.first << " -- " << interfaceIndexes.second;
+                LOG_INFO_S << currentModel.toString() << " adding columns: " << interfaceIndexes.first << " -- " << interfaceIndexes.second;
                 for(size_t i = interfaceIndexes.first; i <= interfaceIndexes.second; ++i)
                 {
                     // Since a single agents spans multiple columns with its
