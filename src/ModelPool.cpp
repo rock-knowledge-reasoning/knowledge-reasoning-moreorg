@@ -179,4 +179,50 @@ size_t ModelPool::getValue(const owlapi::model::IRI& resource, size_t defaultVal
     return defaultVal;
 }
 
+std::pair<owlapi::model::IRI, size_t> ModelPool::getMaxResource() const
+{
+    size_t maxValue = std::numeric_limits<size_t>::min();
+    //organization_model::ModelPool::value_type currentMax;
+    std::pair<owlapi::model::IRI, size_t> currentMax;
+
+    organization_model::ModelPool::const_iterator cit = this->begin();
+    for(; cit != this->end(); ++cit)
+    {
+        if(maxValue < cit->second)
+        {
+            maxValue = cit->second;
+            currentMax = *cit;
+        }
+        maxValue = std::max( maxValue, cit->second);
+    }
+    return currentMax;
+}
+
+std::pair<owlapi::model::IRI, size_t> ModelPool::getMinResource() const
+{
+    size_t minValue = std::numeric_limits<size_t>::max();
+    std::pair<owlapi::model::IRI, size_t> currentMin;
+
+    organization_model::ModelPool::const_iterator cit = this->begin();
+    for(; cit != this->end(); ++cit)
+    {
+        if(cit->second < minValue )
+        {
+            minValue = cit->second;
+            currentMin = *cit;
+        }
+    }
+    return currentMin;
+}
+
+size_t ModelPool::getMaxResourceCount() const
+{
+    return getMaxResource().second;
+}
+
+size_t ModelPool::getMinResourceCount() const
+{
+    return getMinResource().second;
+}
+
 } // end namespace organization_model

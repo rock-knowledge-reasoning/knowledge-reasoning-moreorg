@@ -82,6 +82,26 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
 
         size_t getValue(const owlapi::model::IRI& resource, size_t defaultVal) const;
 
+        /**
+         * Get the entry with the maximum number of resources
+         */
+        std::pair<owlapi::model::IRI, size_t> getMaxResource() const;
+
+        /**
+         * Get the entry with the minimum number of resources
+         */
+        std::pair<owlapi::model::IRI, size_t> getMinResource() const;
+
+        /**
+         * Get the maximum value of all key value pairs
+         */
+        size_t getMaxResourceCount() const;
+
+        /**
+         * Get the minimum value of all key value pairs
+         */
+        size_t getMinResourceCount() const;
+
 };
 
 /**
