@@ -1,11 +1,12 @@
 #ifndef ORGANIZATION_MODEL_ASK_HPP
 #define ORGANIZATION_MODEL_ASK_HPP
 
-#include <organization_model/SharedPtr.hpp>
 #include <owlapi/model/OWLCardinalityRestriction.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
-#include <organization_model/OrganizationModel.hpp>
-#include <organization_model/algebra/ResourceSupportVector.hpp>
+#include "SharedPtr.hpp"
+#include "OrganizationModel.hpp"
+#include "algebra/ResourceSupportVector.hpp"
+#include "FunctionalityRequirement.hpp"
 
 namespace organization_model {
 
@@ -68,6 +69,19 @@ public:
      * initialized with
      */
     FunctionalityMapping computeFunctionalityMapping(const ModelPool& pool, bool applyFunctionalSaturationBound = false) const;
+
+    ModelPool::Set getResourceSupport(const FunctionalityRequirement& functionalityRequirement) const;
+
+    /**
+     * Get the set of resources (or combination thereof) that support a given
+     * union of services
+     * That means, that services are either supported by separate systems or
+     * combined systems
+     * \param functionalities should be a set of functionalities / functionality models
+     * \return available resources (or combination thereof) to support this set of functionalities
+     */
+    ModelPool::Set getResourceSupport(const FunctionalitySet& functionalities,
+            const FunctionalityRequirement::Map& functionalityRequirements) const;
 
     /**
      * Get the set of resources (or combination thereof) that support a given
@@ -313,13 +327,20 @@ public:
      * Get the functionality mapping of the current OrganizationModelAsk object
      * \return FunctionalityMapping
      */
-     const FunctionalityMapping& getFunctionalityMapping() { return mFunctionalityMapping; }
+    const FunctionalityMapping& getFunctionalityMapping() { return mFunctionalityMapping; }
 
     /**
      * Check if a model pool exceeds the saturation bound with respect to a
      * given functionality set
      */
     bool isMinimal(const ModelPool& modelPool, const FunctionalitySet& functionalities) const;
+
+    /**
+     * Get the data property value of the complete combination given by the pool
+     * \throw std::runtime_error if the given data propery does not exist
+     */
+    double getDataPropertyValue(const ModelPool& modelPool, const owlapi::model::IRI& dataProperty) const;
+
 protected:
 
     /**
@@ -371,6 +392,8 @@ protected:
 
 
     ModelPool::Set filterNonMinimal(const ModelPool::Set& modelPoolSet, const FunctionalitySet& functionalities) const;
+
+    static void updateScalingFactor(std::vector<double>& factors, size_t idx, double newValue);
 
 private:
     OrganizationModel::Ptr mpOrganizationModel;

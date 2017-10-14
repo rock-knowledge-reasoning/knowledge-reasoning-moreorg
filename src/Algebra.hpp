@@ -52,6 +52,11 @@ public:
     static ModelPool merge(const std::set<ModelPool>& pool);
 
     /**
+     * Multiply the cardinalities with a given factor
+     */
+    static ModelPool multiply(const ModelPool& pool, uint32_t factor);
+
+    /**
      * Apply cartesian product like:
      * a = {(0,1),(1,1),(2,0)}
      * b = {(0,0),(1,2),(2,0)}

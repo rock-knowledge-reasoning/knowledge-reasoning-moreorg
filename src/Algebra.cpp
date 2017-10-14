@@ -175,6 +175,16 @@ ModelPool Algebra::merge(const std::set<ModelPool>& modelPoolSet)
     return mergedPool.toModelPool();
 }
 
+ModelPool Algebra::multiply(const ModelPool& pool, uint32_t factor)
+{
+    ModelPool scaled;
+    for(const ModelPool::value_type& entry : pool)
+    {
+        scaled[entry.first] = entry.second*factor;
+    }
+    return scaled;
+}
+
 ModelPool::Set Algebra::maxCompositions(const ModelPool& a, const ModelPool& b)
 {
     ModelPool::Set aPool;

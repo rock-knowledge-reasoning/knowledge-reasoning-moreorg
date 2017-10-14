@@ -3,6 +3,7 @@
 #include <organization_model/OrganizationModelAsk.hpp>
 #include <organization_model/reasoning/ResourceMatch.hpp>
 #include <organization_model/vocabularies/OM.hpp>
+#include <organization_model/FunctionalityRequirement.hpp>
 #include "test_utils.hpp"
 
 using namespace organization_model;
@@ -275,6 +276,39 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
 
         ModelPool::Set combinations = ask.getResourceSupport(functionalities);
         BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting : " << imageProvider.toString() << " and " << emiPowerProvider.toString() << ": '" << ModelPool::toString(combinations) << "'");
+    }
+
+    {
+        ModelPool modelPool;
+        modelPool[sherpa] = 1;
+        modelPool[crex] = 1;
+
+        OrganizationModelAsk ask(om, modelPool);
+        FunctionalitySet functionalities;
+
+        Functionality transportProvider( OM::resolve("TransportProvider") );
+        functionalities.insert( transportProvider );
+
+        {
+            double minItems = 10;
+            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GE, minItems);
+            PropertyConstraint::List constraints;
+            constraints.push_back(constraint);
+
+            FunctionalityRequirement fr(transportProvider, constraints);
+            ModelPool::Set combinations = ask.getResourceSupport(fr);
+            BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting transport for minimum of " << minItems << " items: '" << ModelPool::toString(combinations) << "'");
+        }
+        {
+            double minItems = 30;
+            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GE, minItems);
+            PropertyConstraint::List constraints;
+            constraints.push_back(constraint);
+
+            FunctionalityRequirement fr(transportProvider, constraints);
+            ModelPool::Set combinations = ask.getResourceSupport(fr);
+            BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting transport for minimum of " << minItems << " items: '" << ModelPool::toString(combinations) << "'");
+        }
     }
 }
 

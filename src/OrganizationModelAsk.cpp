@@ -10,6 +10,7 @@
 #include <organization_model/reasoning/ResourceMatch.hpp>
 #include <organization_model/vocabularies/OM.hpp>
 #include <organization_model/algebra/Connectivity.hpp>
+#include "FunctionalityRequirement.hpp"
 
 
 using namespace owlapi::model;
@@ -318,6 +319,35 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
     return true;
 }
 
+double OrganizationModelAsk::getDataPropertyValue(const ModelPool& modelPool, const owlapi::model::IRI& dataProperty) const
+{
+    bool initialized = false;
+    double value = 0;
+    for(const ModelPool::value_type& p : modelPool)
+    {
+        try {
+            const owlapi::model::IRI& model = p.first;
+            if(!initialized)
+            {
+                value = mOntologyAsk.getDataValue(model, dataProperty)->getDouble();
+                initialized = true;
+            } else {
+                value += mOntologyAsk.getDataValue(model, dataProperty)->getDouble();
+            }
+        } catch(const std::exception& e)
+        {
+            LOG_WARN_S << e.what();
+        }
+    }
+
+    if(!initialized)
+    {
+        throw std::runtime_error("organization_model::OrganizationModelAsk::getDataPropertyValue: the data property '" + dataProperty.toString() + "' is not extractable for the model pool: " + modelPool.toString());
+    }
+
+    return value;
+}
+
 ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& modelPoolSet, const FunctionalitySet& functionalities) const
 {
     ModelPool::Set filtered;
@@ -330,6 +360,153 @@ ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& mode
         }
     }
     return filtered;
+}
+
+ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequirement& functionalityRequirement) const
+{
+    const owlapi::model::IRI& functionalityModel = functionalityRequirement.getFunctionality().getModel();
+    try {
+        // Computing all model combination that support this functionality
+        ModelPool::Set modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
+        ModelPool::Set supportPool;
+        std::vector<double> scalingFactors(modelPoolSet.size(), 1.0);
+
+        // Todo: improve this for the complete set of combinations that support
+        // the minimum requirement
+        //
+        const PropertyConstraint::List& constraints = functionalityRequirement.getPropertyConstraints();
+        for(const PropertyConstraint& constraint : constraints)
+        {
+            const owlapi::model::IRI& property = constraint.getProperty();
+            size_t index = 0;
+            for(const ModelPool& pool : modelPoolSet)
+            {
+                double value = getDataPropertyValue(pool, property);
+                switch(constraint.getType())
+                {
+                    case PropertyConstraint::EQ:
+                        if(value == constraint.getValue())
+                        {
+                            updateScalingFactor(scalingFactors, index, 1);
+                        } else {
+                            // no correction possible
+                            updateScalingFactor(scalingFactors, index, 0);
+                        }
+                        break;
+                    case PropertyConstraint::LE:
+                        if(value <= constraint.getValue())
+                        {
+                            updateScalingFactor(scalingFactors, index, 1);
+                        } else {
+                            // no correction possible
+                            updateScalingFactor(scalingFactors, index, 0);
+                        }
+                        break;
+                    case PropertyConstraint::LT:
+                        if(value < constraint.getValue())
+                        {
+                            updateScalingFactor(scalingFactors, index, 1);
+                        } else {
+                            // no correction possible
+                            updateScalingFactor(scalingFactors, index, 0);
+                        }
+                        break;
+                    case PropertyConstraint::GE:
+                        if(value >= constraint.getValue())
+                        {
+                            updateScalingFactor(scalingFactors, index, 1);
+                        } else {
+                            double scalingFactor = std::ceil( constraint.getValue() / value );
+                            updateScalingFactor(scalingFactors, index, scalingFactor);
+                        }
+                        break;
+                    case PropertyConstraint::GT:
+                        if(value >= constraint.getValue())
+                        {
+                            updateScalingFactor(scalingFactors, index, 1);
+                        } else {
+                            double scalingFactor = std::ceil( constraint.getValue() / value );
+                            updateScalingFactor(scalingFactors, index, scalingFactor);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                ++index;
+            }
+        }
+
+        size_t index = 0;
+        for(const ModelPool& pool : modelPoolSet)
+        {
+            double scalingFactor = scalingFactors[index];
+            if(scalingFactor == 0)
+            {
+                // nothing to do
+            } else if(scalingFactor == 1.0)
+            {
+                supportPool.insert(pool);
+            } else
+            {
+                ModelPool scaled = Algebra::multiply(pool, scalingFactor);
+                supportPool.insert(scaled);
+            }
+            ++index;
+        }
+
+        return supportPool;
+    } catch(const std::invalid_argument& e)
+    {
+        LOG_DEBUG_S << "Could not find resource support for service: '" << functionalityModel;
+        return ModelPool::Set();
+    }
+}
+
+ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& functionalities, const FunctionalityRequirement::Map& functionalityRequirements) const
+{
+    // Functionality requirements:
+    if(functionalities.empty())
+    {
+        std::invalid_argument("organization_model::OrganizationModelAsk::getResourceSupport:"
+                " no functionality given in request");
+    }
+
+    /// Retrieve the systems that support the functionalities and create
+    /// 'compositions'
+    /// i.e. per requested function the combination of models that support it,
+    /// while accounting for the (data property constraints)
+    Function2PoolMap functionalityProviders;
+    ModelPool::Set supportingCompositions;
+    {
+        FunctionalitySet::const_iterator cit = functionalities.begin();
+        for(; cit != functionalities.end(); ++cit)
+        {
+            const Functionality& functionality = *cit;
+            const owlapi::model::IRI& functionalityModel = functionality.getModel();
+            // Requesting from the functionality mapping will in most cases
+            // embed the functional saturation bound, e.g.
+            // the minimum to provide a certain functionality (per se, without
+            // accouting for a particular dataProperty requirement)
+            //
+            // In principle one will need a special join function for each kind
+            // of data property -- right now we assume that we can 'sum' the
+            // dataproperties in order to deal with the requirements
+            //
+            try {
+                // Computing all model combination that support this
+                // functionality
+                ModelPool::Set modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
+
+                supportingCompositions = Algebra::maxCompositions(supportingCompositions, modelPoolSet);
+            } catch(const std::invalid_argument& e)
+            {
+                LOG_DEBUG_S << "Could not find resource support for service: '" << functionalityModel;
+                return ModelPool::Set();
+            }
+        }
+    }
+    return supportingCompositions;
+
 }
 
 ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& functionalities) const
@@ -914,5 +1091,20 @@ std::string OrganizationModelAsk::toString() const
 //    }
 //    return supportedModels;
 //}
+
+void OrganizationModelAsk::updateScalingFactor(std::vector<double>& factors, size_t idx, double newValue)
+{
+    double& v = factors.at(idx);
+    if(v == 0)
+    {
+        return;
+    } else if(newValue == 0)
+    {
+        v = 0;
+        return;
+    } else {
+        v = std::max(v, newValue);
+    }
+}
 
 } // end namespace organization_model

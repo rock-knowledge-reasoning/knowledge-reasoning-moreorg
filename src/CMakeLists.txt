@@ -16,6 +16,7 @@ rock_library(organization_model
         facets/Robot.cpp
         Functionality.cpp
         FunctionalityMapping.cpp
+        FunctionalityRequirement.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
         Metric.cpp
@@ -23,6 +24,7 @@ rock_library(organization_model
         OrganizationModel.cpp
         OrganizationModelAsk.cpp
         OrganizationModelTell.cpp
+        PropertyConstraint.cpp
         organization_model/ActorModelLink.cpp
         organization_model/EndpointModel.cpp
         organization_model/Grounding.cpp
@@ -48,6 +50,7 @@ rock_library(organization_model
         facets/Facet.hpp
         facets/Robot.hpp
         Functionality.hpp
+        FunctionalityRequirement.hpp
         FunctionalityMapping.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
@@ -56,6 +59,7 @@ rock_library(organization_model
         OrganizationModel.hpp
         OrganizationModelAsk.hpp
         OrganizationModelTell.hpp
+        PropertyConstraint.hpp
         organization_model/ActorModelLink.hpp
         organization_model/EndpointModel.hpp
         organization_model/Grounding.hpp
