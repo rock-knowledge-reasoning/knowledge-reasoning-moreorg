@@ -3,15 +3,15 @@
 #include <sstream>
 #include <base-logging/Logging.hpp>
 #include <organization_model/OrganizationModelAsk.hpp>
-#include <boost/assign/list_of.hpp>
 
 namespace organization_model {
 namespace algebra {
 
-std::map<SupportType, std::string> SupportTypeTxt = boost::assign::map_list_of
-    (NO_SUPPORT, "no support")
-    (PARTIAL_SUPPORT, "partial support")
-    (FULL_SUPPORT, "full support")
+std::map<SupportType, std::string> SupportTypeTxt = {
+    {NO_SUPPORT, "no support"},
+    {PARTIAL_SUPPORT, "partial support"},
+    {FULL_SUPPORT, "full support"},
+    }
     ;
 
 ResourceSupportVector::ResourceSupportVector()

@@ -1,7 +1,8 @@
 #include "ModelPool.hpp"
 #include <sstream>
 #include <numeric/LimitedCombination.hpp>
-#include <organization_model/OrganizationModel.hpp>
+#include "OrganizationModel.hpp"
+#include "Algebra.hpp"
 
 namespace organization_model {
 
@@ -54,6 +55,153 @@ ModelPool ModelPool::applyUpperBound(const ModelPool& upperBounds) const
         }
     }
     return modelPool;
+}
+
+
+ModelCombinationSet ModelPool::applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBound)
+{
+    ModelCombinationSet boundedCombinations;
+    ModelCombinationSet::const_iterator cit = combinations.begin();
+    for(; cit != combinations.end(); ++cit)
+    {
+        ModelPool modelPool = OrganizationModel::combination2ModelPool(*cit);
+        if(modelPool.isWithinUpperBound(upperBound))
+        {
+            boundedCombinations.insert(*cit);
+        }
+    }
+
+    LOG_DEBUG_S << "Upper bound set on resources: " << std::endl
+        << "prev: " << OrganizationModel::toString(combinations) << std::endl
+        << "bound: " << std::endl << ModelPoolDelta(upperBound).toString(4) << std::endl
+        << "bounded: " << OrganizationModel::toString(boundedCombinations);
+    return boundedCombinations;
+}
+
+ModelPool::Set ModelPool::applyLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBound)
+{
+    ModelPool::Set boundedModelPools;
+    ModelPool::Set::const_iterator cit = modelPools.begin();
+    for(; cit != modelPools.end(); ++cit)
+    {
+        const ModelPool& modelPool = *cit;
+        ModelPoolDelta delta = Algebra::substract(lowerBound, modelPool);
+        if(!delta.isNegative())
+        {
+            boundedModelPools.insert(modelPool);
+        }
+    }
+
+    LOG_DEBUG_S << "Lower bound set on resources: " << std::endl
+        << "prev: " << std::endl << ModelPool::toString(modelPools,4) << std::endl
+        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
+        << "bounded: " << std::endl << ModelPool::toString(boundedModelPools,4);
+    return boundedModelPools;
+}
+
+ModelCombinationSet ModelPool::applyLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBound)
+{
+    ModelCombinationSet boundedCombinations;
+    ModelCombinationSet::const_iterator cit = combinations.begin();
+    for(; cit != combinations.end(); ++cit)
+    {
+        ModelPool modelPool = OrganizationModel::combination2ModelPool(*cit);
+        ModelPoolDelta delta = Algebra::substract(lowerBound, modelPool);
+        if(!delta.isNegative())
+        {
+            boundedCombinations.insert(*cit);
+        }
+    }
+
+    LOG_DEBUG_S << "Lower bound set on resources: " << std::endl
+        << "prev: " << OrganizationModel::toString(combinations) << std::endl
+        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString() << std::endl
+        << "bounded: " << OrganizationModel::toString(boundedCombinations);
+    return boundedCombinations;
+}
+
+ModelPool::Set ModelPool::expandToLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBound)
+{
+    ModelPool::Set boundedModelPools;
+    if(modelPools.empty())
+    {
+        boundedModelPools.insert(lowerBound);
+        return boundedModelPools;
+    }
+
+    ModelPool::Set::const_iterator cit = modelPools.begin();
+    for(; cit != modelPools.end(); ++cit)
+    {
+        ModelPool modelPool = *cit;
+        // enforce minimum requirement
+        modelPool = Algebra::max(lowerBound, modelPool);
+        boundedModelPools.insert(modelPool);
+    }
+
+    LOG_DEBUG_S << "Lower bound expanded on resources: " << std::endl
+        << "prev: " << std::endl << ModelPool::toString(modelPools,4) << std::endl
+        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
+        << "bounded: " << std::endl << ModelPool::toString(boundedModelPools,4);
+    return boundedModelPools;
+}
+
+ModelCombinationSet ModelPool::expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBound)
+{
+    ModelCombinationSet boundedCombinations;
+    if(combinations.empty())
+    {
+        boundedCombinations.insert(OrganizationModel::modelPool2Combination(lowerBound));
+    }
+    ModelCombinationSet::const_iterator cit = combinations.begin();
+    for(; cit != combinations.end(); ++cit)
+    {
+        ModelPool modelPool = OrganizationModel::combination2ModelPool(*cit);
+        // enforce minimum requirement
+        modelPool = Algebra::max(lowerBound, modelPool);
+        ModelCombination expandedCombination = OrganizationModel::modelPool2Combination(modelPool);
+
+        boundedCombinations.insert(expandedCombination);
+    }
+
+    LOG_DEBUG_S << "Lower bound expanded on resources: " << std::endl
+        << "prev: " << OrganizationModel::toString(combinations) << std::endl
+        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
+        << "bounded: " << OrganizationModel::toString(boundedCombinations);
+    return boundedCombinations;
+}
+
+
+bool ModelPool::isWithinUpperBound(const ModelPool& upperBound) const
+{
+    LOG_DEBUG_S << "DELTA lval: " << std::endl
+        << ModelPoolDelta(upperBound).toString(4);
+    LOG_DEBUG_S << "DELTA rval: " << std::endl
+        << ModelPoolDelta(*this).toString(4);
+    ModelPoolDelta delta = Algebra::substract(*this, upperBound);
+    LOG_DEBUG_S << "Result: " << std::endl
+        << delta.toString(4);
+
+    return !delta.isNegative();
+}
+
+ModelPool::Set ModelPool::applyUpperBound(const ModelPool::Set& modelPools, const ModelPool& upperBound)
+{
+    ModelPool::Set boundedModelPools;
+    ModelPool::Set::const_iterator cit = modelPools.begin();
+    for(; cit != modelPools.end(); ++cit)
+    {
+        const ModelPool& modelPool = *cit;
+        if(modelPool.isWithinUpperBound(upperBound))
+        {
+            boundedModelPools.insert(modelPool);
+        }
+    }
+
+    LOG_DEBUG_S << "Upper bound set on resources: " << std::endl
+        << "    prev: " << ModelPool::toString(modelPools,4) << std::endl
+        << "    bound: " << ModelPoolDelta(upperBound).toString(4) << std::endl
+        << "    bounded: " << ModelPool::toString(boundedModelPools,4);
+    return boundedModelPools;
 }
 
 ModelCombination ModelPool::toModelCombination() const

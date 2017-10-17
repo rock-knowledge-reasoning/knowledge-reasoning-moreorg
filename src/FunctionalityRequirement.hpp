@@ -17,13 +17,24 @@ public:
     FunctionalityRequirement(const Functionality& functionality,
             const PropertyConstraint::List& propertyConstraints);
 
+    FunctionalityRequirement(const Functionality& functionality,
+            const PropertyConstraint::Set& propertyConstraints);
+
     const Functionality& getFunctionality() const { return mFunctionality; }
 
-    const PropertyConstraint::List& getPropertyConstraints() const { return mPropertyConstraints; }
+    const PropertyConstraint::Set& getPropertyConstraints() const { return mPropertyConstraints; }
+
+    void addPropertyConstraint(const PropertyConstraint& constraint);
+
+    /**
+     * Add a list of property constraints
+     */
+    void addPropertyConstraints(const PropertyConstraint::List& constraints);
+    void addPropertyConstraints(const PropertyConstraint::Set& constraints);
 
 private:
     Functionality mFunctionality;
-    PropertyConstraint::List mPropertyConstraints;
+    PropertyConstraint::Set mPropertyConstraints;
 };
 
 } // namespace organization_model

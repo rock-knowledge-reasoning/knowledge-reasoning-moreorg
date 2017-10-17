@@ -113,7 +113,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
     //
     // LocationImageProvider: CREX --> 1, Sherpa --> 1
     // Compute service set of all known functionalities
-    FunctionalitySet functionalities = Functionality::toFunctionalitySet(functionalityModels);
+    Functionality::Set functionalities = Functionality::toFunctionalitySet(functionalityModels);
 
     // Compute the bound for all services
     LOG_DEBUG_S << "Get functional saturation bound for '" << functionalityModels;
@@ -136,7 +136,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
     }
 
     FunctionalityMapping functionalityMapping(modelPool, functionalityModels, functionalSaturationBound);
-    FunctionalitySet::const_iterator fit = functionalities.begin();
+    Functionality::Set::const_iterator fit = functionalities.begin();
     for(; fit != functionalities.end(); ++fit)
     {
         const Functionality& functionality = *fit;
@@ -163,7 +163,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
                 << combinationModelPool.toString(4);
 
 
-            FunctionalitySet functionalities;
+            Functionality::Set functionalities;
             functionalities.insert(functionality);
             if(isMinimal(combinationModelPool, functionalities))
             {
@@ -234,7 +234,7 @@ FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(
 }
 
 
-bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const FunctionalitySet& functionalities) const
+bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functionality::Set& functionalities) const
 {
     // Check overall support
     algebra::SupportType supportType = getSupportType(functionalities, modelPool);
@@ -348,7 +348,7 @@ double OrganizationModelAsk::getDataPropertyValue(const ModelPool& modelPool, co
     return value;
 }
 
-ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& modelPoolSet, const FunctionalitySet& functionalities) const
+ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& modelPoolSet, const Functionality::Set& functionalities) const
 {
     ModelPool::Set filtered;
     ModelPool::Set::const_iterator mit = modelPoolSet.begin();
@@ -376,72 +376,8 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequi
         // Computing all model combination that support this functionality
         ModelPool::Set modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
         ModelPool::Set supportPool;
-        std::vector<double> scalingFactors(modelPoolSet.size(), 1.0);
 
-        // Todo: improve this for the complete set of combinations that support
-        // the minimum requirement
-        //
-        const PropertyConstraint::List& constraints = functionalityRequirement.getPropertyConstraints();
-        for(const PropertyConstraint& constraint : constraints)
-        {
-            const owlapi::model::IRI& property = constraint.getProperty();
-            size_t index = 0;
-            for(const ModelPool& pool : modelPoolSet)
-            {
-                double value = getDataPropertyValue(pool, property);
-                switch(constraint.getType())
-                {
-                    case PropertyConstraint::EQ:
-                        if(value == constraint.getValue())
-                        {
-                            updateScalingFactor(scalingFactors, index, 1);
-                        } else {
-                            // no correction possible
-                            updateScalingFactor(scalingFactors, index, 0);
-                        }
-                        break;
-                    case PropertyConstraint::LE:
-                        if(value <= constraint.getValue())
-                        {
-                            updateScalingFactor(scalingFactors, index, 1);
-                        } else {
-                            // no correction possible
-                            updateScalingFactor(scalingFactors, index, 0);
-                        }
-                        break;
-                    case PropertyConstraint::LT:
-                        if(value < constraint.getValue())
-                        {
-                            updateScalingFactor(scalingFactors, index, 1);
-                        } else {
-                            // no correction possible
-                            updateScalingFactor(scalingFactors, index, 0);
-                        }
-                        break;
-                    case PropertyConstraint::GE:
-                        if(value >= constraint.getValue())
-                        {
-                            updateScalingFactor(scalingFactors, index, 1);
-                        } else {
-                            double scalingFactor = std::ceil( constraint.getValue() / value );
-                            updateScalingFactor(scalingFactors, index, scalingFactor);
-                        }
-                        break;
-                    case PropertyConstraint::GT:
-                        if(value >= constraint.getValue())
-                        {
-                            updateScalingFactor(scalingFactors, index, 1);
-                        } else {
-                            double scalingFactor = std::ceil( constraint.getValue() / value );
-                            updateScalingFactor(scalingFactors, index, scalingFactor);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                ++index;
-            }
-        }
+        std::vector<double> scalingFactors = getScalingFactors(modelPoolSet, functionalityRequirement);
 
         size_t index = 0;
         for(const ModelPool& pool : modelPoolSet)
@@ -468,7 +404,7 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequi
             LOG_WARN_S << "organization_model::OrganizationModelAsk::getResourceSupport: could not compute functionality constrained model pool, since model pool is missing for setting the upper bound";
             return supportPool;
         } else {
-            return  applyUpperBound(supportPool, mModelPool);
+            return  ModelPool::applyUpperBound(supportPool, mModelPool);
         }
     } catch(const std::invalid_argument& e)
     {
@@ -477,7 +413,36 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequi
     }
 }
 
-ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& functionalities, const FunctionalityRequirement::Map& functionalityRequirements) const
+ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequirement::Map& functionalitiesRequirements) const
+{
+    ModelPool::Set supportingCompositions;
+    for(const FunctionalityRequirement::Map::value_type& pair : functionalitiesRequirements)
+    {
+        // Requesting from the functionality mapping will in most cases
+        // embed the functional saturation bound, e.g.
+        // the minimum to provide a certain functionality (per se, without
+        // accouting for a particular dataProperty requirement)
+        //
+        // In principle one will need a special join function for each kind
+        // of data property -- right now we assume that we can 'sum' the
+        // dataproperties in order to deal with the requirements
+        //
+        try {
+            // deal with additional constraints
+            const FunctionalityRequirement& functionalityRequirement = pair.second;
+            ModelPool::Set modelPoolSet = getResourceSupport(functionalityRequirement);
+            supportingCompositions = Algebra::maxCompositions(supportingCompositions, modelPoolSet);
+        } catch(const std::invalid_argument& e)
+        {
+            LOG_DEBUG_S << "Could not find resource support for service: '" << pair.first.getModel();
+            return ModelPool::Set();
+        }
+    }
+
+    return supportingCompositions;
+}
+
+ModelPool::Set OrganizationModelAsk::getResourceSupport(const Functionality::Set& functionalities, const FunctionalityRequirement::Map& functionalityRequirements) const
 {
     // Functionality requirements:
     if(functionalities.empty())
@@ -493,7 +458,7 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& 
     Function2PoolMap functionalityProviders;
     ModelPool::Set supportingCompositions;
     {
-        FunctionalitySet::const_iterator cit = functionalities.begin();
+        Functionality::Set::const_iterator cit = functionalities.begin();
         for(; cit != functionalities.end(); ++cit)
         {
             const Functionality& functionality = *cit;
@@ -532,7 +497,7 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& 
     return supportingCompositions;
 }
 
-ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& functionalities) const
+ModelPool::Set OrganizationModelAsk::getResourceSupport(const Functionality::Set& functionalities) const
 {
     if(functionalities.empty())
     {
@@ -546,7 +511,7 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& 
     Function2PoolMap functionalityProviders;
     ModelPool::Set supportingCompositions;
     {
-        FunctionalitySet::const_iterator cit = functionalities.begin();
+        Functionality::Set::const_iterator cit = functionalities.begin();
         for(; cit != functionalities.end(); ++cit)
         {
             const Functionality& functionality = *cit;
@@ -564,41 +529,12 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& 
     return supportingCompositions;
 }
 
-ModelPool::Set OrganizationModelAsk::getBoundedResourceSupport(const FunctionalitySet& functionalities) const
+ModelPool::Set OrganizationModelAsk::getBoundedResourceSupport(const Functionality::Set& functionalities) const
 {
     ModelPool::Set modelPools = getResourceSupport(functionalities);
     modelPools = filterNonMinimal(modelPools, functionalities);
     ModelPool bound = getFunctionalSaturationBound(functionalities);
-    return applyUpperBound(modelPools, bound);
-}
-
-ModelPool::Set OrganizationModelAsk::applyUpperBound(const ModelPool::Set& modelPools, const ModelPool& upperBound) const
-{
-    ModelPool::Set boundedModelPools;
-    ModelPool::Set::const_iterator cit = modelPools.begin();
-    for(; cit != modelPools.end(); ++cit)
-    {
-        const ModelPool& modelPool = *cit;
-
-        LOG_DEBUG_S << "DELTA lval: " << std::endl
-            << ModelPoolDelta(upperBound).toString(4);
-        LOG_DEBUG_S << "DELTA rval: " << std::endl
-            << ModelPoolDelta(modelPool).toString(4);
-        ModelPoolDelta delta = Algebra::substract(modelPool, upperBound);
-        LOG_DEBUG_S << "Result: " << std::endl
-            << delta.toString(4);
-
-        if(!delta.isNegative())
-        {
-            boundedModelPools.insert(modelPool);
-        }
-    }
-
-    LOG_DEBUG_S << "Upper bound set on resources: " << std::endl
-        << "    prev: " << ModelPool::toString(modelPools,4) << std::endl
-        << "    bound: " << ModelPoolDelta(upperBound).toString(4) << std::endl
-        << "    bounded: " << ModelPool::toString(boundedModelPools,4);
-    return boundedModelPools;
+    return ModelPool::applyUpperBound(modelPools, bound);
 }
 
 ModelCombinationSet OrganizationModelAsk::applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBound) const
@@ -608,12 +544,7 @@ ModelCombinationSet OrganizationModelAsk::applyUpperBound(const ModelCombination
     for(; cit != combinations.end(); ++cit)
     {
         ModelPool modelPool = OrganizationModel::combination2ModelPool(*cit);
-
-        LOG_DEBUG_S << "DELTA lva: " << ModelPoolDelta(upperBound).toString(4);
-        LOG_DEBUG_S << "DELTA rval: " << ModelPoolDelta(modelPool).toString(4);
-        ModelPoolDelta delta = Algebra::substract(modelPool, upperBound);
-        LOG_DEBUG_S << "Result: " << delta.toString(4);
-        if(!delta.isNegative())
+        if(modelPool.isWithinUpperBound(upperBound))
         {
             boundedCombinations.insert(*cit);
         }
@@ -718,7 +649,7 @@ ModelCombinationSet OrganizationModelAsk::expandToLowerBound(const ModelCombinat
     return boundedCombinations;
 }
 
-algebra::SupportType OrganizationModelAsk::getSupportType(const FunctionalitySet& functionalities, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
+algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality::Set& functionalities, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
 {
     ModelPool modelPool;
     modelPool[model] = cardinalityOfModel;
@@ -727,15 +658,15 @@ algebra::SupportType OrganizationModelAsk::getSupportType(const FunctionalitySet
 
 algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
 {
-    FunctionalitySet functionalities;
+    Functionality::Set functionalities;
     functionalities.insert(functionality);
     return getSupportType(functionalities, model, cardinalityOfModel);
 }
 
-algebra::SupportType OrganizationModelAsk::getSupportType(const FunctionalitySet& functionalities, const ModelPool& modelPool) const
+algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality::Set& functionalities, const ModelPool& modelPool) const
 {
     IRIList functionalityModels;
-    FunctionalitySet::const_iterator fit = functionalities.begin();
+    Functionality::Set::const_iterator fit = functionalities.begin();
     for(; fit != functionalities.end(); ++fit)
     {
         functionalityModels.push_back(fit->getModel());
@@ -767,7 +698,7 @@ algebra::SupportType OrganizationModelAsk::getSupportType(const FunctionalitySet
 
 algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const ModelPool& modelPool) const
 {
-    FunctionalitySet functionalities;
+    Functionality::Set functionalities;
     functionalities.insert(functionality);
     return getSupportType(functionalities, modelPool);
 }
@@ -840,10 +771,10 @@ ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality
     return upperBounds;
 }
 
-ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const FunctionalitySet& functionalities) const
+ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality::Set& functionalities) const
 {
     ModelPool upperBounds;
-    FunctionalitySet::const_iterator cit = functionalities.begin();
+    Functionality::Set::const_iterator cit = functionalities.begin();
     for(; cit != functionalities.end(); ++cit)
     {
         ModelPool saturation = getFunctionalSaturationBound(*cit);
@@ -857,6 +788,21 @@ ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality
     return upperBounds;
 }
 
+ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality::Set& functionalities, const FunctionalityRequirement& constraints) const
+{
+    ModelPool modelSupport = getFunctionalSaturationBound(functionalities);
+    for(ModelPool::value_type& pair : modelSupport)
+    {
+        ModelPool m;
+        m.insert(pair);
+        double p = getScalingFactor(m, constraints);
+        // the functional saturation bound
+        pair.second = p;
+    }
+
+    return modelSupport;
+}
+
 bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelCombination& b) const
 {
     ModelPool poolA = OrganizationModel::combination2ModelPool(a);
@@ -868,11 +814,11 @@ bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelC
     return delta.isNegative();
 }
 
-bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const FunctionalitySet& functionalities) const
+bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functionality::Set& functionalities) const
 {
     // Requires the functionality mapping to be properly initialized
 
-    FunctionalitySet::const_iterator cit = functionalities.begin();
+    Functionality::Set::const_iterator cit = functionalities.begin();
     ModelPool::Set previousModelPools;
     bool init = true;
     for(; cit != functionalities.end(); ++cit)
@@ -916,12 +862,19 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functi
     }
 }
 
+bool OrganizationModelAsk::isSupporting(const ModelPool& pool, const Functionality& functionality) const
+{
+    Functionality::Set functionalities;
+    functionalities.insert(functionality);
+    return isSupporting(pool, functionalities);
+}
+
 bool OrganizationModelAsk::isSupporting(const owlapi::model::IRI& model, const Functionality& functionality) const
 {
     ModelPool modelPool;
     modelPool.setResourceCount(model, 1);
 
-    FunctionalitySet functionalities;
+    Functionality::Set functionalities;
     functionalities.insert(functionality);
     if( isSupporting(modelPool, functionalities) )
     {
@@ -1114,6 +1067,92 @@ std::string OrganizationModelAsk::toString() const
 //    }
 //    return supportedModels;
 //}
+
+
+std::vector<double> OrganizationModelAsk::getScalingFactors(const ModelPool::Set& modelPoolSet, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport) const
+{
+    std::vector<double> scalingFactors(modelPoolSet.size(), 1.0);
+    size_t index = 0;
+    for(const ModelPool& pool : modelPoolSet)
+    {
+        double scalingFactor = getScalingFactor(pool, functionalityRequirement, doCheckSupport);
+        updateScalingFactor(scalingFactors, index, scalingFactor);
+        ++index;
+    }
+    return scalingFactors;
+}
+
+double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport) const
+{
+    const PropertyConstraint::Set& constraints = functionalityRequirement.getPropertyConstraints();
+
+    // assuming that model supporting
+    if(doCheckSupport)
+    {
+        if(!isSupporting(modelPool, functionalityRequirement.getFunctionality()))
+        {
+            return 0.0;
+        }
+    }
+
+    // Todo: improve this for the complete set of combinations that support
+    // the minimum requirement
+    //
+    for(const PropertyConstraint& constraint : constraints)
+    {
+        const owlapi::model::IRI& property = constraint.getProperty();
+        double value = getDataPropertyValue(modelPool, property);
+        switch(constraint.getType())
+        {
+            case PropertyConstraint::EQ:
+                if(value == constraint.getValue())
+                {
+                    return 1.0;
+                } else {
+                    // no correction possible
+                    return 0.0;
+                }
+                break;
+            case PropertyConstraint::LE:
+                if(value <= constraint.getValue())
+                {
+                    return 1.0;
+                } else {
+                    // no correction possible
+                    return 0.0;
+                }
+                break;
+            case PropertyConstraint::LT:
+                if(value < constraint.getValue())
+                {
+                    return 1.0;
+                } else {
+                    // no correction possible
+                    return 0.0;
+                }
+                break;
+            case PropertyConstraint::GE:
+                if(value >= constraint.getValue())
+                {
+                    return 1.0;
+                } else {
+                    return std::ceil( constraint.getValue() / value );
+                }
+                break;
+            case PropertyConstraint::GT:
+                if(value >= constraint.getValue())
+                {
+                    return 1.0;
+                } else {
+                    return std::ceil( constraint.getValue() / value );
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    return 1.0;
+}
 
 void OrganizationModelAsk::updateScalingFactor(std::vector<double>& factors, size_t idx, double newValue)
 {

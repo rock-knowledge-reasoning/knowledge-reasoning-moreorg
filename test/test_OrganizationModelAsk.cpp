@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
 
         ask.prepare(modelPool);
 
-        FunctionalitySet functionalitySet;
+        Functionality::Set functionalitySet;
         Functionality functionality(stereoImageProvider);
         functionalitySet.insert(functionality);
 
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
 
         ask.prepare(modelPool);
 
-        FunctionalitySet functionalitySet;
+        Functionality::Set functionalitySet;
         Functionality functionality(stereoImageProvider);
         functionalitySet.insert(functionality);
 
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
         functionalitySet.insert( Functionality(emiPowerProvider) );
         functionalitySet.insert( Functionality(locationImageProvider) );
 
-        FunctionalitySet intermediateCheck;
+        Functionality::Set intermediateCheck;
         intermediateCheck.insert(Functionality(emiPowerProvider));
         algebra::SupportType support0= ask.getSupportType(intermediateCheck, modelPool);
         algebra::SupportType support1= ask.getSupportType(functionalitySet, modelPool);
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
 
         ask.prepare(modelPool);
 
-        FunctionalitySet functionalitySet;
+        Functionality::Set functionalitySet;
         Functionality functionality(stereoImageProvider);
         functionalitySet.insert(functionality);
 
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
 
         ask.prepare(modelPool);
 
-        FunctionalitySet functionalitySet;
+        Functionality::Set functionalitySet;
         Functionality functionality(stereoImageProvider);
         functionalitySet.insert(functionality);
 
@@ -233,6 +233,50 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
         functionalitySet.insert( Functionality(emiPowerProvider) );
         functionalitySet.insert( Functionality(locationImageProvider) );
         BOOST_REQUIRE_MESSAGE(ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
+    }
+}
+
+BOOST_AUTO_TEST_CASE(functional_saturation_with_property_constraints)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
+
+    IRI sherpa = OM::resolve("Sherpa");
+    IRI crex = OM::resolve("CREX");
+    IRI payload = OM::resolve("Payload");
+    IRI payloadCamera = OM::resolve("PayloadCamera");
+
+    IRI stereoImageProvider = OM::resolve("StereoImageProvider");
+    IRI locationImageProvider = OM::resolve("LocationImageProvider");
+    IRI emiPowerProvider = OM::resolve("EmiPowerProvider");
+
+    OrganizationModelAsk ask(om);
+    {
+        ModelPool modelPool;
+        modelPool[sherpa] = 1;
+        modelPool[crex] = 1;
+
+        // Use functional saturation bound
+        OrganizationModelAsk ask(om, modelPool, true);
+
+        Functionality::Set functionalities;
+        Functionality transportProvider( OM::resolve("TransportProvider") );
+        Functionality stereoImageProvider( OM::resolve("StereoImageProvider") );
+        functionalities.insert( transportProvider );
+        functionalities.insert( stereoImageProvider );
+
+        {
+            double minItems = 30;
+            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GE, minItems);
+            PropertyConstraint::List constraints;
+            constraints.push_back(constraint);
+
+            FunctionalityRequirement fr(transportProvider, constraints);
+            ModelPool modelPool = ask.getFunctionalSaturationBound(functionalities, fr);
+            BOOST_REQUIRE_MESSAGE(!modelPool.empty(), "Saturation bound for combinations supporting transport for minimum of " << minItems << " items: '" << modelPool.toString() << "'");
+        }
     }
 }
 
@@ -254,7 +298,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
 
         OrganizationModelAsk ask(om, modelPool);
         IRI functionalityModel = OM::resolve("ImageProvider");
-        FunctionalitySet functionalities;
+        Functionality::Set functionalities;
         functionalities.insert( Functionality(functionalityModel) );
 
         ModelPool::Set combinations = ask.getResourceSupport(functionalities);
@@ -267,7 +311,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         modelPool[crex] = 1;
 
         OrganizationModelAsk ask(om, modelPool);
-        FunctionalitySet functionalities;
+        Functionality::Set functionalities;
 
         IRI imageProvider = OM::resolve("ImageProvider");
         IRI emiPowerProvider = OM::resolve("EmiPowerProvider");
@@ -284,7 +328,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         modelPool[crex] = 1;
 
         OrganizationModelAsk ask(om, modelPool);
-        FunctionalitySet functionalities;
+        Functionality::Set functionalities;
 
         Functionality transportProvider( OM::resolve("TransportProvider") );
         functionalities.insert( transportProvider );
@@ -318,7 +362,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
 
         // Use functional saturation bound
         OrganizationModelAsk ask(om, modelPool, true);
-        FunctionalitySet functionalities;
+        Functionality::Set functionalities;
 
         Functionality transportProvider( OM::resolve("TransportProvider") );
         Functionality stereoImageProvider( OM::resolve("StereoImageProvider") );

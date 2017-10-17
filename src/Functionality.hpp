@@ -8,6 +8,9 @@ namespace organization_model {
 class Functionality
 {
 public:
+    typedef std::vector<Functionality> List;
+    typedef std::set<Functionality> Set;
+
     Functionality(const owlapi::model::IRI& model);
 
     virtual ~Functionality() {}
@@ -19,7 +22,7 @@ public:
     /**
      * Convert list of models to functionality set
      */
-    static std::set<Functionality> toFunctionalitySet(const owlapi::model::IRIList& model);
+    static Set toFunctionalitySet(const owlapi::model::IRIList& model);
 
     /**
      * Stringify functionality
@@ -31,14 +34,11 @@ public:
      * Stringify functionality set
      * \return string representing the set: "[<f0>, <f1>, ..., <fn>]"
      */
-    static std::string toString(const std::set<Functionality>& set);
+    static std::string toString(const Set& set);
 
 private:
     owlapi::model::IRI mModel;
 };
-
-typedef std::vector<Functionality> FunctionalityList;
-typedef std::set<Functionality> FunctionalitySet;
 
 } // end namespace organization_model
 #endif // ORGANIZATION_MODEL_FUNCTIONALITY_HPP

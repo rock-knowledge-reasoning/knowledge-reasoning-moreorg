@@ -70,7 +70,21 @@ public:
      */
     FunctionalityMapping computeFunctionalityMapping(const ModelPool& pool, bool applyFunctionalSaturationBound = false) const;
 
+    /*
+     * Get the set of resource that support a given collection of
+     * functionalities and accouting for the resource requirements
+     * \return available combinations to support this set of functionalities
+     * with the given constraints
+     */
     ModelPool::Set getResourceSupport(const FunctionalityRequirement& functionalityRequirement) const;
+
+    /**
+     * Get the set of resource that support a given collection of
+     * functionalities and accouting for the resource requirements
+     * \return available combinations to support this set of functionalities
+     * with the given constraints
+     */
+    ModelPool::Set getResourceSupport(const FunctionalityRequirement::Map& functionalityRequirements) const;
 
     /**
      * Get the set of resources (or combination thereof) that support a given
@@ -80,7 +94,7 @@ public:
      * \param functionalities should be a set of functionalities / functionality models
      * \return available resources (or combination thereof) to support this set of functionalities
      */
-    ModelPool::Set getResourceSupport(const FunctionalitySet& functionalities,
+    ModelPool::Set getResourceSupport(const Functionality::Set& functionalities,
             const FunctionalityRequirement::Map& functionalityRequirements) const;
 
     /**
@@ -91,7 +105,7 @@ public:
      * \param functionalities should be a set of functionalities / functionality models
      * \return available resources (or combination thereof) to support this set of functionalities
      */
-    ModelPool::Set getResourceSupport(const FunctionalitySet& functionalities) const;
+    ModelPool::Set getResourceSupport(const Functionality::Set& functionalities) const;
 
     /**
      * Get the set of resources that should support a given union of services,
@@ -99,7 +113,7 @@ public:
      * of resources that support the given union of services
      * \return bound set of combinations
      */
-    ModelPool::Set getBoundedResourceSupport(const FunctionalitySet& functionalities) const;
+    ModelPool::Set getBoundedResourceSupport(const Functionality::Set& functionalities) const;
 
     /**
      * Apply an upper bound of resources to an existing Set of model
@@ -107,18 +121,9 @@ public:
      * \param upperBounds Bounding ModelPool
      * \return all combinations that operate within the bounds of the given
      * ModelPool
+     * \todo move to ModelPool
      */
     ModelCombinationSet applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBounds) const;
-
-    /**
-     * Apply an upper bound of resources to an existing Set of model
-     * combinations
-     * \param modelPoolSet Set of modelPools
-     * \param upperBounds Bounding ModelPool
-     * \return all combinations that operate within the bounds of the given
-     * ModelPool
-     */
-    ModelPool::Set applyUpperBound(const ModelPool::Set& modelPoolSet, const ModelPool& upperBounds) const;
 
     /**
      * Apply a lower bound of resources to an existing set of model
@@ -176,7 +181,7 @@ public:
      * \see getFunctionalSaturationBound in order to find the minimum number
      * \return required to provide the functionality (if full support can be achieved)
      */
-    algebra::SupportType getSupportType(const FunctionalitySet& functionality,
+    algebra::SupportType getSupportType(const Functionality::Set& functionality,
             const owlapi::model::IRI& model,
             uint32_t cardinalityOfModel = 1) const;
 
@@ -202,7 +207,7 @@ public:
      * systems
      * \return type of support
      */
-    algebra::SupportType getSupportType(const FunctionalitySet& functionalities,
+    algebra::SupportType getSupportType(const Functionality::Set& functionalities,
             const ModelPool& models) const;
 
     /**
@@ -252,7 +257,18 @@ public:
      * \return Cardinality bound for resource models
      * \throw std::invalid_argument when the model pool is empty
      */
-    ModelPool getFunctionalSaturationBound(const FunctionalitySet& functionalities) const;
+    ModelPool getFunctionalSaturationBound(const Functionality::Set& functionalities) const;
+
+    /**
+     * Compute the upper bound for the cardinality of each resource model
+     * to support the given set of services (union of services) under
+     * consideration of the given constraints
+     * \param functionalities set of functionalities for which the functional saturation bound needs to
+     * be computed
+     * \return Cardinality bound for resource models
+     * \throw std::invalid_argument when the model pool is empty
+     */
+    ModelPool getFunctionalSaturationBound(const Functionality::Set& functionalities, const FunctionalityRequirement& constraints) const;
 
     ///**
     // * Get the set of resources
@@ -287,8 +303,14 @@ public:
      * \return True if the combination support the set of services, false
      * otherwise
      */
-    bool isSupporting(const ModelPool& modelPool, const FunctionalitySet& functionalities) const;
+    bool isSupporting(const ModelPool& modelPool, const Functionality::Set& functionalities) const;
 
+    /**
+     * Check is the model combination supports a given set of services
+     * \return True if the combination support the set of services, false
+     * otherwise
+     */
+    bool isSupporting(const ModelPool& modelPool, const Functionality& functionality) const;
 
     /**
      * Check if the model supports a service
@@ -333,7 +355,7 @@ public:
      * Check if a model pool exceeds the saturation bound with respect to a
      * given functionality set
      */
-    bool isMinimal(const ModelPool& modelPool, const FunctionalitySet& functionalities) const;
+    bool isMinimal(const ModelPool& modelPool, const Functionality::Set& functionalities) const;
 
     /**
      * Get the data property value of the complete combination given by the pool
@@ -390,9 +412,16 @@ protected:
     FunctionalityMapping computeBoundedFunctionalityMapping(const ModelPool& pool, const owlapi::model::IRIList& functionalityModels) const;
     FunctionalityMapping computeUnboundedFunctionalityMapping(const ModelPool& pool, const owlapi::model::IRIList& functionalityModels) const;
 
+    ModelPool::Set filterNonMinimal(const ModelPool::Set& modelPoolSet, const Functionality::Set& functionalities) const;
 
-    ModelPool::Set filterNonMinimal(const ModelPool::Set& modelPoolSet, const FunctionalitySet& functionalities) const;
+    double getScalingFactor(const ModelPool& modelPool, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport=false) const;
 
+    std::vector<double> getScalingFactors(const ModelPool::Set& modelPoolSet, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport=false) const;
+    /**
+     *
+     * TODO: proper implementation of min/max/eq constraints -- e.g. to detect
+     * validity of constraints (use Gecode::IntVar propagation)
+     */
     static void updateScalingFactor(std::vector<double>& factors, size_t idx, double newValue);
 
 private:

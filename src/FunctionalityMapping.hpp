@@ -6,8 +6,6 @@
 
 namespace organization_model {
 
-typedef std::set<ModelCombination> ModelCombinationSet;
-
 /// Maps a 'combined system' to the functionality it can 'theoretically'
 /// provide when looking at its resources
 typedef std::map<ModelPool, owlapi::model::IRIList> Pool2FunctionMap;

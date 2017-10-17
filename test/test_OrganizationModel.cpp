@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        FunctionalitySet functionalities;
+        Functionality::Set functionalities;
         functionalities.insert( Functionality(OM::resolve("StereoImageProvider")) );
 
         ModelPool::Set modelPools = ask.getResourceSupport(functionalities);
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
 
         OrganizationModelAsk ask(om, items, false);
 
-        FunctionalitySet functionalities;
+        Functionality::Set functionalities;
         functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
         ModelPool::Set combinations = ask.getResourceSupport(functionalities);
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         {
             OrganizationModelAsk ask(om, items, false);
 
-            FunctionalitySet functionalities;
+            Functionality::Set functionalities;
             functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
             ModelPool::Set combinations = ask.getResourceSupport(functionalities);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         {
             OrganizationModelAsk ask(om, items, true);
 
-            FunctionalitySet functionalities;
+            Functionality::Set functionalities;
             functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
             ModelPool::Set combinations = ask.getResourceSupport(functionalities);
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        FunctionalitySet functionalities;
+        Functionality::Set functionalities;
         functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
         functionalities.insert( Functionality(OM::resolve("ImageProvider") ) );
         functionalities.insert( Functionality(OM::resolve("EmiPowerProvider") ) );
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(resource_support_crex)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        FunctionalitySet functionalities;
+        Functionality::Set functionalities;
         functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
 
         ModelPool::Set combinations = ask.getResourceSupport(functionalities);

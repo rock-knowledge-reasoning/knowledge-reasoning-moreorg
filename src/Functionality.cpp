@@ -13,9 +13,9 @@ bool Functionality::operator<(const Functionality& other) const
     return this->getModel() < other.getModel();
 }
 
-FunctionalitySet Functionality::toFunctionalitySet(const owlapi::model::IRIList& models)
+Functionality::Set Functionality::toFunctionalitySet(const owlapi::model::IRIList& models)
 {
-    FunctionalitySet functionalities;
+    Functionality::Set functionalities;
     {
         IRIList::const_iterator cit = models.begin();
         for(; cit != models.end(); ++cit)
@@ -30,7 +30,7 @@ std::string Functionality::toString(const std::set<Functionality>& functionaliti
 {
     std::string s;
     s += "[";
-    FunctionalitySet::const_iterator cit = functionalities.begin();
+    Functionality::Set::const_iterator cit = functionalities.begin();
     for(; cit != functionalities.end();)
     {
         s += cit->toString();

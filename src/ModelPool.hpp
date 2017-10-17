@@ -8,6 +8,7 @@
 namespace organization_model {
 
 typedef owlapi::model::IRIList ModelCombination;
+typedef std::set<ModelCombination> ModelCombinationSet;
 
 /**
  * \class ModelPool
@@ -51,6 +52,78 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          * \return model bound after applying the upper bound
          */
         ModelPool applyUpperBound(const ModelPool& upperBounds) const;
+
+        /**
+         * Apply an upper bound of resources to an existing Set of model
+         * combinations
+         * \param modelPoolSet Set of modelPools
+         * \param upperBounds Bounding ModelPool
+         * \return all combinations that operate within the bounds of the given
+         * ModelPool
+         */
+        static ModelPool::Set applyUpperBound(const ModelPool::Set& modelPools, const ModelPool& upperBound);
+
+        /**
+         * Apply an upper bound of resources to an existing Set of model
+         * combinations
+         * \param upperBounds Bounding ModelPool
+         * \return all combinations that operate within the bounds of the given
+         * ModelPool
+         * \todo move to ModelPool
+         */
+        static ModelCombinationSet applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBounds);
+
+        /**
+         * Apply a lower bound of resources to an existing set of model
+         * combinations, i.e., remove ModelCombinations that operate below the lower
+         * bound
+         * \param combinations
+         * \param lowerBounds Bounding ModelPool
+         * \return all combinations that operate within the bounds of the given
+         * ModelPool
+         */
+        static ModelCombinationSet applyLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBounds);
+
+        /**
+         * Apply a lower bound of resources to an existing set of model
+         * combinations, i.e., remove ModelCombinations that operate below the lower
+         * bound
+         * \param combinations
+         * \param lowerBounds Bounding ModelPool
+         * \return all combinations that operate within the bounds of the given
+         * ModelPool
+         */
+        static ModelPool::Set applyLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBounds);
+
+        /*
+         * Enforces the minimum requirement by expanding missing models to
+         * a model combination to fulfill the requirement,
+         * Apply a lower bound of resources to an existing set of model
+         * combinations
+         * \param combinations
+         * \param lowerBounds Bounding ModelPool
+         * \return all combinations that operate now within the bounds of the given
+         * ModelPool
+         */
+        static ModelCombinationSet expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBounds);
+
+        /*
+         * Enforces the minimum requirement by expanding missing models to
+         * a model combination to fulfill the requirement,
+         * Apply a lower bound of resources to an existing set of model
+         * combinations
+         * \param combinations
+         * \param lowerBounds Bounding ModelPool
+         * \return all combinations that operate now within the bounds of the given
+         * ModelPool
+         */
+        static ModelPool::Set expandToLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBounds);
+
+        /**
+         * Check if the current model pool lies within the bound given by
+         * the upper bound
+         */
+        bool isWithinUpperBound(const ModelPool& upperBound) const;
 
         /**
          * Convert this model pool to a model combination
