@@ -365,6 +365,13 @@ ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& mode
 ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequirement& functionalityRequirement) const
 {
     const owlapi::model::IRI& functionalityModel = functionalityRequirement.getFunctionality().getModel();
+
+    // If there are no property constraints
+    if(functionalityRequirement.getPropertyConstraints().empty())
+    {
+        return mFunctionalityMapping.getModelPools(functionalityModel);
+    }
+
     try {
         // Computing all model combination that support this functionality
         ModelPool::Set modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
@@ -454,7 +461,15 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequi
             ++index;
         }
 
-        return supportPool;
+        ModelPool::Set boundedSupportPool;
+        // Check if the scaled variant lies within general resource bounds
+        if(mModelPool.empty())
+        {
+            LOG_WARN_S << "organization_model::OrganizationModelAsk::getResourceSupport: could not compute functionality constrained model pool, since model pool is missing for setting the upper bound";
+            return supportPool;
+        } else {
+            return  applyUpperBound(supportPool, mModelPool);
+        }
     } catch(const std::invalid_argument& e)
     {
         LOG_DEBUG_S << "Could not find resource support for service: '" << functionalityModel;
@@ -495,7 +510,16 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& 
             try {
                 // Computing all model combination that support this
                 // functionality
-                ModelPool::Set modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
+                FunctionalityRequirement::Map::const_iterator cit = functionalityRequirements.find(functionality);
+                ModelPool::Set modelPoolSet;
+                if(cit != functionalityRequirements.end())
+                {
+                    // no constraints need to be considered
+                    modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
+                } else {
+                    // deal with additional constraints
+                    modelPoolSet = getResourceSupport(cit->second);
+                }
 
                 supportingCompositions = Algebra::maxCompositions(supportingCompositions, modelPoolSet);
             } catch(const std::invalid_argument& e)
@@ -506,7 +530,6 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& 
         }
     }
     return supportingCompositions;
-
 }
 
 ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalitySet& functionalities) const

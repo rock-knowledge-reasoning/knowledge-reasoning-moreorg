@@ -297,6 +297,47 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
 
             FunctionalityRequirement fr(transportProvider, constraints);
             ModelPool::Set combinations = ask.getResourceSupport(fr);
+            BOOST_REQUIRE_MESSAGE(combinations.size() == 1, "Combinations supporting transport for minimum of " << minItems << " items: '" << ModelPool::toString(combinations) << "'");
+        }
+        {
+            double minItems = 30;
+            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GE, minItems);
+            PropertyConstraint::List constraints;
+            constraints.push_back(constraint);
+
+            FunctionalityRequirement fr(transportProvider, constraints);
+            ModelPool::Set combinations = ask.getResourceSupport(fr);
+            BOOST_REQUIRE_MESSAGE(combinations.empty(), "No combinations supporting transport for minimum of " << minItems << " items: '" << ModelPool::toString(combinations) << "'");
+        }
+    }
+
+    {
+        ModelPool modelPool;
+        modelPool[sherpa] = 4;
+        modelPool[crex] = 10;
+
+        // Use functional saturation bound
+        OrganizationModelAsk ask(om, modelPool, true);
+        FunctionalitySet functionalities;
+
+        Functionality transportProvider( OM::resolve("TransportProvider") );
+        Functionality stereoImageProvider( OM::resolve("StereoImageProvider") );
+        functionalities.insert( transportProvider );
+        functionalities.insert( stereoImageProvider );
+
+        {
+            ModelPool::Set combinations = ask.getResourceSupport(functionalities);
+            BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting : " << transportProvider.toString() << " with model pool: " << modelPool.toString(12) << "\n '" << ModelPool::toString(combinations) << "'");
+        }
+
+        {
+            double minItems = 10;
+            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GE, minItems);
+            PropertyConstraint::List constraints;
+            constraints.push_back(constraint);
+
+            FunctionalityRequirement fr(transportProvider, constraints);
+            ModelPool::Set combinations = ask.getResourceSupport(fr);
             BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting transport for minimum of " << minItems << " items: '" << ModelPool::toString(combinations) << "'");
         }
         {
