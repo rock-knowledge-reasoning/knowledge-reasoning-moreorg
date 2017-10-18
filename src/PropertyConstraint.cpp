@@ -1,15 +1,16 @@
 #include "PropertyConstraint.hpp"
 #include <sstream>
+#include <tuple>
 
 namespace organization_model {
 
 std::map<PropertyConstraint::ConstraintType, std::string> PropertyConstraint::TypeTxt = {
     {PropertyConstraint::UNKNOWN, "UNKNOWN"},
-    {PropertyConstraint::EQ, "=="},
-    {PropertyConstraint::LT, "<"},
-    {PropertyConstraint::LE, "<="},
-    {PropertyConstraint::GE, ">="},
-    {PropertyConstraint::GT, ">"},
+    {PropertyConstraint::EQUAL, "=="},
+    {PropertyConstraint::LESS_THAN, "<"},
+    {PropertyConstraint::LESS_EQUAL, "<="},
+    {PropertyConstraint::GREATER_EQUAL, ">="},
+    {PropertyConstraint::GREATER_THEN, ">"},
     {CONSTRAINT_TYPE_END, "ConstraintTypeEnd"}
     }
     ;
@@ -41,16 +42,35 @@ bool PropertyConstraint::operator==(const PropertyConstraint& other) const
 
 bool PropertyConstraint::operator<(const PropertyConstraint& other) const
 {
+    if(*this == other)
+    {
+        return false;
+    }
+
     if(mType < other.mType)
     {
         return true;
-    } else if(mDataProperty < other.mDataProperty)
+    } else if(mType == other.mType)
     {
-        return true;
-    } else {
-        return mValue < other.mValue;
+        if(mDataProperty < other.mDataProperty)
+        {
+            return true;
+        } else if(mDataProperty == other.mDataProperty)
+        {
+            return mValue < other.mValue;
+        }
     }
     return false;
+}
+
+PropertyConstraint::Clusters PropertyConstraint::getClusters(const PropertyConstraint::Set& constraints)
+{
+    std::map<owlapi::model::IRI, PropertyConstraint::Set> clustered;
+    for(const PropertyConstraint& constraint : constraints)
+    {
+        clustered[constraint.getProperty()].insert( constraint );
+    }
+    return clustered;
 }
 
 } // end namespace organization_model

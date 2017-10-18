@@ -7,10 +7,11 @@
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <owlapi/model/OWLOntologyTell.hpp>
 #include <owlapi/Vocabulary.hpp>
-#include <organization_model/reasoning/ResourceMatch.hpp>
-#include <organization_model/vocabularies/OM.hpp>
-#include <organization_model/algebra/Connectivity.hpp>
+#include "reasoning/ResourceMatch.hpp"
+#include "vocabularies/OM.hpp"
+#include "algebra/Connectivity.hpp"
 #include "FunctionalityRequirement.hpp"
+#include "PropertyConstraintSolver.hpp"
 
 
 using namespace owlapi::model;
@@ -803,6 +804,23 @@ ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality
     return modelSupport;
 }
 
+ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality::Set& functionalities, const FunctionalityRequirement::Map& constraints) const
+{
+    ModelPool upperBounds;
+    for(const FunctionalityRequirement::Map::value_type& v : constraints)
+    {
+        const FunctionalityRequirement& constraint = v.second;
+        ModelPool saturation = getFunctionalSaturationBound(functionalities, constraint);
+
+        ModelPool::const_iterator mit = saturation.begin();
+        for(; mit != saturation.end(); ++mit)
+        {
+            upperBounds[mit->first] = std::max(upperBounds[mit->first], saturation[mit->first]);
+        }
+    }
+    return upperBounds;
+}
+
 bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelCombination& b) const
 {
     ModelPool poolA = OrganizationModel::combination2ModelPool(a);
@@ -1084,8 +1102,6 @@ std::vector<double> OrganizationModelAsk::getScalingFactors(const ModelPool::Set
 
 double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport) const
 {
-    const PropertyConstraint::Set& constraints = functionalityRequirement.getPropertyConstraints();
-
     // assuming that model supporting
     if(doCheckSupport)
     {
@@ -1095,63 +1111,56 @@ double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool, const 
         }
     }
 
-    // Todo: improve this for the complete set of combinations that support
-    // the minimum requirement
-    //
-    for(const PropertyConstraint& constraint : constraints)
+    const PropertyConstraint::Set& constraints = functionalityRequirement.getPropertyConstraints();
+    PropertyConstraint::Clusters clusteredConstraints = PropertyConstraint::getClusters(constraints);
+
+    double scalingFactor = 1.0;
+    std::map<owlapi::model::IRI, double> propertyValue;
+    std::map<owlapi::model::IRI, ValueBound> valueBoundFactors;
+
+    // Find the global scaling factor, which is defined by the set of
+    // requirements
+    for(const PropertyConstraint::Clusters::value_type property2Constraints : clusteredConstraints)
     {
-        const owlapi::model::IRI& property = constraint.getProperty();
+        const owlapi::model::IRI& property = property2Constraints.first;
+        // the existing data property value
         double value = getDataPropertyValue(modelPool, property);
-        switch(constraint.getType())
+        propertyValue[property] = value;
+
+        ValueBound vb;
+        try {
+            // Will throw when the constraints cannot be fulfilled
+            vb = PropertyConstraintSolver::merge(property2Constraints.second);
+        } catch(const std::runtime_error& e)
         {
-            case PropertyConstraint::EQ:
-                if(value == constraint.getValue())
-                {
-                    return 1.0;
-                } else {
-                    // no correction possible
-                    return 0.0;
-                }
-                break;
-            case PropertyConstraint::LE:
-                if(value <= constraint.getValue())
-                {
-                    return 1.0;
-                } else {
-                    // no correction possible
-                    return 0.0;
-                }
-                break;
-            case PropertyConstraint::LT:
-                if(value < constraint.getValue())
-                {
-                    return 1.0;
-                } else {
-                    // no correction possible
-                    return 0.0;
-                }
-                break;
-            case PropertyConstraint::GE:
-                if(value >= constraint.getValue())
-                {
-                    return 1.0;
-                } else {
-                    return std::ceil( constraint.getValue() / value );
-                }
-                break;
-            case PropertyConstraint::GT:
-                if(value >= constraint.getValue())
-                {
-                    return 1.0;
-                } else {
-                    return std::ceil( constraint.getValue() / value );
-                }
-                break;
-            default:
-                break;
+            throw std::invalid_argument("organization_model::getScalingFactor: functional requirement cannot be fulfilled by this model pool: " + modelPool.toString(12));
+        }
+
+        if(scalingFactor*value >= vb.getMin())
+        {
+            // existing scalingFactor is sufficient, e.g to reach the minimum
+            scalingFactor = std::max(1.0, scalingFactor);
+        } else {
+            // in order to reach the minimum: compute the scaling factor
+            double minFactor = std::ceil( vb.getMin() / value );
+            scalingFactor = std::max(minFactor, scalingFactor);
         }
     }
-    return 1.0;
+
+    for(const PropertyConstraint::Clusters::value_type property2Constraints : clusteredConstraints)
+    {
+        const owlapi::model::IRI& property = property2Constraints.first;
+        // the existing data property value
+        double scaledValue = scalingFactor*propertyValue[property];
+        const ValueBound& vb = valueBoundFactors[property];
+
+        if( scaledValue < vb.getMin() || scaledValue > vb.getMax())
+        {
+            throw std::invalid_argument("organization_model::getScalingFactor: functional requirement cannot be fulfilled by this model pool: " + modelPool.toString(12) +
+                    " a feasible scaling factor could not be found for all requirements");
+        }
+    }
+    return scalingFactor;
 }
 
 void OrganizationModelAsk::updateScalingFactor(std::vector<double>& factors, size_t idx, double newValue)

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <set>
+#include <map>
 #include <owlapi/model/IRI.hpp>
 
 namespace organization_model {
@@ -12,8 +13,9 @@ class PropertyConstraint
 public:
     typedef std::vector<PropertyConstraint> List;
     typedef std::set<PropertyConstraint> Set;
+    typedef std::map<owlapi::model::IRI, PropertyConstraint::Set> Clusters;
 
-    enum ConstraintType { UNKNOWN, EQ, LT, LE, GE, GT, CONSTRAINT_TYPE_END };
+    enum ConstraintType { UNKNOWN, EQUAL, LESS_THAN, LESS_EQUAL, GREATER_EQUAL, GREATER_THEN, CONSTRAINT_TYPE_END };
 
     static std::map<ConstraintType, std::string> TypeTxt;
 
@@ -29,7 +31,16 @@ public:
 
     std::string toString() const;
 
+    /**
+     * Cluster the set of constraints, based on the referred property
+     */
+    static Clusters getClusters(const PropertyConstraint::Set& constraints);
+
     bool operator==(const PropertyConstraint& other) const;
+
+    /**
+     * Add less operator for using property constraint in sets
+     */
     bool operator<(const PropertyConstraint& other) const;
 
 private:

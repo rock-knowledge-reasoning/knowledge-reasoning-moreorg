@@ -25,6 +25,8 @@ rock_library(organization_model
         OrganizationModelAsk.cpp
         OrganizationModelTell.cpp
         PropertyConstraint.cpp
+        PropertyConstraintSolver.cpp
+        #RandomModelGenerator.cpp
         organization_model/ActorModelLink.cpp
         organization_model/EndpointModel.cpp
         organization_model/Grounding.cpp
@@ -34,6 +36,7 @@ rock_library(organization_model
         reasoning/ResourceMatch.cpp
         Service.cpp
         utils/CoalitionStructureGeneration.cpp
+        ValueBound.cpp
     HEADERS
         Algebra.hpp
         algebra/Connectivity.hpp
@@ -60,6 +63,7 @@ rock_library(organization_model
         OrganizationModelAsk.hpp
         OrganizationModelTell.hpp
         PropertyConstraint.hpp
+        PropertyConstraintSolver.hpp
         organization_model/ActorModelLink.hpp
         organization_model/EndpointModel.hpp
         organization_model/Grounding.hpp
@@ -73,6 +77,7 @@ rock_library(organization_model
         utils/CorrelationClustering.hpp
         vocabularies/OM.hpp
         vocabularies/Robot.hpp
+        ValueBound.hpp
     DEPS_PKGCONFIG numeric pddl_planner owlapi
     LIBS glpk ${Boost_THREAD_LIBRARY}
 )

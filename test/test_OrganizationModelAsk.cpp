@@ -4,6 +4,8 @@
 #include <organization_model/reasoning/ResourceMatch.hpp>
 #include <organization_model/vocabularies/OM.hpp>
 #include <organization_model/FunctionalityRequirement.hpp>
+#include <organization_model/PropertyConstraintSolver.hpp>
+#include <gecode/search.hh>
 #include "test_utils.hpp"
 
 using namespace organization_model;
@@ -255,8 +257,8 @@ BOOST_AUTO_TEST_CASE(functional_saturation_with_property_constraints)
     OrganizationModelAsk ask(om);
     {
         ModelPool modelPool;
-        modelPool[sherpa] = 1;
-        modelPool[crex] = 1;
+        modelPool[sherpa] = 30;
+        modelPool[crex] = 30;
 
         // Use functional saturation bound
         OrganizationModelAsk ask(om, modelPool, true);
@@ -269,13 +271,15 @@ BOOST_AUTO_TEST_CASE(functional_saturation_with_property_constraints)
 
         {
             double minItems = 30;
-            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GE, minItems);
+            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;
             constraints.push_back(constraint);
 
             FunctionalityRequirement fr(transportProvider, constraints);
             ModelPool modelPool = ask.getFunctionalSaturationBound(functionalities, fr);
             BOOST_REQUIRE_MESSAGE(!modelPool.empty(), "Saturation bound for combinations supporting transport for minimum of " << minItems << " items: '" << modelPool.toString() << "'");
+            BOOST_REQUIRE_MESSAGE(modelPool[crex] == 15, "Up to 15 instances of '" << crex << "' can contribute for this functionality");
+            BOOST_REQUIRE_MESSAGE(modelPool[sherpa] == 4, "Up to 4 instances of '" << sherpa << "' can contribute for this functionality");
         }
     }
 }
@@ -335,7 +339,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
 
         {
             double minItems = 10;
-            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GE, minItems);
+            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;
             constraints.push_back(constraint);
 
@@ -345,7 +349,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         }
         {
             double minItems = 30;
-            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GE, minItems);
+            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;
             constraints.push_back(constraint);
 
@@ -371,12 +375,12 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
 
         {
             ModelPool::Set combinations = ask.getResourceSupport(functionalities);
-            BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting : " << transportProvider.toString() << " with model pool: " << modelPool.toString(12) << "\n '" << ModelPool::toString(combinations) << "'");
+            BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Combinations supporting : " << transportProvider.toString() << " and " << stereoImageProvider.toString() << " with model pool: " << modelPool.toString(12) << "\n '" << ModelPool::toString(combinations) << "' (functional saturation bound is active)");
         }
 
         {
             double minItems = 10;
-            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GE, minItems);
+            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;
             constraints.push_back(constraint);
 
@@ -386,7 +390,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         }
         {
             double minItems = 30;
-            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GE, minItems);
+            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;
             constraints.push_back(constraint);
 
@@ -478,8 +482,49 @@ BOOST_AUTO_TEST_CASE(to_string_extended_scenario)
     BOOST_TEST_MESSAGE(ask.toString());
 }
 
-BOOST_AUTO_TEST_CASE(transport)
+BOOST_AUTO_TEST_CASE(property_constraint_solver)
 {
+    {
+        PropertyConstraint::List constraints;
+        owlapi::model::IRI property = OM::resolve("payloadTransportCapacity");
+
+        PropertyConstraint constraint0(property, PropertyConstraint::GREATER_EQUAL, 0);
+        constraints.push_back(constraint0);
+
+        PropertyConstraint constraint1(property, PropertyConstraint::LESS_EQUAL, 10);
+        constraints.push_back(constraint1);
+
+        ValueBound vb = PropertyConstraintSolver::merge(constraints);
+        BOOST_REQUIRE_MESSAGE(vb.getMin() == 0 && vb.getMax() == 10, "ValueBound should be 0 < vb < 10, but was " << vb.toString());
+    }
+    {
+        PropertyConstraint::List constraints;
+        owlapi::model::IRI property = OM::resolve("payloadTransportCapacity");
+
+        PropertyConstraint constraint0(property, PropertyConstraint::GREATER_EQUAL, 15);
+        constraints.push_back(constraint0);
+
+        PropertyConstraint constraint1(property, PropertyConstraint::LESS_EQUAL, 10);
+        constraints.push_back(constraint1);
+
+        BOOST_REQUIRE_THROW(PropertyConstraintSolver::merge(constraints), std::invalid_argument);
+    }
+    {
+        PropertyConstraint::List constraints;
+        owlapi::model::IRI property = OM::resolve("payloadTransportCapacity");
+
+        PropertyConstraint constraint0(property, PropertyConstraint::GREATER_EQUAL, 15);
+        constraints.push_back(constraint0);
+
+        PropertyConstraint constraint1(property, PropertyConstraint::LESS_EQUAL, 20);
+        constraints.push_back(constraint1);
+
+        PropertyConstraint constraint2(property, PropertyConstraint::EQUAL, 17.5);
+        constraints.push_back(constraint2);
+
+        ValueBound vb = PropertyConstraintSolver::merge(constraints);
+        BOOST_REQUIRE_MESSAGE(vb.getMin() == 17.5 && vb.getMax() == 17.5, "ValueBound should be 17.5, but was " << vb.toString());
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

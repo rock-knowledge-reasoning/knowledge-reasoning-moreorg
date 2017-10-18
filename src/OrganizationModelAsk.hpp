@@ -72,7 +72,7 @@ public:
 
     /*
      * Get the set of resource that support a given collection of
-     * functionalities and accouting for the resource requirements
+     * functionalities and accounting for the resource requirements
      * \return available combinations to support this set of functionalities
      * with the given constraints
      */
@@ -80,7 +80,7 @@ public:
 
     /**
      * Get the set of resource that support a given collection of
-     * functionalities and accouting for the resource requirements
+     * functionalities and accounting for the resource requirements
      * \return available combinations to support this set of functionalities
      * with the given constraints
      */
@@ -270,6 +270,16 @@ public:
      */
     ModelPool getFunctionalSaturationBound(const Functionality::Set& functionalities, const FunctionalityRequirement& constraints) const;
 
+    /**
+     * Compute the upper bound for the cardinality of each resource model
+     * to support the given set of services (union of services) under
+     * consideration of the given constraints
+     * \param functionalities set of functionalities for which the functional saturation bound needs to
+     * be computed
+     * \return Cardinality bound for resource models
+     * \throw std::invalid_argument when the model pool is empty
+     */
+    ModelPool getFunctionalSaturationBound(const Functionality::Set& functionalities, const FunctionalityRequirement::Map& constraints) const;
     ///**
     // * Get the set of resources
     // * \return available resources to support this set of services
