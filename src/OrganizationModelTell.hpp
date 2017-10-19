@@ -1,7 +1,7 @@
 #ifndef ORGANIZATION_MODEL_TELL_HPP
 #define ORGANIZATION_MODEL_TELL_HPP
 
-#include <organization_model/OrganizationModel.hpp>
+#include "OrganizationModel.hpp"
 
 namespace organization_model {
 

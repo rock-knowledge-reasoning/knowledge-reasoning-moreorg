@@ -41,14 +41,14 @@ BOOST_AUTO_TEST_CASE(handle_reference_ccf)
 
         CCF<IRI>::Atoms atoms;
 
-        IRI a("1"); 
-        IRI b("2"); 
-        IRI c("3"); 
-        IRI d("4"); 
-        IRI e("5"); 
-        IRI f("6"); 
-        IRI g("7"); 
-        IRI h("8"); 
+        IRI a("1");
+        IRI b("2");
+        IRI c("3");
+        IRI d("4");
+        IRI e("5");
+        IRI f("6");
+        IRI g("7");
+        IRI h("8");
 
         atoms.insert(a);
         atoms.insert(b);
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(handle_reference_ccf)
         BOOST_TEST_MESSAGE("AStar: " << aStar);
 
         CCF<IRI>::CoalitionsList list = ccf.createLists(aStar, coalitions);
-        BOOST_FOREACH(CCF<IRI>::Coalitions c, list)
+        for(CCF<IRI>::Coalitions c : list)
         {
             BOOST_TEST_MESSAGE("Coalitions: " << c.toString());
         }
@@ -120,9 +120,9 @@ BOOST_AUTO_TEST_CASE(compute_coalitions)
         CCF<IRI>::Atoms atoms;
 
         // Links
-        IRI a("1-2"); 
-        IRI b("1-3"); 
-        IRI c("1-4"); 
+        IRI a("1-2");
+        IRI b("1-3");
+        IRI c("1-4");
 
         atoms.insert(a);
         atoms.insert(b);
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(compute_coalitions)
 
         CCF<IRI> ccf(atoms);
 
-        BOOST_FOREACH(CCF<IRI>::Atom atom, atoms)
+        for(CCF<IRI>::Atom atom : atoms)
         {
             ccf.addPositiveConstraint( CCF<IRI>::Constraint(atom));
         }
@@ -152,14 +152,14 @@ BOOST_AUTO_TEST_CASE(compute_coalitions)
         BOOST_TEST_MESSAGE("AStar: " << aStar);
 
         CCF<IRI>::CoalitionsList list = ccf.createLists(aStar, coalitions);
-        BOOST_FOREACH(CCF<IRI>::Coalitions c, list)
+        for(CCF<IRI>::Coalitions c : list)
         {
             BOOST_TEST_MESSAGE("Coalitions: " << c.toString());
         }
 
         std::vector< CCF<IRI>::Coalitions > feasibleCoalitionStructure;
         ccf.computeFeasibleCoalitions(list, feasibleCoalitionStructure);
-        BOOST_FOREACH(CCF<IRI>::Coalitions structure, feasibleCoalitionStructure)
+        for(CCF<IRI>::Coalitions structure : feasibleCoalitionStructure)
         {
             BOOST_TEST_MESSAGE("Feasible coalition structure: " << structure.toString());
         }

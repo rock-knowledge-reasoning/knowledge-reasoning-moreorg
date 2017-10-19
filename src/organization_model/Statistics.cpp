@@ -1,6 +1,5 @@
 #include "Statistics.hpp"
 #include <sstream>
-#include <boost/foreach.hpp>
 
 namespace organization_model {
 namespace organization_model {
@@ -50,7 +49,7 @@ std::ostream& operator<<(std::ostream& os, const Statistics& statistics)
 std::ostream& operator<<(std::ostream& os, const std::vector<Statistics>& statisticsList)
 {
     os << "StatisticsList: " << std::endl;
-    BOOST_FOREACH(const Statistics& s, statisticsList)
+    for(const Statistics& s : statisticsList)
     {
         os << s;
     }

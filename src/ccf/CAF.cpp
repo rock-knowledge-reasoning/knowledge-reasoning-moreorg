@@ -1,7 +1,6 @@
 #include <set>
 #include <iostream>
 #include <math.h>
-#include <boost/foreach.hpp>
 #include <base/Time.hpp>
 #include <base-logging/Logging.hpp>
 #include "CombinedActor.hpp"
@@ -27,7 +26,7 @@ int main()
 
     // Create seed, i.e. initialize combined actors for link count 0
     std::set<CombinedActor> combinedActors;
-    BOOST_FOREACH(Link link, validLinks)
+    for(Link link : validLinks)
     {
         CombinedActor combinedActor(link, availableLinkGroups, &linkGroupMap, &interfaceLinkMap);
         combinedActors.insert(combinedActor);
@@ -50,7 +49,7 @@ int main()
             continue;
         } else {
             // foreach each combined actor, pick a valid combination link group
-            // Pick a combined actor from current linkCount -1 
+            // Pick a combined actor from current linkCount -1
 
             // Store combined actors for current link count
             std::set<CombinedActor> combinedActors;
@@ -87,7 +86,7 @@ int main()
             base::Time stop = base::Time::now();
             std::cout << "New actors " << combinedActors.size() << " for link count " << linkCount << std::endl;
             std::cout << "Computing time: " << (stop - start).toSeconds() << " seconds" << std::endl;
-            //BOOST_FOREACH(CombinedActor actor, combinedActors)
+            //for(CombinedActor actor : combinedActors)
             //{
             //    LOG_DEBUG_S << actor;
             //}

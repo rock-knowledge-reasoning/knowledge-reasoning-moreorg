@@ -1,9 +1,8 @@
 #include "Metric.hpp"
 #include <sstream>
-#include <boost/foreach.hpp>
-#include <owlapi/model/OWLOntologyAsk.hpp>
-#include <organization_model/vocabularies/OM.hpp>
 #include <base-logging/Logging.hpp>
+#include <owlapi/model/OWLOntologyAsk.hpp>
+#include "vocabularies/OM.hpp"
 
 namespace organization_model {
 
@@ -23,9 +22,9 @@ MetricMap Metric::getMetricMap() const
     IRIList actorModels = mpAsk->allSubClassesOf( vocabulary::OM::Actor() );
     IRIList services = mpAsk->allSubClassesOf( vocabulary::OM::Service() );
 
-    BOOST_FOREACH(const IRI& actorModel, actorModels)
+    for(const IRI& actorModel : actorModels)
     {
-        BOOST_FOREACH(const IRI& service, services)
+        for(const IRI& service : services)
         {
             try {
                 LOG_DEBUG_S << "Compute metric for: " << actorModel << " and " << service;

@@ -12,11 +12,11 @@ CombinedActor::CombinedActor() {}
 
 CombinedActor::CombinedActor(const Link& link, const std::set<LinkGroup>& linkGroups, LinkGroupMap* linkGroupMap, InterfaceLinkMap* interfaceLinkMap)
     : mLinks()
-    , mWhiteListLinkGroup(linkGroups)
     , mLinkGroupMap(linkGroupMap)
     , mInterfaceLinkMap(interfaceLinkMap)
+    , mWhiteListLinkGroup(linkGroups)
 {
-    addLink(link); 
+    addLink(link);
 }
 
 void CombinedActor::addLink(const Link& link)
@@ -42,7 +42,6 @@ bool CombinedActor::operator<(const CombinedActor& other) const
 std::set<Link> CombinedActor::getWhitelistLinks() const
 {
     std::set<Link> whitelistLinks;
-    base::Time start = base::Time::now();
     {
         std::set<LinkGroup>::const_iterator cit = mWhiteListLinkGroup.begin();
         for(; cit != mWhiteListLinkGroup.end(); ++cit)
@@ -55,30 +54,7 @@ std::set<Link> CombinedActor::getWhitelistLinks() const
             }
         }
     }
-    //std::sort(whitelistLinks.begin(), whitelistLinks.end());
     return whitelistLinks;
-
-//    std::vector<Link> blacklistLinks;
-//    {
-//        std::set<Interface>::const_iterator cit = mBlackListInterface.begin();
-//        for(; cit != mBlackListInterface.end(); ++cit)
-//        {
-//            const std::set<Link>& linkSet = (*mInterfaceLinkMap)[cit->getId()];
-//            blacklistLinks.insert(blacklistLinks.begin(), linkSet.begin(), linkSet.end());
-//        }
-//    }
-//    std::sort(blacklistLinks.begin(), blacklistLinks.end());
-
-//    std::vector<Link> result(whitelistLinks.size());
-//    std::vector<Link>::iterator it;
-//    it = std::set_difference(whitelistLinks.begin(), whitelistLinks.end(), blacklistLinks.begin(), blacklistLinks.end(), result.begin());
-//    result.resize(it - result.begin());
-//    LOG_DEBUG_S << (base::Time::now() - start).toSeconds();
-//    //std::cout << "GetWhiteLinks" << std::endl;
-//    //std::cout << "    white: " << whitelistLinks << std::endl;
-//    //std::cout << "    black: " << blacklistLinks << std::endl;
-//    //std::cout << "    diff: " << result << std::endl;
-//    return result;
 }
 
 void CombinedActor::blacklist(const Link& link)
@@ -114,7 +90,7 @@ std::ostream& operator<<(std::ostream& os, const CombinedActor& actor)
 {
     std::set<Link> links = actor.getLinks();
     os << "Links: [";
-    BOOST_FOREACH(const Link& link, links)
+    for(const Link& link : links)
     {
         os << link;
         os << ",";
@@ -123,14 +99,14 @@ std::ostream& operator<<(std::ostream& os, const CombinedActor& actor)
     os << "     Constraints: " << std::endl;
     os << "         link group:" << std::endl;
     os << "             blacklist: [";
-    BOOST_FOREACH(const LinkGroup& group, actor.mBlackListLinkGroup)
+    for(const LinkGroup& group : actor.mBlackListLinkGroup)
     {
         os << group;
         os << ",";
     }
     os << "]" << std::endl;
     os << "             whitelist: [";
-    BOOST_FOREACH(const LinkGroup& group, actor.mWhiteListLinkGroup)
+    for(const LinkGroup& group : actor.mWhiteListLinkGroup)
     {
         os << group;
         os << ",";
@@ -139,14 +115,14 @@ std::ostream& operator<<(std::ostream& os, const CombinedActor& actor)
 
     os << "         interface:" << std::endl;
     os << "             blacklist: [";
-    BOOST_FOREACH(const Interface& interface, actor.mBlackListInterface)
+    for(const Interface& interface : actor.mBlackListInterface)
     {
         os << interface;
         os << ",";
     }
     os << "]" << std::endl;
     os << "             whitelist: [";
-    BOOST_FOREACH(const Interface& interface, actor.mWhiteListInterface)
+    for(const Interface& interface : actor.mWhiteListInterface)
     {
         os << interface;
         os << ",";
@@ -155,7 +131,7 @@ std::ostream& operator<<(std::ostream& os, const CombinedActor& actor)
 
     std::set<Link> whitelistLinks = actor.getWhitelistLinks();
     os << "    Whitelist links: [";
-    BOOST_FOREACH(const Link& link, whitelistLinks)
+    for(const Link& link : whitelistLinks)
     {
         os << link;
         os << ",";

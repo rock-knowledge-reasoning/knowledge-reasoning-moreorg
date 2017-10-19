@@ -1,11 +1,10 @@
 #include "PDDLExporter.hpp"
 #include <iostream>
 #include <fstream>
-#include <boost/foreach.hpp>
 #include <base-logging/Logging.hpp>
 #include <pddl_planner/representation/Domain.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include "../vocabularies/OM.hpp"
 
 using namespace owlapi::model;
 
@@ -31,7 +30,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
     // Adding types to the domain -> concepts
     owlapi::model::OWLOntologyAsk ask(model.ontology());
     IRIList klasses = ask.allClasses();
-    BOOST_FOREACH(IRI klass, klasses)
+    for(const IRI& klass : klasses)
     {
         try {
             domain.addType(klass.getFragment());
@@ -44,7 +43,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
 
     LOG_DEBUG_S << "All instance of actor";
     IRIList instances = ask.allInstancesOf( OM::Actor(), false);
-    BOOST_FOREACH(IRI instance, instances)
+    for(const IRI& instance : instances)
     {
         try {
             LOG_DEBUG_S << "Domain: adding typed constant: '" << instance << "' of type '" << OM::Actor() << "'";
@@ -57,7 +56,7 @@ pddl_planner::representation::Domain PDDLExporter::toDomain(const OrganizationMo
     }
     LOG_DEBUG_S << "All services";
     IRIList services = ask.allInstancesOf( OM::ServiceModel(), false);
-    BOOST_FOREACH(IRI service, services)
+    for(const IRI& service : services)
     {
         try {
             LOG_DEBUG_S << "Domain: adding typed constant: '" << service << "' of type '" << OM::ServiceModel() << "'";
@@ -203,12 +202,12 @@ pddl_planner::representation::Problem PDDLExporter::toProblem(const Organization
 
     owlapi::model::OWLOntologyAsk ask(model.ontology());
     IRIList instances = ask.allInstancesOf( OM::Actor(), false);
-    BOOST_FOREACH(IRI instance, instances)
+    for(const IRI& instance : instances)
     {
         try {
             std::string instanceName = instance.getFragment();
             IRIList relatedActors = ask.allRelatedInstances(instance, OM::has(), OM::Actor());
-            BOOST_FOREACH(IRI relatedActor, relatedActors)
+            for(const IRI& relatedActor : relatedActors)
             {
                 // embodies: CombinedActor embodies Actor
                 problem.addInitialStatus( Expression(embodies, instanceName, relatedActor.getFragment()) );
@@ -216,7 +215,7 @@ pddl_planner::representation::Problem PDDLExporter::toProblem(const Organization
 
             // provides: Actor provides Capability / Service
             IRIList relatedServicesOrCapabilities = ask.allRelatedInstances(instance, OM::provides());
-            BOOST_FOREACH(IRI related, relatedServicesOrCapabilities)
+            for(const IRI& related : relatedServicesOrCapabilities)
             {
                 if(ask.isInstanceOf(related, OM::ServiceModel()))
                 {
@@ -240,7 +239,7 @@ pddl_planner::representation::Problem PDDLExporter::toProblem(const Organization
 
     // All atomic actors
     IRIList atomicActors = ask.allInstancesOf( OM::Actor(), true);
-    BOOST_FOREACH(IRI atomicActor, atomicActors)
+    for(const IRI& atomicActor : atomicActors)
     {
         std::string actorName = atomicActor.getFragment();
         problem.addInitialStatus( Expression(atomic, actorName) );

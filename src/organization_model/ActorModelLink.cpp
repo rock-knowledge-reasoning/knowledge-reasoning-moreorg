@@ -1,5 +1,5 @@
 #include "ActorModelLink.hpp"
-#include <boost/foreach.hpp>
+#include <iostream>
 #include <algorithm>
 #include <assert.h>
 
@@ -59,10 +59,10 @@ std::string ActorModelLink::toString() const
 std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<ActorModelLink> > modelSet)
 {
     int count = 0;
-    BOOST_FOREACH(const std::vector<ActorModelLink>& compositeActorModel, modelSet)
+    for(const std::vector<ActorModelLink>& compositeActorModel : modelSet)
     {
         os << "#" << ++count << ": ";
-        BOOST_FOREACH(const ActorModelLink& link, compositeActorModel)
+        for(const ActorModelLink& link : compositeActorModel)
         {
             os << link.toString() << ";";
         }

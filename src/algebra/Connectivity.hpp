@@ -3,8 +3,8 @@
 
 #include <gecode/set.hh>
 #include <gecode/search.hh>
-#include <organization_model/OrganizationModelAsk.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include "../OrganizationModelAsk.hpp"
+#include "../vocabularies/OM.hpp"
 
 namespace organization_model {
 namespace algebra {

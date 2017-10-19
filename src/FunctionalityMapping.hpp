@@ -2,7 +2,7 @@
 #define ORGANIZATION_MODEL_FUNCTIONALITY_MAPPING_HPP
 
 #include <set>
-#include<organization_model/ModelPool.hpp>
+#include "ModelPool.hpp"
 
 namespace organization_model {
 

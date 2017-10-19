@@ -1,5 +1,4 @@
 #include <boost/test/unit_test.hpp>
-#include <boost/foreach.hpp>
 #include <base/Time.hpp>
 #include <owlapi/io/OWLOntologyIO.hpp>
 #include <owlapi/model/OWLOntologyTell.hpp>
@@ -23,7 +22,7 @@ BOOST_AUTO_TEST_SUITE(csp)
 //    OWLOntologyTell tell(ontology);
 //    OWLOntologyAsk ask(ontology);
 //    tell.initializeDefaultClasses();
-//    
+//
 //
 //    OWLClass::Ptr a = tell.klass("http://klass/base");
 //    OWLClass::Ptr b = tell.klass("http://klass/base-derived");
@@ -177,7 +176,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     //
     // 1. first infer 1. level services
     //
-    // Constraints: 
+    // Constraints:
     //  subclassing constraints, should also allow to account for limiting
     //  facts, e.g. sherpa+crex -> enable, disable, but that will be important
     //  lateron
@@ -197,7 +196,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     } catch(...)
     {
         BOOST_TEST_MESSAGE("Sherpa does not provide LocationImageProvider\nAssignment failed for: " << location_image_provider);
-        BOOST_FOREACH(OWLCardinalityRestriction::Ptr r, r_sherpa_with_service)
+        for(OWLCardinalityRestriction::Ptr r : r_sherpa_with_service)
         {
             BOOST_TEST_MESSAGE("Cardinality: " << r->toString());
         }

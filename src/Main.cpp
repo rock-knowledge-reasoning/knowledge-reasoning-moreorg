@@ -1,8 +1,7 @@
 #include <iostream>
 #include <stdio.h>
-#include <organization_model/OrganizationModel.hpp>
-#include <boost/foreach.hpp>
-#include <organization_model/ccf/CCF.hpp>
+#include "OrganizationModel.hpp"
+#include "ccf/CCF.hpp"
 
 int main(int argc, char** argv)
 {

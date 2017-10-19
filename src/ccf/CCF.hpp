@@ -6,11 +6,10 @@
 #include <algorithm>
 #include <sstream>
 #include <stdint.h>
-#include <boost/foreach.hpp>
 #include <base-logging/Logging.hpp>
 
 /**
- * This is an implementation of the Constrained Coalition Formation algorithm 
+ * This is an implementation of the Constrained Coalition Formation algorithm
  * as suggested by Rahwan et. al "Constrained Coalition Formation",2011
  */
 
@@ -44,7 +43,7 @@ public:
             return false;
         }
 
-        BOOST_FOREACH(const T& item, other)
+        for(const T& item : other)
         {
             if(!mSet.count(item) )
             {
@@ -63,7 +62,7 @@ public:
     Set<T> createUnion(const Set<T>& s) const
     {
         Set<T> tmpSet = *this;
-        BOOST_FOREACH(const T& item, s)
+        for(const T& item : s)
         {
             tmpSet.insert(item);
         }
@@ -106,7 +105,7 @@ public:
     {
         std::stringstream ss;
         ss << "{";
-        BOOST_FOREACH(const T& item, mSet)
+        for(const T& item : mSet)
         {
             ss << item;
             ss << ",";
@@ -140,7 +139,7 @@ public:
             return false;
         }
 
-        BOOST_FOREACH(const Set<T>& s, Set< Set<T> >::mSet)
+        for(const Set<T>& s : Set< Set<T> >::mSet)
         {
             if(s.empty())
             {
@@ -161,7 +160,7 @@ public:
     SetOfSets<T> createUnion(const SetOfSets<T>& other) const
     {
         SetOfSets<T> tmpSet = *this;
-        BOOST_FOREACH(const Set<T> item, other)
+        for(const Set<T> item : other)
         {
             tmpSet.insert(item);
         }
@@ -178,9 +177,9 @@ public:
     Set<T> flatten() const
     {
         Set<T> newSet;
-        BOOST_FOREACH(const Set<T>& s, Set< Set<T> >::mSet)
+        for(const Set<T>& s : Set< Set<T> >::mSet)
         {
-            BOOST_FOREACH(const T& t, s)
+            for(const T& t : s)
             {
                 newSet.insert(t);
             }
@@ -191,9 +190,9 @@ public:
     bool includes(const SetOfSets<T>& other) const
     {
         bool includes = false;
-        BOOST_FOREACH(const Set<T>& thisSubset, Set< Set<T> >::mSet)
+        for(const Set<T>& thisSubset : Set< Set<T> >::mSet)
         {
-            BOOST_FOREACH(const Set<T>& otherSubset, other)
+            for(const Set<T>& otherSubset : other)
             {
                 if(thisSubset.includes(otherSubset))
                 {
@@ -213,7 +212,7 @@ public:
     {
         std::stringstream ss;
         ss << "{";
-        BOOST_FOREACH(const Set<T>& s, Set< Set<T> >::mSet)
+        for(const Set<T>& s : Set< Set<T> >::mSet)
         {
             ss << s.toString();
             ss << ",";
@@ -277,7 +276,7 @@ struct Coalition
 
     bool constraintsApply(const Constraints& constraints) const
     {
-        BOOST_FOREACH(const Set<T>& c, constraints)
+        for(const Set<T>& c : constraints)
         {
             if(positive.includes(c))
             {
@@ -291,8 +290,8 @@ struct Coalition
 
     Set< Coalition<T> > getFeasibleCoalitions() const
     {
-        Set< Coalition<T> > coalitions; 
-        BOOST_FOREACH(const Constraint& p, positive)
+        Set< Coalition<T> > coalitions;
+        for(const Constraint& p : positive)
         {
             coalitions.insert( Coalition(p, Constraints()) );
         }
@@ -303,11 +302,11 @@ struct Coalition
     static Set<T> getUniqueElements(Coalitions& coalitions)
     {
         Set<T> atoms;
-        BOOST_FOREACH(const Coalition& coalition, coalitions)
+        for(const Coalition& coalition : coalitions)
         {
-            BOOST_FOREACH(const Constraint& constraint, coalition.positive)
+            for(const Constraint& constraint : coalition.positive)
             {
-                BOOST_FOREACH(const Atom& a, constraint)
+                for(const Atom& a : constraint)
                 {
                     atoms.insert(a);
                 }
@@ -348,7 +347,7 @@ public:
     typedef Constraints NegativeConstraints;
     typedef std::vector<T> AStar;
 
-private: 
+private:
     Atoms mAtoms;
     Constraints mPositiveConstraints;
     Constraints mNegativeConstraints;
@@ -358,7 +357,7 @@ public:
 
     CCF(const AtomsVector& atoms)
     {
-        BOOST_FOREACH(const Atom& atom, atoms)
+        for(const Atom& atom : atoms)
         {
             mAtoms.insert(atom);
         }
@@ -385,7 +384,7 @@ public:
         // find biggest in list and pick first item
         Constraint largestConstraint;
         size_t largestConstraintSize = 0;
-        BOOST_FOREACH(const Constraint& c, constraints)
+        for(const Constraint& c : constraints)
         {
             size_t constraintSize = c.size();
             if(constraintSize > largestConstraintSize)
@@ -396,7 +395,7 @@ public:
         }
 
         // Make sure we are using only constraints that are relevant
-        BOOST_FOREACH(Atom a, largestConstraint)
+        for(Atom a : largestConstraint)
         {
             if(atoms.contains(a))
             {
@@ -451,9 +450,9 @@ public:
         {
             NegativeConstraints tmpN = n;
 
-            BOOST_FOREACH(Constraint nc, tmpN)
+            for(Constraint nc : tmpN)
             {
-                BOOST_FOREACH(Constraint nc_s, tmpN)
+                for(Constraint nc_s : tmpN)
                 {
                     if(nc_s.isSupersetOf(nc))
                     {
@@ -466,9 +465,9 @@ public:
         {
             PositiveConstraints tmpP = p;
 
-            BOOST_FOREACH(Constraint pc, tmpP)
+            for(Constraint pc : tmpP)
             {
-                BOOST_FOREACH(Constraint pc_s, tmpP)
+                for(Constraint pc_s : tmpP)
                 {
                     if(pc_s.isSupersetOf(pc))
                     {
@@ -492,7 +491,7 @@ public:
         // if there is a constraint in N with exactly one agent
         {
             NegativeConstraints tmpSet = n;
-            BOOST_FOREACH(Constraint nc, tmpSet)
+            for(Constraint nc : tmpSet)
             {
                 if(nc.size() == 1)
                 {
@@ -599,14 +598,14 @@ public:
         // ai are part of the prohibited set
         NegativeConstraints ncs_ai; //N Tilde ai
 
-        // Here we filter out the selected atom and create 
-        // two sets: 
+        // Here we filter out the selected atom and create
+        // two sets:
         // ncs_ai -> finally contains all subset when substracting 'atom'
         // ncs_not_ai -> finally all subsets that never related to atom
-        BOOST_FOREACH(Constraint nc, n)
+        for(Constraint nc : n)
         {
             if( nc.contains(atom) )
-            { 
+            {
                 Constraint constraint = nc.without(atom);
                 //if(!constraint.empty())
                 //{
@@ -624,7 +623,7 @@ public:
         // to permitted coalitions, when merged with ai
         PositiveConstraints pcs_ai;
 
-        BOOST_FOREACH(Constraint pc, p)
+        for(Constraint pc : p)
         {
             if( pc.contains(atom) )
             {
@@ -671,7 +670,7 @@ public:
         size_t extraListPosition = aStar.size();
 
         // Iterate through base cases
-        BOOST_FOREACH(const Coalition& coalition, coalitions)
+        for(const Coalition& coalition : coalitions)
         {
             bool foundList = false;
             // Picking a feasible coaltion -- in our case they should be feasible by default
@@ -708,10 +707,10 @@ public:
     {
         // Pick coalition
         Coalitions coalitionStructure = baseCoalition;
-        BOOST_FOREACH(const Coalition& listCoalition, list[level])
+        for(const Coalition& listCoalition : list[level])
         {
             Coalitions feasibleCoalitions = listCoalition.getFeasibleCoalitions();
-            BOOST_FOREACH(Coalition c, feasibleCoalitions)
+            for(Coalition c : feasibleCoalitions)
             {
                 coalitionStructure.insert(c);
 
@@ -721,20 +720,20 @@ public:
                     LOG_DEBUG_S << "Check all atoms used in coalition structure, i.e. structure complete: " << coalitionStructure.toString() << " unique elements: " << Coalition::getUniqueElements(coalitionStructure).size() << " atoms: " << mAtoms.size();
                     coalitions.push_back(coalitionStructure);
                     // eval and update
-                } else { 
+                } else {
                     if(level < list.size() - 1)
                     {
                         LOG_DEBUG_S << "Use list: " << level;
                         level = level + 1;
                         Coalitions nextLevelCoalitions = list[level];
 
-                        BOOST_FOREACH(Coalition nextLevelCoalition, nextLevelCoalitions)
+                        for(Coalition nextLevelCoalition : nextLevelCoalitions)
                         {
-                            BOOST_FOREACH(const Coalition& coalition, coalitionStructure)
+                            for(const Coalition& coalition : coalitionStructure)
                             {
-                                BOOST_FOREACH(const Constraint& constraint, coalition.positive)
+                                for(const Constraint& constraint : coalition.positive)
                                 {
-                                    BOOST_FOREACH(const Atom& atom, constraint)
+                                    for(const Atom& atom : constraint)
                                     {
                                         nextLevelCoalition.negative.insert( Constraint(atom) );
                                     }

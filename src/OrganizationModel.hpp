@@ -4,9 +4,9 @@
 #include <stdint.h>
 #include <organization_model/SharedPtr.hpp>
 #include <owlapi/model/OWLOntology.hpp>
-#include <organization_model/FunctionalityMapping.hpp>
-#include <organization_model/Functionality.hpp>
-#include <organization_model/Service.hpp>
+#include "FunctionalityMapping.hpp"
+#include "Functionality.hpp"
+#include "Service.hpp"
 
 namespace organization_model {
 

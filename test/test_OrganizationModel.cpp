@@ -510,7 +510,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //    problem.addObject(TypedItem("location_s0", locationType));
 //
 //    IRIList atomicActors = om.ontology()->allInstancesOf( OM::Actor(), true);
-//    BOOST_FOREACH(IRI atomicActor, atomicActors)
+//    for(IRI atomicActor : atomicActors)
 //    {
 //        std::string instanceName = atomicActor.getFragment();
 //        problem.addInitialStatus(Expression("operative",instanceName));

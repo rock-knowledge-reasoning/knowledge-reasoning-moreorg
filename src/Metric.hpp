@@ -2,9 +2,9 @@
 #define ORGANIZATION_MODEL_METRIC_HPP
 
 #include <stdexcept>
-#include <organization_model/ModelPool.hpp>
-#include <organization_model/OrganizationModel.hpp>
 #include <owlapi/model/OWLCardinalityRestriction.hpp>
+#include "ModelPool.hpp"
+#include "OrganizationModel.hpp"
 
 namespace organization_model {
 

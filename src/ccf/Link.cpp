@@ -1,5 +1,4 @@
 #include "Link.hpp"
-#include <boost/foreach.hpp>
 
 namespace multiagent {
 namespace ccf {
@@ -16,10 +15,10 @@ Link::Link(Interface first, Interface second)
         mSecond = first;
         mFirst = second;
     }
-} 
+}
 
-LinkGroup Link::getGroup() const 
-{    
+LinkGroup Link::getGroup() const
+{
     return LinkGroup(mFirst.getActor(), mSecond.getActor());
 }
 
@@ -49,7 +48,7 @@ std::ostream& operator<<(std::ostream& os, const Link& link)
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Link>& links)
 {
-    BOOST_FOREACH(const Link& link, links)
+    for(const Link& link : links)
     {
         os << link;
         os << ",";

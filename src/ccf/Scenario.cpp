@@ -1,7 +1,7 @@
 #include "Scenario.hpp"
 #include <numeric/Combinatorics.hpp>
 
-using namespace numeric; 
+using namespace numeric;
 
 namespace multiagent {
 namespace ccf {
@@ -25,7 +25,7 @@ Scenario Scenario::fromConsole()
     std::cout << "Please provide information about the actor types: " << std::endl;
 
     for(size_t i = 0; i < numberOfActorTypes; ++i)
-    { 
+    {
         std::cout << "The available number of items per type:" << std::endl;
 
         size_t numberPerActorType;
@@ -90,7 +90,7 @@ void Scenario::compute()
         actorList.push_back(actor);
     }
 
-    
+
     Combination<Actor> combination(actorList, actorList.size(), MAX);
     mNumberOfActorCombinations = combination.numberOfCombinations();
 
@@ -115,7 +115,7 @@ void Scenario::createLinks()
     } while(combinations.next());
 
     // Remove links that violate general constraints
-    BOOST_FOREACH(Link link, links)
+    for(const Link& link : links)
     {
         if(link.getFirstActor() == link.getSecondActor())
         {
@@ -137,7 +137,7 @@ void Scenario::createLinks()
         // Create actor mapping
         mActorLinkMap[link.getFirstActor()].insert(link);
         mActorLinkMap[link.getSecondActor()].insert(link);
-    }   
+    }
 
     Combination<LinkType> linkTypeCombinations( getValidLinkTypeList(), mActors.size()-1, MAX);
     mNumberOfLinkTypeCombinations = linkTypeCombinations.numberOfCombinations();
