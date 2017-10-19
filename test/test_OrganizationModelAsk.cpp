@@ -338,6 +338,15 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         functionalities.insert( transportProvider );
 
         {
+            FunctionalityRequirement fr;
+            BOOST_REQUIRE_THROW( ask.getResourceSupport(fr), std::invalid_argument );
+        }
+        {
+            FunctionalityRequirement::Map fr;
+            ModelPool::Set modelPools = ask.getResourceSupport(functionalities, fr);
+            BOOST_REQUIRE_MESSAGE(!modelPool.empty(), "Resource support for functionalities without requirement: " << ModelPool::toString(modelPools));
+        }
+        {
             double minItems = 10;
             PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;

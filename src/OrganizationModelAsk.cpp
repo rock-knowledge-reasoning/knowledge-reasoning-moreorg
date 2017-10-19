@@ -478,7 +478,7 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const Functionality::Set
                 // functionality
                 FunctionalityRequirement::Map::const_iterator cit = functionalityRequirements.find(functionality);
                 ModelPool::Set modelPoolSet;
-                if(cit != functionalityRequirements.end())
+                if(cit == functionalityRequirements.end())
                 {
                     // no constraints need to be considered
                     modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
