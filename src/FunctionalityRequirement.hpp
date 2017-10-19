@@ -32,6 +32,9 @@ public:
     void addPropertyConstraints(const PropertyConstraint::List& constraints);
     void addPropertyConstraints(const PropertyConstraint::Set& constraints);
 
+    std::string toString(size_t indent = 0) const;
+    static std::string toString(const FunctionalityRequirement::Map& requirements, size_t indent = 0);
+
 private:
     Functionality mFunctionality;
     PropertyConstraint::Set mPropertyConstraints;
