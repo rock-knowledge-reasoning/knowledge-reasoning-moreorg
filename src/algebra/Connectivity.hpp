@@ -3,6 +3,7 @@
 
 #include <gecode/set.hh>
 #include <gecode/search.hh>
+#include <graph_analysis/BaseGraph.hpp>
 #include "../OrganizationModelAsk.hpp"
 #include "../vocabularies/OM.hpp"
 
@@ -16,6 +17,8 @@ namespace algebra {
  */
 class Connectivity : public Gecode::Space
 {
+    friend class ConnectivityBrancher;
+
     /// Model pool which has to be checked for its connectivity
     ModelPool mModelPool;
     /// The organization model
@@ -34,9 +37,15 @@ class Connectivity : public Gecode::Space
     /// Register the interface index ranges
     typedef std::pair<uint32_t, uint32_t> IndexRange;
     std::vector< IndexRange > mInterfaceIndexRanges;
+
+    // |#ofInterface|*a0Idx + a1Idx
     Gecode::IntVarArray mConnections;
 
+    mutable graph_analysis::BaseGraph::Ptr mpBaseGraph;
+
     Gecode::Symmetries identifySymmetries(Gecode::IntVarArray& connections);
+
+    bool isComplete() const;
 
 public:
     Connectivity(const ModelPool& modelPool, const OrganizationModelAsk& ask, const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface") );
@@ -71,7 +80,15 @@ public:
      */
     std::string toString() const;
 
+    static double merit(const Gecode::Space& space, Gecode::IntVar x, int idx);
+
+    /**
+     * Define the value selection merit function
+     */
+
+    double computeMerit(Gecode::IntVar x, int idx) const;
 };
+
 
 } // end namespace algebra
 } // end namespace organization_model

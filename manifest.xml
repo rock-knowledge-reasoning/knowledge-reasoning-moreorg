@@ -13,6 +13,7 @@
   <depend package="base/numeric" />
   <depend package="planning/pddl_planner" />
   <depend package="knowledge_reasoning/owlapi" />
+  <depend package="tools/graph_analysis" />
   <!-- gnu linear programming kit -->
   <depend package="glpk" />
 </package>

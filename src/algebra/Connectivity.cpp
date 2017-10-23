@@ -2,6 +2,8 @@
 #include <organization_model/vocabularies/OM.hpp>
 #include <numeric/Combinatorics.hpp>
 #include <gecode/minimodel.hh>
+#include <gecode/int.hh>
+#include <graph_analysis/GraphIO.hpp>
 
 using namespace owlapi::model;
 
@@ -18,7 +20,7 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     , mModelCombination(mModelPool.toModelCombination())
 {
     assert(!mModelCombination.empty());
-    // Identify interfaces -- we assume here ElectoMechanicalInterface
+    // Identify interfaces -- we assume here ElectroMechanicalInterface
     IRIList::const_iterator mit = mModelCombination.begin();
     for(; mit != mModelCombination.end(); ++mit)
     {
@@ -40,7 +42,6 @@ Connectivity::Connectivity(const ModelPool& modelPool,
                 LOG_WARN_S << "Found a minimum cardinality restrictions for a resource -- was expecting a max cardinality constraint";
             }
         }
-        assert(false);
 
         if(interfaces.empty())
         {
@@ -187,8 +188,12 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     // which is the MAX of the domain -> 1
     // Propagation will set the other invalid connections to 0, thus speeding up
     // the assignment process
-    branch(*this, mConnections, Gecode::INT_VAR_MAX_MAX(), Gecode::INT_VAL_MAX(), symmetries);
 
+    //Gecode::Rnd rnd;
+    //rnd.time();
+    //// Which variable to pick
+    //branch(*this, mConnections, Gecode::INT_VAR_RND(rnd), Gecode::INT_VAL_MAX(), symmetries);
+    branch(*this, mConnections, Gecode::INT_VAR_MERIT_MIN(&merit), Gecode::INT_VAL_MAX(), symmetries);
 }
 
 Connectivity::Connectivity(bool share, Connectivity& other)
@@ -198,6 +203,7 @@ Connectivity::Connectivity(bool share, Connectivity& other)
     , mModelCombination(other.mModelCombination)
     , mInterfaces(other.mInterfaces)
     , mInterfaceMapping(other.mInterfaceMapping)
+    , mInterfaceIndexRanges(other.mInterfaceIndexRanges)
 {
     mConnections.update(*this, share, other.mConnections);
 }
@@ -205,6 +211,78 @@ Connectivity::Connectivity(bool share, Connectivity& other)
 Gecode::Space* Connectivity::copy(bool share)
 {
     return new Connectivity(share, *this);
+}
+
+bool Connectivity::isComplete() const
+{
+    Gecode::Matrix<Gecode::IntVarArray> connectionMatrix(mConnections, mInterfaces.size(), mInterfaces.size());
+
+    using namespace graph_analysis;
+    Vertex::PtrList vertices;
+    // Currently testing connectivity is implemented only for lemon
+    mpBaseGraph = BaseGraph::getInstance(BaseGraph::LEMON_DIRECTED_GRAPH);
+    for(size_t i = 0; i < mInterfaceMapping.size(); ++i)
+    {
+        Vertex::Ptr v(new Vertex(mInterfaceMapping[i].first.getFragment()));
+        mpBaseGraph->addVertex(v);
+
+        vertices.push_back(v);
+    }
+
+    for(size_t a0 = 0; a0 < mInterfaceIndexRanges.size() - 1 ; ++a0)
+    {
+        IndexRange a0InterfaceIndexes = mInterfaceIndexRanges[a0];
+
+        for(size_t a1 = a0+1; a1 < mInterfaceIndexRanges.size(); ++a1)
+        {
+            IndexRange a1InterfaceIndexes = mInterfaceIndexRanges[a1];
+
+            bool connectionFound = false;
+            // check if any of the interface link has a value of one:
+            // Interfaces of Agent A
+            for(size_t i0 = a0InterfaceIndexes.first; i0 <= a0InterfaceIndexes.second; ++i0)
+            {
+                const IRI& interfaceModel0 = mInterfaces[i0];
+
+                // Interfaces of Agent B
+                for(size_t i1 = a1InterfaceIndexes.first; i1 <= a1InterfaceIndexes.second; ++i1)
+                {
+                    const IRI& interfaceModel1 = mInterfaces[i1];
+
+                    Gecode::IntVar v = connectionMatrix(i0,i1);
+                    if(!v.assigned())
+                    {
+                        throw std::runtime_error("organization_model::algebra::Connectivity::checkGraphCompleteness: expected value to be assiged");
+                    }
+
+                    if(v.val() == 1)
+                    {
+                        // connection exists between these two systems
+                        connectionFound = true;
+                        Edge::Ptr e0(new Edge(vertices[a0],vertices[a1]));
+                        e0->setLabel(interfaceModel0.getFragment());
+                        Edge::Ptr e1(new Edge(vertices[a1],vertices[a0]));
+                        e1->setLabel(interfaceModel1.getFragment());
+                        mpBaseGraph->addEdge(e0);
+                        mpBaseGraph->addEdge(e1);
+                        break;
+                    }
+                }
+
+                if(connectionFound)
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    if(!mpBaseGraph->isConnected())
+    {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 bool Connectivity::isFeasible(const ModelPool& modelPool,
@@ -225,15 +303,31 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
         }
         Gecode::DFS<Connectivity> searchEngine(connectivity, options);
 
-        Connectivity* current = searchEngine.next();
-        if(current)
+        Connectivity* current = NULL;
+        Connectivity* last = NULL;
+        while((current = searchEngine.next()))
         {
-            LOG_DEBUG_S << "Connection is feasible: found solution " << current->toString();
-
-            delete current;
-            delete connectivity;
-            return true;
+            if(current->isComplete())
+            {
+                LOG_DEBUG_S << "Connection is feasible: found solution " << current->toString();
+                graph_analysis::io::GraphIO::write("/tmp/organization-model-connectivity-test-success.dot", current->mpBaseGraph);
+                delete last;
+                delete current;
+                delete connectivity;
+                return true;
+            } else {
+                LOG_DEBUG_S << "Connection is not feasible";
+                delete last;
+                last = current;
+            }
         }
+
+        if(last)
+        {
+            graph_analysis::io::GraphIO::write("/tmp/organization-model-connectivity-test-failure.dot", current->mpBaseGraph);
+        }
+        delete last;
+        delete connectivity;
     } catch(const std::invalid_argument& e)
     {
         // When there is no connection interface then the construction of
@@ -319,6 +413,56 @@ Gecode::Symmetries Connectivity::identifySymmetries(Gecode::IntVarArray& connect
     symmetries << VariableSequenceSymmetry(cols, connectionMatrix.height());
 
     return symmetries;
+}
+
+double Connectivity::merit(const Gecode::Space& space, Gecode::IntVar x, int idx)
+{
+    // prefer the highly constrained
+    const Connectivity& connectivity = static_cast<const Connectivity&>(space);
+    return connectivity.computeMerit(x,idx);
+}
+
+double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
+{
+    size_t a1Idx = idx%mInterfaces.size();
+    size_t a0Idx = (idx - a1Idx)/mInterfaces.size();
+
+    IndexRange idxRange0;
+    IndexRange idxRange1;
+
+    for(IndexRange range : mInterfaceIndexRanges)
+    {
+        if(a0Idx >= range.first && a0Idx <= range.second)
+        {
+            idxRange0 = range;
+        }
+        if(a1Idx >= range.first && a1Idx <= range.second )
+        {
+            idxRange1 = range;
+        }
+    }
+
+    size_t existingConnections = 0;
+    Gecode::Matrix<Gecode::IntVarArray> connectionMatrix(mConnections, mInterfaces.size(), mInterfaces.size());
+    size_t a0;
+    for(a0 = idxRange0.first; a0 <= idxRange0.second; ++a0)
+    {
+        for(size_t a1 = 0; a1 < mInterfaces.size(); ++a1)
+        {
+            Gecode::IntVar v = connectionMatrix(a0,a1);
+            if( v.assigned())
+            {
+                if(v.val() == 1)
+                {
+                    ++existingConnections;
+                }
+            }
+        }
+    }
+
+    // a0: # of interfaces
+    // existingConnections
+    return existingConnections/(1.0*a0);
 }
 
 } // end namespace algebra

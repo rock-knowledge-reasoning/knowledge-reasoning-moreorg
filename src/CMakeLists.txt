@@ -79,6 +79,7 @@ rock_library(organization_model
         vocabularies/Robot.hpp
         ValueBound.hpp
     DEPS_PKGCONFIG numeric pddl_planner owlapi
+        graph_analysis
     LIBS glpk ${Boost_THREAD_LIBRARY}
 )
 
