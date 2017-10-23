@@ -48,7 +48,7 @@ std::string FunctionalityRequirement::toString(size_t indent) const
 {
     std::stringstream ss;
     std::string hspace(indent,' ');
-    ss << hspace << mFunctionality.toString() << std::endl;
+    ss << hspace << mFunctionality.getModel().toQuotedString() << std::endl;
     ss << hspace << "    Constraints:" << std::endl;
     for(const PropertyConstraint& constraint : mPropertyConstraints)
     {

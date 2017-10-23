@@ -5,11 +5,12 @@
 #include <owlapi/model/OWLCardinalityRestriction.hpp>
 #include "ModelPool.hpp"
 #include "OrganizationModel.hpp"
+#include "OrganizationModelAsk.hpp"
 
 namespace organization_model {
 
 // TODO: commment from ICRA Reviewer paper 2015
-// how can further merit functions like information again, failure rates
+// how can further merit functions like information gain, failure rates
 // or similar be combined into the probability of survival metric
 
 namespace metrics {
@@ -47,11 +48,22 @@ public:
     MetricMap getMetricMap() const;
 
     /**
-     * Compute the metric for a given function (service) and an actor model
+     * Compute the metric for a given function (service) and a single agent model
      * \return computed metric
      */
     double compute(const owlapi::model::IRI& function, const owlapi::model::IRI& model) const;
+
+    /**
+     * Compute the metric for a given function (service) and a agent defined by
+     * a model pool
+     */
     double compute(const owlapi::model::IRI& function, const ModelPool& modelPool) const;
+
+    /**
+     * Compute the exclusive use metric for two model pools
+     */
+    double computeExclusiveUse(const ModelPool& required, const ModelPool& available) const;
+
     /**
      * Compute the metric for a given set of functions (services)
      * \param functions Set of function that require
@@ -63,6 +75,11 @@ public:
     double computeExclusiveUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const;
 
     /**
+     * Compute the shared use metric for two model pools
+     */
+    double computeSharedUse(const ModelPool& required, const ModelPool& available) const;
+
+    /**
      * Compute the metric for a given set of functions (services)
      * \param functions Set of function that allow
      * a shared use of available resource, i.e., function requirements
@@ -72,6 +89,9 @@ public:
      */
     double computeSharedUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const;
 
+    /**
+     *
+     */
     virtual double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const { throw std::runtime_error("organization_model::metrics::Metric::compute: not implemented"); }
 
     /**
@@ -93,7 +113,8 @@ public:
 
 protected:
     OrganizationModel mOrganizationModel;
-    shared_ptr<owlapi::model::OWLOntologyAsk> mpAsk;
+    OrganizationModelAsk mOrganizationModelAsk;
+    shared_ptr<owlapi::model::OWLOntologyAsk> mpOntologyAsk;
 
     metrics::Type mType;
 };

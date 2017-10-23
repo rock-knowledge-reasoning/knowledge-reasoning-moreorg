@@ -27,7 +27,10 @@ namespace metrics {
 class Redundancy : public Metric
 {
 public:
-    Redundancy(const OrganizationModel& organization);
+    /**
+     * Default probability of survival
+     */
+    Redundancy(const OrganizationModel& organization, double defaultPoS = 0.95);
 
     double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
             const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const;
@@ -42,7 +45,7 @@ public:
     static double parallel(const std::vector<double>& probabilities);
 
     /**
-     * Compute survivability of a serial system 
+     * Compute survivability of a serial system
      * \param probabilities vector of probability of survival values
      */
     static double serial(const std::vector<double>& probabilities);
@@ -52,6 +55,8 @@ public:
      * used sequentially
      */
     double sequentialUse(const std::vector<double>& values) const { return serial(values); }
+private:
+    double mDefaultProbabilityOfSurvival;
 };
 
 } // end namespace metrics

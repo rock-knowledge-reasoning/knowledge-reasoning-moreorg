@@ -8,7 +8,8 @@ namespace organization_model {
 
 Metric::Metric(const OrganizationModel& organization, metrics::Type type)
     : mOrganizationModel(organization)
-    , mpAsk(new owlapi::model::OWLOntologyAsk(mOrganizationModel.ontology()))
+    , mOrganizationModelAsk(OrganizationModel::Ptr(new OrganizationModel(organization)))
+    , mpOntologyAsk(new owlapi::model::OWLOntologyAsk(mOrganizationModel.ontology()))
     , mType(type)
 {}
 
@@ -19,8 +20,8 @@ MetricMap Metric::getMetricMap() const
 
     MetricMap metricMap;
 
-    IRIList actorModels = mpAsk->allSubClassesOf( vocabulary::OM::Actor() );
-    IRIList services = mpAsk->allSubClassesOf( vocabulary::OM::Service() );
+    IRIList actorModels = mpOntologyAsk->allSubClassesOf( vocabulary::OM::Actor() );
+    IRIList services = mpOntologyAsk->allSubClassesOf( vocabulary::OM::Service() );
 
     for(const IRI& actorModel : actorModels)
     {
@@ -69,6 +70,16 @@ double Metric::compute(const owlapi::model::IRI& function, const ModelPool& mode
     return computeExclusiveUse(functionSet, modelPool);
 }
 
+double Metric::computeSharedUse(const ModelPool& required, const ModelPool& available) const
+{
+    using namespace owlapi::model;
+    std::vector<OWLCardinalityRestriction::Ptr> r_available = mOrganizationModelAsk.getCardinalityRestrictions(available, OWLCardinalityRestriction::SUM_OP, false);
+    std::vector<OWLCardinalityRestriction::Ptr> r_required = mOrganizationModelAsk.getCardinalityRestrictions(required, OWLCardinalityRestriction::MAX_OP, true);
+
+    return computeMetric(r_required, r_available);
+
+}
+
 double Metric::computeSharedUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const
 {
     using namespace owlapi::model;
@@ -84,42 +95,34 @@ double Metric::computeSharedUse(const owlapi::model::IRISet& functions, const Mo
     return sequentialUse(values);
 }
 
+double Metric::computeExclusiveUse(const ModelPool& required, const ModelPool& available) const
+{
+    using namespace owlapi::model;
+    std::vector<OWLCardinalityRestriction::Ptr> r_available = mOrganizationModelAsk.getCardinalityRestrictions(available, OWLCardinalityRestriction::SUM_OP, false);
+    std::vector<OWLCardinalityRestriction::Ptr> r_required = mOrganizationModelAsk.getCardinalityRestrictions(required, OWLCardinalityRestriction::SUM_OP, true);
+
+    return computeMetric(r_required, r_available);
+
+}
+
 double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const
 {
     using namespace owlapi::model;
 
     std::vector<OWLCardinalityRestriction::Ptr> requirements;
+
+    ModelPool required;
     IRISet::const_iterator fit = functions.begin();
     for(; fit != functions.end(); ++fit)
     {
         const IRI& function = *fit;
-        // Get minimal requirements to maintain the function
-        std::vector<OWLCardinalityRestriction::Ptr> functionRequirements = mpAsk->getCardinalityRestrictions(function);
-        requirements.insert(requirements.end(), functionRequirements.begin(), functionRequirements.end());
+        required[function] = 1;
     }
-    requirements = OWLCardinalityRestriction::compact(requirements);
+    requirements = mOrganizationModelAsk.getCardinalityRestrictions(required, OWLCardinalityRestriction::SUM_OP);
 
     // Get model restrictions, i.e. in effect what has to be available for the
     // given models
-    ModelPool::const_iterator mit = modelPool.begin();
-    std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources;
-    for(; mit != modelPool.end(); ++mit)
-    {
-        IRI model = mit->first;
-        uint32_t modelCount = mit->second;
-
-        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mpAsk->getCardinalityRestrictions(model);
-        std::vector<OWLCardinalityRestriction::Ptr>::iterator cit = availableResources.begin();
-        for(; cit != availableResources.end(); ++cit)
-        {
-            OWLCardinalityRestriction::Ptr restriction = *cit;
-            // Update the cardinality with the actual model count
-            uint32_t cardinality = modelCount*restriction->getCardinality();
-            restriction->setCardinality(cardinality);
-        }
-
-        allAvailableResources = owlapi::model::OWLCardinalityRestriction::join(allAvailableResources, availableResources);
-    }
+    std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources = mOrganizationModelAsk.getCardinalityRestrictions(modelPool, OWLCardinalityRestriction::SUM_OP);
 
     return computeMetric(requirements, allAvailableResources);
 }

@@ -349,6 +349,43 @@ double OrganizationModelAsk::getDataPropertyValue(const ModelPool& modelPool, co
     return value;
 }
 
+std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getCardinalityRestrictions(const ModelPool& modelPool, owlapi::model::OWLCardinalityRestriction::OperationType operationType, bool max2Min) const
+{
+    std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources;
+
+    // Get model restrictions, i.e. in effect what has to be available for the
+    // given models
+    ModelPool::const_iterator mit = modelPool.begin();
+    for(; mit != modelPool.end(); ++mit)
+    {
+        const IRI& model = mit->first;
+        uint32_t modelCount = mit->second;
+
+        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mOntologyAsk.getCardinalityRestrictions(model);
+
+        std::vector<OWLCardinalityRestriction::Ptr> available;
+        for(OWLCardinalityRestriction::Ptr& restriction : availableResources)
+        {
+            // Update the cardinality with the actual model count
+            uint32_t cardinality = modelCount*restriction->getCardinality();
+            if(max2Min && restriction->getCardinalityRestrictionType() == OWLCardinalityRestriction::MAX)
+            {
+                OWLCardinalityRestriction::Ptr converted = OWLCardinalityRestriction::getInstance(restriction->getProperty(),
+                        cardinality,
+                        restriction->getQualification(),
+                        OWLCardinalityRestriction::MIN);
+                available.push_back(converted);
+            } else {
+                restriction->setCardinality(cardinality);
+                available.push_back(restriction);
+            }
+        }
+
+        allAvailableResources = owlapi::model::OWLCardinalityRestriction::join(allAvailableResources, available, operationType );
+    }
+    return allAvailableResources;
+}
+
 ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& modelPoolSet, const Functionality::Set& functionalities) const
 {
     ModelPool::Set filtered;
@@ -796,9 +833,15 @@ ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality
     {
         ModelPool m;
         m.insert(pair);
-        double p = getScalingFactor(m, constraints);
-        // the functional saturation bound
-        pair.second = p;
+        try {
+            double p = getScalingFactor(m, constraints);
+            // the functional saturation bound
+            pair.second = p;
+        } catch(const std::invalid_argument& e)
+        {
+            // does not contribute towards a solution
+            pair.second = 0;
+        }
     }
 
     return modelSupport;
@@ -1093,8 +1136,14 @@ std::vector<double> OrganizationModelAsk::getScalingFactors(const ModelPool::Set
     size_t index = 0;
     for(const ModelPool& pool : modelPoolSet)
     {
-        double scalingFactor = getScalingFactor(pool, functionalityRequirement, doCheckSupport);
-        updateScalingFactor(scalingFactors, index, scalingFactor);
+        try {
+            double scalingFactor = getScalingFactor(pool, functionalityRequirement, doCheckSupport);
+            updateScalingFactor(scalingFactors, index, scalingFactor);
+        } catch(const std::runtime_error& e)
+        {
+            // Model pool is not supported
+            updateScalingFactor(scalingFactors, index, 0);
+        }
         ++index;
     }
     return scalingFactors;
@@ -1123,28 +1172,30 @@ double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool, const 
     for(const PropertyConstraint::Clusters::value_type property2Constraints : clusteredConstraints)
     {
         const owlapi::model::IRI& property = property2Constraints.first;
-        // the existing data property value
-        double value = getDataPropertyValue(modelPool, property);
-        propertyValue[property] = value;
-
-        ValueBound vb;
+        double value;
         try {
+            // the existing data property value
+            value = getDataPropertyValue(modelPool, property);
+            propertyValue[property] = value;
+
+            ValueBound vb;
             // Will throw when the constraints cannot be fulfilled
             vb = PropertyConstraintSolver::merge(property2Constraints.second);
+
+            if(scalingFactor*value >= vb.getMin())
+            {
+                // existing scalingFactor is sufficient, e.g to reach the minimum
+                scalingFactor = std::max(1.0, scalingFactor);
+            } else {
+                // in order to reach the minimum: compute the scaling factor
+                double minFactor = std::ceil( vb.getMin() / value );
+                scalingFactor = std::max(minFactor, scalingFactor);
+            }
         } catch(const std::runtime_error& e)
         {
-            throw std::invalid_argument("organization_model::getScalingFactor: functional requirement cannot be fulfilled by this model pool: " + modelPool.toString(12));
+            throw std::invalid_argument("organization_model::getScalingFactor: functional requirement cannot be fulfilled by this model pool: " + modelPool.toString(12) + " - " + e.what());
         }
 
-        if(scalingFactor*value >= vb.getMin())
-        {
-            // existing scalingFactor is sufficient, e.g to reach the minimum
-            scalingFactor = std::max(1.0, scalingFactor);
-        } else {
-            // in order to reach the minimum: compute the scaling factor
-            double minFactor = std::ceil( vb.getMin() / value );
-            scalingFactor = std::max(minFactor, scalingFactor);
-        }
     }
 
     for(const PropertyConstraint::Clusters::value_type property2Constraints : clusteredConstraints)

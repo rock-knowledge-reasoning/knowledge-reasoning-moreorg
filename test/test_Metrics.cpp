@@ -3,6 +3,7 @@
 
 #include <organization_model/OrganizationModel.hpp>
 #include <organization_model/metrics/Redundancy.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <owlapi/model/OWLOntologyTell.hpp>
 #include <owlapi/model/OWLExactCardinalityRestriction.hpp>
@@ -58,6 +59,59 @@ BOOST_AUTO_TEST_CASE(redundancy)
     BOOST_REQUIRE_MESSAGE(redundancyVal == expected, "Redundancy expected: " << expected << " but got " << redundancyVal);
 }
 
+BOOST_AUTO_TEST_CASE(redundancy_computation)
+{
+    OrganizationModel om(getRootDir() + "/test/data/om-project-transterra.owl");
+    OrganizationModelAsk omAsk(OrganizationModel::Ptr(new OrganizationModel(om)) );
+    metrics::Redundancy redundancy(om);
+
+    IRI sherpa = organization_model::vocabulary::OM::resolve("Sherpa");
+    IRI transportProvider = organization_model::vocabulary::OM::resolve("TransportProvider");
+
+    {
+        ModelPool availableModelPool;
+        availableModelPool[sherpa] = 1;
+
+        IRIList functionalities;
+        functionalities.push_back(transportProvider);
+        BOOST_TEST_MESSAGE("TEST: " << redundancy.computeSequential(functionalities, availableModelPool));
+    }
+
+    {
+        ModelPool availableModelPool;
+        availableModelPool[sherpa] = 1;
+
+        ModelPool requiredModelPool;
+        requiredModelPool[sherpa] = 1;
+        requiredModelPool[transportProvider] = 1;
+
+        // todo: redundancy when nothing is required
+        BOOST_REQUIRE_THROW( redundancy.computeExclusiveUse(requiredModelPool, availableModelPool), std::runtime_error );
+
+        availableModelPool[sherpa] = 2;
+        double r =  redundancy.computeExclusiveUse(requiredModelPool, availableModelPool);
+
+        BOOST_TEST_MESSAGE("Test show required: " << OWLCardinalityRestriction::toString( omAsk.getCardinalityRestrictions(requiredModelPool, OWLCardinalityRestriction::SUM_OP) ) );
+        BOOST_TEST_MESSAGE("Test show available: " << OWLCardinalityRestriction::toString( omAsk.getCardinalityRestrictions(availableModelPool, OWLCardinalityRestriction::SUM_OP) ) );
+        BOOST_REQUIRE_MESSAGE(true, "Redundancy exclusive use is:" << r);
+    }
+
+    {
+        ModelPool availableModelPool;
+        availableModelPool[sherpa] = 1;
+
+        ModelPool requiredModelPool;
+        requiredModelPool[sherpa] = 1;
+        requiredModelPool[transportProvider] = 1;
+
+        // todo: redundancy when nothing is required
+        double r = redundancy.computeSharedUse(requiredModelPool, availableModelPool);
+        BOOST_REQUIRE_MESSAGE(true, "Redundancy shared use is:" << r);
+    }
+
+
+}
+
 BOOST_AUTO_TEST_CASE(metric_map_computation)
 {
 //    OrganizationModel om( getOMSchema() );
@@ -89,7 +143,7 @@ BOOST_AUTO_TEST_CASE(metric_map_computation)
 //        {
 //            modelPool[crex] = i;
 //
-//            //    required: 
+//            //    required:
 //            //            ModelBound::List
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Camera' (1, 1000000)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Localization' (1, 1000000)
@@ -97,7 +151,7 @@ BOOST_AUTO_TEST_CASE(metric_map_computation)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Mapping' (1, 1000000)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Power' (1, 1000000)
 //            //
-//            //    available: 
+//            //    available:
 //            //            ModelBound::List
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Camera' (0, 3)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#EmiPassive' (0, 3)
@@ -128,7 +182,7 @@ BOOST_AUTO_TEST_CASE(metric_map_computation)
 //        {
 //            modelPool[robot] = i;
 //
-//            //    required: 
+//            //    required:
 //            //            ModelBound::List
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Camera' (1, 1000000)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Localization' (1, 1000000)
@@ -136,7 +190,7 @@ BOOST_AUTO_TEST_CASE(metric_map_computation)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Mapping' (1, 1000000)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Power' (1, 1000000)
 //            //
-//            //    available: 
+//            //    available:
 //            //            ModelBound::List
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Camera' (0, 3)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#EmiPassive' (0, 3)

@@ -101,6 +101,7 @@ ResourceMatch::ResourceMatch(const ModelBound::List& required,
         LOG_DEBUG_S << "Required model: " << requiredModel;
 
         Gecode::IntVarArgs args;
+
         for(size_t ai = 0; ai < mAvailableModelBound.size(); ++ai)
         {
             Gecode::IntVar m = modelAssignment(ai, ri);
@@ -115,12 +116,18 @@ ResourceMatch::ResourceMatch(const ModelBound::List& required,
             // if so, then use max required value as upper bound
             const ModelBound& availableModelBound = mAvailableModelBound[ai];
             const owlapi::model::IRI& availableModel = availableModelBound.model;
+
             if(requiredModel == availableModel || ask.isSubClassOf(availableModel, requiredModel))
             {
                 LOG_DEBUG_S << "Available model to fulfill '" << requiredModel << std::endl
-                    << "    " << availableModel;
+                    << "    " << availableModel << std::endl
+                    << "    maxRequired:" << requiredModelBound.max << std::endl
+                    << "    maxAvailable:" << availableModelBound.max << std::endl
+                    ;
+
                 rel(*this, m, Gecode::IRT_LQ, requiredModelBound.max);
                 rel(*this, m, Gecode::IRT_LQ, availableModelBound.max);
+                LOG_DEBUG_S << "Current value of m: " << m;
             } else {
                 // does not fulfill the requirement so force to 0
                 // i.e. no support by this available model
@@ -129,17 +136,28 @@ ResourceMatch::ResourceMatch(const ModelBound::List& required,
         }
         LOG_DEBUG_S << "Required instances of model: " << requiredModel << ", minimum: " << requiredModelBound.min;
         // Row requires a minimum of resources to fulfill the requirement
+        // sum of available (and valid supporting ones) should be at a minimum
+        // of one
         rel(*this, sum(args) >= requiredModelBound.min);
     }
+
 
     for(size_t ai = 0; ai < mAvailableModelBound.size(); ++ai)
     {
         const ModelBound& availableModelBound = mAvailableModelBound[ai];
+        const IRI& availableModel = availableModelBound.model;
+
         Gecode::IntVarArgs args;
         for(size_t ri = 0; ri < mRequiredModelBound.size(); ++ri)
         {
+            const ModelBound& requiredModelBound = mRequiredModelBound[ri];
+            const owlapi::model::IRI& requiredModel = requiredModelBound.model;
             Gecode::IntVar m = modelAssignment(ai, ri);
-            args << m;
+
+            if(requiredModel != availableModel && ask.isSubClassOf(availableModel, requiredModel))
+            {
+                args << m;
+            }
         }
         rel(*this, sum(args) <= availableModelBound.max);
     }

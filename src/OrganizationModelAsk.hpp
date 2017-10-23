@@ -373,6 +373,18 @@ public:
      */
     double getDataPropertyValue(const ModelPool& modelPool, const owlapi::model::IRI& dataProperty) const;
 
+    /**
+     * Get all (joined) restriction that hold for a given model pool
+     * \param modelPool
+     * \param type
+     * \param min2Max When retrieving the cardinalities, e.g., in a mixed setup
+     * for functionalities and model pools, then functionalities defined
+     * requirement in terms of Min cardinalities, and agents Max cardinalities.
+     * To allow propery computation of the metrics, adapt min to max
+     * cardinalities
+     */
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> getCardinalityRestrictions(const ModelPool& modelPool, owlapi::model::OWLCardinalityRestriction::OperationType type = owlapi::model::OWLCardinalityRestriction::SUM_OP, bool max2Min = false) const;
+
 protected:
 
     /**

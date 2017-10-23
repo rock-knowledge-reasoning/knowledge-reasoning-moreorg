@@ -12,8 +12,9 @@ using namespace owlapi::vocabulary;
 namespace organization_model {
 namespace metrics {
 
-Redundancy::Redundancy(const OrganizationModel& organization)
+Redundancy::Redundancy(const OrganizationModel& organization, double defaultPoS)
     : Metric(organization, REDUNDANCY)
+    , mDefaultProbabilityOfSurvival(defaultPoS)
 {}
 
 double Redundancy::computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const
@@ -59,6 +60,10 @@ double Redundancy::computeSequential(const std::vector<owlapi::model::IRISet>& f
 
 double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Ptr>& required, const std::vector<OWLCardinalityRestriction::Ptr>& available) const
 {
+    if(required.empty())
+    {
+        throw std::invalid_argument("organization_model::metrics::Redundancy: set of cardinality restriction to define requirements is empty");
+    }
     using namespace owlapi::model;
 
     // Strategies to compute redundancy:
@@ -104,7 +109,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
             modelBoundRemaining = solution.substractMinFrom(modelBoundRemaining);
             LOG_DEBUG_S << "Remaining: " << ModelBound::toString(modelBoundRemaining);
         }
-    } catch(const std::runtime_error& e)
+    } catch(const std::exception& e)
     {
         LOG_DEBUG_S << e.what();
     }
@@ -135,13 +140,13 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         double probabilityOfSurvival = 0;
         try {
             // SCHOKO: Model should have an associated probability of failure
-            OWLLiteral::Ptr value = mpAsk->getDataValue(qualification, vocabulary::OM::probabilityOfFailure());
+            OWLLiteral::Ptr value = mpOntologyAsk->getDataValue(qualification, vocabulary::OM::probabilityOfFailure());
             LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
             probabilityOfSurvival = 1 - value->getDouble();
         } catch(...)
         {
-            LOG_DEBUG_S << "Using probability of failure for '" << qualification << ": 0.5";
-            probabilityOfSurvival = 0.5;
+            LOG_DEBUG_S << "Using probability of failure for '" << qualification << ": 0.95";
+            probabilityOfSurvival = mDefaultProbabilityOfSurvival;
         }
 
         ModelSurvivability survivability(*cit, probabilityOfSurvival, fullModelRedundancy);
@@ -169,7 +174,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
             for(; mit != models.end(); ++mit)
             {
                 // Check if model can be used to strengthen the survivability
-                if( mit->getQualification() == remaining.model || mpAsk->isSubClassOf(remaining.model, mit->getQualification()) )
+                if( mit->getQualification() == remaining.model || mpOntologyAsk->isSubClassOf(remaining.model, mit->getQualification()) )
                 {
                     try {
                         remaining.decrement();
