@@ -135,9 +135,9 @@ ResourceMatch::ResourceMatch(const ModelBound::List& required,
             }
         }
         LOG_DEBUG_S << "Required instances of model: " << requiredModel << ", minimum: " << requiredModelBound.min;
-        // Row requires a minimum of resources to fulfill the requirement
+        // Row requires a minimum of resources to fulfill this particular requirement
         // sum of available (and valid supporting ones) should be at a minimum
-        // of one
+        // of the required
         rel(*this, sum(args) >= requiredModelBound.min);
     }
 
@@ -154,11 +154,14 @@ ResourceMatch::ResourceMatch(const ModelBound::List& required,
             const owlapi::model::IRI& requiredModel = requiredModelBound.model;
             Gecode::IntVar m = modelAssignment(ai, ri);
 
-            if(requiredModel != availableModel && ask.isSubClassOf(availableModel, requiredModel))
+            // Collect all true subclasses for a given model
+            // Todo: needs to be a leaf node
+            if(requiredModel != availableModel && ask.isDirectSubClassOf(availableModel, requiredModel))
             {
                 args << m;
             }
         }
+        // Maximum number of available resources should not exceed the
         rel(*this, sum(args) <= availableModelBound.max);
     }
 
