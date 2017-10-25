@@ -224,6 +224,20 @@
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ManipulationProvider">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Service"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulator"/>
+                <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulation"/>
+                <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -259,20 +273,6 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
-                <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion"/>
-                <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
                 <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
@@ -281,6 +281,20 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
                 <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization"/>
+                <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
+                <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -295,14 +309,14 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#LogisticHubProvider"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#LogisticHubProvider"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -339,14 +353,14 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulation"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulator"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulator"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -367,7 +381,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulation"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -404,14 +418,14 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MoveTo"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ElectroMechanicalInterface"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ElectroMechanicalInterface"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MoveTo"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
