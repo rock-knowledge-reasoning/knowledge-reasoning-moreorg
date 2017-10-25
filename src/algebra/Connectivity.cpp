@@ -1,14 +1,40 @@
 #include "Connectivity.hpp"
+#include <base/Time.hpp>
 #include <organization_model/vocabularies/OM.hpp>
 #include <numeric/Combinatorics.hpp>
-#include <gecode/minimodel.hh>
 #include <gecode/int.hh>
+#include <gecode/minimodel.hh>
+#include <gecode/search/meta/rbs.hh>
+#include <gecode/search.hh>
 #include <graph_analysis/GraphIO.hpp>
 
 using namespace owlapi::model;
 
 namespace organization_model {
 namespace algebra {
+
+Connectivity::Statistics Connectivity::msStatistics;
+
+Connectivity::Statistics::Statistics()
+    : evaluations(0)
+{}
+
+std::string Connectivity::Statistics::toString(size_t indent) const
+{
+    std::stringstream ss;
+    std::string hspace(indent,' ');
+    ss << hspace << "Statistics:" << std::endl;
+    ss << hspace << "    # graph completeness evalutions: " << evaluations << std::endl;
+    ss << hspace << "    time in s: " << timeInS << std::endl;
+    ss << hspace << "    stopped: " << stopped << std::endl;
+    ss << hspace << "    # propagator executions: " << csp.propagate << std::endl;
+    ss << hspace << "    # failed nodes: " << csp.fail << std::endl;
+    ss << hspace << "    # expanded nodes: " << csp.node << std::endl;
+    ss << hspace << "    depth of search stack: " << csp.depth << std::endl;
+    ss << hspace << "    # restarts: " << csp.restart << std::endl;
+    ss << hspace << "    # nogoods: " << csp.nogood << std::endl;
+    return ss.str();
+}
 
 Connectivity::Connectivity(const ModelPool& modelPool,
         const OrganizationModelAsk& ask,
@@ -19,6 +45,7 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     , mInterfaceBaseClass(interfaceBaseClass)
     , mModelCombination(mModelPool.toModelCombination())
 {
+    mRnd.time();
     assert(!mModelCombination.empty());
     // Identify interfaces -- we assume here ElectroMechanicalInterface
     IRIList::const_iterator mit = mModelCombination.begin();
@@ -204,6 +231,7 @@ Connectivity::Connectivity(bool share, Connectivity& other)
     , mInterfaces(other.mInterfaces)
     , mInterfaceMapping(other.mInterfaceMapping)
     , mInterfaceIndexRanges(other.mInterfaceIndexRanges)
+    , mRnd(other.mRnd)
 {
     mConnections.update(*this, share, other.mConnections);
 }
@@ -289,53 +317,75 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
         const OrganizationModelAsk& ask,
         double timeoutInMs)
 {
+    graph_analysis::BaseGraph::Ptr baseGraph;
+    return Connectivity::isFeasible(modelPool, ask, baseGraph, timeoutInMs);
+}
+
+bool Connectivity::isFeasible(const ModelPool& modelPool,
+        const OrganizationModelAsk& ask,
+        graph_analysis::BaseGraph::Ptr& baseGraph,
+        double timeoutInMs)
+{
     // For a single system this check is trivially true
     if(modelPool.numberOfInstances() < 2)
     {
         return true;
     }
-    try {
-        Connectivity* connectivity = new Connectivity(modelPool, ask);
-        Gecode::Search::Options options;
-        if(timeoutInMs > 0)
-        {
-            options.stop = Gecode::Search::Stop::time(timeoutInMs);
-        }
-        Gecode::DFS<Connectivity> searchEngine(connectivity, options);
 
-        Connectivity* current = NULL;
-        Connectivity* last = NULL;
+    msStatistics.evaluations = 0;
+
+    Connectivity* last = NULL;
+    Connectivity* connectivity = new Connectivity(modelPool, ask);
+    Gecode::Search::Options options;
+    if(timeoutInMs > 0)
+    {
+        options.stop = Gecode::Search::Stop::time(timeoutInMs);
+    }
+    options.nogoods_limit = 1024;
+    //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::geometric(10,2);
+    //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::constant(4);
+    Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::rnd(1U,1,50,10);
+    options.cutoff = c;
+    Gecode::RBS<Connectivity, Gecode::DFS> searchEngine(connectivity, options);
+
+    bool isComplete;
+    Connectivity* current = NULL;
+    base::Time startTime = base::Time::now();
+    try {
         while((current = searchEngine.next()))
         {
-            if(current->isComplete())
+            ++msStatistics.evaluations;
+
+            isComplete = current->isComplete();
+            baseGraph = current->mpBaseGraph->clone();
+            delete last;
+            last = NULL;
+
+            if(isComplete)
             {
                 LOG_DEBUG_S << "Connection is feasible: found solution " << current->toString();
-                graph_analysis::io::GraphIO::write("/tmp/organization-model-connectivity-test-success.dot", current->mpBaseGraph);
-                delete last;
-                delete current;
-                delete connectivity;
-                return true;
+                break;
             } else {
                 LOG_DEBUG_S << "Connection is not feasible";
-                delete last;
                 last = current;
             }
         }
-
-        if(last)
-        {
-            graph_analysis::io::GraphIO::write("/tmp/organization-model-connectivity-test-failure.dot", current->mpBaseGraph);
-        }
-        delete last;
-        delete connectivity;
     } catch(const std::invalid_argument& e)
     {
         // When there is no connection interface then the construction of
         // connectivity fails, thus a connection is not feasible
         LOG_WARN_S << e.what();
     }
-    LOG_DEBUG_S << "Connection is not feasible";
-    return false;
+
+    msStatistics.timeInS = (base::Time::now() - startTime).toSeconds();
+    msStatistics.stopped = searchEngine.stopped();
+    msStatistics.csp = searchEngine.statistics();
+
+    delete last;
+    delete current;
+    delete connectivity;
+
+    return isComplete;
 }
 
 std::string Connectivity::toString() const
@@ -460,9 +510,20 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
         }
     }
 
-    // a0: # of interfaces
-    // existingConnections
-    return existingConnections/(1.0*a0);
+    double merit = 0;
+    size_t numberOfInterfaces = idxRange0.second - idxRange0.first + 1;
+    double bias = 1/(100.0 + mRnd(1000));
+
+    if(existingConnections != 0)
+    {
+        // a0: # of interfaces
+        // existingConnections
+        merit = existingConnections/(1.0*numberOfInterfaces);
+        LOG_INFO_S << "Merit: " << merit << ": bias: "<< bias << " existingConnections:" << existingConnections << "/" << numberOfInterfaces;
+    } else {
+        LOG_INFO_S << "Merit: " << merit << ": bias: " << bias << " existingConnections: " << existingConnections << "/" << numberOfInterfaces;
+    }
+    return merit + bias;
 }
 
 } // end namespace algebra
