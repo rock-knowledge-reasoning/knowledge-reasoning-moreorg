@@ -7,6 +7,7 @@
 #include <gecode/search/meta/rbs.hh>
 #include <gecode/search.hh>
 #include <graph_analysis/GraphIO.hpp>
+#include <numeric/Stats.hpp>
 
 using namespace owlapi::model;
 
@@ -36,6 +37,59 @@ std::string Connectivity::Statistics::toString(size_t indent) const
     return ss.str();
 }
 
+std::string Connectivity::Statistics::toString(const std::vector<Connectivity::Statistics>& statistics)
+{
+    std::stringstream ss;
+    std::vector< numeric::Stats<double> > stats(9);
+
+    ss << "[graph completeness eval][time in s][stopped][# propagator executions][# failed nodes][# expanded nodes][# depth of search stack][# restarts][# nogoods]" << std::endl;
+    for(const Connectivity::Statistics& s : statistics)
+    {
+        size_t i = 0;
+        ss << s.evaluations << " ";
+        stats[i++].update(s.evaluations);
+
+        ss << s.timeInS << " ";
+        stats[i++].update(s.timeInS);
+
+        ss << s.stopped << " ";
+        stats[i++].update(s.stopped);
+
+        ss << s.csp.propagate << " ";
+        stats[i++].update(s.csp.propagate);
+
+        ss << s.csp.fail << " ";
+        stats[i++].update(s.csp.fail);
+
+        ss << s.csp.node << " ";
+        stats[i++].update(s.csp.node);
+
+        ss << s.csp.depth << " ";
+        stats[i++].update(s.csp.depth);
+
+        ss << s.csp.restart << " ";
+        stats[i++].update(s.csp.depth);
+
+        ss << s.csp.nogood << " ";
+        stats[i++].update(s.csp.nogood);
+
+        ss << std::endl;
+    }
+
+    ss << "[graph completeness eval][stdev][time in s][stdev][stopped][stdev][# propagator executions][stdev][# failed nodes][stdev][# expanded nodes][stdev][# depth of search stack][stdev][# restarts][stdev][# nogoods][stdev]" << std::endl;
+    for(size_t i = 0; i < stats.size(); ++i)
+    {
+        ss << stats[i].mean()
+            << " "
+            << stats[i].stdev()
+            << " "
+            ;
+    }
+    ss << std::endl;
+
+    return ss.str();
+}
+
 Connectivity::Connectivity(const ModelPool& modelPool,
         const OrganizationModelAsk& ask,
         const owlapi::model::IRI& interfaceBaseClass
@@ -46,6 +100,7 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     , mModelCombination(mModelPool.toModelCombination())
 {
     mRnd.time();
+
     assert(!mModelCombination.empty());
     // Identify interfaces -- we assume here ElectroMechanicalInterface
     IRIList::const_iterator mit = mModelCombination.begin();
@@ -215,10 +270,10 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     // which is the MAX of the domain -> 1
     // Propagation will set the other invalid connections to 0, thus speeding up
     // the assignment process
+    //branch(*this, mConnections, Gecode::INT_VAR_MIN_MIN(), Gecode::INT_VAL_MAX(), symmetries);
 
-    //Gecode::Rnd rnd;
-    //rnd.time();
     //// Which variable to pick
+    //branch(*this, mConnections, Gecode::INT_VAR_DEGREE_MIN(), Gecode::INT_VAL_MAX(), symmetries);
     //branch(*this, mConnections, Gecode::INT_VAR_RND(rnd), Gecode::INT_VAL_MAX(), symmetries);
     branch(*this, mConnections, Gecode::INT_VAR_MERIT_MIN(&merit), Gecode::INT_VAL_MAX(), symmetries);
 }
@@ -315,16 +370,16 @@ bool Connectivity::isComplete() const
 
 bool Connectivity::isFeasible(const ModelPool& modelPool,
         const OrganizationModelAsk& ask,
-        double timeoutInMs)
+        double timeoutInMs, size_t minFeasible)
 {
     graph_analysis::BaseGraph::Ptr baseGraph;
-    return Connectivity::isFeasible(modelPool, ask, baseGraph, timeoutInMs);
+    return Connectivity::isFeasible(modelPool, ask, baseGraph, timeoutInMs, minFeasible);
 }
 
 bool Connectivity::isFeasible(const ModelPool& modelPool,
         const OrganizationModelAsk& ask,
         graph_analysis::BaseGraph::Ptr& baseGraph,
-        double timeoutInMs)
+        double timeoutInMs, size_t minFeasible)
 {
     // For a single system this check is trivially true
     if(modelPool.numberOfInstances() < 2)
@@ -348,7 +403,8 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
     options.cutoff = c;
     Gecode::RBS<Connectivity, Gecode::DFS> searchEngine(connectivity, options);
 
-    bool isComplete;
+    bool isComplete = false;
+    size_t feasibleSolutions = 0;
     Connectivity* current = NULL;
     base::Time startTime = base::Time::now();
     try {
@@ -364,7 +420,11 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
             if(isComplete)
             {
                 LOG_DEBUG_S << "Connection is feasible: found solution " << current->toString();
-                break;
+                ++feasibleSolutions;
+                if(feasibleSolutions >= minFeasible)
+                {
+                    break;
+                }
             } else {
                 LOG_DEBUG_S << "Connection is not feasible";
                 last = current;

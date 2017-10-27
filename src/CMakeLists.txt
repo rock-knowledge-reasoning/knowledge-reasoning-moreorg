@@ -111,3 +111,6 @@ rock_executable(multiagent_scenario_analysis utils/ScenarioAnalysis.cpp
 
 rock_executable(limited_combinations utils/LimitedCombination.cpp
     DEPS organization_model)
+
+rock_executable(organization_model-bm Benchmark.cpp
+    DEPS organization_model)
