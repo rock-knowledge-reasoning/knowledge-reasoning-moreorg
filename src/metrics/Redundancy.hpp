@@ -32,6 +32,11 @@ public:
      */
     Redundancy(const OrganizationModel& organization, double defaultPoS = 0.95);
 
+    /**
+     * Default probability of survival
+     */
+    Redundancy(const OrganizationModel::Ptr& organization, double defaultPoS = 0.95);
+
     double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
             const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const;
 
@@ -55,6 +60,19 @@ public:
      * used sequentially
      */
     double sequentialUse(const std::vector<double>& values) const { return serial(values); }
+
+    /**
+     * Set the default probability survial that shall be used for computed the
+     * redundancy
+     */
+    void setDefaultProbabilityOfSurvival(double p) { mDefaultProbabilityOfSurvival = p; }
+
+    /**
+     * Get the default probability survial that shall be used for computed the
+     * redundancy
+     */
+    double getDefaultProbabilityOfSurvival() { return mDefaultProbabilityOfSurvival; }
+
 private:
     double mDefaultProbabilityOfSurvival;
 };

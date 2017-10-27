@@ -37,6 +37,11 @@ public:
      */
     Metric(const OrganizationModel& organization, metrics::Type type);
 
+    /**
+     * Metric for an organization model
+     */
+    Metric(const OrganizationModel::Ptr& organization, metrics::Type type);
+
     virtual ~Metric() {}
 
     typedef shared_ptr<Metric> Ptr;
@@ -107,16 +112,23 @@ public:
      */
     virtual double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ModelPool& modelPool, bool sharedUse = true) const { throw std::runtime_error("organization_model::metrics::Metric::compute(functions,modelPool) not implemented"); }
 
+    /**
+     * Compute a particular metric for a required model pool and an available
+     * \return computed metric
+     */
+    static Metric::Ptr getInstance(metrics::Type type,
+            const OrganizationModel::Ptr& organization);
+
     static std::string toString(const MetricMap& map, uint32_t indent = 0);
 
     virtual double sequentialUse(const std::vector<double>& values) const { throw std::runtime_error("organization_model::metrics::Metric::sequentialUse  not implemented"); }
 
 protected:
-    OrganizationModel mOrganizationModel;
+    OrganizationModel::Ptr mpOrganizationModel;
     OrganizationModelAsk mOrganizationModelAsk;
-    shared_ptr<owlapi::model::OWLOntologyAsk> mpOntologyAsk;
-
     metrics::Type mType;
+
+    static std::map<metrics::Type, Metric::Ptr> msMetrics;
 };
 
 } // end namespace organization_model

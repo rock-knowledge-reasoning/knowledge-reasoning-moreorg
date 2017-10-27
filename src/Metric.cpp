@@ -4,14 +4,24 @@
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include "vocabularies/OM.hpp"
 
+#include "metrics/Redundancy.hpp"
+
 namespace organization_model {
 
+std::map<metrics::Type,Metric::Ptr> Metric::msMetrics;
+
 Metric::Metric(const OrganizationModel& organization, metrics::Type type)
-    : mOrganizationModel(organization)
-    , mOrganizationModelAsk(OrganizationModel::Ptr(new OrganizationModel(organization)))
-    , mpOntologyAsk(new owlapi::model::OWLOntologyAsk(mOrganizationModel.ontology()))
+    : mpOrganizationModel(new OrganizationModel(organization))
+    , mOrganizationModelAsk(mpOrganizationModel)
     , mType(type)
 {}
+
+Metric::Metric(const OrganizationModel::Ptr& organization, metrics::Type type)
+    : mpOrganizationModel(organization)
+    , mOrganizationModelAsk(organization)
+    , mType(type)
+{}
+
 
 MetricMap Metric::getMetricMap() const
 {
@@ -20,8 +30,8 @@ MetricMap Metric::getMetricMap() const
 
     MetricMap metricMap;
 
-    IRIList actorModels = mpOntologyAsk->allSubClassesOf( vocabulary::OM::Actor() );
-    IRIList services = mpOntologyAsk->allSubClassesOf( vocabulary::OM::Service() );
+    IRIList actorModels = mOrganizationModelAsk.ontology().allSubClassesOf( vocabulary::OM::Actor() );
+    IRIList services = mOrganizationModelAsk.ontology().allSubClassesOf( vocabulary::OM::Service() );
 
     for(const IRI& actorModel : actorModels)
     {
@@ -125,6 +135,29 @@ double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const
     std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources = mOrganizationModelAsk.getCardinalityRestrictions(modelPool, OWLCardinalityRestriction::SUM_OP);
 
     return computeMetric(requirements, allAvailableResources);
+}
+
+
+Metric::Ptr Metric::getInstance(metrics::Type type, const OrganizationModel::Ptr& organization)
+{
+    std::map<metrics::Type, Metric::Ptr>::const_iterator cit = msMetrics.find(type);
+    if(cit != msMetrics.end())
+    {
+        return cit->second;
+    }
+
+    switch(type)
+    {
+        case metrics::REDUNDANCY:
+        {
+            Metric::Ptr metric(new metrics::Redundancy(organization));
+            msMetrics[metrics::REDUNDANCY] = metric;
+            return metric;
+        }
+        default:
+            break;
+    }
+    throw std::invalid_argument("organization_model::Metric::getInstance: failed to retrieve a type");
 }
 
 std::string Metric::toString(const MetricMap& map, uint32_t indent)

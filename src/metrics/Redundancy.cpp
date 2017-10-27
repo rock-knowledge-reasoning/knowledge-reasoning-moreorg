@@ -17,6 +17,11 @@ Redundancy::Redundancy(const OrganizationModel& organization, double defaultPoS)
     , mDefaultProbabilityOfSurvival(defaultPoS)
 {}
 
+Redundancy::Redundancy(const OrganizationModel::Ptr& organization, double defaultPoS)
+    : Metric(organization, REDUNDANCY)
+    , mDefaultProbabilityOfSurvival(defaultPoS)
+{}
+
 double Redundancy::computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const
 {
     using namespace owlapi::model;
@@ -100,7 +105,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         // Check how often a full redundancy of the top level model is given
         while(true)
         {
-            solution = ResourceMatch::solve(modelBoundRequired, modelBoundRemaining, mOrganizationModel.ontology());
+            solution = ResourceMatch::solve(modelBoundRequired, modelBoundRemaining, mpOrganizationModel->ontology());
             ++fullModelRedundancy;
             LOG_DEBUG_S << "Solution: " << solution.toString();
             // Remove the consumed models from the list of available and try to
@@ -140,7 +145,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         double probabilityOfSurvival = 0;
         try {
             // SCHOKO: Model should have an associated probability of failure
-            OWLLiteral::Ptr value = mpOntologyAsk->getDataValue(qualification, vocabulary::OM::probabilityOfFailure());
+            OWLLiteral::Ptr value = mOrganizationModelAsk.ontology().getDataValue(qualification, vocabulary::OM::probabilityOfFailure());
             LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
             probabilityOfSurvival = 1 - value->getDouble();
         } catch(...)
@@ -174,7 +179,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
             for(; mit != models.end(); ++mit)
             {
                 // Check if model can be used to strengthen the survivability
-                if( mit->getQualification() == remaining.model || mpOntologyAsk->isSubClassOf(remaining.model, mit->getQualification()) )
+                if( mit->getQualification() == remaining.model || mOrganizationModelAsk.ontology().isSubClassOf(remaining.model, mit->getQualification()) )
                 {
                     try {
                         remaining.decrement();
