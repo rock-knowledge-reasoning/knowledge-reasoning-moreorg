@@ -1,27 +1,13 @@
-NOTE
-This directory structure follows some simple rules, to allow for generic build
-processes and simplify reuse of this project. 
+# Organization modelling with OWL
+ 
+The main purpose of this implementation of an organization model is to describe (reconfigurable)
+multirobot systems so that one can reason about structure and function.
+The organization model relies on a basic system
+description -- provided in OWL -- to infer system combinations from it.
 
-For build automation the project structure should be parsed and validated
+These system combinations (coalition / composite actors) have quantifiable
+requirements. These requirements are defined by the combination of
+restrictions which apply to the model of atomic actors.
 
-
-STRUCTURE
--- src/ 
-	Contains all header (*.h/*.hpp) and source files
--- build/
-	The target directory for the build process, temporary content
--- bindings/
-	Language bindings for this package, e.g. put into subfolders such as
-   |-- ruby/ 
-        Ruby language bindings
--- viz/
-        Source files for a vizkit plugin / widget related to this library 
--- resources/
-	General resources such as images that are needed by the program
--- configuration/
-	Configuration files for running the program
--- external/
-	When including software that needs a non standard installation process, or one that can be
-	easily embedded include the external software directly here
--- doc/
-	should contain the existing doxygen file: doxygen.conf
+The organization model allows to augment an organization model for a given
+set of atomic actors.

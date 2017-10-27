@@ -19,7 +19,7 @@ typedef std::vector<owlapi::model::IRIList> CandidatesList;
  * \mainpage Organization modelling with OWL
  *
  * The main purpose of the organization model is to describe (reconfigurable)
- * multirobot systems so that one can reason about structure and funtion.
+ * multirobot systems so that one can reason about structure and function.
  * The organization model relies on a basic system
  * description -- provided in OWL -- to infer system combinations from it.
  *
