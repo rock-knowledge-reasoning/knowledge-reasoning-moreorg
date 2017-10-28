@@ -274,6 +274,8 @@ Connectivity::Connectivity(const ModelPool& modelPool,
 
     //// Which variable to pick
     //branch(*this, mConnections, Gecode::INT_VAR_DEGREE_MIN(), Gecode::INT_VAL_MAX(), symmetries);
+    //Gecode::Rnd rnd;
+    //rnd.time();
     //branch(*this, mConnections, Gecode::INT_VAR_RND(rnd), Gecode::INT_VAL_MAX(), symmetries);
     branch(*this, mConnections, Gecode::INT_VAR_MERIT_MIN(&merit), Gecode::INT_VAL_MAX(), symmetries);
 }
@@ -398,10 +400,10 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
     {
         options.stop = Gecode::Search::Stop::time(timeoutInMs);
     }
-    options.nogoods_limit = 1024;
+    options.nogoods_limit = 128;
     //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::geometric(10,2);
     //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::constant(4);
-    Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::rnd(1U,1,50,10);
+    Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::rnd(1U,1,5,1);
     options.cutoff = c;
     Gecode::RBS<Connectivity, Gecode::DFS> searchEngine(connectivity, options);
 
@@ -567,6 +569,9 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
                 if(v.val() == 1)
                 {
                     ++existingConnections;
+                    // if interface has found a connection continue with the
+                    // next
+                    break;
                 }
             }
         }
