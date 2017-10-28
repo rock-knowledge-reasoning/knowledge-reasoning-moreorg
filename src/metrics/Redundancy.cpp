@@ -12,13 +12,8 @@ using namespace owlapi::vocabulary;
 namespace organization_model {
 namespace metrics {
 
-Redundancy::Redundancy(const OrganizationModel& organization, double defaultPoS)
-    : Metric(organization, REDUNDANCY)
-    , mDefaultProbabilityOfSurvival(defaultPoS)
-{}
-
-Redundancy::Redundancy(const OrganizationModel::Ptr& organization, double defaultPoS)
-    : Metric(organization, REDUNDANCY)
+Redundancy::Redundancy(const OrganizationModelAsk& organization, double defaultPoS)
+    : Metric(REDUNDANCY, organization)
     , mDefaultProbabilityOfSurvival(defaultPoS)
 {}
 
@@ -105,13 +100,13 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         // Check how often a full redundancy of the top level model is given
         while(true)
         {
-            solution = ResourceMatch::solve(modelBoundRequired, modelBoundRemaining, mpOrganizationModel->ontology());
+            solution = ResourceMatch::solve(modelBoundRequired, modelBoundRemaining, mOrganizationModelAsk);
             ++fullModelRedundancy;
-            LOG_DEBUG_S << "Solution: " << solution.toString();
             // Remove the consumed models from the list of available and try to
             // repeat solving
             // throws invalid_argument when model bounds are exceeded
             modelBoundRemaining = solution.substractMinFrom(modelBoundRemaining);
+            LOG_DEBUG_S << "Solution: " << solution.toString();
             LOG_DEBUG_S << "Remaining: " << ModelBound::toString(modelBoundRemaining);
         }
     } catch(const std::exception& e)

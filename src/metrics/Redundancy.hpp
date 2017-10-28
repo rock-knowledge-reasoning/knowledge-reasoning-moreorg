@@ -30,12 +30,7 @@ public:
     /**
      * Default probability of survival
      */
-    Redundancy(const OrganizationModel& organization, double defaultPoS = 0.95);
-
-    /**
-     * Default probability of survival
-     */
-    Redundancy(const OrganizationModel::Ptr& organization, double defaultPoS = 0.95);
+    Redundancy(const OrganizationModelAsk& organization, double defaultPoS = 0.95);
 
     double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
             const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const;

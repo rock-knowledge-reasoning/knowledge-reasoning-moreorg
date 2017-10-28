@@ -1,24 +1,15 @@
 #include "Metric.hpp"
 #include <sstream>
 #include <base-logging/Logging.hpp>
-#include <owlapi/model/OWLOntologyAsk.hpp>
 #include "vocabularies/OM.hpp"
-
 #include "metrics/Redundancy.hpp"
 
 namespace organization_model {
 
 std::map<metrics::Type,Metric::Ptr> Metric::msMetrics;
 
-Metric::Metric(const OrganizationModel& organization, metrics::Type type)
-    : mpOrganizationModel(new OrganizationModel(organization))
-    , mOrganizationModelAsk(mpOrganizationModel)
-    , mType(type)
-{}
-
-Metric::Metric(const OrganizationModel::Ptr& organization, metrics::Type type)
-    : mpOrganizationModel(organization)
-    , mOrganizationModelAsk(organization)
+Metric::Metric(metrics::Type type, const OrganizationModelAsk& organization)
+    : mOrganizationModelAsk(organization)
     , mType(type)
 {}
 
@@ -138,7 +129,7 @@ double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const
 }
 
 
-Metric::Ptr Metric::getInstance(metrics::Type type, const OrganizationModel::Ptr& organization)
+Metric::Ptr Metric::getInstance(metrics::Type type, const OrganizationModelAsk& organization)
 {
     std::map<metrics::Type, Metric::Ptr>::const_iterator cit = msMetrics.find(type);
     if(cit != msMetrics.end())

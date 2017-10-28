@@ -4,13 +4,15 @@
 #include <gecode/set.hh>
 #include <gecode/int.hh>
 #include <gecode/search.hh>
+#include <base-logging/Logging.hpp>
 
-#include <organization_model/SharedPtr.hpp>
 #include <owlapi/model/OWLOntology.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
-#include <organization_model/ModelPool.hpp>
-#include <organization_model/reasoning/ModelBound.hpp>
-#include <base-logging/Logging.hpp>
+
+#include "../SharedPtr.hpp"
+#include "../OrganizationModelAsk.hpp"
+#include "../ModelPool.hpp"
+#include "ModelBound.hpp"
 
 namespace organization_model {
 namespace reasoning {
@@ -154,6 +156,14 @@ public:
     static ResourceMatch::Solution solve(const ModelBound::List& required,
             const ModelBound::List& available,
             owlapi::model::OWLOntology::Ptr ontology);
+
+    static ResourceMatch::Solution solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& modelRequirements,
+            const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& providerResources,
+            const OrganizationModelAsk& ontologyAsk);
+
+    static ResourceMatch::Solution solve(const ModelBound::List& required,
+            const ModelBound::List& available,
+            const OrganizationModelAsk& ontologyAsk);
 
     /**
      * Create a string representation of this object

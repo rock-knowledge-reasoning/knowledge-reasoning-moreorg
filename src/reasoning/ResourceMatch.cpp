@@ -219,6 +219,18 @@ ResourceMatch::Solution ResourceMatch::solve(const ModelBound::List& required, c
     return solution;
 }
 
+ResourceMatch::Solution ResourceMatch::solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& modelRequirements,
+        const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& providerResources,
+        const OrganizationModelAsk& ask)
+{
+    return solve(modelRequirements, providerResources, ask.getOrganizationModel()->ontology());
+}
+
+ResourceMatch::Solution ResourceMatch::solve(const ModelBound::List& required, const ModelBound::List& available, const OrganizationModelAsk& ask)
+{
+    return solve(required, available, ask.getOrganizationModel()->ontology());
+}
+
 ResourceMatch::Solution ResourceMatch::getSolution() const
 {
     Gecode::Matrix<Gecode::IntVarArray> modelAssignment(mModelAssignment, mAvailableModelBound.size(), mRequiredModelBound.size());

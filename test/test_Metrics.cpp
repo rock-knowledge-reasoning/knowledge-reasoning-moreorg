@@ -7,6 +7,7 @@
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <owlapi/model/OWLOntologyTell.hpp>
 #include <owlapi/model/OWLExactCardinalityRestriction.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 
 using namespace organization_model;
 using namespace owlapi;
@@ -16,9 +17,9 @@ BOOST_AUTO_TEST_SUITE(model_metrics)
 
 BOOST_AUTO_TEST_CASE(redundancy)
 {
-    OrganizationModel om( getOMSchema() );
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()) );
 
-    OWLOntologyTell tell(om.ontology());
+    OWLOntologyTell tell(om->ontology());
 
     OWLClass::Ptr a = tell.klass("http://klass/base");
     OWLClass::Ptr b = tell.klass("http://klass/base-derived");
@@ -27,7 +28,7 @@ BOOST_AUTO_TEST_CASE(redundancy)
 
     tell.subClassOf(c,b);
     tell.subClassOf(b,a);
-    om.ontology()->refresh();
+    om->ontology()->refresh();
 
     std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
     {
@@ -48,7 +49,8 @@ BOOST_AUTO_TEST_CASE(redundancy)
         resourcePool.push_back(restriction);
     }
 
-    metrics::Redundancy redundancy(om);
+    OrganizationModelAsk ask(om);
+    metrics::Redundancy redundancy(ask);
     // Serial connection of two parallel a 0.5
     // [ [ 0.5 ] --- [ 0.5 ] ]  --- [ [ 0.5 ] --- [ 0.5 ] ]
     //
@@ -63,7 +65,7 @@ BOOST_AUTO_TEST_CASE(redundancy_computation)
 {
     OrganizationModel om(getRootDir() + "/test/data/om-project-transterra.owl");
     OrganizationModelAsk omAsk(OrganizationModel::Ptr(new OrganizationModel(om)) );
-    metrics::Redundancy redundancy(om);
+    metrics::Redundancy redundancy(omAsk);
 
     IRI sherpa = organization_model::vocabulary::OM::resolve("Sherpa");
     IRI transportProvider = organization_model::vocabulary::OM::resolve("TransportProvider");
@@ -108,8 +110,37 @@ BOOST_AUTO_TEST_CASE(redundancy_computation)
         double r = redundancy.computeSharedUse(requiredModelPool, availableModelPool);
         BOOST_REQUIRE_MESSAGE(true, "Redundancy shared use is:" << r);
     }
+}
 
+BOOST_AUTO_TEST_CASE(function_redundancy)
+{
+    std::string filename = getRootDir() + "/test/data/om-project-transterra.owl";
 
+    ModelPool modelPool;
+    modelPool[organization_model::vocabulary::OM::resolve("Sherpa")] = 5;
+    modelPool[organization_model::vocabulary::OM::resolve("CREX")] = 3;
+    modelPool[organization_model::vocabulary::OM::resolve("BaseCamp")] = 3;
+    modelPool[organization_model::vocabulary::OM::resolve("Payload")] = 10;
+
+    OrganizationModel::Ptr om(new OrganizationModel(filename) );
+    OrganizationModelAsk ask(om, modelPool, true);
+
+    {
+        IRISet functionSet;
+        functionSet.insert(organization_model::vocabulary::OM::resolve("Mapping"));
+        Metric::Ptr metrics = Metric::getInstance(metrics::REDUNDANCY, ask);
+        double value = metrics->computeSharedUse(functionSet, modelPool);
+        BOOST_REQUIRE_MESSAGE(value != 0, "Mapping has redundancy: " << value);
+    }
+
+    {
+        IRISet functionSet;
+        functionSet.insert(organization_model::vocabulary::OM::resolve("TransportProvider"));
+        Metric::Ptr metrics = Metric::getInstance(metrics::REDUNDANCY, ask);
+        double value = metrics->computeSharedUse(functionSet, modelPool);
+
+        BOOST_REQUIRE_MESSAGE(value != 0, "TransportProvider has redundancy: " << value);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(metric_map_computation)

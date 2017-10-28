@@ -48,14 +48,15 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    OrganizationModel::Ptr om(new OrganizationModel(filename) );
-    OrganizationModelAsk ask(om);
-
     ModelPool modelPool;
     modelPool[vocabulary::OM::resolve("Sherpa")] = 5;
     modelPool[vocabulary::OM::resolve("CREX")] = 3;
     modelPool[vocabulary::OM::resolve("BaseCamp")] = 3;
     modelPool[vocabulary::OM::resolve("Payload")] = 10;
+
+    OrganizationModel::Ptr om(new OrganizationModel(filename) );
+    OrganizationModelAsk ask(om, modelPool, true);
+
 
     std::vector<algebra::Connectivity::Statistics> stats;
     std::cout << "# epochs: " << epochs << std::endl;
@@ -83,7 +84,7 @@ int main(int argc, char** argv)
 
     std::cout << algebra::Connectivity::Statistics::toString(stats) << std::endl;
 
-    Metric::Ptr metrics = Metric::getInstance(metrics::REDUNDANCY, om);
+    Metric::Ptr metrics = Metric::getInstance(metrics::REDUNDANCY, ask);
     IRIList functions = ask.ontology().allSubClassesOf(vocabulary::OM::Functionality());
     std::cout << std::endl << "Functions" << std::endl;
     for(const IRI& f : functions)

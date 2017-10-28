@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <owlapi/model/OWLCardinalityRestriction.hpp>
 #include "ModelPool.hpp"
-#include "OrganizationModel.hpp"
 #include "OrganizationModelAsk.hpp"
 
 namespace organization_model {
@@ -35,12 +34,7 @@ public:
     /**
      * Metric for an organization model
      */
-    Metric(const OrganizationModel& organization, metrics::Type type);
-
-    /**
-     * Metric for an organization model
-     */
-    Metric(const OrganizationModel::Ptr& organization, metrics::Type type);
+    Metric(metrics::Type type, const OrganizationModelAsk& organization);
 
     virtual ~Metric() {}
 
@@ -117,14 +111,13 @@ public:
      * \return computed metric
      */
     static Metric::Ptr getInstance(metrics::Type type,
-            const OrganizationModel::Ptr& organization);
+            const OrganizationModelAsk& organization);
 
     static std::string toString(const MetricMap& map, uint32_t indent = 0);
 
     virtual double sequentialUse(const std::vector<double>& values) const { throw std::runtime_error("organization_model::metrics::Metric::sequentialUse  not implemented"); }
 
 protected:
-    OrganizationModel::Ptr mpOrganizationModel;
     OrganizationModelAsk mOrganizationModelAsk;
     metrics::Type mType;
 

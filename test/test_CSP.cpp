@@ -4,11 +4,14 @@
 #include <owlapi/model/OWLOntologyTell.hpp>
 #include <owlapi/OWLApi.hpp>
 #include <organization_model/reasoning/ResourceMatch.hpp>
+#include <organization_model/vocabularies/OM.hpp>
+#include <organization_model/OrganizationModelAsk.hpp>
 
 #include "test_utils.hpp"
 
 using namespace owlapi;
 using namespace owlapi::model;
+using namespace organization_model;
 using namespace organization_model::reasoning;
 
 BOOST_AUTO_TEST_SUITE(csp)
@@ -41,7 +44,7 @@ BOOST_AUTO_TEST_SUITE(csp)
 //    resourcePool.push_back(b->getIRI());
 //    resourcePool.push_back(c->getIRI());
 //
-//    owlapi::csp::ResourceMatch* match = owlapi::csp::ResourceMatch::solve(query, resourcePool, ontology);
+//    ResourceMatch* match = ResourceMatch::solve(query, resourcePool, ontology);
 //
 //    BOOST_TEST_MESSAGE("Assignment: " << match->toString());
 //
@@ -102,11 +105,11 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     OWLOntologyAsk ask(ontology);
     tell.initializeDefaultClasses();
 
-    IRI sherpa = owlapi::vocabulary::OM::resolve("Sherpa");
-    IRI move_to = owlapi::vocabulary::OM::resolve("MoveTo");
-    IRI image_provider = owlapi::vocabulary::OM::resolve("ImageProvider");
-    IRI stereo_image_provider = owlapi::vocabulary::OM::resolve("StereoImageProvider");
-    IRI location_image_provider = owlapi::vocabulary::OM::resolve("LocationImageProvider");
+    IRI sherpa = organization_model::vocabulary::OM::resolve("Sherpa");
+    IRI move_to = organization_model::vocabulary::OM::resolve("MoveTo");
+    IRI image_provider = organization_model::vocabulary::OM::resolve("ImageProvider");
+    IRI stereo_image_provider = organization_model::vocabulary::OM::resolve("StereoImageProvider");
+    IRI location_image_provider = organization_model::vocabulary::OM::resolve("LocationImageProvider");
 
     std::vector<OWLCardinalityRestriction::Ptr> r_sherpa = ask.getCardinalityRestrictions(sherpa);
     std::vector<OWLCardinalityRestriction::Ptr> r_move_to = ask.getCardinalityRestrictions(move_to);
@@ -121,7 +124,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     BOOST_TEST_MESSAGE("Sherpa provides: " << OWLCardinalityRestriction::toString(r_sherpa));
     {
         std::string capabilityName = "Localization";
-        ModelBound::List modelBounds = fulfillment.getAssignments(owlapi::vocabulary::OM::resolve(capabilityName));
+        ModelBound::List modelBounds = fulfillment.getAssignments(organization_model::vocabulary::OM::resolve(capabilityName));
         BOOST_REQUIRE_MESSAGE(modelBounds.size() == 1, "Matching of 1 provided resource expected, but got '" << modelBounds.size());
 
         ModelBound modelBound = modelBounds.front();
@@ -129,7 +132,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     }
     {
         std::string capabilityName = "Locomotion";
-        ModelBound::List modelBounds = fulfillment.getAssignments(owlapi::vocabulary::OM::resolve(capabilityName));
+        ModelBound::List modelBounds = fulfillment.getAssignments(organization_model::vocabulary::OM::resolve(capabilityName));
         BOOST_REQUIRE_MESSAGE(modelBounds.size() == 1, "Matching of 1 provided resource expected, but got '" << modelBounds.size());
 
         ModelBound modelBound = modelBounds.front();
@@ -137,7 +140,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     }
     {
         std::string capabilityName = "Mapping";
-        ModelBound::List modelBounds = fulfillment.getAssignments(owlapi::vocabulary::OM::resolve(capabilityName));
+        ModelBound::List modelBounds = fulfillment.getAssignments(organization_model::vocabulary::OM::resolve(capabilityName));
         BOOST_REQUIRE_MESSAGE(modelBounds.size() == 1, "Matching of 1 provided resource expected, but got '" << modelBounds.size());
 
         ModelBound modelBound = modelBounds.front();
@@ -145,7 +148,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     }
     {
         std::string capabilityName = "Power";
-        ModelBound::List modelBounds = fulfillment.getAssignments(owlapi::vocabulary::OM::resolve(capabilityName));
+        ModelBound::List modelBounds = fulfillment.getAssignments(organization_model::vocabulary::OM::resolve(capabilityName));
         BOOST_REQUIRE_MESSAGE(modelBounds.size() == 1, "Matching of 1 provided resource expected, but got '" << modelBounds.size());
 
         ModelBound modelBound = modelBounds.front();
@@ -157,7 +160,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     BOOST_TEST_MESSAGE("Sherpa provides ImageProvider\nAssignment: " << fulfillment.toString());
 
     {
-        OWLObjectProperty::Ptr hasProperty = ask.getOWLObjectProperty( owlapi::vocabulary::OM::resolve("has") );
+        OWLObjectProperty::Ptr hasProperty = ask.getOWLObjectProperty( organization_model::vocabulary::OM::resolve("has") );
         OWLCardinalityRestriction::Ptr restriction(new OWLObjectMinCardinality(hasProperty, 1, image_provider));
         tell.subClassOf(sherpa, restriction);
     }
@@ -166,7 +169,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     BOOST_TEST_MESSAGE("Sherpa provides StereoImageProvider\nAssignment: " << fulfillment.toString());
 
     {
-        OWLObjectProperty::Ptr hasProperty = ask.getOWLObjectProperty( owlapi::vocabulary::OM::resolve("has") );
+        OWLObjectProperty::Ptr hasProperty = ask.getOWLObjectProperty( organization_model::vocabulary::OM::resolve("has") );
         OWLCardinalityRestriction::Ptr restriction(new OWLObjectMinCardinality(hasProperty, 1, move_to));
         tell.subClassOf(sherpa, restriction);
     }
@@ -191,7 +194,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     //    --> 1 - image_provider
     std::vector<OWLCardinalityRestriction::Ptr> r_sherpa_with_service = ask.getCardinalityRestrictions(sherpa);
     try {
-        fulfillment = owlapi::csp::ResourceMatch::solve(r_location_image_provider, r_sherpa_with_service, ontology);
+        fulfillment = ResourceMatch::solve(r_location_image_provider, r_sherpa_with_service, ontology);
         BOOST_REQUIRE_MESSAGE(true, "Sherpa provides LocationImageProvider\nAssignment: " << fulfillment.toString());
     } catch(...)
     {
@@ -221,7 +224,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     serviceModels.push_back(location_image_provider);
     serviceModels.push_back(image_provider);
     serviceModels.push_back(move_to);
-    IRI emi_power_provider = owlapi::vocabulary::OM::resolve("EmiPowerProvider");
+    IRI emi_power_provider = organization_model::vocabulary::OM::resolve("EmiPowerProvider");
     serviceModels.push_back(emi_power_provider);
 
     {
@@ -247,12 +250,12 @@ BOOST_AUTO_TEST_CASE(performance_three_sherpa)
     OWLOntologyAsk ask(ontology);
     tell.initializeDefaultClasses();
 
-    IRI sherpa = owlapi::vocabulary::OM::resolve("Sherpa");
-    IRI move_to = owlapi::vocabulary::OM::resolve("MoveTo");
-    IRI image_provider = owlapi::vocabulary::OM::resolve("ImageProvider");
-    IRI stereo_image_provider = owlapi::vocabulary::OM::resolve("StereoImageProvider");
-    IRI location_image_provider = owlapi::vocabulary::OM::resolve("LocationImageProvider");
-    IRI emi_power_provider = owlapi::vocabulary::OM::resolve("EmiPowerProvider");
+    IRI sherpa = organization_model::vocabulary::OM::resolve("Sherpa");
+    IRI move_to = organization_model::vocabulary::OM::resolve("MoveTo");
+    IRI image_provider = organization_model::vocabulary::OM::resolve("ImageProvider");
+    IRI stereo_image_provider = organization_model::vocabulary::OM::resolve("StereoImageProvider");
+    IRI location_image_provider = organization_model::vocabulary::OM::resolve("LocationImageProvider");
+    IRI emi_power_provider = organization_model::vocabulary::OM::resolve("EmiPowerProvider");
 
     owlapi::model::IRIList serviceModels;
     // http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider,
@@ -289,11 +292,11 @@ BOOST_AUTO_TEST_CASE(performance_ten_sherpa)
     OWLOntologyAsk ask(ontology);
     tell.initializeDefaultClasses();
 
-    IRI sherpa = owlapi::vocabulary::OM::resolve("Sherpa");
-    IRI move_to = owlapi::vocabulary::OM::resolve("MoveTo");
-    IRI image_provider = owlapi::vocabulary::OM::resolve("ImageProvider");
-    IRI stereo_image_provider = owlapi::vocabulary::OM::resolve("StereoImageProvider");
-    IRI location_image_provider = owlapi::vocabulary::OM::resolve("LocationImageProvider");
+    IRI sherpa = organization_model::vocabulary::OM::resolve("Sherpa");
+    IRI move_to = organization_model::vocabulary::OM::resolve("MoveTo");
+    IRI image_provider = organization_model::vocabulary::OM::resolve("ImageProvider");
+    IRI stereo_image_provider = organization_model::vocabulary::OM::resolve("StereoImageProvider");
+    IRI location_image_provider = organization_model::vocabulary::OM::resolve("LocationImageProvider");
 
     owlapi::model::IRIList serviceModels;
     // http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider,
@@ -303,7 +306,7 @@ BOOST_AUTO_TEST_CASE(performance_ten_sherpa)
     //serviceModels.push_back(location_image_provider);
     //serviceModels.push_back(image_provider);
     //serviceModels.push_back(move_to);
-    IRI emi_power_provider = owlapi::vocabulary::OM::resolve("EmiPowerProvider");
+    IRI emi_power_provider = organization_model::vocabulary::OM::resolve("EmiPowerProvider");
     serviceModels.push_back(emi_power_provider);
 
 
@@ -324,8 +327,6 @@ BOOST_AUTO_TEST_CASE(performance_ten_sherpa)
 
 BOOST_AUTO_TEST_CASE(model_bound)
 {
-    using namespace owlapi::csp;
-
     {
         ModelBound::List a;
         a.push_back(ModelBound("m0",1,1));
@@ -422,6 +423,27 @@ BOOST_AUTO_TEST_CASE(model_bound)
         ModelBound::List list;
         BOOST_REQUIRE_THROW(list = ModelBound::substractMin(a,b), std::invalid_argument);
     }
+}
+
+BOOST_AUTO_TEST_CASE(function_mapping)
+{
+    OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-project-transterra.owl"));
+    OrganizationModelAsk ask(om);
+
+    IRI mapping = organization_model::vocabulary::OM::resolve("Mapping");
+    ModelBound required0(mapping,1,1);
+    ModelBound available0(mapping,0,8);
+
+    ModelBound::List required;
+    required.push_back(required0);
+
+    ModelBound::List available;
+    available.push_back(available0);
+
+    ResourceMatch::Solution solution = ResourceMatch::solve(required, available, ask);
+    BOOST_TEST_MESSAGE("Solution found: " << solution.toString());
+
+
 }
 
 
