@@ -353,6 +353,7 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
 {
     std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources;
 
+    owlapi::model::OWLProperty::Ptr propertyHas = ontology().getOWLObjectProperty( organization_model::vocabulary::OM::has() );
     // Get model restrictions, i.e. in effect what has to be available for the
     // given models
     ModelPool::const_iterator mit = modelPool.begin();
@@ -362,6 +363,24 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
         uint32_t modelCount = mit->second;
 
         std::vector<OWLCardinalityRestriction::Ptr> availableResources = mOntologyAsk.getCardinalityRestrictions(model);
+
+        // This is not a meta constraint, but a direct representation of an
+        // atomic resource, so add the exact availability of the given high level resource, which is
+        // defined through the model pool
+        if(availableResources.empty())
+        {
+            OWLCardinalityRestriction::Ptr highlevelModelMaxConstraint = OWLCardinalityRestriction::getInstance(propertyHas,
+                    modelCount,
+                    mit->first,
+                    OWLCardinalityRestriction::MAX);
+            availableResources.push_back(highlevelModelMaxConstraint);
+
+            OWLCardinalityRestriction::Ptr highlevelModelMinConstraint = OWLCardinalityRestriction::getInstance(propertyHas,
+                    modelCount,
+                    mit->first,
+                    OWLCardinalityRestriction::MIN);
+            availableResources.push_back(highlevelModelMinConstraint);
+        }
 
         std::vector<OWLCardinalityRestriction::Ptr> available;
         for(OWLCardinalityRestriction::Ptr& restriction : availableResources)
