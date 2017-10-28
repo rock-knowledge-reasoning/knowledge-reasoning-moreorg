@@ -579,9 +579,9 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
         // a0: # of interfaces
         // existingConnections
         merit = existingConnections/(1.0*numberOfInterfaces);
-        LOG_INFO_S << "Merit: " << merit << ": bias: "<< bias << " existingConnections:" << existingConnections << "/" << numberOfInterfaces;
+        LOG_DEBUG_S << "Merit: " << merit << ": bias: "<< bias << " existingConnections:" << existingConnections << "/" << numberOfInterfaces;
     } else {
-        LOG_INFO_S << "Merit: " << merit << ": bias: " << bias << " existingConnections: " << existingConnections << "/" << numberOfInterfaces;
+        LOG_DEBUG_S << "Merit: " << merit << ": bias: " << bias << " existingConnections: " << existingConnections << "/" << numberOfInterfaces;
     }
     return merit + bias;
 }
