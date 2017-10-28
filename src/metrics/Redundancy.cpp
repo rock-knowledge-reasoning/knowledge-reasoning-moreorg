@@ -90,6 +90,12 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
     ModelBound::List modelBoundRemaining = ResourceMatch::toModelBoundList(available);
     ModelBound::List modelBoundRequired = ResourceMatch::toModelBoundList(required);
 
+    if(!ResourceMatch::hasMinRequirements( modelBoundRequired ) )
+    {
+        throw std::invalid_argument("organization_model::metrics::Redundancy: model bound requires minimum requirements"
+                "to complete redundancy computation, but none are provided");
+    }
+
     LOG_DEBUG_S << "Available: " << ModelBound::toString(modelBoundRemaining);
     LOG_DEBUG_S << "Required: " << ModelBound::toString(modelBoundRequired);
 

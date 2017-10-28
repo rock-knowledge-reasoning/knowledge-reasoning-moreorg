@@ -208,6 +208,12 @@ public:
      */
     static owlapi::model::IRIList filterSupportedModels(const owlapi::model::IRIList& combination,
             const owlapi::model::IRIList& serviceModels, owlapi::model::OWLOntology::Ptr ontology);
+
+    /**
+     * Check if the model bound list contains minimum requirements, i.e.
+     * if any of the model bounds min in > 0
+     */
+    static bool hasMinRequirements(const ModelBound::List& list);
 };
 
 } // end namespace reasoning

@@ -387,5 +387,17 @@ owlapi::model::IRIList ResourceMatch::filterSupportedModels(const owlapi::model:
     return supportedModels;
 }
 
+bool ResourceMatch::hasMinRequirements(const ModelBound::List& list)
+{
+    for(const ModelBound& bound : list)
+    {
+        if(bound.min > 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 } // end namespace reasoning
 } // end namespace organization_model
