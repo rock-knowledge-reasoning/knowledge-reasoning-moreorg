@@ -24,3 +24,5 @@ owlapi_install_ontology("http://www.rock-robotics.org/2015/12/robots/Sherpa"
     "test/data/om-robot-sherpa.owl")
 owlapi_install_ontology("http://www.rock-robotics.org/2015/12/projects/TransTerrA"
     "test/data/om-project-transterra.owl")
+owlapi_install_ontology("http://www.rock-robotics.org/2017/10/om-lego"
+    "test/data/om-lego-v0.1.owl")

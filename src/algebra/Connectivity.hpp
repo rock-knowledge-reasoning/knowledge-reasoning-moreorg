@@ -103,7 +103,8 @@ public:
      * \param timeoutInMs Timeout of the feasibility check, default is 0
      * \return True if a connection is feasible, false otherwise
      */
-    static bool isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask, double timeoutInMs = 0, size_t minFeasible = 1);
+    static bool isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask, double timeoutInMs = 0, size_t minFeasible = 1,
+            const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface") );
 
     /**
      * Check whether a model pool can be fully connected
@@ -114,7 +115,8 @@ public:
      * \param baseGraph that hold the resulting connection graph
      * \return True if a connection is feasible, false otherwise
      */
-    static bool isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask, graph_analysis::BaseGraph::Ptr& baseGraph, double timeoutInMs = 0, size_t minFeasible = 1);
+    static bool isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask, graph_analysis::BaseGraph::Ptr& baseGraph, double timeoutInMs = 0, size_t minFeasible = 1,
+            const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface") );
 
     /**
      * Convert solution to string

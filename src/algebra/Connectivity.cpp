@@ -25,7 +25,7 @@ std::string Connectivity::Statistics::toString(size_t indent) const
     std::stringstream ss;
     std::string hspace(indent,' ');
     ss << hspace << "Statistics:" << std::endl;
-    ss << hspace << "    # graph completeness evalutions: " << evaluations << std::endl;
+    ss << hspace << "    # graph completeness evaluations: " << evaluations << std::endl;
     ss << hspace << "    time in s: " << timeInS << std::endl;
     ss << hspace << "    stopped: " << stopped << std::endl;
     ss << hspace << "    # propagator executions: " << csp.propagate << std::endl;
@@ -370,16 +370,18 @@ bool Connectivity::isComplete() const
 
 bool Connectivity::isFeasible(const ModelPool& modelPool,
         const OrganizationModelAsk& ask,
-        double timeoutInMs, size_t minFeasible)
+        double timeoutInMs, size_t minFeasible,
+        const owlapi::model::IRI& interfaceBaseClass)
 {
     graph_analysis::BaseGraph::Ptr baseGraph;
-    return Connectivity::isFeasible(modelPool, ask, baseGraph, timeoutInMs, minFeasible);
+    return Connectivity::isFeasible(modelPool, ask, baseGraph, timeoutInMs, minFeasible, interfaceBaseClass);
 }
 
 bool Connectivity::isFeasible(const ModelPool& modelPool,
         const OrganizationModelAsk& ask,
         graph_analysis::BaseGraph::Ptr& baseGraph,
-        double timeoutInMs, size_t minFeasible)
+        double timeoutInMs, size_t minFeasible,
+        const owlapi::model::IRI& interfaceBaseClass)
 {
     // For a single system this check is trivially true
     if(modelPool.numberOfInstances() < 2)
@@ -390,7 +392,7 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
     msStatistics.evaluations = 0;
 
     Connectivity* last = NULL;
-    Connectivity* connectivity = new Connectivity(modelPool, ask);
+    Connectivity* connectivity = new Connectivity(modelPool, ask, interfaceBaseClass);
     Gecode::Search::Options options;
     if(timeoutInMs > 0)
     {
