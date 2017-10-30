@@ -410,10 +410,12 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
     {
         options.stop = Gecode::Search::Stop::time(timeoutInMs);
     }
-    options.nogoods_limit = 128;
+    options.nogoods_limit = 1024;
     //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::geometric(10,2);
-    //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::constant(4);
-    Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::rnd(1U,1,5,1);
+    //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::constant(1);
+    Gecode::Rnd rnd;
+    rnd.hw();
+    Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::rnd(rnd.seed(),1,connectivity->mInterfaces.size(),2);
     options.cutoff = c;
     Gecode::RBS<Connectivity, Gecode::DFS> searchEngine(connectivity, options);
 
