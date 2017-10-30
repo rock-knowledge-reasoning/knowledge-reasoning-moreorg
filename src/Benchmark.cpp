@@ -210,7 +210,7 @@ int main(int argc, char** argv)
     }
 
     std::cout << "Logging into: " << logfile << std::endl;
-    std::ofstream log(logfile, std::ofstream::out);
+    std::stringstream log;
     log << "# number of epochs: " << epochs << std::endl;
     log << "# minfeasible: " << minFeasible << std::endl;
     log << "# [model #] " << algebra::Connectivity::Statistics::getStatsDescription() << std::endl;
@@ -238,7 +238,12 @@ int main(int argc, char** argv)
         }
         log << std::endl;
     }
-    log.close();
+
+    std::cout << log.str() << std::endl;
+
+    std::ofstream saveLog(logfile, std::ofstream::out);
+    saveLog << log.str();
+    saveLog.close();
 
     return 0;
 }
