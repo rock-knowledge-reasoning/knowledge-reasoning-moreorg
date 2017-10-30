@@ -102,6 +102,7 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     , mAsk(ask.ontology())
     , mInterfaceBaseClass(interfaceBaseClass)
     , mModelCombination(mModelPool.toModelCombination())
+    , mAgentConnections(*this, mModelCombination.size()*mModelCombination.size(), 0, mModelCombination.size())
 {
     // Use hw() (not time -- since resolution of time seem to be rather low)
     mRnd.hw();
@@ -225,6 +226,9 @@ Connectivity::Connectivity(const ModelPool& modelPool,
             }
             // There should be maximum one connection between two systems
             rel(*this, sum( agentInterconnection ) <= 1);
+
+            Gecode::Matrix<Gecode::IntVarArray> agentConnectionMatrix(mAgentConnections, mModelCombination.size(), mModelCombination.size());
+            rel(*this, agentConnectionMatrix(a0, a1) == sum( agentInterconnection ) );
         }
     }
 
@@ -296,6 +300,7 @@ Connectivity::Connectivity(bool share, Connectivity& other)
     , mRnd(other.mRnd)
 {
     mConnections.update(*this, share, other.mConnections);
+    mAgentConnections.update(*this, share, other.mAgentConnections);
 }
 
 Gecode::Space* Connectivity::copy(bool share)
@@ -561,41 +566,59 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
         }
     }
 
-    size_t existingConnections = 0;
-    Gecode::Matrix<Gecode::IntVarArray> connectionMatrix(mConnections, mInterfaces.size(), mInterfaces.size());
-    size_t a0;
-    for(a0 = idxRange0.first; a0 <= idxRange0.second; ++a0)
+    size_t agent0 = std::distance(mInterfaceIndexRanges.begin(), std::find(mInterfaceIndexRanges.begin(), mInterfaceIndexRanges.end(),idxRange0));
+    size_t agent1 = std::distance(mInterfaceIndexRanges.begin(), std::find(mInterfaceIndexRanges.begin(), mInterfaceIndexRanges.end(),idxRange1));
+
+    size_t existingConnections0 = 0;
+    size_t existingConnections1 = 0;
+    Gecode::Matrix<Gecode::IntVarArray> agentConnections(mAgentConnections, mModelCombination.size(), mModelCombination.size());
+    for(size_t i = 0; i < mModelCombination.size(); ++i)
     {
-        for(size_t a1 = 0; a1 < mInterfaces.size(); ++a1)
         {
-            Gecode::IntVar v = connectionMatrix(a0,a1);
-            if( v.assigned())
+            Gecode::IntVar v = agentConnections(i, agent0);
+            if(v.assigned())
             {
                 if(v.val() == 1)
                 {
-                    ++existingConnections;
-                    // if interface has found a connection continue with the
-                    // next
-                    break;
+                    ++existingConnections0;
                 }
             }
         }
+
+        {
+            Gecode::IntVar v = agentConnections(i, agent1);
+            if(v.assigned())
+            {
+                if(v.val() == 1)
+                {
+                    ++existingConnections1;
+                }
+            }
+
+        }
     }
 
-    double merit = 0;
-    size_t numberOfInterfaces = idxRange0.second - idxRange0.first + 1;
+    double merit0 = 0;
+    size_t numberOfInterfaces0 = idxRange0.second - idxRange0.first + 1;
+
+    double merit1 = 0;
+    size_t numberOfInterfaces1 = idxRange1.second - idxRange1.first + 1;
     double bias = 1/(100.0 + mRnd(1000));
 
-    if(existingConnections != 0)
+    if(existingConnections0 != 0)
     {
         // a0: # of interfaces
         // existingConnections
-        merit = existingConnections/(1.0*numberOfInterfaces);
-        LOG_DEBUG_S << "Merit: " << merit << ": bias: "<< bias << " existingConnections:" << existingConnections << "/" << numberOfInterfaces;
-    } else {
-        LOG_DEBUG_S << "Merit: " << merit << ": bias: " << bias << " existingConnections: " << existingConnections << "/" << numberOfInterfaces;
+        merit0 = existingConnections0/(1.0*numberOfInterfaces0);
+        LOG_DEBUG_S << "Merit: " << merit0 << ": bias: "<< bias << " existingConnections:" << existingConnections0 << "/" << numberOfInterfaces0;
     }
-    return merit + bias;
+    if(existingConnections1 != 0)
+    {
+        merit1 = existingConnections1/(1.0*numberOfInterfaces1);
+        LOG_DEBUG_S << "Merit: " << merit1 << ": bias: "<< bias << " existingConnections:" << existingConnections1 << "/" << numberOfInterfaces1;
+    }
+
+    return std::min(merit0,merit1) + bias;
 }
 
 } // end namespace algebra
