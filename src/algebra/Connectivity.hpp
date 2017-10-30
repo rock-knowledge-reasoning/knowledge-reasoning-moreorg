@@ -4,6 +4,7 @@
 #include <gecode/set.hh>
 #include <gecode/search.hh>
 #include <base/Time.hpp>
+#include <numeric/Stats.hpp>
 #include <graph_analysis/BaseGraph.hpp>
 #include "../OrganizationModelAsk.hpp"
 #include "../vocabularies/OM.hpp"
@@ -42,6 +43,9 @@ class Connectivity : public Gecode::Space
     // |#ofInterface|*a0Idx + a1Idx
     Gecode::IntVarArray mConnections;
 
+    // Helper class to improve computation of merit function
+    Gecode::IntVarArray mAgentConnections;
+
     // Random number generator
     mutable Gecode::Rnd mRnd;
 
@@ -74,6 +78,18 @@ public:
         Gecode::Search::Statistics csp;
 
         std::string toString(size_t indent = 0) const;
+
+
+        /**
+         * Get a description of the field of the statistics vector
+         */
+        static std::string getStatsDescription();
+
+        /**
+         * Compute the combined stats
+         * \see getStatsDescription
+         */
+        static std::vector<numeric::Stats<double> > compute(const std::vector<Connectivity::Statistics>& stats);
 
         static std::string toString(const std::vector<Connectivity::Statistics>& stats);
     };

@@ -7,7 +7,7 @@
 #include <gecode/search/meta/rbs.hh>
 #include <gecode/search.hh>
 #include <graph_analysis/GraphIO.hpp>
-#include <numeric/Stats.hpp>
+#include <iostream>
 
 using namespace owlapi::model;
 
@@ -37,46 +37,51 @@ std::string Connectivity::Statistics::toString(size_t indent) const
     return ss.str();
 }
 
-std::string Connectivity::Statistics::toString(const std::vector<Connectivity::Statistics>& statistics)
+std::string Connectivity::Statistics::getStatsDescription()
 {
-    std::stringstream ss;
+    return "[graph completeness eval][stdev][time in s][stdev][stopped][stdev][# propagator executions][stdev][# failed nodes][stdev][# expanded nodes][stdev][# depth of search stack][stdev][# restarts][stdev][# nogoods][stdev]";
+}
+
+std::vector< numeric::Stats<double> > Connectivity::Statistics::compute(const std::vector<Connectivity::Statistics>& statistics)
+{
     std::vector< numeric::Stats<double> > stats(9);
 
-    ss << "[graph completeness eval][time in s][stopped][# propagator executions][# failed nodes][# expanded nodes][# depth of search stack][# restarts][# nogoods]" << std::endl;
     for(const Connectivity::Statistics& s : statistics)
     {
         size_t i = 0;
-        ss << s.evaluations << " ";
         stats[i++].update(s.evaluations);
-
-        ss << s.timeInS << " ";
         stats[i++].update(s.timeInS);
-
-        ss << s.stopped << " ";
         stats[i++].update(s.stopped);
-
-        ss << s.csp.propagate << " ";
         stats[i++].update(s.csp.propagate);
-
-        ss << s.csp.fail << " ";
         stats[i++].update(s.csp.fail);
-
-        ss << s.csp.node << " ";
         stats[i++].update(s.csp.node);
-
-        ss << s.csp.depth << " ";
         stats[i++].update(s.csp.depth);
-
-        ss << s.csp.restart << " ";
         stats[i++].update(s.csp.depth);
-
-        ss << s.csp.nogood << " ";
         stats[i++].update(s.csp.nogood);
+    }
+    return stats;
+}
 
+std::string Connectivity::Statistics::toString(const std::vector<Connectivity::Statistics>& statistics)
+{
+    std::stringstream ss;
+    ss << "[graph completeness eval][time in s][stopped][# propagator executions][# failed nodes][# expanded nodes][# depth of search stack][# restarts][# nogoods]" << std::endl;
+    for(const Connectivity::Statistics& s : statistics)
+    {
+        ss << s.evaluations << " ";
+        ss << s.timeInS << " ";
+        ss << s.stopped << " ";
+        ss << s.csp.propagate << " ";
+        ss << s.csp.fail << " ";
+        ss << s.csp.node << " ";
+        ss << s.csp.depth << " ";
+        ss << s.csp.restart << " ";
+        ss << s.csp.nogood << " ";
         ss << std::endl;
     }
 
-    ss << "[graph completeness eval][stdev][time in s][stdev][stopped][stdev][# propagator executions][stdev][# failed nodes][stdev][# expanded nodes][stdev][# depth of search stack][stdev][# restarts][stdev][# nogoods][stdev]" << std::endl;
+    ss << getStatsDescription() << std::endl;
+    std::vector< numeric::Stats<double> > stats = compute(statistics);
     for(size_t i = 0; i < stats.size(); ++i)
     {
         ss << stats[i].mean()
@@ -86,7 +91,6 @@ std::string Connectivity::Statistics::toString(const std::vector<Connectivity::S
             ;
     }
     ss << std::endl;
-
     return ss.str();
 }
 
@@ -99,7 +103,8 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     , mInterfaceBaseClass(interfaceBaseClass)
     , mModelCombination(mModelPool.toModelCombination())
 {
-    mRnd.time();
+    // Use hw() (not time -- since resolution of time seem to be rather low)
+    mRnd.hw();
 
     assert(!mModelCombination.empty());
     // Identify interfaces -- we assume here ElectroMechanicalInterface

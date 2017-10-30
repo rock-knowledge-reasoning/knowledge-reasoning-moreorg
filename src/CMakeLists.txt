@@ -21,6 +21,7 @@ rock_library(organization_model
         metrics/ModelSurvivability.cpp
         Metric.cpp
         ModelPool.cpp
+        ModelPoolIterator.cpp
         OrganizationModel.cpp
         OrganizationModelAsk.cpp
         OrganizationModelTell.cpp
@@ -59,11 +60,13 @@ rock_library(organization_model
         metrics/ModelSurvivability.hpp
         Metric.hpp
         ModelPool.hpp
+        ModelPoolIterator.hpp
         OrganizationModel.hpp
         OrganizationModelAsk.hpp
         OrganizationModelTell.hpp
         PropertyConstraint.hpp
         PropertyConstraintSolver.hpp
+        #RandomModelGenerator.hpp
         organization_model/ActorModelLink.hpp
         organization_model/EndpointModel.hpp
         organization_model/Grounding.hpp
