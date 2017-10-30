@@ -179,8 +179,8 @@ Connectivity::Connectivity(const ModelPool& modelPool,
             exactNumberOfConnections << v;
         }
     }
-
-    rel(*this, sum(exactNumberOfConnections) == mInterfaceIndexRanges.size() - 1);
+    Gecode::IntVar linkCount(*this, mInterfaceIndexRanges.size()-1, mInterfaceIndexRanges.size());
+    rel(*this, sum(exactNumberOfConnections) == linkCount);
 
     // for all interfaces check compatibility and set domain (0) or (0,1)
     // accordingly 1 means connection (can be) established
