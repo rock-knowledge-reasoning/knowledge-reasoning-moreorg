@@ -6,17 +6,19 @@
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY om-base "http://www.rock-robotics.org/2014/01/om-base#" >
     <!ENTITY om-schema "http://www.rock-robotics.org/2014/01/om-schema#" >
 ]>
 
 
 <rdf:RDF xmlns="http://www.rock-robotics.org/2015/12/robots/BaseCamp#"
      xml:base="http://www.rock-robotics.org/2015/12/robots/BaseCamp"
-     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-     xmlns:owl="http://www.w3.org/2002/07/owl#"
-     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#">
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:om-base="http://www.rock-robotics.org/2014/01/om-base#">
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2015/12/robots/BaseCamp">
         <rdfs:comment>v0.1
  * change base uri to om-schema</rdfs:comment>
@@ -143,15 +145,22 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;LogisticHubProvider"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
                 <owl:onClass rdf:resource="&om-schema;EmiPassive"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">6</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="&om-schema;LogisticHubProvider"/>
-                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onProperty rdf:resource="&om-schema;hasTransportCapacity"/>
+                <owl:onClass rdf:resource="&om-schema;Actor"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">0</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -164,9 +173,9 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#LogisticHub -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#LogisticHubProvider -->
 
-    <owl:Class rdf:about="&om-schema;LogisticHub"/>
+    <owl:Class rdf:about="&om-schema;LogisticHubProvider"/>
     
 
 
@@ -186,15 +195,16 @@
     <owl:NamedIndividual rdf:about="&om-schema;BaseCamp">
         <rdf:type rdf:resource="&om-schema;BaseCamp"/>
         <om-schema:locomotionProperty rdf:datatype="&xsd;double"></om-schema:locomotionProperty>
-        <om-schema:payloadTransportSupplyDemand rdf:datatype="&xsd;integer">-1</om-schema:payloadTransportSupplyDemand>
-        <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">0.0</om-schema:nominalPowerConsumption>
+        <om-schema:transportCapacity rdf:datatype="&xsd;nonNegativeInteger">0</om-schema:transportCapacity>
         <om-schema:energyCapacity rdf:datatype="&xsd;double">0.0</om-schema:energyCapacity>
-        <om-schema:nominalHeight rdf:datatype="&xsd;double">0.3</om-schema:nominalHeight>
-        <om-schema:maxHeight rdf:datatype="&xsd;double">0.3</om-schema:maxHeight>
+        <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">0.0</om-schema:nominalPowerConsumption>
         <om-schema:minHeight rdf:datatype="&xsd;double">0.3</om-schema:minHeight>
+        <om-schema:maxHeight rdf:datatype="&xsd;double">0.3</om-schema:maxHeight>
+        <om-schema:nominalHeight rdf:datatype="&xsd;double">0.3</om-schema:nominalHeight>
         <om-schema:minWidth rdf:datatype="&xsd;double">0.5</om-schema:minWidth>
         <om-schema:nominalWidth rdf:datatype="&xsd;double">0.5</om-schema:nominalWidth>
         <om-schema:maxWidth rdf:datatype="&xsd;double">0.5</om-schema:maxWidth>
+        <om-schema:transportDemand rdf:datatype="&xsd;nonNegativeInteger">1</om-schema:transportDemand>
         <om-schema:mass rdf:datatype="&xsd;double">3.0</om-schema:mass>
         <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>
     </owl:NamedIndividual>

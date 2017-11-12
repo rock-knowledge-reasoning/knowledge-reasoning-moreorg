@@ -3,6 +3,7 @@
 #include <organization_model/facets/Robot.hpp>
 #include <organization_model/vocabularies/OM.hpp>
 #include "test_utils.hpp"
+#include <organization_model/vocabularies/Robot.hpp>
 
 using namespace organization_model;
 
@@ -64,10 +65,9 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
     using namespace owlapi::model;
     using namespace organization_model::vocabulary;
 
-    BOOST_TEST_MESSAGE("STARTING TO READ");
     IRI organizationModelIRI = "http://www.rock-robotics.org/2015/12/projects/TransTerrA";
     OrganizationModel::Ptr om(new OrganizationModel(organizationModelIRI));
-    BOOST_TEST_MESSAGE("FINISHED READING");
+
     IRI sherpa = OM::resolve("Sherpa");
     IRI payload = OM::resolve("Payload");
     IRI basecamp = OM::resolve("BaseCamp");
@@ -114,21 +114,47 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
 
     {
         organization_model::facets::Robot robot(sherpa, ask);
-        int32_t transportSupplyDemand = robot.getPayloadTransportSupplyDemand();
-        BOOST_REQUIRE_MESSAGE( transportSupplyDemand > 0, "Robot " << sherpa << " has transport supply demand of: " << transportSupplyDemand);
+        uint32_t transportDemand = robot.getTransportDemand();
+        BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << sherpa << " has transport demand of: " << transportDemand);
+
+        uint32_t transportCapacity = robot.getTransportCapacity();
+        BOOST_REQUIRE_MESSAGE( transportCapacity == 10, "Robot " << sherpa << " has transport capacity of: " << transportCapacity);
+
+        {
+            IRI model = vocabulary::OM::resolve("CREX");
+            uint32_t transportCapacityForModel = robot.getTransportCapacity(model);
+            BOOST_REQUIRE_MESSAGE( transportCapacityForModel == 2, "Robot " << sherpa << " has transport capacity of " << transportCapacityForModel << " for " << model);
+        }
+
+        {
+            IRI model = vocabulary::OM::resolve("CoyoteIII");
+            uint32_t transportCapacityForModel = robot.getTransportCapacity(model);
+            BOOST_REQUIRE_MESSAGE( transportCapacityForModel == 2, "Robot " << sherpa << " has transport capacity of " << transportCapacityForModel << " for " << model);
+        }
+
+        {
+            IRI model = vocabulary::OM::resolve("BaseCamp");
+            uint32_t transportCapacityForModel = robot.getTransportCapacity(model);
+            BOOST_REQUIRE_MESSAGE( transportCapacityForModel == 2, "Robot " << sherpa << " has transport capacity of " << transportCapacityForModel << " for " << model);
+        }
+
+        {
+            IRI model = vocabulary::OM::resolve("Payload");
+            uint32_t transportCapacityForModel = robot.getTransportCapacity(model);
+            BOOST_REQUIRE_MESSAGE( transportCapacityForModel == 10, "Robot " << sherpa << " has transport capacity of " << transportCapacityForModel << " for " << model);
+        }
 
     }
     {
         organization_model::facets::Robot robot(basecamp, ask);
-        int32_t transportSupplyDemand = robot.getPayloadTransportSupplyDemand();
-        BOOST_REQUIRE_MESSAGE( transportSupplyDemand < 0, "Robot " << basecamp << " has transport supply demand of: " << transportSupplyDemand);
+        uint32_t transportDemand = robot.getTransportDemand();
+        BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << basecamp << " has transport demand of: " << transportDemand);
     }
 
     {
         organization_model::facets::Robot robot(payload, ask);
-        int32_t transportSupplyDemand = robot.getPayloadTransportSupplyDemand();
-        BOOST_REQUIRE_MESSAGE( transportSupplyDemand < 0, "Robot " << payload << " has transport supply demand of: " << transportSupplyDemand);
-
+        uint32_t transportDemand = robot.getTransportDemand();
+        BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << payload << " has transport demand of: " << transportDemand);
     }
 }
 

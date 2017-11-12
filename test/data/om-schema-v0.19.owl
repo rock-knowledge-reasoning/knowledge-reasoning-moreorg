@@ -42,7 +42,7 @@
 * 0.10
  * added data properties such as mass etc. for Sherpa, CREX, Payload
  * add PayloadBattery</rdfs:comment>
-        <owl:imports rdf:resource="http://www.rock-robotics.org/2017/08/om-base#"/>
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base#"/>
     </owl:Ontology>
     
 

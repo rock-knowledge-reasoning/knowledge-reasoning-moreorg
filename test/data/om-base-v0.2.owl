@@ -15,32 +15,12 @@
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-    <owl:Ontology rdf:about="http://www.rock-robotics.org/2017/08/om-base#">
+    <owl:Ontology rdf:about="http://www.rock-robotics.org/2014/01/om-base#">
         <rdfs:comment>Changelog:
-* separate om-base-schema from om-schema
-* 0.18
-  * change TransportService -&gt; TransportProvider and LogisticHub -&gt; LogisticHubProvider for consistency reasons
-* 0.17
- * add property payloadTransportSupplyDemand
-* 0.16
- * add soil sampler 
-* 0.15
- * introduce modularization, i.e. move robot specific entries to their own ontology and using import statements
-* 0.14
- * add TransportService
-* 0.13
- * add concept functionality
-* 0.12
- * add payloadTransportCapacity
-* 0.11
- * update CREX
-  * change explicit dependency on MoveTo to addition of sub requirement
- * added CoyoteIII
- * changed BaseCamps to BaseCamp
- * added LogisticHub (Capability) and PayloadLogisticHub (Service)
-* 0.10
- * added data properties such as mass etc. for Sherpa, CREX, Payload
- * add PayloadBattery</rdfs:comment>
+* 0.2
+ * use hasTransportCapacity to allow commodity dependant transport capability
+* 0.1
+ * separated om-base-schema from om-schema 0.18</rdfs:comment>
     </owl:Ontology>
     
 
@@ -53,6 +33,14 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#hasTransportCapacity -->
+
+    <owl:ObjectProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#hasTransportCapacity">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+    </owl:ObjectProperty>
     
 
 
@@ -128,6 +116,25 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#transportDemand -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#transportDemand">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#transportProperty"/>
+        <rdfs:range rdf:resource="&xsd;double"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#transportProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#transportProperty">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+        <rdfs:range rdf:resource="&xsd;double"/>
+    </owl:DatatypeProperty>
     
 
 
@@ -313,24 +320,6 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#payloadTransportCapacity -->
-
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#payloadTransportCapacity">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
-        <rdfs:range rdf:resource="&xsd;nonNegativeInteger"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#payloadTransportSupplyDemand -->
-
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#payloadTransportSupplyDemand">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
-        <rdfs:range rdf:resource="&xsd;integer"/>
-    </owl:DatatypeProperty>
-    
-
-
     <!-- http://www.rock-robotics.org/2014/01/om-schema#physicalProperty -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty">
@@ -369,6 +358,16 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#transportCapacity -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#transportCapacity">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#transportProperty"/>
+        <rdfs:range rdf:resource="&xsd;double"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -380,10 +379,18 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Agent -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Agent">
+        <owl:equivalentClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Actor"/>
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Actor -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Actor">
-        <owl:equivalentClass rdf:resource="http://www.rock-robotics.org/2017/08/om-base#Agent"/>
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
         <rdfs:comment>An actor is a physical or logical entity that can act, i.e. perform actions which have an effect</rdfs:comment>
     </owl:Class>
@@ -462,14 +469,6 @@
 
 There is always only one instance of a service an actor can provide, e.g,
 a StereoImageProvider service cannot depends upon two instances of ImageProvider but need to associated directly with two camera</rdfs:comment>
-    </owl:Class>
-    
-
-
-    <!-- http://www.rock-robotics.org/2017/08/om-base#Agent -->
-
-    <owl:Class rdf:about="http://www.rock-robotics.org/2017/08/om-base#Agent">
-        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
     </owl:Class>
     
 

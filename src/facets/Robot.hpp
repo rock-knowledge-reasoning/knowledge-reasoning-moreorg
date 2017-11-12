@@ -37,18 +37,20 @@ public:
     double getEnergyCapacity() const { return mEnergyCapacity; }
 
     /**
-     * Get the payload transport supply/demand
-     * Supply if it can transport payloads, demand if it requires a certain
-     * capacity to be carried
-     * Immobile system have to have a value less than 1 for demand
+     * Get the payload transport demand
      */
-    int32_t getPayloadTransportSupplyDemand() const { return mPayloadTransportSupplyDemand; }
+    uint32_t getTransportDemand() const { return mTransportDemand; }
 
     /**
-     * The transport capacity of this agent / robot -- if is is mobile
-     * @deprecated
+     * the overal transport capacity for other agents (without further
+     * specification)
      */
-    uint32_t getPayloadTransportCapacity() const { return mPayloadTransportCapacity; }
+    uint32_t getTransportCapacity() const { return mTransportCapacity; }
+
+    /**
+     * The transport capacity of this agent for a particular other agent model
+     */
+    uint32_t getTransportCapacity(const owlapi::model::IRI& model) const;
 
     /**
      * Empirical information
@@ -99,8 +101,8 @@ private:
     double mEnergyCapacity;
     double mNominalPowerConsumption;
 
-    uint32_t mPayloadTransportCapacity;
-    int32_t mPayloadTransportSupplyDemand;
+    uint32_t mTransportCapacity;
+    uint32_t mTransportDemand;
 };
 
 } // end namespace facets

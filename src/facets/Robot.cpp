@@ -18,8 +18,8 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
     , mMinVelocity(0.0)
     , mMaxVelocity(0.0)
     , mNominalVelocity(0.0)
-    , mPayloadTransportCapacity(0)
-    , mPayloadTransportSupplyDemand(0)
+    , mTransportCapacity(0)
+    , mTransportDemand(0)
 {
 
     try {
@@ -52,12 +52,35 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
 
     // optional transport capability
     try {
-        mPayloadTransportSupplyDemand = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::payloadTransportSupplyDemand())->getInteger();
-        mPayloadTransportCapacity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::payloadTransportCapacity())->getInteger();
+        mTransportDemand = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::transportDemand())->getDouble();
+        // get cardinality constraint
+        mTransportCapacity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::transportCapacity())->getDouble();
+
+
     } catch(const std::exception& e)
     {
         LOG_INFO_S << e.what();
     }
+}
+
+uint32_t Robot::getTransportCapacity(const owlapi::model::IRI& model) const
+{
+    std::vector<OWLCardinalityRestriction::Ptr> restrictions = ontologyAsk().getCardinalityRestrictionsForTarget(mActorModel, vocabulary::OM::hasTransportCapacity(), model);
+    uint32_t capacity = getTransportCapacity();
+    for(const OWLCardinalityRestriction::Ptr& r : restrictions)
+    {
+        switch(r->getCardinalityRestrictionType())
+        {
+            case OWLCardinalityRestriction::MAX:
+                capacity = std::min(capacity, r->getCardinality());
+                break;
+            case OWLCardinalityRestriction::MIN:
+            case OWLCardinalityRestriction::EXACT:
+            case OWLCardinalityRestriction::UNKNOWN:
+                throw std::runtime_error("organization_model::facets::Robot::getTransportCapacity: expected max cardinality restriction, but got '" + OWLCardinalityRestriction::CardinalityRestrictionTypeTxt[r->getCardinalityRestrictionType()] + "'");
+        }
+    }
+    return capacity;
 }
 
 double Robot::estimatedEnergyCost(double distanceInM) const
@@ -87,7 +110,8 @@ std::string Robot::toString() const
     ss << "    min velocity (m/s):            " << mMinVelocity << std::endl;
     ss << "    max velocity (m/s):            " << mMaxVelocity << std::endl;
     ss << "    nominal velocity (m/s):        " << mNominalVelocity << std::endl;
-    ss << "    payload supply/demand (units): " << mPayloadTransportSupplyDemand << std::endl;
+    ss << "    transport demand (units):      " << mTransportDemand << std::endl;
+    ss << "    transport capacity (units):    " << mTransportCapacity << std::endl;
     return ss.str();
 }
 

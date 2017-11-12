@@ -20,9 +20,11 @@ public:
     VOCABULARY_ADD_WORD(ServiceModel);
 
     VOCABULARY_ADD_WORD(Resource);
+    VOCABULARY_ADD_WORD(Agent);
     VOCABULARY_ADD_WORD(Actor);
     VOCABULARY_ADD_WORD(Capability);
     VOCABULARY_ADD_WORD(CompositeActor);
+    VOCABULARY_ADD_WORD(CompositeAgent);
     VOCABULARY_ADD_WORD(Functionality);
     VOCABULARY_ADD_WORD(Interface);
     VOCABULARY_ADD_WORD(Location);
@@ -40,6 +42,7 @@ public:
     VOCABULARY_ADD_WORD(provides);
     VOCABULARY_ADD_WORD(uses);
     VOCABULARY_ADD_WORD(fulfills);
+    VOCABULARY_ADD_WORD(hasTransportCapacity);
 
     VOCABULARY_ADD_WORD(probabilityOfFailure);
 };
