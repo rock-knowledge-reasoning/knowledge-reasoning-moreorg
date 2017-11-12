@@ -130,6 +130,46 @@ std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const Organizat
     return stats;
 }
 
+std::vector<numeric::Stats<double> > runFunctionalSaturationBoundTest(const OrganizationModel::Ptr& om, const ModelPool& modelPool,
+        size_t epochs)
+{
+    numeric::Stats<double> timeWithSatBound;
+    numeric::Stats<double> timeWithoutSatBound;
+    for(size_t i = 0; i < epochs; ++i)
+    {
+        double duration;
+        {
+            base::Time start = base::Time::now();
+            OrganizationModelAsk ask(om, modelPool, false);
+            duration = (base::Time::now() - start).toSeconds();
+            timeWithoutSatBound.update(duration);
+        }
+
+        {
+            base::Time start = base::Time::now();
+            OrganizationModelAsk ask(om, modelPool, true);
+            duration = (base::Time::now() - start).toSeconds();
+            timeWithSatBound.update(duration);
+        }
+    }
+
+    std::vector< numeric::Stats<double> > stats;
+    stats.push_back(timeWithoutSatBound);
+    stats.push_back(timeWithSatBound);
+    return stats;
+}
+
+void printUsage(char** argv)
+{
+    std::cout << "usage: " << argv[0] << std::endl;
+    std::cout << "    -o <organization-model-file>" << std::endl;
+    std::cout << "    -e <number-of-epochs" << std::endl;
+    std::cout << "    -m <number-of-mininum-feasible-solutions>" << std::endl;
+    std::cout << "    -s <test-specification-file>" << std::endl;
+    std::cout << "    -l <logfile-to-generate>" << std::endl;
+    std::cout << "    -t <benchmark-type: fsat or con" << std::endl;
+}
+
 
 // how to create an n-d representation for exploration of the interface
 // compatibility landscape
@@ -143,7 +183,8 @@ int main(int argc, char** argv)
     std::string logfile = "/tmp/organization-model-benchmark.log";
     size_t epochs = 1;
     size_t minFeasible = 1;
-    while((c = getopt(argc,argv, "o:e:m:s:l:")) != -1)
+    std::string type = "con";
+    while((c = getopt(argc,argv, "o:e:m:s:l:t:")) != -1)
     {
         if(optarg)
         {
@@ -177,6 +218,21 @@ int main(int argc, char** argv)
                     logfile = optarg;
                     break;
                 }
+                case 'h':
+                {
+                    printUsage(argv);
+                    exit(0);
+                }
+                case 't':
+                {
+                    type = optarg;
+                    if(!(type == "con" || type == "fsat"))
+                    {
+                        std::cout << "Error: test type '" << type << "' unknown" << std::endl;
+                        printUsage(argv);
+                        exit(0);
+                    }
+                }
             }
         }
     }
@@ -208,35 +264,68 @@ int main(int argc, char** argv)
     } else {
         om = OrganizationModel::Ptr(new OrganizationModel(spec.organizationModelIRI));
     }
-
     std::cout << "Logging into: " << logfile << std::endl;
     std::stringstream log;
-    log << "# number of epochs: " << epochs << std::endl;
-    log << "# minfeasible: " << minFeasible << std::endl;
-    log << "# [model #] " << algebra::Connectivity::Statistics::getStatsDescription() << std::endl;
 
-    ModelPoolIterator mit(spec.from, spec.to, spec.stepSize);
-    while(mit.next())
+    if(type == "con")
     {
-        ModelPool current = mit.current();
-        std::vector<algebra::Connectivity::Statistics> stats = runModelPoolTest(om, current, epochs, minFeasible);
+        log << "from: " << spec.from.toString(4) << std::endl;
+        log << "to: " << spec.to.toString(4) << std::endl;
+        log << "step: " << spec.stepSize.toString(4) << std::endl;
+        log << "# number of epochs: " << epochs << std::endl;
+        log << "# minfeasible: " << minFeasible << std::endl;
+        log << "# [model #] " << algebra::Connectivity::Statistics::getStatsDescription() << std::endl;
 
-        std::vector<numeric::Stats<double> > numericStats = algebra::Connectivity::Statistics::compute(stats);
-        // record the number of model instances
-        ModelPool::const_iterator cit = current.begin();
-        for(; cit != current.end(); ++cit)
+        ModelPoolIterator mit(spec.from, spec.to, spec.stepSize);
+        while(mit.next())
         {
-            log << cit->second;
-            log << " ";
+            ModelPool current = mit.current();
+            std::vector<algebra::Connectivity::Statistics> stats = runModelPoolTest(om, current, epochs, minFeasible);
+
+            std::vector<numeric::Stats<double> > numericStats = algebra::Connectivity::Statistics::compute(stats);
+            // record the number of model instances
+            ModelPool::const_iterator cit = current.begin();
+            for(; cit != current.end(); ++cit)
+            {
+                log << cit->second;
+                log << " ";
+            }
+            for(const numeric::Stats<double>& s : numericStats)
+            {
+                log << s.mean()
+                    << " "
+                    << s.stdev()
+                    << " ";
+            }
+            log << std::endl;
         }
-        for(const numeric::Stats<double>& s : numericStats)
+    } else if(type == "fsat")
+    {
+        log << "# number of epochs: " << epochs << std::endl;
+        log << "# [model #] [timeInS w/o sat bound][stdev][timeInS w sat bound][stdev]" << std::endl;
+        ModelPoolIterator mit(spec.from, spec.to, spec.stepSize);
+        while(mit.next())
         {
-            log << s.mean()
-                << " "
-                << s.stdev()
-                << " ";
+            ModelPool current  = mit.current();
+            std::cout << "Current: " << current.toString(4) << std::endl;
+            std::vector<numeric::Stats<double> > numericStats = runFunctionalSaturationBoundTest(om, current, epochs);
+
+            // record the number of model instances
+            ModelPool::const_iterator cit = current.begin();
+            for(; cit != current.end(); ++cit)
+            {
+                log << cit->second;
+                log << " ";
+            }
+            for(const numeric::Stats<double>& s : numericStats)
+            {
+                log << s.mean()
+                    << " "
+                    << s.stdev()
+                    << " ";
+            }
+            log << std::endl;
         }
-        log << std::endl;
     }
 
     std::cout << log.str() << std::endl;
@@ -244,6 +333,7 @@ int main(int argc, char** argv)
     std::ofstream saveLog(logfile, std::ofstream::out);
     saveLog << log.str();
     saveLog.close();
+    std::cout << "Save into: " << logfile << std::endl;
 
     return 0;
 }
