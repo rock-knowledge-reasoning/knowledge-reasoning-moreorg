@@ -31,7 +31,7 @@ int main()
 
     size_t numberOfAtoms = numeric::LimitedCombination<char>::totalNumberOfAtoms(availabilityMap);
 
-    std::cout << "#SizeOfDraw   #Combinations" << std::endl;
+    std::cout << "#Exact sizeOfDraw   #Combinations" << std::endl;
     for(int i=1; i <= numberOfAtoms; ++i)
     {
         int count = 0;
