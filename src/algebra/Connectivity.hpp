@@ -40,6 +40,9 @@ class Connectivity : public Gecode::Space
     typedef std::pair<uint32_t, uint32_t> IndexRange;
     std::vector< IndexRange > mInterfaceIndexRanges;
 
+    /// Map from the index of a variable to the two agents/index of index ranges
+    std::vector< std::pair<size_t, size_t> > mIdx2Agents;
+
     // |#ofInterface|*a0Idx + a1Idx
     Gecode::IntVarArray mConnections;
 

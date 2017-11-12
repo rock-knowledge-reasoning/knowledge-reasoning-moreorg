@@ -275,6 +275,32 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     //
     Gecode::Symmetries symmetries = identifySymmetries(connections);
 
+    for(size_t idx = 0; idx < mInterfaces.size()*mInterfaces.size(); ++idx)
+    {
+        size_t a1Idx = idx%mInterfaces.size();
+        size_t a0Idx = (idx - a1Idx)/mInterfaces.size();
+
+        IndexRange idxRange0;
+        IndexRange idxRange1;
+
+        for(IndexRange range : mInterfaceIndexRanges)
+        {
+            if(a0Idx >= range.first && a0Idx <= range.second)
+            {
+                idxRange0 = range;
+            }
+            if(a1Idx >= range.first && a1Idx <= range.second )
+            {
+                idxRange1 = range;
+            }
+        }
+
+        size_t agent0 = std::distance(mInterfaceIndexRanges.begin(), std::find(mInterfaceIndexRanges.begin(), mInterfaceIndexRanges.end(),idxRange0));
+        size_t agent1 = std::distance(mInterfaceIndexRanges.begin(), std::find(mInterfaceIndexRanges.begin(), mInterfaceIndexRanges.end(),idxRange1));
+
+        mIdx2Agents.push_back( std::pair<size_t,size_t>(agent0,agent1) );
+    }
+
     // Ideally prefer the assignment of feasible 'connections' for a system,
     // which is the MAX of the domain -> 1
     // Propagation will set the other invalid connections to 0, thus speeding up
@@ -284,7 +310,7 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     //// Which variable to pick
     //branch(*this, mConnections, Gecode::INT_VAR_DEGREE_MIN(), Gecode::INT_VAL_MAX(), symmetries);
     //Gecode::Rnd rnd;
-    //rnd.time();
+    //rnd.hw();
     //branch(*this, mConnections, Gecode::INT_VAR_RND(rnd), Gecode::INT_VAL_MAX(), symmetries);
     branch(*this, mConnections, Gecode::INT_VAR_MERIT_MIN(&merit), Gecode::INT_VAL_MAX(), symmetries);
 }
@@ -297,6 +323,7 @@ Connectivity::Connectivity(bool share, Connectivity& other)
     , mInterfaces(other.mInterfaces)
     , mInterfaceMapping(other.mInterfaceMapping)
     , mInterfaceIndexRanges(other.mInterfaceIndexRanges)
+    , mIdx2Agents(other.mIdx2Agents)
     , mRnd(other.mRnd)
 {
     mConnections.update(*this, share, other.mConnections);
@@ -412,10 +439,10 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
     }
     options.nogoods_limit = 1024;
     //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::geometric(10,2);
-    //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::constant(1);
-    Gecode::Rnd rnd;
-    rnd.hw();
-    Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::rnd(rnd.seed(),1,connectivity->mInterfaces.size(),2);
+    Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::constant(1);
+   // Gecode::Rnd rnd;
+   // rnd.hw();
+   // Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::rnd(rnd.seed(),1,connectivity->mInterfaces.size(),2);
     options.cutoff = c;
     Gecode::RBS<Connectivity, Gecode::DFS> searchEngine(connectivity, options);
 
@@ -550,26 +577,7 @@ double Connectivity::merit(const Gecode::Space& space, Gecode::IntVar x, int idx
 
 double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
 {
-    size_t a1Idx = idx%mInterfaces.size();
-    size_t a0Idx = (idx - a1Idx)/mInterfaces.size();
-
-    IndexRange idxRange0;
-    IndexRange idxRange1;
-
-    for(IndexRange range : mInterfaceIndexRanges)
-    {
-        if(a0Idx >= range.first && a0Idx <= range.second)
-        {
-            idxRange0 = range;
-        }
-        if(a1Idx >= range.first && a1Idx <= range.second )
-        {
-            idxRange1 = range;
-        }
-    }
-
-    size_t agent0 = std::distance(mInterfaceIndexRanges.begin(), std::find(mInterfaceIndexRanges.begin(), mInterfaceIndexRanges.end(),idxRange0));
-    size_t agent1 = std::distance(mInterfaceIndexRanges.begin(), std::find(mInterfaceIndexRanges.begin(), mInterfaceIndexRanges.end(),idxRange1));
+    std::pair<size_t, size_t> agents = mIdx2Agents[idx];
 
     size_t existingConnections0 = 0;
     size_t existingConnections1 = 0;
@@ -577,7 +585,7 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
     for(size_t i = 0; i < mModelCombination.size(); ++i)
     {
         {
-            Gecode::IntVar v = agentConnections(i, agent0);
+            Gecode::IntVar v = agentConnections(i, agents.first);
             if(v.assigned())
             {
                 if(v.val() == 1)
@@ -588,7 +596,7 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
         }
 
         {
-            Gecode::IntVar v = agentConnections(i, agent1);
+            Gecode::IntVar v = agentConnections(i, agents.second);
             if(v.assigned())
             {
                 if(v.val() == 1)
@@ -600,11 +608,14 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
         }
     }
 
+    IndexRange idxRange0 = mInterfaceIndexRanges[agents.first];
     double merit0 = 0;
     size_t numberOfInterfaces0 = idxRange0.second - idxRange0.first + 1;
 
+    IndexRange idxRange1 = mInterfaceIndexRanges[agents.second];
     double merit1 = 0;
     size_t numberOfInterfaces1 = idxRange1.second - idxRange1.first + 1;
+
     double bias = 1/(100.0 + mRnd(1000));
 
     if(existingConnections0 != 0)
