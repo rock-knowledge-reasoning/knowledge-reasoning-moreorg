@@ -154,12 +154,7 @@ ResourceMatch::ResourceMatch(const ModelBound::List& required,
             const owlapi::model::IRI& requiredModel = requiredModelBound.model;
             Gecode::IntVar m = modelAssignment(ai, ri);
 
-            // Collect all true subclasses for a given model
-            // Todo: needs to be a leaf node
-            if(requiredModel != availableModel && ask.isDirectSubClassOf(availableModel, requiredModel))
-            {
-                args << m;
-            }
+            args << m;
         }
         // Maximum number of available resources should not exceed the
         rel(*this, sum(args) <= availableModelBound.max);
