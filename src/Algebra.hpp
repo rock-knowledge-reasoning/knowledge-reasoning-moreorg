@@ -8,6 +8,7 @@ namespace organization_model {
 class Algebra
 {
 public:
+    enum OperationType { UNKNOWN, SUM_OP, MIN_OP, MAX_OP, OPERATION_END };
     /**
      * Compute delta as b - a
      */
