@@ -96,11 +96,13 @@ std::string Connectivity::Statistics::toString(const std::vector<Connectivity::S
 
 Connectivity::Connectivity(const ModelPool& modelPool,
         const OrganizationModelAsk& ask,
-        const owlapi::model::IRI& interfaceBaseClass
+        const owlapi::model::IRI& interfaceBaseClass,
+        const owlapi::model::IRI& propertyClass
         )
     : mModelPool(modelPool)
     , mAsk(ask.ontology())
     , mInterfaceBaseClass(interfaceBaseClass)
+    , mPropertyClass(propertyClass)
     , mModelCombination(mModelPool.toModelCombination())
     , mAgentConnections(*this, mModelCombination.size()*mModelCombination.size(), 0, mModelCombination.size())
 {
@@ -113,7 +115,7 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     for(; mit != mModelCombination.end(); ++mit)
     {
         const IRI& model = *mit;
-        std::vector<OWLCardinalityRestriction::Ptr> restrictions = mAsk.getCardinalityRestrictions(model, mInterfaceBaseClass);
+        std::vector<OWLCardinalityRestriction::Ptr> restrictions = mAsk.getCardinalityRestrictions(model, mPropertyClass, mInterfaceBaseClass);
 
         owlapi::model::IRIList interfaces;
         std::vector<OWLCardinalityRestriction::Ptr>::const_iterator rit = restrictions.begin();

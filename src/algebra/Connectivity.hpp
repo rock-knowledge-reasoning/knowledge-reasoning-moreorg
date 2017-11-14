@@ -27,6 +27,7 @@ class Connectivity : public Gecode::Space
     owlapi::model::OWLOntologyAsk mAsk;
 
     owlapi::model::IRI mInterfaceBaseClass;
+    owlapi::model::IRI mProperty;
 
     ModelCombination mModelCombination;
     owlapi::model::IRIList mInterfaces;
@@ -97,7 +98,11 @@ public:
         static std::string toString(const std::vector<Connectivity::Statistics>& stats);
     };
 
-    Connectivity(const ModelPool& modelPool, const OrganizationModelAsk& ask, const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface") );
+    Connectivity(const ModelPool& modelPool,
+            const OrganizationModelAsk& ask,
+            const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface"),
+            const owlapi::model::IRI& property = vocabulary::OM::has()
+    );
 
     /**
      * Search support
