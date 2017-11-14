@@ -406,7 +406,7 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
         const IRI& model = mit->first;
         uint32_t modelCount = mit->second;
 
-        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mOntologyAsk.getCardinalityRestrictionsForTarget(model, objectProperty, model);
+        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mOntologyAsk.getCardinalityRestrictions(model, objectProperty);
 
         // This is not a meta constraint, but a direct representation of an
         // atomic resource, so add the exact availability of the given high level resource, which is
