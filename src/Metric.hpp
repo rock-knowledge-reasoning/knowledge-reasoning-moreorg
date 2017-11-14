@@ -5,6 +5,7 @@
 #include <owlapi/model/OWLCardinalityRestriction.hpp>
 #include "ModelPool.hpp"
 #include "OrganizationModelAsk.hpp"
+#include "vocabularies/OM.hpp"
 
 namespace organization_model {
 
@@ -34,7 +35,9 @@ public:
     /**
      * Metric for an organization model
      */
-    Metric(metrics::Type type, const OrganizationModelAsk& organization);
+    Metric(metrics::Type type,
+            const OrganizationModelAsk& organization,
+            const owlapi::model::IRI& property = vocabulary::OM::has());
 
     virtual ~Metric() {}
 
@@ -120,6 +123,7 @@ public:
 protected:
     OrganizationModelAsk mOrganizationModelAsk;
     metrics::Type mType;
+    owlapi::model::IRI mProperty;
 
     static std::map<metrics::Type, Metric::Ptr> msMetrics;
 };

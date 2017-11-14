@@ -8,9 +8,12 @@ namespace organization_model {
 
 std::map<metrics::Type,Metric::Ptr> Metric::msMetrics;
 
-Metric::Metric(metrics::Type type, const OrganizationModelAsk& organization)
+Metric::Metric(metrics::Type type,
+        const OrganizationModelAsk& organization,
+        const owlapi::model::IRI& property)
     : mOrganizationModelAsk(organization)
     , mType(type)
+    , mProperty(property)
 {}
 
 
@@ -74,8 +77,8 @@ double Metric::compute(const owlapi::model::IRI& function, const ModelPool& mode
 double Metric::computeSharedUse(const ModelPool& required, const ModelPool& available) const
 {
     using namespace owlapi::model;
-    std::vector<OWLCardinalityRestriction::Ptr> r_available = mOrganizationModelAsk.getCardinalityRestrictions(available, OWLCardinalityRestriction::SUM_OP, false);
-    std::vector<OWLCardinalityRestriction::Ptr> r_required = mOrganizationModelAsk.getCardinalityRestrictions(required, OWLCardinalityRestriction::MAX_OP, true);
+    std::vector<OWLCardinalityRestriction::Ptr> r_available = mOrganizationModelAsk.getCardinalityRestrictions(available, mProperty, OWLCardinalityRestriction::SUM_OP, false);
+    std::vector<OWLCardinalityRestriction::Ptr> r_required = mOrganizationModelAsk.getCardinalityRestrictions(required, mProperty, OWLCardinalityRestriction::MAX_OP, true);
 
     return computeMetric(r_required, r_available);
 
@@ -99,8 +102,8 @@ double Metric::computeSharedUse(const owlapi::model::IRISet& functions, const Mo
 double Metric::computeExclusiveUse(const ModelPool& required, const ModelPool& available) const
 {
     using namespace owlapi::model;
-    std::vector<OWLCardinalityRestriction::Ptr> r_available = mOrganizationModelAsk.getCardinalityRestrictions(available, OWLCardinalityRestriction::SUM_OP, false);
-    std::vector<OWLCardinalityRestriction::Ptr> r_required = mOrganizationModelAsk.getCardinalityRestrictions(required, OWLCardinalityRestriction::SUM_OP, true);
+    std::vector<OWLCardinalityRestriction::Ptr> r_available = mOrganizationModelAsk.getCardinalityRestrictions(available, mProperty, OWLCardinalityRestriction::SUM_OP, false);
+    std::vector<OWLCardinalityRestriction::Ptr> r_required = mOrganizationModelAsk.getCardinalityRestrictions(required, mProperty, OWLCardinalityRestriction::SUM_OP, true);
 
     return computeMetric(r_required, r_available);
 
@@ -119,12 +122,11 @@ double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const
         const IRI& function = *fit;
         required[function] = 1;
     }
-    requirements = mOrganizationModelAsk.getCardinalityRestrictions(required, OWLCardinalityRestriction::SUM_OP);
+    requirements = mOrganizationModelAsk.getCardinalityRestrictions(required, mProperty, OWLCardinalityRestriction::SUM_OP);
 
     // Get model restrictions, i.e. in effect what has to be available for the
     // given models
-    std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources = mOrganizationModelAsk.getCardinalityRestrictions(modelPool, OWLCardinalityRestriction::SUM_OP);
-
+    std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources = mOrganizationModelAsk.getCardinalityRestrictions(modelPool, mProperty, OWLCardinalityRestriction::SUM_OP);
     return computeMetric(requirements, allAvailableResources);
 }
 
