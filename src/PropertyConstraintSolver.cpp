@@ -32,11 +32,9 @@ ValueBound PropertyConstraintSolver::merge(const PropertyConstraint::List& const
 ValueBound PropertyConstraintSolver::merge(const PropertyConstraint::Set& constraints)
 {
     PropertyConstraintSolver propertyConstraintSolver;
-    LOG_WARN_S << "Start merge: ";
 
     for(const PropertyConstraint& constraint : constraints)
     {
-        LOG_WARN_S << "Adding constraint: " << constraint.toString();
         double value = constraint.getValue();
         switch(constraint.getType())
         {
@@ -63,7 +61,7 @@ ValueBound PropertyConstraintSolver::merge(const PropertyConstraint::Set& constr
     propertyConstraintSolver.status();
     if(propertyConstraintSolver.failed())
     {
-        throw std::invalid_argument("organization_model::PropertyConstraintSolver: constraints can not be fulfilled");
+        throw std::invalid_argument("organization_model::PropertyConstraintSolver: constraints cannot be fulfilled");
     } else {
         ValueBound valueBound(propertyConstraintSolver.mValue.min(), propertyConstraintSolver.mValue.max());
         return valueBound;

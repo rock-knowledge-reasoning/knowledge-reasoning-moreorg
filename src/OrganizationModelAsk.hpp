@@ -436,13 +436,28 @@ protected:
 
     ModelPool::Set filterNonMinimal(const ModelPool::Set& modelPoolSet, const Functionality::Set& functionalities) const;
 
+    /**
+     * Given a modelPool (which support the requested functionality) provide an
+     * indication on how many of these composite agents (represented by this
+     * modelPool) are needed to fulfill the requirement
+     * Relies on proper CSP-based bound checking to merge the provided
+     * functionality requirements and embedded property constraints
+     * \return scaling factor
+     */
     double getScalingFactor(const ModelPool& modelPool, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport=false) const;
 
-    std::vector<double> getScalingFactors(const ModelPool::Set& modelPoolSet, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport=false) const;
     /**
-     *
-     * TODO: proper implementation of min/max/eq constraints -- e.g. to detect
-     * validity of constraints (use Gecode::IntVar propagation)
+     * Given a number of modelPools (which support the requested functionality) provide an
+     * indication on how many of these composite agents (represented by this
+     * modelPool) are needed to fulfill the requirement
+     * \return scaling factor
+     */
+    std::vector<double> getScalingFactors(const ModelPool::Set& modelPoolSet, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport=false) const;
+
+    /**
+     * Update the list of scaling factors, which tell how many instances of a
+     * 'model pool' are required to support a requested (set of) functionality
+     * \see getScalingFactor
      */
     static void updateScalingFactor(std::vector<double>& factors, size_t idx, double newValue);
 

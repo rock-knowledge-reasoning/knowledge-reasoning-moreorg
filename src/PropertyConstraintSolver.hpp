@@ -22,7 +22,17 @@ public:
 
     virtual Gecode::Space* copy(bool share);
 
+    /**
+     * Merge a list of constraints a returns the corresponding allowed value bound
+     * \return ValueBound The allowed value range
+     * \throws std::invalid_argument when constraints cannot be fulfilled
+     */
     static ValueBound merge(const PropertyConstraint::List& constraints);
+    /**
+     * Merge a list of constraints a returns the corresponding allowed value bound
+     * \return ValueBound The allowed value range
+     * \throws std::invalid_argument when constraints cannot be fulfilled
+     */
     static ValueBound merge(const PropertyConstraint::Set& constraints);
 
 private:
