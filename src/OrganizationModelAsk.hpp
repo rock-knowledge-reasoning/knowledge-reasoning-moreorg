@@ -6,7 +6,9 @@
 #include "SharedPtr.hpp"
 #include "OrganizationModel.hpp"
 #include "algebra/ResourceSupportVector.hpp"
+#include "Algebra.hpp"
 #include "FunctionalityRequirement.hpp"
+#include "vocabularies/OM.hpp"
 
 namespace organization_model {
 
@@ -369,21 +371,32 @@ public:
 
     /**
      * Get the data property value of the complete combination given by the pool
+     * \param dataProperty
      * \throw std::runtime_error if the given data propery does not exist
      */
-    double getDataPropertyValue(const ModelPool& modelPool, const owlapi::model::IRI& dataProperty) const;
+    double getDataPropertyValue(const ModelPool& modelPool,
+            const owlapi::model::IRI& dataProperty,
+            Algebra::OperationType type = Algebra::SUM_OP) const;
+
+    /**
+     * Get the property value for a given target class, which is either given
+     * through a cardinality restriction or a data property assignment
+     */
+    double getPropertyValue(const ModelPool& modelPool,
+            const owlapi::model::IRI& property) const;
 
     /**
      * Get all (joined) restriction that hold for a given model pool
      * \param modelPool
      * \param type
      * \param min2Max When retrieving the cardinalities, e.g., in a mixed setup
-     * for functionalities and model pools, then functionalities defined
-     * requirement in terms of Min cardinalities, and agents Max cardinalities.
-     * To allow propery computation of the metrics, adapt min to max
-     * cardinalities
+     * for functionalities and model pools, then functionalities define
+     * requirement in terms of Min cardinalities, and agents use Max cardinalities.
+     * To allow proper computation of the metrics, adapt min to max cardinalities in that context
      */
-    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> getCardinalityRestrictions(const ModelPool& modelPool, owlapi::model::OWLCardinalityRestriction::OperationType type = owlapi::model::OWLCardinalityRestriction::SUM_OP, bool max2Min = false) const;
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> getCardinalityRestrictions(const ModelPool& modelPool,
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has(),
+            owlapi::model::OWLCardinalityRestriction::OperationType type = owlapi::model::OWLCardinalityRestriction::SUM_OP, bool max2Min = false) const;
 
 protected:
 

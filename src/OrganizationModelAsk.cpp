@@ -320,7 +320,7 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
     return true;
 }
 
-double OrganizationModelAsk::getDataPropertyValue(const ModelPool& modelPool, const owlapi::model::IRI& dataProperty) const
+double OrganizationModelAsk::getDataPropertyValue(const ModelPool& modelPool, const owlapi::model::IRI& dataProperty, Algebra::OperationType opType) const
 {
     bool initialized = false;
     double value = 0;
@@ -333,7 +333,21 @@ double OrganizationModelAsk::getDataPropertyValue(const ModelPool& modelPool, co
                 value = mOntologyAsk.getDataValue(model, dataProperty)->getDouble();
                 initialized = true;
             } else {
-                value += mOntologyAsk.getDataValue(model, dataProperty)->getDouble();
+                double nValue = mOntologyAsk.getDataValue(model, dataProperty)->getDouble();
+                switch(opType)
+                {
+                    case Algebra::SUM_OP:
+                        value += nValue;
+                        break;
+                    case Algebra::MIN_OP:
+                        value += std::min(value, nValue);
+                        break;
+                    case Algebra::MAX_OP:
+                        value += std::max(value, nValue);
+                        break;
+                    default:
+                        throw std::invalid_argument("organization_model::OrganizationModelAsk::getDataValue: unsupported operation selected");
+                }
             }
         } catch(const std::exception& e)
         {
@@ -349,11 +363,41 @@ double OrganizationModelAsk::getDataPropertyValue(const ModelPool& modelPool, co
     return value;
 }
 
-std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getCardinalityRestrictions(const ModelPool& modelPool, owlapi::model::OWLCardinalityRestriction::OperationType operationType, bool max2Min) const
+double OrganizationModelAsk::getPropertyValue(const ModelPool& modelPool,
+        const owlapi::model::IRI& property) const
+{
+    try {
+        double value = getDataPropertyValue(modelPool, property, Algebra::SUM_OP);
+        return value;
+    } catch(const std::runtime_error& e)
+    {
+        // data property does not exist or value is not set
+    }
+
+    using namespace owlapi::model;
+    std::vector<OWLCardinalityRestriction::Ptr> restrictions = getCardinalityRestrictions(modelPool,
+            vocabulary::OM::hasTransportCapacity(),
+            OWLCardinalityRestriction::SUM_OP
+            );
+    for(OWLCardinalityRestriction::Ptr restriction : restrictions)
+    {
+        if(restriction->getCardinalityRestrictionType() == OWLCardinalityRestriction::MAX)
+        {
+            return restriction->getCardinality();
+        }
+    }
+    throw std::invalid_argument("organization_model::OrganizationModelAsk::getPropertyValue: failed to identify value for '"
+            + property.toString() + "' for model pool: " + modelPool.toString(8));
+}
+
+std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getCardinalityRestrictions(const ModelPool& modelPool,
+    const owlapi::model::IRI& objectProperty,
+    owlapi::model::OWLCardinalityRestriction::OperationType operationType,
+    bool max2Min) const
 {
     std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources;
 
-    owlapi::model::OWLProperty::Ptr propertyHas = ontology().getOWLObjectProperty( vocabulary::OM::has() );
+    owlapi::model::OWLProperty::Ptr property = ontology().getOWLObjectProperty(objectProperty);
     // Get model restrictions, i.e. in effect what has to be available for the
     // given models
     ModelPool::const_iterator mit = modelPool.begin();
@@ -362,20 +406,20 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
         const IRI& model = mit->first;
         uint32_t modelCount = mit->second;
 
-        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mOntologyAsk.getCardinalityRestrictions(model, vocabulary::OM::has());
+        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mOntologyAsk.getCardinalityRestrictionsForTarget(model, objectProperty, model);
 
         // This is not a meta constraint, but a direct representation of an
         // atomic resource, so add the exact availability of the given high level resource, which is
         // defined through the model pool
         if(availableResources.empty())
         {
-            OWLCardinalityRestriction::Ptr highlevelModelMaxConstraint = OWLCardinalityRestriction::getInstance(propertyHas,
+            OWLCardinalityRestriction::Ptr highlevelModelMaxConstraint = OWLCardinalityRestriction::getInstance(property,
                     modelCount,
                     mit->first,
                     OWLCardinalityRestriction::MAX);
             availableResources.push_back(highlevelModelMaxConstraint);
 
-            OWLCardinalityRestriction::Ptr highlevelModelMinConstraint = OWLCardinalityRestriction::getInstance(propertyHas,
+            OWLCardinalityRestriction::Ptr highlevelModelMinConstraint = OWLCardinalityRestriction::getInstance(property,
                     modelCount,
                     mit->first,
                     OWLCardinalityRestriction::MIN);
@@ -1170,7 +1214,8 @@ std::vector<double> OrganizationModelAsk::getScalingFactors(const ModelPool::Set
 
 double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport) const
 {
-    // assuming that model supporting
+    // Either assume that model is supporting the particular functionality, or
+    // perform a dedicated check
     if(doCheckSupport)
     {
         if(!isSupporting(modelPool, functionalityRequirement.getFunctionality()))
@@ -1180,26 +1225,26 @@ double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool, const 
     }
 
     const PropertyConstraint::Set& constraints = functionalityRequirement.getPropertyConstraints();
+    // Set of property constraint set, where each set is referring to a
+    // particular property
     PropertyConstraint::Clusters clusteredConstraints = PropertyConstraint::getClusters(constraints);
 
-    double scalingFactor = 1.0;
     std::map<owlapi::model::IRI, double> propertyValue;
     std::map<owlapi::model::IRI, ValueBound> valueBoundFactors;
 
     // Find the global scaling factor, which is defined by the set of
     // requirements
+    double scalingFactor = 1.0;
     for(const PropertyConstraint::Clusters::value_type property2Constraints : clusteredConstraints)
     {
         const owlapi::model::IRI& property = property2Constraints.first;
-        double value;
         try {
-            // the existing data property value
-            value = getDataPropertyValue(modelPool, property);
+            // the existing data property value or the cardinality constraint
+            double value = getPropertyValue(modelPool, property);
             propertyValue[property] = value;
 
-            ValueBound vb;
             // Will throw when the constraints cannot be fulfilled
-            vb = PropertyConstraintSolver::merge(property2Constraints.second);
+            ValueBound vb = PropertyConstraintSolver::merge(property2Constraints.second);
 
             if(scalingFactor*value >= vb.getMin())
             {
@@ -1238,12 +1283,16 @@ void OrganizationModelAsk::updateScalingFactor(std::vector<double>& factors, siz
     double& v = factors.at(idx);
     if(v == 0)
     {
+        // functionality cannot be supported at all
         return;
     } else if(newValue == 0)
     {
         v = 0;
+        // functionality cannot be supported at all
         return;
     } else {
+        // functionality can ony be supported with scaling of given
+        // maximum value
         v = std::max(v, newValue);
     }
 }
