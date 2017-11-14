@@ -319,12 +319,15 @@ ModelBound::List ResourceMatch::toModelBoundList(const std::vector<owlapi::model
     return modelBounds;
 }
 
-bool ResourceMatch::isSupporting(const owlapi::model::IRI& providerModel, const owlapi::model::IRI& serviceModel, OWLOntology::Ptr ontology)
+bool ResourceMatch::isSupporting(const owlapi::model::IRI& providerModel,
+        const owlapi::model::IRI& serviceModel,
+        OWLOntology::Ptr ontology,
+        const owlapi::model::IRI& objectProperty)
 {
     OWLOntologyAsk ask(ontology);
 
-    std::vector<OWLCardinalityRestriction::Ptr> providerRestrictions = ask.getCardinalityRestrictions(providerModel);
-    std::vector<OWLCardinalityRestriction::Ptr> serviceRestrictions = ask.getCardinalityRestrictions(serviceModel);
+    std::vector<OWLCardinalityRestriction::Ptr> providerRestrictions = ask.getCardinalityRestrictions(providerModel, objectProperty);
+    std::vector<OWLCardinalityRestriction::Ptr> serviceRestrictions = ask.getCardinalityRestrictions(serviceModel, objectProperty);
 
     return isSupporting(providerRestrictions, serviceRestrictions, ontology);
 }
@@ -344,29 +347,30 @@ bool ResourceMatch::isSupporting(const std::vector<owlapi::model::OWLCardinality
 
 
 owlapi::model::IRIList ResourceMatch::filterSupportedModels(const ModelPool& modelPool,
-        const owlapi::model::IRIList& resourceModels, owlapi::model::OWLOntology::Ptr ontology)
+        const owlapi::model::IRIList& resourceModels, owlapi::model::OWLOntology::Ptr ontology,
+        const owlapi::model::IRI& objectProperty)
 {
-    return filterSupportedModels(modelPool.toModelCombination(), resourceModels, ontology);
+    return filterSupportedModels(modelPool.toModelCombination(), resourceModels, ontology, objectProperty);
 }
 
 owlapi::model::IRIList ResourceMatch::filterSupportedModels(const owlapi::model::IRIList& combinations,
-        const owlapi::model::IRIList& resourceModels, owlapi::model::OWLOntology::Ptr ontology)
+        const owlapi::model::IRIList& resourceModels, owlapi::model::OWLOntology::Ptr ontology, const owlapi::model::IRI& objectProperty)
 {
     OWLOntologyAsk ask(ontology);
-    std::vector<OWLCardinalityRestriction::Ptr> providerRestrictions = ask.getCardinalityRestrictions(combinations);
+    std::vector<OWLCardinalityRestriction::Ptr> providerRestrictions = ask.getCardinalityRestrictions(combinations, objectProperty);
     owlapi::model::IRIList supportedModels;
 
     owlapi::model::IRIList::const_iterator it = resourceModels.begin();
     for(; it != resourceModels.end(); ++it)
     {
         owlapi::model::IRI resourceModel = *it;
-        std::vector<OWLCardinalityRestriction::Ptr> resourceRestrictions = ask.getCardinalityRestrictions(resourceModel);
+        std::vector<OWLCardinalityRestriction::Ptr> resourceRestrictions = ask.getCardinalityRestrictions(resourceModel, objectProperty);
         if(resourceRestrictions.empty())
         {
             // This definition has no children, i.e. is not defined by
             // subconstraints, thus adding the resourceModel itself as min
             // constraint
-            OWLCardinalityRestriction::Ptr restriction(new OWLCardinalityRestriction(ask.getOWLObjectProperty(vocabulary::OM::has()), 1, resourceModel, OWLCardinalityRestriction::MIN));
+            OWLCardinalityRestriction::Ptr restriction(new OWLCardinalityRestriction(ask.getOWLObjectProperty(objectProperty), 1, resourceModel, OWLCardinalityRestriction::MIN));
             resourceRestrictions.push_back(restriction);
         }
 

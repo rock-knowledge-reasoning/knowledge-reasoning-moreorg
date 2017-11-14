@@ -12,6 +12,7 @@
 #include "../SharedPtr.hpp"
 #include "../OrganizationModelAsk.hpp"
 #include "../ModelPool.hpp"
+#include "../vocabularies/OM.hpp"
 #include "ModelBound.hpp"
 
 namespace organization_model {
@@ -64,7 +65,9 @@ typedef owlapi::model::IRIList TypeList;
  */
 class ResourceMatch : public Gecode::Space
 {
+    /// Required set of models
     ModelBound::List mRequiredModelBound;
+    /// Available set of models
     ModelBound::List mAvailableModelBound;
 
     /**
@@ -187,7 +190,8 @@ public:
      * \return True if the providerModel supports the serviceModel
      */
     static bool isSupporting(const owlapi::model::IRI& providerModel, const owlapi::model::IRI& serviceModel,
-            owlapi::model::OWLOntology::Ptr ontology);
+            owlapi::model::OWLOntology::Ptr ontology,
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
 
 
     static bool isSupporting(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& providerRestrictions,
@@ -200,14 +204,17 @@ public:
      * \return List of provided services
      */
     static owlapi::model::IRIList filterSupportedModels(const ModelPool& modelPool,
-            const owlapi::model::IRIList& serviceModels, owlapi::model::OWLOntology::Ptr ontology);
+            const owlapi::model::IRIList& serviceModels,
+            owlapi::model::OWLOntology::Ptr ontology,
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
     /**
      * Compute for a given set of model and possible models, the available
      * set of supported models, i.e., fulfilling the restrictions
      * \return List of provided services
      */
     static owlapi::model::IRIList filterSupportedModels(const owlapi::model::IRIList& combination,
-            const owlapi::model::IRIList& serviceModels, owlapi::model::OWLOntology::Ptr ontology);
+            const owlapi::model::IRIList& serviceModels, owlapi::model::OWLOntology::Ptr ontology,
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
 
     /**
      * Check if the model bound list contains minimum requirements, i.e.
