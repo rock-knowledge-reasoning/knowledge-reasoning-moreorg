@@ -157,9 +157,9 @@ ResourceMatch::ResourceMatch(const ModelBound::List& required,
     }
 
     // Set branchers -- since otherwise we will have no assigned solutions
-    branch(*this, mModelAssignment, Gecode::INT_VAR_SIZE_MAX(), Gecode::INT_VAL_SPLIT_MIN());
+    //branch(*this, mModelAssignment, Gecode::INT_VAR_SIZE_MAX(), Gecode::INT_VAL_SPLIT_MIN());
     branch(*this, mModelAssignment, Gecode::INT_VAR_MIN_MIN(), Gecode::INT_VAL_SPLIT_MIN());
-    branch(*this, mModelAssignment, Gecode::INT_VAR_NONE(), Gecode::INT_VAL_SPLIT_MIN());
+    //branch(*this, mModelAssignment, Gecode::INT_VAR_NONE(), Gecode::INT_VAL_SPLIT_MIN());
 
     //Gecode::Gist::Print<ResourceMatch> p("Print solution");
     //Gecode::Gist::Options o;
