@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(recursive_resolution)
         IRIList supportedFunctionalityModels = ResourceMatch::filterSupportedModels(combination, functionalities, om->ontology());
 
         OWLOntologyAsk oAsk(om->ontology());
-        std::vector<OWLCardinalityRestriction::Ptr> restrictions = oAsk.getCardinalityRestrictions(locationImageProvider);
+        std::vector<OWLCardinalityRestriction::Ptr> restrictions = oAsk.getCardinalityRestrictions(locationImageProvider, vocabulary::OM::has());
         BOOST_TEST_MESSAGE("Cardinality: " << OWLCardinalityRestriction::toString(restrictions));
         {
             uint32_t saturationPoint = ask.getFunctionalSaturationBound(functionality.getModel(), agent);
@@ -271,15 +271,15 @@ BOOST_AUTO_TEST_CASE(functional_saturation_with_property_constraints)
 
         {
             double minItems = 30;
-            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
+            PropertyConstraint constraint(OM::resolve("transportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;
             constraints.push_back(constraint);
 
             FunctionalityRequirement fr(transportProvider, constraints);
             ModelPool modelPool = ask.getFunctionalSaturationBound(functionalities, fr);
             BOOST_REQUIRE_MESSAGE(!modelPool.empty(), "Saturation bound for combinations supporting transport for minimum of " << minItems << " items: '" << modelPool.toString() << "'");
-            BOOST_REQUIRE_MESSAGE(modelPool[crex] == 15, "Up to 15 instances of '" << crex << "' can contribute for this functionality");
-            BOOST_REQUIRE_MESSAGE(modelPool[sherpa] == 4, "Up to 4 instances of '" << sherpa << "' can contribute for this functionality");
+            BOOST_REQUIRE_MESSAGE(modelPool[crex] == 15, "Up to 15 instances of '" << crex << "' can contribute for this functionality, was: " << modelPool[crex]);
+            BOOST_REQUIRE_MESSAGE(modelPool[sherpa] == 3, "Up to 3 instances of '" << sherpa << "' can contribute for this functionality was: " << modelPool[sherpa]);
         }
     }
 }
@@ -348,17 +348,17 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         }
         {
             double minItems = 10;
-            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
+            PropertyConstraint constraint(OM::resolve("transportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;
             constraints.push_back(constraint);
 
             FunctionalityRequirement fr(transportProvider, constraints);
             ModelPool::Set combinations = ask.getResourceSupport(fr);
-            BOOST_REQUIRE_MESSAGE(combinations.size() == 1, "Combinations supporting transport for minimum of " << minItems << " items: '" << ModelPool::toString(combinations) << "'");
+            BOOST_REQUIRE_MESSAGE(combinations.size() >= 1, "Combinations supporting transport for minimum of " << minItems << " items: '" << ModelPool::toString(combinations) << "'");
         }
         {
             double minItems = 30;
-            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
+            PropertyConstraint constraint(OM::resolve("transportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;
             constraints.push_back(constraint);
 
@@ -389,7 +389,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
 
         {
             double minItems = 10;
-            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
+            PropertyConstraint constraint(OM::resolve("transportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;
             constraints.push_back(constraint);
 
@@ -399,7 +399,7 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
         }
         {
             double minItems = 30;
-            PropertyConstraint constraint(OM::resolve("payloadTransportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
+            PropertyConstraint constraint(OM::resolve("transportCapacity"), PropertyConstraint::GREATER_EQUAL, minItems);
             PropertyConstraint::List constraints;
             constraints.push_back(constraint);
 
@@ -495,7 +495,7 @@ BOOST_AUTO_TEST_CASE(property_constraint_solver)
 {
     {
         PropertyConstraint::List constraints;
-        owlapi::model::IRI property = OM::resolve("payloadTransportCapacity");
+        owlapi::model::IRI property = OM::resolve("transportCapacity");
 
         PropertyConstraint constraint0(property, PropertyConstraint::GREATER_EQUAL, 0);
         constraints.push_back(constraint0);
@@ -508,7 +508,7 @@ BOOST_AUTO_TEST_CASE(property_constraint_solver)
     }
     {
         PropertyConstraint::List constraints;
-        owlapi::model::IRI property = OM::resolve("payloadTransportCapacity");
+        owlapi::model::IRI property = OM::resolve("transportCapacity");
 
         PropertyConstraint constraint0(property, PropertyConstraint::GREATER_EQUAL, 15);
         constraints.push_back(constraint0);
@@ -520,7 +520,7 @@ BOOST_AUTO_TEST_CASE(property_constraint_solver)
     }
     {
         PropertyConstraint::List constraints;
-        owlapi::model::IRI property = OM::resolve("payloadTransportCapacity");
+        owlapi::model::IRI property = OM::resolve("transportCapacity");
 
         PropertyConstraint constraint0(property, PropertyConstraint::GREATER_EQUAL, 15);
         constraints.push_back(constraint0);

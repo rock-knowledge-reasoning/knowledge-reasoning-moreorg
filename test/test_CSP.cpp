@@ -6,6 +6,7 @@
 #include <organization_model/reasoning/ResourceMatch.hpp>
 #include <organization_model/vocabularies/OM.hpp>
 #include <organization_model/OrganizationModelAsk.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 
 #include "test_utils.hpp"
 
@@ -111,11 +112,11 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     IRI stereo_image_provider = organization_model::vocabulary::OM::resolve("StereoImageProvider");
     IRI location_image_provider = organization_model::vocabulary::OM::resolve("LocationImageProvider");
 
-    std::vector<OWLCardinalityRestriction::Ptr> r_sherpa = ask.getCardinalityRestrictions(sherpa);
-    std::vector<OWLCardinalityRestriction::Ptr> r_move_to = ask.getCardinalityRestrictions(move_to);
-    std::vector<OWLCardinalityRestriction::Ptr> r_image_provider = ask.getCardinalityRestrictions(image_provider);
-    std::vector<OWLCardinalityRestriction::Ptr> r_stereo_image_provider = ask.getCardinalityRestrictions(stereo_image_provider);
-    std::vector<OWLCardinalityRestriction::Ptr> r_location_image_provider = ask.getCardinalityRestrictions(location_image_provider);
+    std::vector<OWLCardinalityRestriction::Ptr> r_sherpa = ask.getCardinalityRestrictions(sherpa, organization_model::vocabulary::OM::has());
+    std::vector<OWLCardinalityRestriction::Ptr> r_move_to = ask.getCardinalityRestrictions(move_to, organization_model::vocabulary::OM::has());
+    std::vector<OWLCardinalityRestriction::Ptr> r_image_provider = ask.getCardinalityRestrictions(image_provider, organization_model::vocabulary::OM::has());
+    std::vector<OWLCardinalityRestriction::Ptr> r_stereo_image_provider = ask.getCardinalityRestrictions(stereo_image_provider, organization_model::vocabulary::OM::has());
+    std::vector<OWLCardinalityRestriction::Ptr> r_location_image_provider = ask.getCardinalityRestrictions(location_image_provider, organization_model::vocabulary::OM::has());
 
     using namespace organization_model::reasoning;
     ResourceMatch::Solution fulfillment = ResourceMatch::solve(r_move_to, r_sherpa, ontology);
@@ -192,16 +193,20 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     //  --> location_image_provider
     //    --> 1 - move_to
     //    --> 1 - image_provider
-    std::vector<OWLCardinalityRestriction::Ptr> r_sherpa_with_service = ask.getCardinalityRestrictions(sherpa);
+    std::vector<OWLCardinalityRestriction::Ptr> r_sherpa_with_service = ask.getCardinalityRestrictions(sherpa, organization_model::vocabulary::OM::has());
     try {
         fulfillment = ResourceMatch::solve(r_location_image_provider, r_sherpa_with_service, ontology);
         BOOST_REQUIRE_MESSAGE(true, "Sherpa provides LocationImageProvider\nAssignment: " << fulfillment.toString());
     } catch(...)
     {
         BOOST_TEST_MESSAGE("Sherpa does not provide LocationImageProvider\nAssignment failed for: " << location_image_provider);
+        for(OWLCardinalityRestriction::Ptr r : r_location_image_provider)
+        {
+            BOOST_TEST_MESSAGE("Required cardinality: " << r->toString());
+        }
         for(OWLCardinalityRestriction::Ptr r : r_sherpa_with_service)
         {
-            BOOST_TEST_MESSAGE("Cardinality: " << r->toString());
+            BOOST_TEST_MESSAGE("Available cardinality: " << r->toString());
         }
         BOOST_REQUIRE_MESSAGE(false, "Assignment failed");
     }

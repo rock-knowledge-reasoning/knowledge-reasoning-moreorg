@@ -25,6 +25,17 @@ BOOST_AUTO_TEST_CASE(list)
 
     owlapi::vocabulary::Custom lego("http://www.rock-robotics.org/2017/10/om-lego#");
 
+    // report
+    // Statistics:
+    // # graph completeness evaluations: 145
+    // time in s: 119.324
+    // stopped: 0
+    // # propagator executions: 3032041
+    // # failed nodes: 0
+    // # expanded nodes: 7540
+    // depth of search stack: 51
+    // # restarts: 144
+    // # nogoods: 144
     ModelPool modelPool;
     modelPool[ lego.resolve("YellowBlock") ] = 10;
     modelPool[ lego.resolve("GreenBlock") ] = 10;

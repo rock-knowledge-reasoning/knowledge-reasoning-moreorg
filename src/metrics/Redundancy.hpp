@@ -3,6 +3,7 @@
 
 #include <organization_model/OrganizationModel.hpp>
 #include <organization_model/Metric.hpp>
+#include "../vocabularies/OM.hpp"
 
 namespace organization_model {
 namespace metrics {
@@ -30,7 +31,10 @@ public:
     /**
      * Default probability of survival
      */
-    Redundancy(const OrganizationModelAsk& organization, double defaultPoS = 0.95);
+    Redundancy(const OrganizationModelAsk& organization,
+            double defaultPoS = 0.95,
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
+
 
     double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
             const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const;

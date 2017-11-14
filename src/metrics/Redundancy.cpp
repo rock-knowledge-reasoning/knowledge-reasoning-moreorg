@@ -12,8 +12,11 @@ using namespace owlapi::vocabulary;
 namespace organization_model {
 namespace metrics {
 
-Redundancy::Redundancy(const OrganizationModelAsk& organization, double defaultPoS)
-    : Metric(REDUNDANCY, organization)
+Redundancy::Redundancy(const OrganizationModelAsk& organization,
+        double defaultPoS,
+        const owlapi::model::IRI& objectProperty)
+
+    : Metric(REDUNDANCY, organization, objectProperty)
     , mDefaultProbabilityOfSurvival(defaultPoS)
 {}
 
