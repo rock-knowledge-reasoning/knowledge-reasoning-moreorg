@@ -83,6 +83,16 @@ uint32_t Robot::getTransportCapacity(const owlapi::model::IRI& model) const
     return capacity;
 }
 
+int32_t Robot::getTransportSupplyDemand() const
+{
+    if(isMobile())
+    {
+        return getTransportCapacity();
+    } else {
+        return getTransportDemand();
+    }
+}
+
 double Robot::estimatedEnergyCost(double distanceInM) const
 {
     // W * m/ (m/s)

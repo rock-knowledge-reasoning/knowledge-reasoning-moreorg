@@ -53,6 +53,12 @@ public:
     uint32_t getTransportCapacity(const owlapi::model::IRI& model) const;
 
     /**
+     * For compatibilty reasons provide supplyDemand: positive value represent
+     * an available transport capacity while negative value a transport demand
+     */
+    int32_t getTransportSupplyDemand() const;
+
+    /**
      * Empirical information
      * P_n = W/t
      */
