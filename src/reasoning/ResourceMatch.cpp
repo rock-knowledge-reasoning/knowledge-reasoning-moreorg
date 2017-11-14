@@ -145,15 +145,11 @@ ResourceMatch::ResourceMatch(const ModelBound::List& required,
     for(size_t ai = 0; ai < mAvailableModelBound.size(); ++ai)
     {
         const ModelBound& availableModelBound = mAvailableModelBound[ai];
-        const IRI& availableModel = availableModelBound.model;
 
         Gecode::IntVarArgs args;
         for(size_t ri = 0; ri < mRequiredModelBound.size(); ++ri)
         {
-            const ModelBound& requiredModelBound = mRequiredModelBound[ri];
-            const owlapi::model::IRI& requiredModel = requiredModelBound.model;
             Gecode::IntVar m = modelAssignment(ai, ri);
-
             args << m;
         }
         // Maximum number of available resources should not exceed the
