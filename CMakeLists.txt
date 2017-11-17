@@ -26,3 +26,5 @@ owlapi_install_ontology("http://www.rock-robotics.org/2015/12/projects/TransTerr
     "test/data/om-project-transterra.owl")
 owlapi_install_ontology("http://www.rock-robotics.org/2017/10/om-lego"
     "test/data/om-lego-v0.1.owl")
+owlapi_install_ontology("http://www.rock-robotics.org/2017/10/om-icaps"
+    "test/data/om-icaps-v0.1.owl")

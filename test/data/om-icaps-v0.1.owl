@@ -1,0 +1,192 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY om-schema "http://www.rock-robotics.org/2014/01/om-schema#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.rock-robotics.org/2017/10/om-icaps#"
+     xml:base="http://www.rock-robotics.org/2017/10/om-icaps"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#">
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base#"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#Adapter -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#Adapter">
+        <rdfs:subClassOf rdf:resource="&om-schema;Actor"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Female"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Special"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#BlueAgent -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#BlueAgent">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#StandardAgent"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#Female -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#Female">
+        <rdfs:subClassOf rdf:resource="&om-schema;MechanicalInterface"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#GreenAgent -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#GreenAgent">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#StandardAgent"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#Male -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#Male">
+        <rdfs:subClassOf rdf:resource="&om-schema;MechanicalInterface"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#Manipulator -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#Manipulator">
+        <rdfs:subClassOf rdf:resource="&om-schema;Actor"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Special"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#RedAgent -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#RedAgent">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#StandardAgent"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#Special -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#Special">
+        <rdfs:subClassOf rdf:resource="&om-schema;MechanicalInterface"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#StandardAgent -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#StandardAgent">
+        <rdfs:subClassOf rdf:resource="&om-schema;Actor"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Female"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Male"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#YellowAgent -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#YellowAgent">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#StandardAgent"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#Female -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#Female">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Female"/>
+        <om-schema:compatibleWith rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Male"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#Male -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#Male">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Male"/>
+        <om-schema:compatibleWith rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Female"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-icaps#Special -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2017/10/om-icaps#Special">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Special"/>
+        <om-schema:compatibleWith rdf:resource="http://www.rock-robotics.org/2017/10/om-icaps#Special"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.5.0) http://owlapi.sourceforge.net -->
+
