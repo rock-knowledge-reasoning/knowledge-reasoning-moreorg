@@ -44,6 +44,9 @@ public:
     VOCABULARY_ADD_WORD(fulfills);
     VOCABULARY_ADD_WORD(hasTransportCapacity);
 
+    VOCABULARY_ADD_WORD(transportCapacity);
+    VOCABULARY_ADD_WORD(transportDemand);
+
     VOCABULARY_ADD_WORD(probabilityOfFailure);
 };
 

@@ -80,6 +80,7 @@ rock_library(organization_model
         utils/CorrelationClustering.hpp
         vocabularies/OM.hpp
         vocabularies/Robot.hpp
+        vocabularies/VRP.hpp
         ValueBound.hpp
     DEPS_PKGCONFIG numeric pddl_planner owlapi
         graph_analysis
