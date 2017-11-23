@@ -373,4 +373,14 @@ size_t ModelPool::getMinResourceCount() const
     return getMinResource().second;
 }
 
+owlapi::model::IRIList ModelPool::getModels() const
+{
+    owlapi::model::IRIList models;
+    for(const ModelPool::value_type& m : *this)
+    {
+        models.push_back(m.first);
+    }
+    return models;
+}
+
 } // end namespace organization_model

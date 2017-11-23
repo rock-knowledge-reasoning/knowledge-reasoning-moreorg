@@ -175,6 +175,11 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          */
         size_t getMinResourceCount() const;
 
+        /**
+         * Get the list of models
+         * \return list of models
+         */
+        owlapi::model::IRIList getModels() const;
 };
 
 /**
