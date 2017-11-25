@@ -83,7 +83,7 @@ ModelPool Algebra::max(const ModelPool& a, const ModelPool& b)
     for(; bit != b.end(); ++bit)
     {
         const owlapi::model::IRI& model = bit->first;
-        uint32_t cardinality = bit->second;
+        size_t cardinality = bit->second;
 
         ModelPool::iterator rit = resultPool.find(model);
         if(rit != resultPool.end())
@@ -122,7 +122,7 @@ ModelPool Algebra::min(const ModelPool& a, const ModelPool& b)
     for(; bit != b.end(); ++bit)
     {
         const owlapi::model::IRI& model = bit->first;
-        uint32_t cardinality = bit->second;
+        size_t cardinality = bit->second;
 
         // if result pool does not contain the entry, then use the only existing
         // (min) requirement
