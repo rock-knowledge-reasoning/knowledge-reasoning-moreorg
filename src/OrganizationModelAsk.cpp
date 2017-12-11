@@ -19,6 +19,10 @@ using namespace owlapi::vocabulary;
 
 namespace organization_model {
 
+OrganizationModelAsk::OrganizationModelAsk()
+    : mOntologyAsk( OWLOntology::Ptr() )
+{}
+
 OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
         const ModelPool& modelPool,
         bool applyFunctionalSaturationBound,

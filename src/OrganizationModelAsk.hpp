@@ -28,6 +28,14 @@ public:
     typedef shared_ptr<OrganizationModelAsk> Ptr;
 
     /**
+     * Default constructor for an instance of organization model ask
+     * Without setting any organization model etc. this object
+     * is only useful for lazy initialization
+     */
+    OrganizationModelAsk();
+
+
+    /**
      * Default constructor of the organization model ask
      * \param om OrganizationModel that is used as database
      * \param modelPool ModelPool that is used for bounding -- only agent models
