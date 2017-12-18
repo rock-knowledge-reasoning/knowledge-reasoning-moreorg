@@ -75,6 +75,12 @@ public:
     void setModelPool(const ModelPool& modelPool) { mModelPool = modelPool; }
 
     /**
+     * Get the model pool associated with this ask object
+     * \return model pool
+     */
+    const ModelPool& getModelPool() const { return mModelPool; }
+
+    /**
      * Compute the functionality mapping for the model pool this object was
      * initialized with
      */
