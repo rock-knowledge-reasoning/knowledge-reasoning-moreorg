@@ -155,25 +155,36 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          */
         uint32_t numberOfInstances() const { return toModelCombination().size(); }
 
+        /**
+         * Get the cardinality of a resource
+         * \param defaultVal Return this default value if the model entry does
+         * not exist
+         */
         size_t getValue(const owlapi::model::IRI& resource, size_t defaultVal) const;
 
         /**
          * Get the entry with the maximum number of resources
+         * \return Entry with maximum number of resources -- if multiple entries
+         * exist the first found will be returned
          */
         std::pair<owlapi::model::IRI, size_t> getMaxResource() const;
 
         /**
          * Get the entry with the minimum number of resources
+         * \return Entry with minimum number of resources -- if multiple entries
+         * exist the first found will be returned
          */
         std::pair<owlapi::model::IRI, size_t> getMinResource() const;
 
         /**
          * Get the maximum value of all key value pairs
+         * \return maximum value of resource count
          */
         size_t getMaxResourceCount() const;
 
         /**
          * Get the minimum value of all key value pairs
+         * \return minimum value of resource count
          */
         size_t getMinResourceCount() const;
 
