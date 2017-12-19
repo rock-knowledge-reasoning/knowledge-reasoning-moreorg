@@ -48,8 +48,10 @@ pddl_planner::representation::Domain PDDLExporter::toDomain()
     domain.addRequirement("conditional-effects");
     domain.addRequirement("action-costs");
 
-    IRIList baseKlasses{ OM::Actor() };
     domain.addType(OM::Actor().getFragment());
+    domain.addType(OM::Location().getFragment());
+
+    IRIList baseKlasses{ OM::Actor() };
     for(const IRI& baseKlass : baseKlasses)
     {
         // Adding types to the domain -> concepts
