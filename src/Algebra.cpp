@@ -226,4 +226,14 @@ ModelPool::Set Algebra::maxCompositions(const ModelPool::Set& a, const ModelPool
     return maxCompositions;
 }
 
+bool Algebra::isSubset(const ModelPool& a, const ModelPool& b)
+{
+    return !Algebra::delta(b, a).isNegative();
+}
+
+bool Algebra::isSuperSet(const ModelPool& a, const ModelPool& b)
+{
+    return isSubset(b,a);
+}
+
 } // end namespace organization_model

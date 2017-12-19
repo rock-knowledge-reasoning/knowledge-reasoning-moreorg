@@ -79,6 +79,18 @@ public:
      * a [max] b = { {(0,3),(1,1),(2,0)}, {(0,3),(1,2),(2,0)} }
      */
     static ModelPool::Set maxCompositions(const ModelPool::Set& a, const ModelPool::Set& b);
+
+    /**
+     * Test if a is a subset of b
+     * \return True if a is a subset of b, false otherwise
+     */
+    static bool isSubset(const ModelPool& a, const ModelPool& b);
+
+    /**
+     * Test if a is a superset of b
+     * \return True if a is a superset of b, false otherwise
+     */
+    static bool isSuperSet(const ModelPool& a, const ModelPool& b);
 };
 
 } // end namespace organization_model
