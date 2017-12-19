@@ -3,6 +3,7 @@ rock_testsuite(${PROJECT_NAME}-test suite.cpp
     # test_CoalitionStructureGeneration.cpp
     # test_CorrelationClustering.cpp
     test_Algebra.cpp
+    test_Exporter.cpp
     test_CSP.cpp
     test_Lego.cpp
     test_ModelPool.cpp
