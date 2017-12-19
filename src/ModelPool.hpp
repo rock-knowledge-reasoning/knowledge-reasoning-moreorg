@@ -182,6 +182,17 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          * \return list of models
          */
         owlapi::model::IRIList getModels() const;
+
+        /**
+         * Check if this ModelPool describes an atomic model, i.e.
+         * 1 key value pair with cardinality 1
+         */
+        bool isAtomic() const { return size() == 1 && begin()->second == 1; }
+
+        /**
+         * Get model if this describes an atomic model
+         */
+        const owlapi::model::IRI& getAtomic() const;
 };
 
 /**

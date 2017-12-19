@@ -244,6 +244,17 @@ ModelPool::Set ModelPool::allCombinations(size_t maxSize) const
     return allCombinations;
 }
 
+const owlapi::model::IRI& ModelPool::getAtomic() const
+{
+    if(isAtomic())
+    {
+        return begin()->first;
+    } else {
+        throw std::runtime_error("organization_model::ModelPool::getAtomic: this model pool does"
+                " not describe an atomic model");
+    }
+}
+
 ModelPoolDelta::ModelPoolDelta(const ModelPool& pool)
 {
     ModelPool::const_iterator cit = pool.begin();
