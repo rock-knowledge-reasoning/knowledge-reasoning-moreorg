@@ -158,4 +158,30 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
     }
 }
 
+BOOST_AUTO_TEST_CASE(composite_robot_from_transterra)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+    using namespace organization_model::vocabulary;
+
+    IRI organizationModelIRI = "http://www.rock-robotics.org/2015/12/projects/TransTerrA";
+    OrganizationModel::Ptr om(new OrganizationModel(organizationModelIRI));
+
+    IRI sherpa = OM::resolve("Sherpa");
+    IRI payload = OM::resolve("Payload");
+    IRI basecamp = OM::resolve("BaseCamp");
+
+    ModelPool modelPool;
+    modelPool[sherpa] = 3;
+    modelPool[payload] = 3;
+    modelPool[basecamp] = 1;
+
+    OrganizationModelAsk ask(om, modelPool, true);
+    BOOST_TEST_MESSAGE("Functionality mapping: " << ask.getFunctionalityMapping().toString(4));
+    {
+        organization_model::facets::Robot robot(modelPool, ask);
+        BOOST_REQUIRE_MESSAGE(robot.isMobile(), "Robot " << modelPool.toString() << " is mobile");
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
