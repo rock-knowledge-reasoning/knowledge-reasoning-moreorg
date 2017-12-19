@@ -218,13 +218,22 @@ ModelCombination ModelPool::toModelCombination() const
     return combination;
 }
 
-ModelPool::Set ModelPool::allCombinations() const
+ModelPool::Set ModelPool::allCombinations(size_t maxSize) const
 {
     ModelPool::Set allCombinations;
 
     ModelCombination modelCombinationBound = toModelCombination();
+
+    // Account for the maximum size of the combination
+    size_t sizeOfCombination = numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(*this);
+    if(maxSize > 0)
+    {
+        sizeOfCombination = std::min(maxSize, sizeOfCombination);
+    }
+
     numeric::LimitedCombination<owlapi::model::IRI> combinations(*this,
-            numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(*this), numeric::MAX);
+            sizeOfCombination,
+            numeric::MAX);
 
     do {
         owlapi::model::IRIList combination = combinations.current();

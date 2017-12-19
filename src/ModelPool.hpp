@@ -142,10 +142,12 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
         /**
          * Compute all combinations that can be generated from the given model
          * pool (which defines the available resources)
-         *
+         * \param maxSize If maxSize > 0 then this will be interpreted as maximum size of the combination in terms
+         * of allowed model instances that are part of the ModelPool \see
+         * numberOfInstances
          * \return Set of modelpool representing all possible combinations
          */
-        std::set<ModelPool> allCombinations() const;
+        std::set<ModelPool> allCombinations(size_t maxSize = 0) const;
 
         /**
          * Return the number of instances that are defined by this pool
