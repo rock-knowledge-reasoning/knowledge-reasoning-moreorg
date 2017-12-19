@@ -6,11 +6,23 @@
 namespace organization_model {
 namespace facets {
 
+/**
+ * A facet for individual and composite robotic systems (aka atomic and
+ * composite physical agents)
+ */
 class Robot : public Facet
 {
 
 public:
+    /**
+     * Facet constructor for an atomic system
+     */
     Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& organizationModelAsk);
+
+    /**
+     * Facet constructor for a composite system
+     */
+    Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizationModelAsk);
 
     double getMinAcceleration() const { return mMinAcceleration; }
     double getMaxAcceleration() const { return mMaxAcceleration; }
@@ -82,7 +94,7 @@ public:
      * Create a string object that list all system
      * charateristics
      */
-    std::string toString() const;
+    std::string toString(size_t indent = 0) const;
 
     /**
      * Return if robot is mobile
@@ -91,7 +103,7 @@ public:
 
 private:
 
-    owlapi::model::IRI mActorModel;
+    ModelPool mModelPool;
 
     double mMinAcceleration;
     double mMaxAcceleration;
