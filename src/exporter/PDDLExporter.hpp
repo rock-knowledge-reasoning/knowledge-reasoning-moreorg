@@ -8,8 +8,12 @@
 namespace organization_model {
 
 /**
- * \brief The PDDLExporter allow to export the an instance of OrganizationModel
- * to PDDL (Plan Domain Definition Language).
+ * \brief The PDDLExporter allows to export an instance of the OrganizationModel
+ * to PDDL (Plan Domain Definition Language), which can be augmented to define a
+ * planning problem in PDDL
+ *
+ * \detaile While the domain will contain all basic definition the problem, will
+ * have to be augmented with further information before saving
  */
 class PDDLExporter
 {
@@ -40,6 +44,26 @@ public:
 
     /**
      * Convert the existing model to a partial PDDL problem description
+     * This will only lead to a partial description of the problem and has to be
+     * extended regarding, e.g., locations (under :objects of the problem
+     * definition) and the goal (under :goal) of the problem definition.
+     * A complete definition might look like the following:
+     * \verbatim
+        (define (problem om-partial)
+            (:domain om)
+            (:objects
+                l0 l1 l2 - Location)
+            (:init
+                (atomic Sherpa0)
+                (provides Sherpa0 TransportProvider)
+                (provides Sherpa0 StereoImageProvider)
+                (provides Sherpa0 ManipulationProvider)
+            )
+            (:goal
+                (at Sherpa0_Sherpa1 l2)
+            )
+        )
+     \endverbatim
      * \return Problem description
      */
     pddl_planner::representation::Problem toProblem();
