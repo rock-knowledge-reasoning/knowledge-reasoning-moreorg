@@ -1,7 +1,10 @@
-find_package(Boost REQUIRED thread)
+find_package(Boost REQUIRED thread serialization)
 rock_library(organization_model
     SOURCES
+        AtomicAgent.cpp
+        Agent.cpp
         Algebra.cpp
+        Analyser.cpp
         algebra/Connectivity.cpp
         algebra/ResourceSupportVector.cpp
         ccf/Actor.cpp
@@ -17,6 +20,7 @@ rock_library(organization_model
         Functionality.cpp
         FunctionalityMapping.cpp
         FunctionalityRequirement.cpp
+        Heuristics.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
         Metric.cpp
@@ -36,10 +40,14 @@ rock_library(organization_model
         reasoning/ModelBound.cpp
         reasoning/ResourceMatch.cpp
         Service.cpp
+        StatusSample.cpp
         utils/CoalitionStructureGeneration.cpp
         ValueBound.cpp
     HEADERS
+        AtomicAgent.hpp
+        Agent.hpp
         Algebra.hpp
+        Analyser.hpp
         algebra/Connectivity.hpp
         algebra/ResourceSupportVector.hpp
         ccf/Actor.hpp
@@ -56,6 +64,7 @@ rock_library(organization_model
         Functionality.hpp
         FunctionalityRequirement.hpp
         FunctionalityMapping.hpp
+        Heuristics.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
         Metric.hpp
@@ -74,6 +83,8 @@ rock_library(organization_model
         organization_model/Statistics.hpp
         Service.hpp
         SharedPtr.hpp
+        StatusSample.hpp
+        Types.hpp
         reasoning/ModelBound.hpp
         reasoning/ResourceMatch.hpp
         utils/CoalitionStructureGeneration.hpp
