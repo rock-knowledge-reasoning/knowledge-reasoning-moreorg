@@ -120,4 +120,10 @@ AtomicAgent::List AtomicAgent::createAtomicAgents(const organization_model::Mode
     return agents;
 }
 
+facets::Robot AtomicAgent::getFacet(const OrganizationModelAsk& ask) const
+{
+    return facets::Robot::getInstance(mModel, ask);
+
+}
+
 } // end namespace organization_model

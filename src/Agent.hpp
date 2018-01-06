@@ -2,6 +2,7 @@
 #define ORGANIZATION_MODEL_AGENT_HPP
 
 #include "AtomicAgent.hpp"
+#include "OrganizationModelAsk.hpp"
 
 namespace organization_model {
 
@@ -48,6 +49,12 @@ public:
      * \return model pool as agent type
      */
     ModelPool getType() const;
+
+    /**
+     * Get the robot facet
+     * \return facet object
+     */
+    facets::Robot getFacet(const OrganizationModelAsk& ask) const;
 
 private:
     AtomicAgent::Set mAtomicAgents;

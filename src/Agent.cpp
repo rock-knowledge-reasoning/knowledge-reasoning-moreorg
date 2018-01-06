@@ -20,6 +20,12 @@ Agent::Agent(const AtomicAgent::Set& atomicAgents)
 {
 }
 
+facets::Robot Agent::getFacet(const OrganizationModelAsk& ask) const
+{
+    ModelPool modelPool = getType();
+    return facets::Robot::getInstance(modelPool, ask);
+}
+
 ModelPool Agent::getType() const
 {
     ModelPool pool;

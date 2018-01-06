@@ -6,6 +6,8 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/set.hpp>
+#include "OrganizationModelAsk.hpp"
+#include "facets/Robot.hpp"
 
 namespace organization_model {
 
@@ -65,6 +67,11 @@ public:
      * assuming that it contains only types as keys
      */
     static List createAtomicAgents(const organization_model::ModelPool& modelPool);
+
+    /**
+     * Create the robot facet
+     */
+    facets::Robot getFacet(const OrganizationModelAsk& ask) const;
 };
 
 } // end namespace organization_model
