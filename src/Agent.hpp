@@ -63,6 +63,10 @@ public:
      */
     facets::Robot getFacet(const OrganizationModelAsk& ask) const;
 
+    /**
+     * Get the set of atomic agents
+     */
+    const AtomicAgent::Set& getAtomicAgents() const { return mAtomicAgents; }
 
     /**
      * Get the relative energy consumption for atomic agents
