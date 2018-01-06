@@ -37,6 +37,7 @@ rock_library(organization_model
         organization_model/Grounding.cpp
         organization_model/InterfaceConnection.cpp
         organization_model/Statistics.cpp
+        policies/EnergyProviderPolicy.cpp
         reasoning/ModelBound.cpp
         reasoning/ResourceMatch.cpp
         Service.cpp
@@ -81,6 +82,7 @@ rock_library(organization_model
         organization_model/Grounding.hpp
         organization_model/InterfaceConnection.hpp
         organization_model/Statistics.hpp
+        policies/EnergyProviderPolicy.hpp
         Service.hpp
         SharedPtr.hpp
         StatusSample.hpp

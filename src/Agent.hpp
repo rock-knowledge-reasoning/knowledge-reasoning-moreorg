@@ -3,6 +3,7 @@
 
 #include "AtomicAgent.hpp"
 #include "OrganizationModelAsk.hpp"
+#include "policies/EnergyProviderPolicy.hpp"
 
 namespace organization_model {
 
@@ -28,6 +29,12 @@ public:
      * Add an atomic agent to this agent object
      */
     void add(const AtomicAgent& agent) { mAtomicAgents.insert(agent); }
+
+    /**
+     * Update internal structures, such as energy consumption share when the
+     * agent is complete
+     */
+    void update(const OrganizationModelAsk& ask);
 
     /**
      * Test if this is an atomic agent, i.e. |A| = 1
@@ -56,8 +63,15 @@ public:
      */
     facets::Robot getFacet(const OrganizationModelAsk& ask) const;
 
+
+    /**
+     * Get the relative energy consumption for atomic agents
+     */
+    const std::map<AtomicAgent, double>& getEnergyProviderShares() const { return mEnergyProviderPolicy.getShares(); }
+
 private:
     AtomicAgent::Set mAtomicAgents;
+    policies::EnergyProviderPolicy mEnergyProviderPolicy;
 
 };
 

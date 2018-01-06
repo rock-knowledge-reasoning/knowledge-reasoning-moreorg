@@ -26,6 +26,11 @@ facets::Robot Agent::getFacet(const OrganizationModelAsk& ask) const
     return facets::Robot::getInstance(modelPool, ask);
 }
 
+void Agent::update(const OrganizationModelAsk& ask)
+{
+    mEnergyProviderPolicy.update(*this, ask);
+}
+
 ModelPool Agent::getType() const
 {
     ModelPool pool;
