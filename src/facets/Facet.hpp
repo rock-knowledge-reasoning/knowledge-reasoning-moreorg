@@ -12,17 +12,15 @@ class Facet
 public:
     Facet(const OrganizationModelAsk& organizationModelAsk)
         : mOrganizationModelAsk(organizationModelAsk)
-        , mOWLOntologyAsk(mOrganizationModelAsk.getOrganizationModel()->ontology())
     {}
 
-protected:
     const OrganizationModelAsk& organizationAsk() const { return mOrganizationModelAsk; }
-    const owlapi::model::OWLOntologyAsk& ontologyAsk() const { return mOWLOntologyAsk; }
+
+protected:
+    Facet()
+    {}
 
     OrganizationModelAsk mOrganizationModelAsk;
-    owlapi::model::OWLOntologyAsk mOWLOntologyAsk;
-
-
 };
 
 } // end namespace facets

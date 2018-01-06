@@ -9,6 +9,32 @@ using namespace owlapi::model;
 namespace organization_model {
 namespace facets {
 
+std::map<ModelPool, Robot> Robot::msRobots;
+
+const Robot& Robot::getInstance(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& organizationModelAsk)
+{
+    ModelPool modelPool;
+    modelPool[actorModel] = 1;
+    return getInstance(modelPool, organizationModelAsk);
+}
+
+const Robot& Robot::getInstance(const ModelPool& modelPool, const OrganizationModelAsk& organizationModelAsk)
+{
+    std::map<ModelPool, Robot>::const_iterator cit = msRobots.find(modelPool);
+    if(cit != msRobots.end())
+    {
+        return cit->second;
+    } else {
+        Robot robot(modelPool, organizationModelAsk);
+        msRobots[modelPool] = robot;
+        return msRobots[modelPool];
+    }
+}
+
+Robot::Robot()
+    : Facet()
+{}
+
 Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& organizationModelAsk)
     : Facet(organizationModelAsk)
     , mMinAcceleration(0.0)
@@ -16,9 +42,12 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
     , mNominalAcceleration(0.0)
     , mMinVelocity(0.0)
     , mMaxVelocity(0.0)
+    , mNominalVelocity(0.0)
     , mMass(0.0)
     , mSupplyVoltage(0.0)
-    , mNominalVelocity(0.0)
+    , mEnergy(0.0)
+    , mEnergyCapacity(0.0)
+    , mNominalPowerConsumption(0.0)
     , mTransportCapacity(0)
     , mTransportDemand(0)
 {
@@ -26,10 +55,10 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
     mModelPool[actorModel] = 1;
 
     try {
-        mNominalPowerConsumption = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalPowerConsumption())->getDouble();
-        mMass = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::mass())->getDouble();
-        mSupplyVoltage = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::supplyVoltage())->getDouble();
-        mEnergyCapacity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::energyCapacity())->getDouble();
+        mNominalPowerConsumption = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalPowerConsumption())->getDouble();
+        mMass = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::mass())->getDouble();
+        mSupplyVoltage = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::supplyVoltage())->getDouble();
+        mEnergyCapacity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::energyCapacity())->getDouble();
     } catch(const std::exception& e)
     {
         LOG_WARN_S << e.what();
@@ -39,14 +68,14 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
 
     // optional base mobility
     try {
-        mMinAcceleration = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::minAcceleration())->getDouble();
-        mMaxAcceleration = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::maxAcceleration())->getDouble();
-        mNominalAcceleration = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalAcceleration())->getDouble();
+        mMinAcceleration = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::minAcceleration())->getDouble();
+        mMaxAcceleration = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::maxAcceleration())->getDouble();
+        mNominalAcceleration = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalAcceleration())->getDouble();
 
 
-        mMinVelocity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::minVelocity())->getDouble();
-        mMaxVelocity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::maxVelocity())->getDouble();
-        mNominalVelocity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalVelocity())->getDouble();
+        mMinVelocity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::minVelocity())->getDouble();
+        mMaxVelocity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::maxVelocity())->getDouble();
+        mNominalVelocity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalVelocity())->getDouble();
     } catch(const std::exception& e)
     {
         LOG_INFO_S << e.what();
@@ -55,9 +84,9 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
 
     // optional transport capability
     try {
-        mTransportDemand = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::transportDemand())->getDouble();
+        mTransportDemand = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::transportDemand())->getDouble();
         // get cardinality constraint
-        mTransportCapacity = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::transportCapacity())->getDouble();
+        mTransportCapacity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::transportCapacity())->getDouble();
 
 
     } catch(const std::exception& e)
@@ -89,10 +118,10 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
         const owlapi::model::IRI& actorModel = pair.first;
         size_t modelCount = pair.second;
         try {
-            mNominalPowerConsumption += modelCount*ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalPowerConsumption())->getDouble();
-            mMass += modelCount*ontologyAsk().getDataValue(actorModel, vocabulary::Robot::mass())->getDouble();
-            mSupplyVoltage = ontologyAsk().getDataValue(actorModel, vocabulary::Robot::supplyVoltage())->getDouble();
-            mEnergyCapacity = modelCount*ontologyAsk().getDataValue(actorModel, vocabulary::Robot::energyCapacity())->getDouble();
+            mNominalPowerConsumption += modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalPowerConsumption())->getDouble();
+            mMass += modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::mass())->getDouble();
+            mSupplyVoltage = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::supplyVoltage())->getDouble();
+            mEnergyCapacity = modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::energyCapacity())->getDouble();
         } catch(const std::exception& e)
         {
             LOG_WARN_S << e.what();
@@ -102,13 +131,13 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
 
         // optional base mobility
         try {
-            mMinAcceleration = std::max(mMinAcceleration, ontologyAsk().getDataValue(actorModel, vocabulary::Robot::minAcceleration())->getDouble());
-            mMaxAcceleration = std::max(mMaxAcceleration, ontologyAsk().getDataValue(actorModel, vocabulary::Robot::maxAcceleration())->getDouble());
-            mNominalAcceleration = std::max(mNominalAcceleration, ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalAcceleration())->getDouble());
+            mMinAcceleration = std::max(mMinAcceleration, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::minAcceleration())->getDouble());
+            mMaxAcceleration = std::max(mMaxAcceleration, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::maxAcceleration())->getDouble());
+            mNominalAcceleration = std::max(mNominalAcceleration, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalAcceleration())->getDouble());
 
-            mMinVelocity = std::max(mMinVelocity, ontologyAsk().getDataValue(actorModel, vocabulary::Robot::minVelocity())->getDouble());
-            mMaxVelocity = std::max(mMaxVelocity, ontologyAsk().getDataValue(actorModel, vocabulary::Robot::maxVelocity())->getDouble());
-            mNominalVelocity = std::max(mNominalVelocity, ontologyAsk().getDataValue(actorModel, vocabulary::Robot::nominalVelocity())->getDouble());
+            mMinVelocity = std::max(mMinVelocity, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::minVelocity())->getDouble());
+            mMaxVelocity = std::max(mMaxVelocity, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::maxVelocity())->getDouble());
+            mNominalVelocity = std::max(mNominalVelocity, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalVelocity())->getDouble());
         } catch(const std::exception& e)
         {
             LOG_INFO_S << e.what();
@@ -116,9 +145,9 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
 
         // optional transport capability
         try {
-            mTransportDemand += modelCount*ontologyAsk().getDataValue(actorModel, vocabulary::Robot::transportDemand())->getDouble();
+            mTransportDemand += modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::transportDemand())->getDouble();
             // get cardinality constraint
-            mTransportCapacity += modelCount*ontologyAsk().getDataValue(actorModel, vocabulary::Robot::transportCapacity())->getDouble();
+            mTransportCapacity += modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::transportCapacity())->getDouble();
 
         } catch(const std::exception& e)
         {
@@ -137,7 +166,7 @@ uint32_t Robot::getTransportCapacity(const owlapi::model::IRI& model) const
     if(mModelPool.isAtomic())
     {
         const owlapi::model::IRI& actorModel = mModelPool.getAtomic();
-        std::vector<OWLCardinalityRestriction::Ptr> restrictions = ontologyAsk().getCardinalityRestrictionsForTarget(actorModel, vocabulary::OM::hasTransportCapacity(), model);
+        std::vector<OWLCardinalityRestriction::Ptr> restrictions = organizationAsk().ontology().getCardinalityRestrictionsForTarget(actorModel, vocabulary::OM::hasTransportCapacity(), model);
         capacity = getTransportCapacity();
         for(const OWLCardinalityRestriction::Ptr& r : restrictions)
         {
@@ -169,12 +198,20 @@ int32_t Robot::getTransportSupplyDemand() const
     }
 }
 
+double Robot::estimatedEnergyCostFromTime(double timeInS) const
+{
+    // Watt * s
+    // 1 Wattsekunde = 1/3600 Wh => Wh = Ws*3600
+    //
+    return (mNominalPowerConsumption*timeInS);
+}
+
 double Robot::estimatedEnergyCost(double distanceInM) const
 {
-    // W * m/ (m/s)
-    // 1 Ws = 1/3600 Wh => Wh = Ws*3600
+    // Watt * m/ (m/s)
+    // 1 Wattsekunde = 1/3600 Wh => Wh = Ws*3600
     //
-    return (mNominalPowerConsumption*distanceInM/mNominalVelocity) / 3600.0;
+    return estimatedEnergyCostFromTime( distanceInM/mNominalVelocity);
 }
 
 double Robot::estimatedRelativeEnergyCost(double distanceInM) const

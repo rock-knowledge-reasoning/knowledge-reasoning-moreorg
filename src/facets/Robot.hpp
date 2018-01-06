@@ -14,6 +14,18 @@ class Robot : public Facet
 {
 
 public:
+
+    static const Robot& getInstance(const owlapi::model::IRI& actorModel,
+            const OrganizationModelAsk& ask);
+
+    static const Robot& getInstance(const ModelPool& modelPool,
+            const OrganizationModelAsk& ask);
+
+    /**
+     * Constructor to allow usage in maps
+     */
+    Robot();
+
     /**
      * Facet constructor for an atomic system
      */
@@ -43,8 +55,10 @@ public:
     double getSupplyVoltage() const { return mSupplyVoltage; }
 
     double getEnergy() const { return mEnergy; }
+
     /**
-     * Available Energy W
+     * Available Energy W in As, e.g.
+     * 10 Ah => 36000 Ah
      */
     double getEnergyCapacity() const { return mEnergyCapacity; }
 
@@ -71,12 +85,23 @@ public:
     int32_t getTransportSupplyDemand() const;
 
     /**
-     * Empirical information
+     * Empirical information on average electrical current consumption
+     * Watt
+     * P = U*I = V*A --  V*Ah/s
      * P_n = W/t
+     *
+     * 1 Watt = 1 kg m3/s3
+     *
      */
     double getNominalPowerConsumption() const { return mNominalPowerConsumption; }
 
     /**
+     * Energy cost in Ws
+     */
+    double estimatedEnergyCostFromTime(double timeInS) const;
+
+    /**
+     * Account for the energy cost, caused by nominal travel
      * s = v*t <=> t = s/v_n
      *
      * W = P_n*t = P_n*s/v_n
@@ -121,6 +146,9 @@ private:
 
     uint32_t mTransportCapacity;
     uint32_t mTransportDemand;
+
+    // Robot cache
+    static std::map<ModelPool, Robot> msRobots;
 };
 
 } // end namespace facets
