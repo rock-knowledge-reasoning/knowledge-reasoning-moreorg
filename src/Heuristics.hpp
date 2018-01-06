@@ -4,6 +4,7 @@
 #include <base/Pose.hpp>
 #include "Agent.hpp"
 #include "OrganizationModelAsk.hpp"
+#include "StatusSample.hpp"
 
 namespace organization_model {
 
@@ -34,7 +35,7 @@ public:
     base::Position positionLinear(const Agent& agent,
             const base::Position& from,
             const base::Position& to,
-            size_t progressedTime);
+            size_t progressedTime) const;
 
     /**
      * Time estimate for the required travel of agent \p agent from
@@ -46,7 +47,9 @@ public:
      */
     double travelTime(const Agent& agent,
         const base::Position& from,
-        const base::Position& to);
+        const base::Position& to) const;
+
+    double travelTime(const StatusSample* sample) const;
 
     /**
      * Wait time estimate for the travel between \p from and \p to, where
@@ -60,11 +63,30 @@ public:
     double waitTime(const Agent& agent,
         const base::Position& from,
         const base::Position& to,
-        size_t availableTime);
+        size_t availableTime) const;
 
+    double waitTime(const StatusSample* sample) const;
 
+    /**
+     * Estimate the overall energy consumption
+     */
+    double getEnergyConsumption(const StatusSample* sample) const;
+
+    /**
+     * Compute the energy reduction for a particular atomic agent for operation
+     * from \p fromTime to \p toTime
+     * \return reduction
+     */
+    double getEnergyReductionAbsolute(const StatusSample* sample,
+            const AtomicAgent& agent,
+            size_t fromTime,
+            size_t toTime) const;
 private:
     OrganizationModelAsk mAsk;
+
+    // Cached data
+    mutable StatusSample::RawPtr2Double mEnergyConsumption;
+    mutable StatusSample::RawPtr2Double mTravelTime;
 };
 
 } // end namespace organization_model
