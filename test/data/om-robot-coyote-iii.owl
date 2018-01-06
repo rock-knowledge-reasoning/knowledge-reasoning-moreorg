@@ -319,8 +319,8 @@
         <om-schema:transportCapacity rdf:datatype="&xsd;nonNegativeInteger">4</om-schema:transportCapacity>
         <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>
         <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">50.0</om-schema:nominalPowerConsumption>
-        <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">7.2</om-schema:maxEnergyCapacity>
-        <om-schema:energyCapacity rdf:datatype="&xsd;double">8.0</om-schema:energyCapacity>
+        <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">259200</om-schema:maxEnergyCapacity>
+        <om-schema:energyCapacity rdf:datatype="&xsd;double">259200</om-schema:energyCapacity>
     </owl:NamedIndividual>
 </rdf:RDF>
 
