@@ -1,8 +1,6 @@
 #ifndef ORGANIZATION_MODEL_TYPES_HPP
 #define ORGANIZATION_MODEL_TYPES_HPP
 
-#include <base/Position.hpp>
-
 namespace organization_model {
 namespace activity {
 
