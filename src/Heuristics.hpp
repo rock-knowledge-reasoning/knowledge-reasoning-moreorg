@@ -65,10 +65,15 @@ public:
         const base::Position& to,
         size_t availableTime) const;
 
+    /**
+     * Estimate the wait time for a given sample
+     * \param sample
+     */
     double waitTime(const StatusSample* sample) const;
 
     /**
-     * Estimate the overall energy consumption
+     * Estimate the overall energy consumption for a given sample
+     * \param sample
      */
     double getEnergyConsumption(const StatusSample* sample) const;
 
