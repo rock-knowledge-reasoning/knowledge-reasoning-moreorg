@@ -193,6 +193,19 @@ public:
     double getTravelDistance(size_t time, const AtomicAgent& atomicAgent) const;
 
     /**
+     * Get the overall travel distance of an atomic agent
+     * \return travel distance
+     */
+    double getTravelDistance(const AtomicAgent& atomicAgent) const;
+
+    /**
+     * Get the travel distance to the next travel point here: Point Of Interest
+     * (POI)
+     * \return distance to next POI
+     */
+    double getTravelDistanceToNextPOI(size_t time, const AtomicAgent& atomicAgent) const;
+
+    /**
      * Get operative time, i.e., when the functionality of this atomic agent
      * is required
      * TBD: how to compute, this must be based on the set of active agents over

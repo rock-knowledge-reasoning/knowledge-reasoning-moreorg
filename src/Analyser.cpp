@@ -262,9 +262,33 @@ double Analyser::getTravelDistance(size_t time, const AtomicAgent& atomicAgent) 
     }
     return distance;
 }
+
+double Analyser::getTravelDistance(const AtomicAgent& atomicAgent) const
+{
+    double distance = 0;
+    const StatusSample::ConstRawPtrList& samples = samplesFor(atomicAgent);
+    for(const StatusSample* sample : samples)
+    {
         distance += (sample->getToLocation() - sample->getFromLocation()).norm();
     }
     return distance;
+}
+
+double Analyser::getTravelDistanceToNextPOI(size_t time, const AtomicAgent& atomicAgent) const
+{
+    const StatusSample::ConstRawPtrList& samples = samplesFor(atomicAgent);
+    for(const StatusSample* sample : samples)
+    {
+        // stop with get from time
+        if(sample->getFromTime() <= time && sample->getToTime() >= time)
+        {
+            // distance to next POI is compute based on the assumption of a
+            // linear approach function
+            return (sample->getToLocation() - sample->getFromLocation()).norm()*(time/(sample->getToTime() - sample->getFromTime()) );
+            // last sample which needs to be partially evaluated
+        }
+    }
+    return 0;
 }
 
 double Analyser::getOperativeTime(size_t time, const AtomicAgent& atomicAgent) const
