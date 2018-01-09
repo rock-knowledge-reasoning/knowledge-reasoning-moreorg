@@ -85,7 +85,7 @@ rock_library(organization_model
         organization_model/InterfaceConnection.hpp
         organization_model/Statistics.hpp
         policies/EnergyProviderPolicy.hpp
-        policies/TransportProviderPolicies.hpp
+        policies/TransportProviderPolicy.hpp
         Service.hpp
         SharedPtr.hpp
         StatusSample.hpp
