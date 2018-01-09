@@ -92,6 +92,30 @@ organization_model::ModelPool AtomicAgent::getModelPool(const AtomicAgent::Set& 
     return modelPool;
 }
 
+AtomicAgent::List AtomicAgent::getIntersection(const AtomicAgent::Set& a0,
+        const AtomicAgent::Set& a1)
+{
+     std::vector<AtomicAgent> intersection;
+     std::set_intersection(a0.begin(), a0.end(),
+             a1.begin(), a1.end(),
+             std::back_inserter(intersection)
+     );
+     return intersection;
+}
+
+AtomicAgent::List AtomicAgent::getDifference(const AtomicAgent::Set& a0,
+        const AtomicAgent::Set& a1)
+{
+    // computing remaining, i.e.  remainingInA0 = from - to
+    std::vector<AtomicAgent> remainingInA0;
+
+    std::set_difference(a0.begin(), a0.end(),
+            a1.begin(), a1.end(),
+            std::inserter(remainingInA0, remainingInA0.begin()));
+
+    return remainingInA0;
+}
+
 bool AtomicAgent::operator<(const AtomicAgent& other) const
 {
     if(mModel == other.mModel)

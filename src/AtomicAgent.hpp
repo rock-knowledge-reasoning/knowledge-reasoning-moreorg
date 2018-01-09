@@ -45,10 +45,14 @@ public:
     const std::string& getName() const { return mName; }
 
     std::string toString() const;
+
     static std::string toString(const List& agents, size_t indent = 0);
     static std::string toString(const Set& agents, size_t indent = 0);
     static organization_model::ModelPool getModelPool(const List& agents);
     static organization_model::ModelPool getModelPool(const Set& agents);
+
+    static AtomicAgent::List getIntersection(const AtomicAgent::Set& a0, const AtomicAgent::Set& a1);
+    static AtomicAgent::List getDifference(const AtomicAgent::Set& a0, const AtomicAgent::Set& a1);
 
     bool operator<(const AtomicAgent& other) const;
     bool operator==(const AtomicAgent& other) const { return mModel == other.mModel && mId == other.mId; }

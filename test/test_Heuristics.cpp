@@ -139,4 +139,47 @@ BOOST_FIXTURE_TEST_CASE(energy, HeuristicsFixture)
 
 }
 
+BOOST_FIXTURE_TEST_CASE(reconfiguration_cost, HeuristicsFixture)
+{
+    AtomicAgent::List availableAgents(atomicAgents.begin(), atomicAgents.end());
+
+    Agent agent0;
+    agent0.add(availableAgents[0]);
+    agent0.add(availableAgents[1]);
+
+    Agent agent1;
+    agent1.add(availableAgents[2]);
+
+    {
+        Agent::Set coalitionStructure0;
+        coalitionStructure0.insert(agent0);
+        coalitionStructure0.insert(agent1);
+        Agent::Set coalitionStructure1;
+        coalitionStructure1.insert(agent0);
+        coalitionStructure1.insert(agent1);
+
+        double cost = heuristics->getReconfigurationCost(coalitionStructure0, coalitionStructure1);
+        BOOST_REQUIRE_MESSAGE(cost == 0, "Same agent coalition structure reconfiguration cost should be 0, was " << cost);
+    }
+
+    Agent agent2;
+    agent2.add(availableAgents[0]);
+    agent2.add(availableAgents[1]);
+    agent2.add(availableAgents[2]);
+
+    {
+        Agent::Set coalitionStructure0;
+        coalitionStructure0.insert(agent0);
+        coalitionStructure0.insert(agent1);
+        Agent::Set coalitionStructure1;
+        coalitionStructure1.insert(agent2);
+
+        double cost = heuristics->getReconfigurationCost(coalitionStructure0, coalitionStructure1);
+        BOOST_REQUIRE_MESSAGE(cost == 23, "Reconfiguration cost should be 23, was " << cost);
+    }
+
+
+
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -81,6 +81,30 @@ public:
             const AtomicAgent& agent,
             size_t fromTime,
             size_t toTime) const;
+
+    /**
+     * Compute the reconfiguration cost from a set of agent to another set of
+     * agents, based on teach target agent and involved source agents
+     *
+     * One could consider using the pddl planner, but since the split
+     * disassembles the complete system, this does not give a correct estimate
+     *
+     * \see getReconfigurationCost
+     */
+    double getReconfigurationCost(const Agent::Set& from,
+            const Agent::Set& to) const;
+
+    /**
+     * Compute the reconfiguration to form a particular target agent from a set
+     * of source agents
+     *
+     * Compute cost based on |source-agents|*baseFactor + sum of involved_agents
+     *
+     * \param target Target Agent to be formed
+     * \param origins Map of source agents and the relevant involved atomic
+     * agents
+     */
+    double getReconfigurationCost(const Agent& target, const std::map<Agent, AtomicAgent::List>& origins, double baseFactor = 10) const;
 private:
     OrganizationModelAsk mAsk;
 

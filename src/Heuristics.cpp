@@ -1,5 +1,7 @@
 #include "Heuristics.hpp"
 #include "facets/Robot.hpp"
+#include "exporter/PDDLExporter.hpp"
+#include "pddl_planner/Planning.hpp"
 
 namespace organization_model {
 
@@ -101,6 +103,71 @@ double Heuristics::getEnergyReductionAbsolute(const StatusSample* sample,
         throw std::runtime_error("organization_model::Heuristics::getEnergyReductionAbsolute: "
                 " please call update function on 'agent' to prepare information about energy provider shares");
     }
+}
+
+double Heuristics::getReconfigurationCost(const Agent::Set& _from,
+        const Agent::Set& _to) const
+{
+    AtomicAgent::Set atomicAgents = Agent::allAtomicAgents(_from);
+    if( atomicAgents != Agent::allAtomicAgents(_to))
+    {
+        throw std::invalid_argument("organization_model::Heuristics::getReconfigurationCost: "
+                " from set and to set contain not the same atomic agents");
+    }
+
+    if(_from == _to)
+    {
+        return 0;
+    }
+
+    Agent::List from(_from.begin(), _from.end());
+    std::sort(from.begin(), from.end());
+
+    Agent::List to(_to.begin(), _to.end());
+    std::sort(to.begin(), to.end());
+
+    double cost = 0;
+    for(const Agent& toAgent : to)
+    {
+        std::map<Agent, AtomicAgent::List> originFromAgents;
+        for(const Agent& fromAgent : from)
+        {
+            if(fromAgent == toAgent)
+            {
+                continue;
+            } else
+            {
+                AtomicAgent::List intersection = toAgent.getIntersection(fromAgent);
+                originFromAgents[fromAgent] = intersection;
+            }
+        }
+
+        cost += getReconfigurationCost(toAgent, originFromAgents);
+    }
+    return cost;
+}
+
+double Heuristics::getReconfigurationCost(const Agent& target,
+        const std::map<Agent, AtomicAgent::List>& origins,
+        double baseFactor
+        ) const
+{
+    double cost = 0;
+    std::vector<size_t> deltas;
+    for(const std::pair<Agent, AtomicAgent::List>& p : origins)
+    {
+        const AtomicAgent::List& involvedAgents = p.second;
+
+        // reflect how many reconfiguration between two agents
+        // are required
+        cost += baseFactor;
+
+        // complexity of the reconfiguration is linear with the number of
+        // agents involved in the transaction
+        cost += involvedAgents.size();
+    }
+
+    return cost;
 }
 
 } // end namespace organization_model

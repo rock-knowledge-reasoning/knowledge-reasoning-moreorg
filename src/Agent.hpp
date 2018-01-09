@@ -75,6 +75,35 @@ public:
     const std::map<AtomicAgent, double>& getEnergyProviderShares() const { return mEnergyProviderPolicy.getShares(); }
 
     bool operator<(const Agent& other) const { return this->mAtomicAgents < other.mAtomicAgents; }
+    bool operator==(const Agent& other) const { return this->mAtomicAgents == other.mAtomicAgents; }
+    size_t size() const { return mAtomicAgents.size(); }
+
+    /**
+     * Stringify agent
+     * \return string
+     */
+    std::string toString(size_t indent = 0) const;
+
+    /**
+     * Get the list of all atomic agents that are part of the agent set
+     */
+    static AtomicAgent::Set allAtomicAgents(const Agent::Set& agents);
+
+    /**
+     * Compute intersection with other agent
+     * \return intersection of atomic agents
+     */
+    AtomicAgent::List getIntersection(const Agent& other) const;
+
+    /**
+     * Check if this agent and other agent share atomic agents
+     */
+    bool intersectsWith(const Agent& other) const;
+
+    /**
+     * Get the difference between two agents
+     */
+    AtomicAgent::List getDifference(const Agent& other) const;
 
 private:
     AtomicAgent::Set mAtomicAgents;
