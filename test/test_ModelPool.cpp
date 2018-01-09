@@ -2,8 +2,10 @@
 #include <organization_model/ModelPool.hpp>
 #include <organization_model/ModelPoolIterator.hpp>
 #include <organization_model/Algebra.hpp>
+#include <organization_model/vocabularies/OM.hpp>
 
 using namespace organization_model;
+using namespace organization_model::vocabulary;
 
 BOOST_AUTO_TEST_SUITE(model_pool)
 
@@ -77,5 +79,45 @@ BOOST_AUTO_TEST_CASE(iterator)
     }
 
 }
+
+BOOST_AUTO_TEST_CASE(apply_upper_bound)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    IRI sherpa = OM::resolve("Sherpa");
+    IRI crex = OM::resolve("CREX");
+    IRI payload = OM::resolve("Payload");
+    IRI payloadCamera = OM::resolve("PayloadCamera");
+
+    // upperBound
+    ModelPool modelPool;
+    modelPool[sherpa] = 1;
+    modelPool[crex] = 1;
+
+    ModelCombinationSet combinations;
+    {
+        IRIList combination;
+        combination.push_back(sherpa);
+        combinations.insert(combination);
+    }
+    {
+        IRIList combination;
+        combination.push_back(sherpa);
+        combination.push_back(crex);
+        combinations.insert(combination);
+    }
+    {
+        IRIList combination;
+        combination.push_back(crex);
+        combination.push_back(crex);
+        combination.push_back(crex);
+        combinations.insert(combination);
+    }
+
+    ModelCombinationSet boundedSet = modelPool.applyUpperBound(combinations, modelPool);
+    BOOST_REQUIRE_MESSAGE(boundedSet.size() == 2, "BoundedSet: expected size: 2 was " << boundedSet.size() << ": " << OrganizationModel::toString(boundedSet) );
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

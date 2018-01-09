@@ -642,118 +642,6 @@ ModelPool::Set OrganizationModelAsk::getBoundedResourceSupport(const Functionali
     return ModelPool::applyUpperBound(modelPools, bound);
 }
 
-ModelCombinationSet OrganizationModelAsk::applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBound) const
-{
-    ModelCombinationSet boundedCombinations;
-    ModelCombinationSet::const_iterator cit = combinations.begin();
-    for(; cit != combinations.end(); ++cit)
-    {
-        ModelPool modelPool = OrganizationModel::combination2ModelPool(*cit);
-        if(modelPool.isWithinUpperBound(upperBound))
-        {
-            boundedCombinations.insert(*cit);
-        }
-    }
-
-    LOG_DEBUG_S << "Upper bound set on resources: " << std::endl
-        << "prev: " << OrganizationModel::toString(combinations) << std::endl
-        << "bound: " << std::endl << ModelPoolDelta(upperBound).toString(4) << std::endl
-        << "bounded: " << OrganizationModel::toString(boundedCombinations);
-    return boundedCombinations;
-}
-
-ModelPool::Set OrganizationModelAsk::applyLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBound) const
-{
-    ModelPool::Set boundedModelPools;
-    ModelPool::Set::const_iterator cit = modelPools.begin();
-    for(; cit != modelPools.end(); ++cit)
-    {
-        const ModelPool& modelPool = *cit;
-        ModelPoolDelta delta = Algebra::substract(lowerBound, modelPool);
-        if(!delta.isNegative())
-        {
-            boundedModelPools.insert(modelPool);
-        }
-    }
-
-    LOG_DEBUG_S << "Lower bound set on resources: " << std::endl
-        << "prev: " << std::endl << ModelPool::toString(modelPools,4) << std::endl
-        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
-        << "bounded: " << std::endl << ModelPool::toString(boundedModelPools,4);
-    return boundedModelPools;
-}
-
-ModelCombinationSet OrganizationModelAsk::applyLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBound) const
-{
-    ModelCombinationSet boundedCombinations;
-    ModelCombinationSet::const_iterator cit = combinations.begin();
-    for(; cit != combinations.end(); ++cit)
-    {
-        ModelPool modelPool = OrganizationModel::combination2ModelPool(*cit);
-        ModelPoolDelta delta = Algebra::substract(lowerBound, modelPool);
-        if(!delta.isNegative())
-        {
-            boundedCombinations.insert(*cit);
-        }
-    }
-
-    LOG_DEBUG_S << "Lower bound set on resources: " << std::endl
-        << "prev: " << OrganizationModel::toString(combinations) << std::endl
-        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString() << std::endl
-        << "bounded: " << OrganizationModel::toString(boundedCombinations);
-    return boundedCombinations;
-}
-
-ModelPool::Set OrganizationModelAsk::expandToLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBound) const
-{
-    ModelPool::Set boundedModelPools;
-    if(modelPools.empty())
-    {
-        boundedModelPools.insert(lowerBound);
-        return boundedModelPools;
-    }
-
-    ModelPool::Set::const_iterator cit = modelPools.begin();
-    for(; cit != modelPools.end(); ++cit)
-    {
-        ModelPool modelPool = *cit;
-        // enforce minimum requirement
-        modelPool = Algebra::max(lowerBound, modelPool);
-        boundedModelPools.insert(modelPool);
-    }
-
-    LOG_DEBUG_S << "Lower bound expanded on resources: " << std::endl
-        << "prev: " << std::endl << ModelPool::toString(modelPools,4) << std::endl
-        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
-        << "bounded: " << std::endl << ModelPool::toString(boundedModelPools,4);
-    return boundedModelPools;
-}
-
-ModelCombinationSet OrganizationModelAsk::expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBound) const
-{
-    ModelCombinationSet boundedCombinations;
-    if(combinations.empty())
-    {
-        boundedCombinations.insert(OrganizationModel::modelPool2Combination(lowerBound));
-    }
-    ModelCombinationSet::const_iterator cit = combinations.begin();
-    for(; cit != combinations.end(); ++cit)
-    {
-        ModelPool modelPool = OrganizationModel::combination2ModelPool(*cit);
-        // enforce minimum requirement
-        modelPool = Algebra::max(lowerBound, modelPool);
-        ModelCombination expandedCombination = OrganizationModel::modelPool2Combination(modelPool);
-
-        boundedCombinations.insert(expandedCombination);
-    }
-
-    LOG_DEBUG_S << "Lower bound expanded on resources: " << std::endl
-        << "prev: " << OrganizationModel::toString(combinations) << std::endl
-        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
-        << "bounded: " << OrganizationModel::toString(boundedCombinations);
-    return boundedCombinations;
-}
-
 algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality::Set& functionalities, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
 {
     ModelPool modelPool;
@@ -945,7 +833,6 @@ bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelC
 bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functionality::Set& functionalities) const
 {
     // Requires the functionality mapping to be properly initialized
-
     Functionality::Set::const_iterator cit = functionalities.begin();
     ModelPool::Set previousModelPools;
     bool init = true;
@@ -981,7 +868,19 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functi
 
     }
 
-    ModelPool::Set::const_iterator pit = std::find(previousModelPools.begin(), previousModelPools.end(), modelPool);
+    // Check if any of the previous models is a minimal subset, e.g. with
+    // functional saturation
+    //
+    // TODO: this does not yet account for any negative effects, i.e., when the
+    // coalition is large and for example mass constraints prevent it from
+    // functioning -- find a general way for representation:
+    // by sat bound limited agents + negative effects
+    ModelPool::Set::const_iterator pit = std::find_if(previousModelPools.begin(), previousModelPools.end(),
+            [modelPool](const ModelPool& other)
+            {
+                return Algebra::isSubset(modelPool, other);
+            });
+
     if(pit != previousModelPools.end())
     {
         return true;

@@ -69,7 +69,6 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          * \param upperBounds Bounding ModelPool
          * \return all combinations that operate within the bounds of the given
          * ModelPool
-         * \todo move to ModelPool
          */
         static ModelCombinationSet applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBounds);
 

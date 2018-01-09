@@ -410,49 +410,6 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
     }
 }
 
-BOOST_AUTO_TEST_CASE(apply_upper_bound)
-{
-    using namespace owlapi::vocabulary;
-    using namespace owlapi::model;
-
-    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
-
-    IRI sherpa = OM::resolve("Sherpa");
-    IRI crex = OM::resolve("CREX");
-    IRI payload = OM::resolve("Payload");
-    IRI payloadCamera = OM::resolve("PayloadCamera");
-
-    // upperBound
-    ModelPool modelPool;
-    modelPool[sherpa] = 1;
-    modelPool[crex] = 1;
-
-    OrganizationModelAsk ask(om, modelPool);
-
-    ModelCombinationSet combinations;
-    {
-        IRIList combination;
-        combination.push_back(sherpa);
-        combinations.insert(combination);
-    }
-    {
-        IRIList combination;
-        combination.push_back(sherpa);
-        combination.push_back(crex);
-        combinations.insert(combination);
-    }
-    {
-        IRIList combination;
-        combination.push_back(crex);
-        combination.push_back(crex);
-        combination.push_back(crex);
-        combinations.insert(combination);
-    }
-
-    ModelCombinationSet boundedSet = ask.applyUpperBound(combinations, modelPool);
-    BOOST_REQUIRE_MESSAGE(boundedSet.size() == 2, "BoundedSet: expected size: 2 was " << boundedSet.size() << ": " << OrganizationModel::toString(boundedSet) );
-}
-
 BOOST_AUTO_TEST_CASE(to_string)
 {
     using namespace owlapi::vocabulary;

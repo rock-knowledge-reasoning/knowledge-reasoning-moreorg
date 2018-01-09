@@ -132,62 +132,6 @@ public:
     ModelPool::Set getBoundedResourceSupport(const Functionality::Set& functionalities) const;
 
     /**
-     * Apply an upper bound of resources to an existing Set of model
-     * combinations
-     * \param upperBounds Bounding ModelPool
-     * \return all combinations that operate within the bounds of the given
-     * ModelPool
-     * \todo move to ModelPool
-     */
-    ModelCombinationSet applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBounds) const;
-
-    /**
-     * Apply a lower bound of resources to an existing set of model
-     * combinations, i.e., remove ModelCombinations that operate below the lower
-     * bound
-     * \param combinations
-     * \param lowerBounds Bounding ModelPool
-     * \return all combinations that operate within the bounds of the given
-     * ModelPool
-     */
-    ModelCombinationSet applyLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBounds) const;
-
-    /**
-     * Apply a lower bound of resources to an existing set of model
-     * combinations, i.e., remove ModelCombinations that operate below the lower
-     * bound
-     * \param combinations
-     * \param lowerBounds Bounding ModelPool
-     * \return all combinations that operate within the bounds of the given
-     * ModelPool
-     */
-    ModelPool::Set applyLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBounds) const;
-
-    /*
-     * Enforces the minimum requirement by expanding missing models to
-     * a model combination to fulfill the requirement,
-     * Apply a lower bound of resources to an existing set of model
-     * combinations
-     * \param combinations
-     * \param lowerBounds Bounding ModelPool
-     * \return all combinations that operate now within the bounds of the given
-     * ModelPool
-     */
-    ModelCombinationSet expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBounds) const;
-
-    /*
-     * Enforces the minimum requirement by expanding missing models to
-     * a model combination to fulfill the requirement,
-     * Apply a lower bound of resources to an existing set of model
-     * combinations
-     * \param combinations
-     * \param lowerBounds Bounding ModelPool
-     * \return all combinations that operate now within the bounds of the given
-     * ModelPool
-     */
-    ModelPool::Set expandToLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBounds) const;
-
-    /**
      * Check how a list of functionalities is supported by a model if given cardinality
      * of this model is provided
      * \param functionalities Functionality to be available
