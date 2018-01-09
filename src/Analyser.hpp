@@ -38,11 +38,6 @@ public:
     StatusSample::ConstRawPtrList samplesAt(size_t time) const;
 
     /**
-     *
-     */
-    StatusSample::ConstRawPtrList samples(size_t endTime, size_t startTime = 0) const;
-
-    /**
      * Retrieve all samples for a given atomic agent
      */
     StatusSample::ConstRawPtrList samplesFor(const AtomicAgent& atomicAgent) const;
@@ -74,40 +69,107 @@ public:
 
     /**
      * Get the energy reduction for an individual agent, when assuming the given
-     * sample and time interval
-     *
+     * sample and associated time interval
      * p/atomic agent: energy reduction current / energy max
      * p/agent: energy current / energy max
      * p/agent: energy distribution / entropy
      * p/coalition structure: energy distribution
+     *
+     * \param sample
+     * \param atomicAgent
+     * \param fromTime
+     * \param toTime
+     * \return absolute energy reduction
      */
     double getEnergyReductionAbsolute(const StatusSample* sample, const AtomicAgent& atomicAgent, size_t fromTime, size_t toTime) const;
+
+    /**
+     * Get the absolute energy reduction at \p time for \p atomicAgent
+     * \param time
+     * \param atomicAgent
+     * \return energy reduction
+     */
     double getEnergyReductionAbsolute(size_t time, const AtomicAgent& atomicAgent) const;
+
+    /**
+     * Get the absolute energy reduction at \p time for \p agent
+     * \param time
+     * \param agent
+     * \return energy reduction
+     */
     double getEnergyReductionAbsolute(size_t time, const Agent& agent) const;
+
+    /**
+     * Get absolute available energy at \p time for \p agent
+     * \param time
+     * \param agent
+     * \return available energy
+     */
     double getEnergyAvailableAbsolute(size_t time, const Agent& agent) const;
+
+
+    /**
+     * Get absolute energy reduction at \p time
+     * \param time
+     * \return list of values which corresponding to the current coalition
+     * structure
+     */
     std::vector<double> getEnergyReductionAbsolute(size_t time) const;
+
+    /**
+     * Get absolute available energy at \p time for the active coalition
+     * structure
+     * \param time
+     * \return list of values which corresponding to the current coalition
+     * structure
+     */
     std::vector<double> getEnergyAvailableAbsolute(size_t time) const;
 
     /**
      * Compute the remaining energy relative to the full energy capacity of the
      * given agent
+     * \param time
+     * \param agent
+     * \return relative available energy
      */
     double getEnergyAvailableRelative(size_t time, const Agent& agent) const;
-    double getEnergyReductionRelative(size_t time, const Agent& agent) const;
+
     /**
-     *
+     * Compute the energy reduction relative to the full capacity of an agent
+     * \param time
+     * \param agent
+     * \return relative energy reduction
+     */
+    double getEnergyReductionRelative(size_t time, const Agent& agent) const;
+
+    /**
+     * Compute the energy reduction relative to the full capacity of an atomic
+     * agent
+     * \param time
+     * \param atomicAgent
+     * \return relative energy reduction
      */
     double getEnergyReductionRelative(size_t time, const AtomicAgent& atomicAgent) const;
 
+    /**
+     * Compute the relative available energy (with respect to agents' full
+     * capacity at \p time
+     * \param time
+     * \return list of values which corresponding to the current coalition
+     * structure
+     * \see getCoalitionStructure
+     */
     std::vector<double> getEnergyAvailableRelative(size_t time) const;
 
     /**
      * Compute the median of a number of values
+     * \return median of values
      */
     static double getMedian(std::vector<double> values);
 
     /**
      * Get the energy distribution as median absolute deviation (MAD)
+     * \return median absolute deviation at \p time
      */
     double getEnergyMAD(size_t time) const;
 
@@ -125,7 +187,8 @@ public:
 
     /**
      * Compute the travel distance, based on the direct line between two
-     * locations for a particular atomic agent
+     * locations for a particular atomic agent and the set of involved travel
+     * segments
      */
     double getTravelDistance(size_t time, const AtomicAgent& atomicAgent) const;
 

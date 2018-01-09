@@ -25,6 +25,10 @@ public:
 
     StatusSample();
 
+    /**
+     * \brief StatusSample constructor
+     * \details A status sample represent
+     */
     StatusSample(const Agent& instance,
             const base::Position& fromLocation,
             const base::Position& toLocation,

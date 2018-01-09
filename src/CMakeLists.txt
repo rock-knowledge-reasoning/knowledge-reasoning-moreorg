@@ -42,6 +42,7 @@ rock_library(organization_model
         reasoning/ResourceMatch.cpp
         Service.cpp
         StatusSample.cpp
+        Types.cpp
         utils/CoalitionStructureGeneration.cpp
         ValueBound.cpp
     HEADERS
