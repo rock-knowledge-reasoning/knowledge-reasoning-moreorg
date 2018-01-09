@@ -230,7 +230,7 @@ double Analyser::getEnergyMAD(size_t time) const
     return Analyser::getMedian(deltas);
 }
 
-double Analyser::getEnergyMinAvailableRelative(size_t time) const
+double Analyser::getEnergyAvailableMinRelative(size_t time) const
 {
     std::vector<double> energyAvailable = getEnergyAvailableRelative(time);
     double min = std::numeric_limits<double>::max();
@@ -250,6 +250,18 @@ double Analyser::getTravelDistance(size_t time, const AtomicAgent& atomicAgent) 
     const StatusSample::ConstRawPtrList& samples = samplesFor(atomicAgent);
     for(const StatusSample* sample : samples)
     {
+        // stop with get from time
+        if(sample->getFromTime() <= time && sample->getToTime() >= time)
+        {
+            distance += (sample->getToLocation() - sample->getFromLocation()).norm()*(time - sample->getFromTime());
+            // last sample which needs to be partially evaluated
+            break;
+        } else {
+            distance += (sample->getToLocation() - sample->getFromLocation()).norm();
+        }
+    }
+    return distance;
+}
         distance += (sample->getToLocation() - sample->getFromLocation()).norm();
     }
     return distance;

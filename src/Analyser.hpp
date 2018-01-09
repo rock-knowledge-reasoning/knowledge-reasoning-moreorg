@@ -111,7 +111,12 @@ public:
      */
     double getEnergyMAD(size_t time) const;
 
-    double getEnergyMinAvailableRelative(size_t time) const;
+    /**
+     * Get the min relative available energy at \p time
+     * This allows to identify critical energy levels
+     * \return minimal available energy (relative to an agents full capacity)
+     */
+    double getEnergyAvailableMinRelative(size_t time) const;
 
     // atomic agents:
     // - travelledDistance

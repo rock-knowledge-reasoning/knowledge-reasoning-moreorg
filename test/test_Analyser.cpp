@@ -135,7 +135,7 @@ BOOST_FIXTURE_TEST_CASE(get_energy, AnalyserFixture)
 
     for(size_t i = 0; i < 100; ++i)
     {
-        BOOST_TEST_MESSAGE("getEnergyMinAvailableRelative: " << analyser->getEnergyMinAvailableRelative(i));
+        BOOST_TEST_MESSAGE("getEnergyAvailableMinRelative: " << analyser->getEnergyAvailableMinRelative(i));
     }
 }
 
