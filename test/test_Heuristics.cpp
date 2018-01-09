@@ -175,7 +175,8 @@ BOOST_FIXTURE_TEST_CASE(reconfiguration_cost, HeuristicsFixture)
         coalitionStructure1.insert(agent2);
 
         double cost = heuristics->getReconfigurationCost(coalitionStructure0, coalitionStructure1);
-        BOOST_REQUIRE_MESSAGE(cost == 23, "Reconfiguration cost should be 23, was " << cost);
+        double expectedCost = 600*2 + 180*3;
+        BOOST_REQUIRE_MESSAGE(cost == expectedCost, "Reconfiguration cost should be '" << expectedCost << "', was " << cost);
     }
 
 

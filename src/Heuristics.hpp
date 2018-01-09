@@ -102,9 +102,17 @@ public:
      *
      * \param target Target Agent to be formed
      * \param origins Map of source agents and the relevant involved atomic
+     * \param cooperationTimeInS The basic time to align to system for
+     * cooperation in seconds
+     * \param transferTimePerAtomicAgentInS The basic time for transfer an
+     * atomic agent in seconds
      * agents
      */
-    double getReconfigurationCost(const Agent& target, const std::map<Agent, AtomicAgent::List>& origins, double baseFactor = 10) const;
+    double getReconfigurationCost(const Agent& target,
+            const std::map<Agent, AtomicAgent::List>& origins,
+            double cooperationTimeInS = 600,
+            double transferTimePerAtomicAgentInS = 180)
+        const;
 private:
     OrganizationModelAsk mAsk;
 

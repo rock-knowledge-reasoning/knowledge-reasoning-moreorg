@@ -149,7 +149,8 @@ double Heuristics::getReconfigurationCost(const Agent::Set& _from,
 
 double Heuristics::getReconfigurationCost(const Agent& target,
         const std::map<Agent, AtomicAgent::List>& origins,
-        double baseFactor
+        double cooperationTimeInS,
+        double transferTimePerAtomicAgentInS
         ) const
 {
     double cost = 0;
@@ -160,11 +161,11 @@ double Heuristics::getReconfigurationCost(const Agent& target,
 
         // reflect how many reconfiguration between two agents
         // are required
-        cost += baseFactor;
+        cost += cooperationTimeInS;
 
         // complexity of the reconfiguration is linear with the number of
         // agents involved in the transaction
-        cost += involvedAgents.size();
+        cost += involvedAgents.size() * transferTimePerAtomicAgentInS;
     }
 
     return cost;
