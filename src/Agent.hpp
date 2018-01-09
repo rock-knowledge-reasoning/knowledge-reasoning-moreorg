@@ -4,6 +4,7 @@
 #include "AtomicAgent.hpp"
 #include "OrganizationModelAsk.hpp"
 #include "policies/EnergyProviderPolicy.hpp"
+#include "policies/TransportProviderPolicy.hpp"
 
 namespace organization_model {
 
@@ -73,9 +74,12 @@ public:
      */
     const std::map<AtomicAgent, double>& getEnergyProviderShares() const { return mEnergyProviderPolicy.getShares(); }
 
+    bool operator<(const Agent& other) const { return this->mAtomicAgents < other.mAtomicAgents; }
+
 private:
     AtomicAgent::Set mAtomicAgents;
     policies::EnergyProviderPolicy mEnergyProviderPolicy;
+    policies::TransportProviderPolicy mTransportProviderPolicy;
 
 };
 
