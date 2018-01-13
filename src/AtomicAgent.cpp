@@ -150,4 +150,39 @@ facets::Robot AtomicAgent::getFacet(const OrganizationModelAsk& ask) const
 
 }
 
+AtomicAgent::TypeMap AtomicAgent::toTypeMap(const AtomicAgent::Set& atomicAgents)
+{
+    TypeMap typeMap;
+    for(const AtomicAgent& aa : atomicAgents)
+    {
+        typeMap[ aa.getModel() ].insert(aa);
+    }
+    return typeMap;
+}
+
+std::string AtomicAgent::toString(const TypeMap& typeMap, size_t indent)
+{
+    std::stringstream ss;
+    std::string hspace(indent,' ');
+
+    for(const TypeMap::value_type& v : typeMap)
+    {
+        ss << hspace << v.first.getFragment() << ":" << std::endl;
+        ss << hspace << "    ";
+        AtomicAgent::Set::iterator cit = v.second.begin();
+        for(;cit != v.second.end();)
+        {
+            ss << cit->getId();
+            if(++cit == v.second.end())
+            {
+                break;
+            } else {
+                ss << ", ";
+            }
+        }
+        ss << std::endl;
+    }
+    return ss.str();
+}
+
 } // end namespace organization_model

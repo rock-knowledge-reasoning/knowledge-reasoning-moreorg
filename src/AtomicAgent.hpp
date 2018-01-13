@@ -27,6 +27,7 @@ class AtomicAgent
 public:
     typedef std::vector<AtomicAgent> List;
     typedef std::set<AtomicAgent> Set;
+    typedef std::map<owlapi::model::IRI, std::set<AtomicAgent> > TypeMap;
 
     /**
      * Default constructor to allow usage in lists and maps
@@ -76,6 +77,12 @@ public:
      * Create the robot facet
      */
     facets::Robot getFacet(const OrganizationModelAsk& ask) const;
+
+    /**
+     * Compute the type map from a set of atomic agents
+     */
+    static TypeMap toTypeMap(const AtomicAgent::Set& atomicAgents);
+    static std::string toString(const TypeMap& typeMap, size_t indent = 0);
 };
 
 } // end namespace organization_model
