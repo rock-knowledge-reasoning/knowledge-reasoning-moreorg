@@ -1,13 +1,13 @@
 #include <boost/test/unit_test.hpp>
 #include <organization_model/OrganizationModelAsk.hpp>
-#include <organization_model/facets/Robot.hpp>
+#include <organization_model/facades/Robot.hpp>
 #include <organization_model/vocabularies/OM.hpp>
 #include "test_utils.hpp"
 #include <organization_model/vocabularies/Robot.hpp>
 
 using namespace organization_model;
 
-BOOST_AUTO_TEST_SUITE(facets)
+BOOST_AUTO_TEST_SUITE(facades)
 
 BOOST_AUTO_TEST_CASE(robot)
 {
@@ -25,15 +25,15 @@ BOOST_AUTO_TEST_CASE(robot)
 
     OrganizationModelAsk ask(om, modelPool, true);
     {
-        organization_model::facets::Robot robot(sherpa, ask);
+        organization_model::facades::Robot robot(sherpa, ask);
         BOOST_REQUIRE_MESSAGE(robot.isMobile(), "Robot " << sherpa << " is mobile");
     }
     {
-        organization_model::facets::Robot robot(payload, ask);
+        organization_model::facades::Robot robot(payload, ask);
         BOOST_REQUIRE_MESSAGE(!robot.isMobile(), "Robot " << payload << " is not mobile");
     }
     {
-        organization_model::facets::Robot robot(payload, ask);
+        organization_model::facades::Robot robot(payload, ask);
         BOOST_REQUIRE_MESSAGE(!robot.isMobile(), "Robot " << payload << " is not mobile");
     }
     {
@@ -79,15 +79,15 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
 
     OrganizationModelAsk ask(om, modelPool, true);
     {
-        organization_model::facets::Robot robot(sherpa, ask);
+        organization_model::facades::Robot robot(sherpa, ask);
         BOOST_REQUIRE_MESSAGE(robot.isMobile(), "Robot " << sherpa << " is mobile");
     }
     {
-        organization_model::facets::Robot robot(payload, ask);
+        organization_model::facades::Robot robot(payload, ask);
         BOOST_REQUIRE_MESSAGE(!robot.isMobile(), "Robot " << payload << " is not mobile");
     }
     {
-        organization_model::facets::Robot robot(payload, ask);
+        organization_model::facades::Robot robot(payload, ask);
         BOOST_REQUIRE_MESSAGE(!robot.isMobile(), "Robot " << payload << " is not mobile");
     }
     {
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
     }
 
     {
-        organization_model::facets::Robot robot(sherpa, ask);
+        organization_model::facades::Robot robot(sherpa, ask);
         uint32_t transportDemand = robot.getTransportDemand();
         BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << sherpa << " has transport demand of: " << transportDemand);
 
@@ -146,13 +146,13 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
 
     }
     {
-        organization_model::facets::Robot robot(basecamp, ask);
+        organization_model::facades::Robot robot(basecamp, ask);
         uint32_t transportDemand = robot.getTransportDemand();
         BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << basecamp << " has transport demand of: " << transportDemand);
     }
 
     {
-        organization_model::facets::Robot robot(payload, ask);
+        organization_model::facades::Robot robot(payload, ask);
         uint32_t transportDemand = robot.getTransportDemand();
         BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << payload << " has transport demand of: " << transportDemand);
     }
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(composite_robot_from_transterra)
     OrganizationModelAsk ask(om, modelPool, true);
     BOOST_TEST_MESSAGE("Functionality mapping: " << ask.getFunctionalityMapping().toString(4));
     {
-        organization_model::facets::Robot robot(modelPool, ask);
+        organization_model::facades::Robot robot(modelPool, ask);
         BOOST_REQUIRE_MESSAGE(robot.isMobile(), "Robot " << modelPool.toString() << " is mobile");
     }
 }

@@ -20,7 +20,7 @@ const AtomicAgent::Set& TransportProviderPolicy::activeTransportProviders(const 
     // identify active transport system
     for(const AtomicAgent& aa : agent.getAtomicAgents())
     {
-        double capacity = aa.getFacet(ask).getTransportCapacity();
+        double capacity = aa.getFacade(ask).getTransportCapacity();
         if(capacity > maxCapacity)
         {
             maxCapacity = capacity;

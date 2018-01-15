@@ -7,7 +7,7 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/set.hpp>
 #include "OrganizationModelAsk.hpp"
-#include "facets/Robot.hpp"
+#include "facades/Robot.hpp"
 
 namespace organization_model {
 
@@ -74,9 +74,9 @@ public:
     static List createAtomicAgents(const organization_model::ModelPool& modelPool);
 
     /**
-     * Create the robot facet
+     * Create the robot facade
      */
-    facets::Robot getFacet(const OrganizationModelAsk& ask) const;
+    facades::Robot getFacade(const OrganizationModelAsk& ask) const;
 
     /**
      * Compute the type map from a set of atomic agents

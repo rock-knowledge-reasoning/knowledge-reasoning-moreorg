@@ -1,5 +1,5 @@
 #include "Heuristics.hpp"
-#include "facets/Robot.hpp"
+#include "facades/Robot.hpp"
 #include "exporter/PDDLExporter.hpp"
 #include "pddl_planner/Planning.hpp"
 
@@ -16,7 +16,7 @@ base::Position Heuristics::positionLinear(const Agent& agent,
         size_t progressedTime) const
 {
     ModelPool m = agent.getType();
-    facets::Robot robot(m, mAsk);
+    facades::Robot robot(m, mAsk);
 
     double nominalVelocity = robot.getNominalVelocity();
 
@@ -34,7 +34,7 @@ double Heuristics::travelTime(const Agent& agent,
         const base::Position& to) const
 {
     ModelPool m = agent.getType();
-    facets::Robot robot(m, mAsk);
+    facades::Robot robot(m, mAsk);
 
     double nominalVelocity = robot.getNominalVelocity();
     // s = v*t
@@ -81,7 +81,7 @@ double Heuristics::getEnergyConsumption(const StatusSample* sample) const
     double requiredTravelTime = travelTime(sample);
     double requiredWaitTime = waitTime(sample);
 
-    double energyConsumption = sample->getAgent().getFacet(mAsk).estimatedEnergyCostFromTime(requiredTravelTime + requiredWaitTime);
+    double energyConsumption = sample->getAgent().getFacade(mAsk).estimatedEnergyCostFromTime(requiredTravelTime + requiredWaitTime);
 
     mEnergyConsumption[sample] = energyConsumption;
     return energyConsumption;

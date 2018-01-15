@@ -143,7 +143,7 @@ std::vector<double> Analyser::getEnergyReductionAbsolute(size_t time) const
 
 double Analyser::getEnergyAvailableAbsolute(size_t time, const Agent& agent) const
 {
-    double fullCapacity = agent.getFacet(mAsk).getEnergyCapacity();
+    double fullCapacity = agent.getFacade(mAsk).getEnergyCapacity();
     return fullCapacity - getEnergyReductionAbsolute(time, agent);
 }
 
@@ -161,7 +161,7 @@ std::vector<double> Analyser::getEnergyAvailableAbsolute(size_t time) const
 
 double Analyser::getEnergyReductionRelative(size_t time, const AtomicAgent& atomicAgent) const
 {
-    double fullEnergyCapacity = atomicAgent.getFacet(mAsk).getEnergyCapacity();
+    double fullEnergyCapacity = atomicAgent.getFacade(mAsk).getEnergyCapacity();
     double energyReduction  = getEnergyReductionAbsolute(time, atomicAgent);
 
     if(energyReduction == 0)
@@ -174,7 +174,7 @@ double Analyser::getEnergyReductionRelative(size_t time, const AtomicAgent& atom
 
 double Analyser::getEnergyReductionRelative(size_t time, const Agent& agent) const
 {
-    double fullEnergyCapacity = agent.getFacet(mAsk).getEnergyCapacity();
+    double fullEnergyCapacity = agent.getFacade(mAsk).getEnergyCapacity();
     return getEnergyReductionAbsolute(time, agent) / fullEnergyCapacity;
 }
 

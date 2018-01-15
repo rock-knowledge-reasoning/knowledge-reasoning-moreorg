@@ -7,7 +7,7 @@ using namespace owlapi::model;
 
 
 namespace organization_model {
-namespace facets {
+namespace facades {
 
 std::map<ModelPool, Robot> Robot::msRobots;
 
@@ -32,11 +32,11 @@ const Robot& Robot::getInstance(const ModelPool& modelPool, const OrganizationMo
 }
 
 Robot::Robot()
-    : Facet()
+    : Facade()
 {}
 
 Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& organizationModelAsk)
-    : Facet(organizationModelAsk)
+    : Facade(organizationModelAsk)
     , mMinAcceleration(0.0)
     , mMaxAcceleration(0.0)
     , mNominalAcceleration(0.0)
@@ -63,7 +63,7 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
     {
         LOG_WARN_S << e.what();
 
-        throw std::runtime_error("organization_model::facets::Robot loading of model '" + actorModel.toString() + "' failed: " + e.what());
+        throw std::runtime_error("organization_model::facades::Robot loading of model '" + actorModel.toString() + "' failed: " + e.what());
     }
 
     // optional base mobility
@@ -96,7 +96,7 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
 }
 
 Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizationModelAsk)
-    : Facet(organizationModelAsk)
+    : Facade(organizationModelAsk)
     , mModelPool(modelPool)
     , mMinAcceleration(0.0)
     , mMaxAcceleration(0.0)
@@ -126,7 +126,7 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
         {
             LOG_WARN_S << e.what();
 
-            throw std::runtime_error("organization_model::facets::Robot loading of model '" + actorModel.toString() + "' failed: " + e.what());
+            throw std::runtime_error("organization_model::facades::Robot loading of model '" + actorModel.toString() + "' failed: " + e.what());
         }
 
         // optional base mobility
@@ -178,11 +178,11 @@ uint32_t Robot::getTransportCapacity(const owlapi::model::IRI& model) const
                 case OWLCardinalityRestriction::MIN:
                 case OWLCardinalityRestriction::EXACT:
                 case OWLCardinalityRestriction::UNKNOWN:
-                    throw std::runtime_error("organization_model::facets::Robot::getTransportCapacity: expected max cardinality restriction, but got '" + OWLCardinalityRestriction::CardinalityRestrictionTypeTxt[r->getCardinalityRestrictionType()] + "'");
+                    throw std::runtime_error("organization_model::facades::Robot::getTransportCapacity: expected max cardinality restriction, but got '" + OWLCardinalityRestriction::CardinalityRestrictionTypeTxt[r->getCardinalityRestrictionType()] + "'");
             }
         }
     } else {
-        throw std::runtime_error("facets::Robot::getTransportCapacity: not implemented for composite systems");
+        throw std::runtime_error("facades::Robot::getTransportCapacity: not implemented for composite systems");
 
     }
     return capacity;
@@ -247,5 +247,5 @@ bool Robot::isMobile() const
 }
 
 
-} // end namespace facets
+} // end namespace facades
 } // end namespace organization_model

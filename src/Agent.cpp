@@ -20,10 +20,10 @@ Agent::Agent(const AtomicAgent::Set& atomicAgents)
 {
 }
 
-facets::Robot Agent::getFacet(const OrganizationModelAsk& ask) const
+facades::Robot Agent::getFacade(const OrganizationModelAsk& ask) const
 {
     ModelPool modelPool = getType();
-    return facets::Robot::getInstance(modelPool, ask);
+    return facades::Robot::getInstance(modelPool, ask);
 }
 
 void Agent::update(const OrganizationModelAsk& ask)

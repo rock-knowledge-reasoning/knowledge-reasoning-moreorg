@@ -14,7 +14,7 @@ void EnergyProviderPolicy::update(const Agent& agent, const OrganizationModelAsk
 
     for(const AtomicAgent& atomicAgent : agent.getAtomicAgents())
     {
-        facets::Robot robot = atomicAgent.getFacet(ask);
+        facades::Robot robot = atomicAgent.getFacade(ask);
         double capacity = robot.getEnergyCapacity();
         fullCapacity += capacity;
         energyCapacity[atomicAgent] = capacity;

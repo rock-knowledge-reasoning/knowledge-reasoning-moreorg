@@ -1,28 +1,28 @@
-#ifndef ORGANIZATION_MODEL_FACETS_FACET_HPP
-#define ORGANIZATION_MODEL_FACETS_FACET_HPP
+#ifndef ORGANIZATION_MODEL_FACADES_FACADE_HPP
+#define ORGANIZATION_MODEL_FACADES_FACADE_HPP
 
 #include <organization_model/OrganizationModelAsk.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
 
 namespace organization_model {
-namespace facets {
+namespace facades {
 
-class Facet
+class Facade
 {
 public:
-    Facet(const OrganizationModelAsk& organizationModelAsk)
+    Facade(const OrganizationModelAsk& organizationModelAsk)
         : mOrganizationModelAsk(organizationModelAsk)
     {}
 
     const OrganizationModelAsk& organizationAsk() const { return mOrganizationModelAsk; }
 
 protected:
-    Facet()
+    Facade()
     {}
 
     OrganizationModelAsk mOrganizationModelAsk;
 };
 
-} // end namespace facets
+} // end namespace facades
 } // end namespace organization_model
-#endif // ORGANIZATION_MODEL_FACETS_FACET_HPP
+#endif // ORGANIZATION_MODEL_FACADES_FACADE_HPP

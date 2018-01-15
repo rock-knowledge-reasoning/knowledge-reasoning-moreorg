@@ -144,9 +144,9 @@ AtomicAgent::List AtomicAgent::createAtomicAgents(const organization_model::Mode
     return agents;
 }
 
-facets::Robot AtomicAgent::getFacet(const OrganizationModelAsk& ask) const
+facades::Robot AtomicAgent::getFacade(const OrganizationModelAsk& ask) const
 {
-    return facets::Robot::getInstance(mModel, ask);
+    return facades::Robot::getInstance(mModel, ask);
 
 }
 

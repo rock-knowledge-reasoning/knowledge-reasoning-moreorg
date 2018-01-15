@@ -59,10 +59,10 @@ public:
     ModelPool getType() const;
 
     /**
-     * Get the robot facet
-     * \return facet object
+     * Get the robot facade
+     * \return facade object
      */
-    facets::Robot getFacet(const OrganizationModelAsk& ask) const;
+    facades::Robot getFacade(const OrganizationModelAsk& ask) const;
 
     /**
      * Get the set of atomic agents

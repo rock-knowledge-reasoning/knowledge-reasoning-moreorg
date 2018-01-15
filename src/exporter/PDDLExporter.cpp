@@ -6,7 +6,7 @@
 #include <pddl_planner/representation/Domain.hpp>
 #include "../OrganizationModelAsk.hpp"
 #include "../vocabularies/OM.hpp"
-#include "../facets/Robot.hpp"
+#include "../facades/Robot.hpp"
 
 using namespace owlapi::model;
 
@@ -268,7 +268,7 @@ pddl_planner::representation::Problem PDDLExporter::toProblem()
             }
 
             // Mobility is handled specially
-            facets::Robot robot(agentType, mAsk);
+            facades::Robot robot(agentType, mAsk);
             if( robot.isMobile() )
             {
                 problem.addInitialStatus( Expression(KeywordTxt[MOBILE], instanceName) );

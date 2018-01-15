@@ -1,16 +1,16 @@
-#ifndef ORGANIZATION_MODEL_FACETS_ROBOT_HPP
-#define ORGANIZATION_MODEL_FACETS_ROBOT_HPP
+#ifndef ORGANIZATION_MODEL_FACADES_ROBOT_HPP
+#define ORGANIZATION_MODEL_FACADES_ROBOT_HPP
 
-#include <organization_model/facets/Facet.hpp>
+#include <organization_model/facades/Facade.hpp>
 
 namespace organization_model {
-namespace facets {
+namespace facades {
 
 /**
- * A facet for individual and composite robotic systems (aka atomic and
+ * A facade for individual and composite robotic systems (aka atomic and
  * composite physical agents)
  */
-class Robot : public Facet
+class Robot : public Facade
 {
 
 public:
@@ -27,12 +27,12 @@ public:
     Robot();
 
     /**
-     * Facet constructor for an atomic system
+     * Facade constructor for an atomic system
      */
     Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& organizationModelAsk);
 
     /**
-     * Facet constructor for a composite system
+     * Facade constructor for a composite system
      */
     Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizationModelAsk);
 
@@ -151,6 +151,6 @@ private:
     static std::map<ModelPool, Robot> msRobots;
 };
 
-} // end namespace facets
+} // end namespace facades
 } // end namespace organization_model
-#endif // ORGANIZATION_MODEL_FACETS_ROBOT_HPP
+#endif // ORGANIZATION_MODEL_FACADES_ROBOT_HPP

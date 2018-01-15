@@ -16,7 +16,7 @@ rock_library(organization_model
         ccf/LinkType.cpp
         ccf/Scenario.cpp
         exporter/PDDLExporter.cpp
-        facets/Robot.cpp
+        facades/Robot.cpp
         Functionality.cpp
         FunctionalityMapping.cpp
         FunctionalityRequirement.cpp
@@ -62,8 +62,8 @@ rock_library(organization_model
         ccf/LinkType.hpp
         ccf/Scenario.hpp
         exporter/PDDLExporter.hpp
-        facets/Facet.hpp
-        facets/Robot.hpp
+        facades/Facade.hpp
+        facades/Robot.hpp
         Functionality.hpp
         FunctionalityRequirement.hpp
         FunctionalityMapping.hpp

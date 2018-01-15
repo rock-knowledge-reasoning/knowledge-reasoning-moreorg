@@ -114,7 +114,7 @@ BOOST_FIXTURE_TEST_CASE(get_energy, AnalyserFixture)
 
         {
             double energyReduction = analyser->getEnergyReductionAbsolute(100, a);
-            if( a.getFacet(ask).getEnergyCapacity() != 0)
+            if( a.getFacade(ask).getEnergyCapacity() != 0)
             {
                 BOOST_REQUIRE_MESSAGE(energyReduction > 0, "Energy reduction for '" <<
                         a.getName() << "' should be > 0, but was '" << energyReduction << "'");
