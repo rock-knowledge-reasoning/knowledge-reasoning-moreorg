@@ -1,0 +1,18 @@
+from:     ModelPool:
+        http://www.rock-robotics.org/2014/01/om-schema#BaseCamp : 3
+        http://www.rock-robotics.org/2014/01/om-schema#CoyoteIII : 3
+        http://www.rock-robotics.org/2014/01/om-schema#Payload : 25
+        http://www.rock-robotics.org/2014/01/om-schema#Sherpa : 10
+
+to:     ModelPool:
+        http://www.rock-robotics.org/2014/01/om-schema#BaseCamp : 3
+        http://www.rock-robotics.org/2014/01/om-schema#CoyoteIII : 3
+        http://www.rock-robotics.org/2014/01/om-schema#Payload : 25
+        http://www.rock-robotics.org/2014/01/om-schema#Sherpa : 10
+
+step:     ModelPool:
+
+# number of epochs: 10
+# minfeasible: 1
+# [model #] [graph completeness eval][stdev][time in s][stdev][stopped][stdev][# propagator executions][stdev][# failed nodes][stdev][# expanded nodes][stdev][# depth of search stack][stdev][# restarts][stdev][# nogoods][stdev]
+3 3 25 10 469.4 322.128 25.3937 17.4674 0 0 5.81187e+06 4.01974e+06 0 0 19714.8 13529.4 41 0 41 0 468.4 322.128 

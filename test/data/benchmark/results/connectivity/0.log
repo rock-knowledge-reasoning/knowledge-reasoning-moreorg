@@ -1,0 +1,36 @@
+Read orga iri: http://www.rock-robotics.org/2015/12/projects/TransTerrA
+Read: iri:http://www.rock-robotics.org/2014/01/om-schema#Sherpa '25'
+Read: iri:http://www.rock-robotics.org/2014/01/om-schema#CoyoteIII '3'
+Read: iri:http://www.rock-robotics.org/2014/01/om-schema#BaseCamp '2'
+Read: iri:http://www.rock-robotics.org/2014/01/om-schema#Payload '25'
+# epochs: 1
+ModelPool:
+    http://www.rock-robotics.org/2014/01/om-schema#BaseCamp : 2
+    http://www.rock-robotics.org/2014/01/om-schema#CoyoteIII : 3
+    http://www.rock-robotics.org/2014/01/om-schema#Payload : 25
+    http://www.rock-robotics.org/2014/01/om-schema#Sherpa : 25
+
+[graph completeness eval][time in s][stopped][# propagator executions][# failed nodes][# expanded nodes][# depth of search stack][# restarts][# nogoods]
+13 60.1719 1 332125 0 717 54 13 13 
+[graph completeness eval][stdev][time in s][stdev][stopped][stdev][# propagator executions][stdev][# failed nodes][stdev][# expanded nodes][stdev][# depth of search stack][stdev][# restarts][stdev][# nogoods][stdev]
+13 0 60.1719 0 1 0 332125 0 0 0 717 0 54 0 54 0 13 0 
+
+
+Functions
+http://www.rock-robotics.org/2014/01/om-schema#Service 0.995006
+http://www.rock-robotics.org/2014/01/om-schema#LogisticHubProvider 0.995006
+http://www.rock-robotics.org/2014/01/om-schema#TransportProvider 1
+http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider 1
+http://www.rock-robotics.org/2014/01/om-schema#SoilSamplingProvider 0
+http://www.rock-robotics.org/2014/01/om-schema#PayloadLogisticHub 0.995006
+http://www.rock-robotics.org/2014/01/om-schema#ManipulationProvider 1
+http://www.rock-robotics.org/2014/01/om-schema#LocationImageProvider 1
+http://www.rock-robotics.org/2014/01/om-schema#ImageProvider 1
+http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider 1
+http://www.rock-robotics.org/2014/01/om-schema#Capability 1
+http://www.rock-robotics.org/2014/01/om-schema#Mapping 1
+http://www.rock-robotics.org/2014/01/om-schema#Manipulation 1
+http://www.rock-robotics.org/2014/01/om-schema#Locomotion 1
+http://www.rock-robotics.org/2014/01/om-schema#Localization 1
+http://www.rock-robotics.org/2014/01/om-schema#MoveTo 1
+

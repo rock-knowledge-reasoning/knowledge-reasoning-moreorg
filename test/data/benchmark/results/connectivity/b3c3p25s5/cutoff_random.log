@@ -1,0 +1,18 @@
+# Gecode::Rnd rnd;
+# rnd.hw();
+# Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::rnd(rnd.seed(),1,connectivity->mInterfaces.size(),2);
+
+# epochs: 50
+ModelPool:
+    http://www.rock-robotics.org/2014/01/om-schema#BaseCamp : 3
+    http://www.rock-robotics.org/2014/01/om-schema#CoyoteIII : 3
+    http://www.rock-robotics.org/2014/01/om-schema#Payload : 25
+    http://www.rock-robotics.org/2014/01/om-schema#Sherpa : 10
+
+# number of epochs: 50
+# minfeasible: 1
+# [model #] [graph completeness eval][stdev][time in s][stdev][stopped][stdev][#
+# propagator executions][stdev][# failed nodes][stdev][# expanded
+# nodes][stdev][# depth of search stack][stdev][# restarts][stdev][#
+# nogoods][stdev]
+3 3 25 10 13.06 11.4951 2.5557 2.3149 0 0 163977 135080 0 0 548.52 482.793 41 0 41 0 12.06 11.4951 

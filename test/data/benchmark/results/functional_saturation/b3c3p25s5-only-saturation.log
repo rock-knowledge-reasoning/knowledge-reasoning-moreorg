@@ -1,0 +1,3 @@
+# number of epochs: 10
+# [model #] [timeInS w/o sat bound][stdev][timeInS w sat bound][stdev]
+3 3 25 5 0.139641 0.00224166 0.140413 0.00269868 

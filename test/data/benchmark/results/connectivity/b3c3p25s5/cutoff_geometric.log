@@ -1,0 +1,19 @@
+# Geometric cutoff: 10,# Geometric cutoff: 10,22
+#from:     ModelPool:
+#        http://www.rock-robotics.org/2014/01/om-schema#BaseCamp : 3
+#        http://www.rock-robotics.org/2014/01/om-schema#CoyoteIII : 3
+#        http://www.rock-robotics.org/2014/01/om-schema#Payload : 25
+#        http://www.rock-robotics.org/2014/01/om-schema#Sherpa : 10
+#
+#to:     ModelPool:
+#        http://www.rock-robotics.org/2014/01/om-schema#BaseCamp : 3
+#        http://www.rock-robotics.org/2014/01/om-schema#CoyoteIII : 3
+#        http://www.rock-robotics.org/2014/01/om-schema#Payload : 25
+#        http://www.rock-robotics.org/2014/01/om-schema#Sherpa : 10
+#
+#step:     ModelPool:
+#
+# number of epochs: 50
+# minfeasible: 1
+# [model #] [graph completeness eval][stdev][time in s][stdev][stopped][stdev][# propagator executions][stdev][# failed nodes][stdev][# expanded nodes][stdev][# depth of search stack][stdev][# restarts][stdev][# nogoods][stdev]
+3 3 25 10 10.4 10.022 2.7205 2.76909 0 0 132695 117876 0 0 436.8 420.923 41 0 41 0 9.4 10.022 

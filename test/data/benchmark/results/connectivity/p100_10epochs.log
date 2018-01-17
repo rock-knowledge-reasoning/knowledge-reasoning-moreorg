@@ -1,0 +1,4 @@
+# number of epochs: 10
+# minfeasible: 1
+# [model #] [graph completeness eval][stdev][time in s][stdev][stopped][stdev][# propagator executions][stdev][# failed nodes][stdev][# expanded nodes][stdev][# depth of search stack][stdev][# restarts][stdev][# nogoods][stdev]
+100 9.8 8.25591 10.3401 8.51429 0 0 372567 288668 0 0 980 825.591 99 0 99 0 8.8 8.25591 
