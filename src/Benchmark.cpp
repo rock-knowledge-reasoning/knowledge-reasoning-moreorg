@@ -163,11 +163,11 @@ void printUsage(char** argv)
 {
     std::cout << "usage: " << argv[0] << std::endl;
     std::cout << "    -o <organization-model-file>" << std::endl;
-    std::cout << "    -e <number-of-epochs" << std::endl;
-    std::cout << "    -m <number-of-mininum-feasible-solutions>" << std::endl;
+    std::cout << "    -e <number-of-epochs>" << std::endl;
+    std::cout << "    -m <number-of-mininum-feasible-solutions> (default is /tmp/organization-model-benchmark.log)" << std::endl;
     std::cout << "    -s <test-specification-file>" << std::endl;
     std::cout << "    -l <logfile-to-generate>" << std::endl;
-    std::cout << "    -t <benchmark-type: fsat or con" << std::endl;
+    std::cout << "    -t <benchmark-type: fsat (functional saturation) or con (connectivity)" << std::endl;
 }
 
 
@@ -239,6 +239,7 @@ int main(int argc, char** argv)
     if(filename.empty() && specfile.empty())
     {
         std::cout << "No file or specfile given" << std::endl;
+        printUsage(argv);
         return -1;
     }
 

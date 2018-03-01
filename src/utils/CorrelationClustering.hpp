@@ -12,8 +12,8 @@ namespace numeric {
  * This is an implementation of the correlation clustering as described in:
  * "Correlation Clustering in General Weighted Graphs" (Demaine et al., 2005) and
  * "Correlation Clustering with partial information" (Demaine et al., 2004)
- * 
- * This implementation however does not(!) use non-negative edge weights, but interpretes the sign 
+ *
+ * This implementation however does not(!) use non-negative edge weights, but interpretes the sign
  * as label <+>/<-> to describe similarity.
  *
  * To solve the resulting integer program the GLPK (GNU Linear Programming Kit) is used
@@ -46,7 +46,7 @@ class CorrelationClustering
         // can minimize the following function:
         // w = SUM_{E-}(c_e*x_e) + SUM_{E+}(c_e*x_e}) = SUM_{E}(c_e*x_e)
         size_t totalNumberOfColumns = mEdgeWeights.size();
-        glp_add_cols(mpProblem, totalNumberOfColumns); 
+        glp_add_cols(mpProblem, totalNumberOfColumns);
         // GLP_DB: double bounded variable
         //double sumOfNegativeWeights = 0;
         for(size_t i = 1; i <= totalNumberOfColumns; ++i)
@@ -87,7 +87,7 @@ class CorrelationClustering
                 std::vector<size_t> triangle_permutation = permutation.current();
 
                 int rowNumber = glp_add_rows(mpProblem, 1);
-                std::stringstream ss; 
+                std::stringstream ss;
                 ss << rowNumber;
                 glp_set_row_name(mpProblem, rowNumber, ss.str().c_str());
 
@@ -137,7 +137,7 @@ class CorrelationClustering
 
 
 public:
-    CorrelationClustering(const std::vector<double> edgeWeights)
+    CorrelationClustering(const std::vector<double>& edgeWeights)
         : mEdgeWeights(edgeWeights)
         , mpProblem(0)
     {
@@ -159,8 +159,6 @@ public:
     std::vector<double> getEdgeActivation() const { return solution; }
     std::vector<bool> getOptimalEdgeActivation() const { return mOptimalEdgeActivation; }
 };
-
-
 
 } // end namespace numeric
 #endif // NUMERIC_CORRELATION_CLUSTERING_HPP

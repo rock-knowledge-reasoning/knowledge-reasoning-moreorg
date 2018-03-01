@@ -181,7 +181,14 @@ BOOST_AUTO_TEST_CASE(composite_robot_from_transterra)
     {
         organization_model::facades::Robot robot(modelPool, ask);
         BOOST_REQUIRE_MESSAGE(robot.isMobile(), "Robot " << modelPool.toString() << " is mobile");
+
+//        uint32_t transportDemand = robot.getTransportDemand();
+//        BOOST_REQUIRE_MESSAGE( transportDemand == 7, "Robot " << modelPool.toString() << " has transport demand of: " << transportDemand);
+//
+//        uint32_t transportCapacity = robot.getTransportCapacity();
+//        BOOST_REQUIRE_MESSAGE( transportCapacity == 23, "Robot " << modelPool.toString() << " has transport capacity of: " << transportCapacity);
     }
 }
+
 
 BOOST_AUTO_TEST_SUITE_END()
