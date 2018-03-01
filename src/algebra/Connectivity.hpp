@@ -19,8 +19,6 @@ namespace algebra {
  */
 class Connectivity : public Gecode::Space
 {
-    friend class ConnectivityBrancher;
-
     /// Model pool which has to be checked for its connectivity
     ModelPool mModelPool;
     /// The organization model
