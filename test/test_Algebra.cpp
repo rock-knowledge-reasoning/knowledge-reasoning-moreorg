@@ -484,7 +484,7 @@ BOOST_AUTO_TEST_CASE(subset_superset)
     BOOST_REQUIRE_MESSAGE( Algebra::isSuperset(modelPoolB, modelPoolA), "Equal model pool are supersets" );
 
     modelPoolA[vocabulary::OM::resolve("RobotB")] = 1;
-    BOOST_REQUIRE_MESSAGE( Algebra::isSubset(modelPoolA, modelPoolB), "A is not subset of B");
+    BOOST_REQUIRE_MESSAGE( !Algebra::isSubset(modelPoolA, modelPoolB), "A is not subset of B");
     BOOST_REQUIRE_MESSAGE( Algebra::isSubset(modelPoolB, modelPoolA), "B is subset of A");
     BOOST_REQUIRE_MESSAGE( Algebra::isSuperset(modelPoolA, modelPoolB), "A is superset of B");
     BOOST_REQUIRE_MESSAGE( !Algebra::isSuperset(modelPoolB, modelPoolA), "B is not a superset of A");

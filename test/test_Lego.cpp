@@ -45,6 +45,7 @@ BOOST_AUTO_TEST_CASE(list)
     modelPool[ lego.resolve("Flag") ] = 1;
 
 
+    BOOST_TEST_MESSAGE("Please remain patient -- this test can take up to 2-3 min");
     size_t epochs = 1;
     size_t minFeasible = 1;
     for(size_t i = 0; i < epochs; ++i)

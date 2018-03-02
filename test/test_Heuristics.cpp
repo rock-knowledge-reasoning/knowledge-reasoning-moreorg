@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(estimate_current_position)
             toPosition,
             durationInS);
 
-    BOOST_REQUIRE_MESSAGE(position.x() != expectedDistance && position.y() == 0 && position.z() == 0,
+    BOOST_REQUIRE_MESSAGE(position.x() == expectedDistance && position.y() == 0 && position.z() == 0,
             "Position estimate: " << position.x() << "/" << position.y() << "/" << position.z());
 }
 
