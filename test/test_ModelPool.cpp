@@ -119,5 +119,4 @@ BOOST_AUTO_TEST_CASE(apply_upper_bound)
     BOOST_REQUIRE_MESSAGE(boundedSet.size() == 2, "BoundedSet: expected size: 2 was " << boundedSet.size() << ": " << OrganizationModel::toString(boundedSet) );
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()

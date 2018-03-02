@@ -94,7 +94,7 @@ std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const Organizat
     for(size_t i = 0; i < epochs; ++i)
     {
         BaseGraph::Ptr baseGraph;
-        bool feasible = algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, 60000, minFeasible);
+        algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, 60000, minFeasible);
         if(baseGraph)
         {
             std::stringstream ss;

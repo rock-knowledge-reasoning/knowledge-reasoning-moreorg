@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(list)
     {
         BaseGraph::Ptr baseGraph;
         bool feasible = algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, 0, minFeasible, organization_model::vocabulary::OM::resolve("MechanicalInterface") );
-        assert(feasible);
+        BOOST_REQUIRE_MESSAGE(feasible, "Connectivity check should validate feasibility");
         if(baseGraph)
         {
             std::stringstream ss;
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(icaps)
     {
         BaseGraph::Ptr baseGraph;
         bool feasible = algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, 0, minFeasible, organization_model::vocabulary::OM::resolve("MechanicalInterface") );
-        assert(feasible);
+        BOOST_REQUIRE_MESSAGE(feasible, "Connectivity check should validate feasibility");
         if(baseGraph)
         {
             std::stringstream ss;
