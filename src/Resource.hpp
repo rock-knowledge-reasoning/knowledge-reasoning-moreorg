@@ -52,6 +52,11 @@ public:
     static std::string toString(const Resource::List& requirements, size_t indent = 0);
     static std::string toString(const Resource::Set& requirements, size_t indent = 0);
 
+    void merge(const Resource& other);
+    static Resource merge(const Resource& a, const Resource& b);
+    static Resource::Set merge(const Resource::Set& resources);
+    static Resource::Set merge(const Resource::Set& a, const Resource::Set& b);
+
 private:
     owlapi::model::IRI mModel;
     PropertyConstraint::Set mPropertyConstraints;

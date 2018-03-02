@@ -13,6 +13,7 @@ rock_testsuite(${PROJECT_NAME}-test suite.cpp
     test_Metrics.cpp
     test_OrganizationModel.cpp
     test_OrganizationModelAsk.cpp
+    test_Resource.cpp
     #test_RandomModelGenerator.cpp
     DEPS organization_model
     )

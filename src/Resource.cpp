@@ -111,4 +111,64 @@ std::string Resource::toString(const Resource::Set& resources, size_t indent)
     return ss.str();
 }
 
+void Resource::merge(const Resource& other)
+{
+    if(mModel != other.mModel)
+    {
+        throw std::invalid_argument("organization_model::Resource::merge: cannot merge resources: "
+                " model are different: '" + mModel.toString() + "' and '" + other.mModel.toString());
+    }
+
+    addPropertyConstraints(other.getPropertyConstraints());
+}
+
+Resource Resource::merge(const Resource& a, const Resource& b)
+{
+    if(a.mModel != b.mModel)
+    {
+        throw std::invalid_argument("organization_model::Resource::merge: cannot merge resources: "
+                " model are different: '" + a.mModel.toString() + "' and '" + b.mModel.toString());
+    }
+
+    Resource resource = a;
+    resource.addPropertyConstraints(b.getPropertyConstraints());
+    return resource;
+}
+
+Resource::Set Resource::merge(const Resource::Set& resources)
+{
+    Resource::Set mergedResources;
+    Resource::Set remainingResources = resources;
+
+    Resource::Set::const_iterator ait = remainingResources.begin();
+    for(; ait != std::prev(remainingResources.end()); ++ait)
+    {
+        Resource a = *ait;
+
+        Resource::Set::iterator bit;
+        for(bit = std::next(ait,1); bit != remainingResources.end();)
+        {
+            const Resource& b = *bit;
+
+            if(a.mModel == b.mModel)
+            {
+                a.merge(b);
+                remainingResources.erase(bit++);
+            } else
+            {
+                ++bit;
+            }
+        }
+        mergedResources.insert(a);
+    }
+    return remainingResources;
+}
+
+Resource::Set Resource::merge(const Resource::Set& resourcesA, const Resource::Set& resourcesB)
+{
+    Resource::Set resources = resourcesA;
+    resources.insert(resourcesB.begin(), resourcesB.end());
+    return Resource::merge(resources);
+}
+
 }
