@@ -8,6 +8,14 @@
 
 namespace organization_model {
 
+/**
+ * A property constraint represents a triple P RT D, where
+ * P represent the property, RT the relation/constraint type and D the data
+ * value
+ * \todo Currently PropertyConstraints only represent numeric constraints,
+ * though the general hasValue,allValuesFrom restrictions from OWL could/should
+ * be considered here
+ */
 class PropertyConstraint
 {
 public:
@@ -15,31 +23,79 @@ public:
     typedef std::set<PropertyConstraint> Set;
     typedef std::map<owlapi::model::IRI, PropertyConstraint::Set> Clusters;
 
-    enum ConstraintType { UNKNOWN, EQUAL, LESS_THAN, LESS_EQUAL, GREATER_EQUAL, GREATER_THEN, CONSTRAINT_TYPE_END };
+    enum ConstraintType {
+        /// Unknown constraint type
+        UNKNOWN,
+        /// ==
+        EQUAL,
+        // <
+        LESS_THAN,
+        // <=
+        LESS_EQUAL,
+        // >=
+        GREATER_EQUAL,
+        // >
+        GREATER_THEN,
+        // end marker for iterators
+        CONSTRAINT_TYPE_END
+    };
 
     static std::map<ConstraintType, std::string> TypeTxt;
 
+    /**
+     * Default constructor to allow use in map
+     */
     PropertyConstraint();
 
+    /**
+     * Standard constructor for a property constraint
+     * \param dataProperty The identifier for the property
+     * \param c constraint/relation type
+     * \param value Constraining value
+     */
     PropertyConstraint(const owlapi::model::IRI& dataProperty, ConstraintType c, double value);
 
+    /**
+     * Get the constraint type
+     * \return constraint type
+     */
     ConstraintType getType() const { return mType; }
 
+    /**
+     * Get the (data) property
+     * \return property
+     */
     const owlapi::model::IRI& getProperty() const { return mDataProperty; }
 
+    /**
+     * Get the value
+     * \return constraining value
+     */
     double getValue() const { return mValue; }
 
+    /**
+     * Stringify this object
+     * \return string representing this PropertyConstraint
+     */
     std::string toString() const;
 
     /**
      * Cluster the set of constraints, based on the referred property
+     * \return Set of Clusters
      */
     static Clusters getClusters(const PropertyConstraint::Set& constraints);
 
+    /**
+     * Check equality of two PropertyConstraint object
+     * \param other Other PropertyConstraint to compare against
+     * \return True, if they are equal false otherwise
+     */
     bool operator==(const PropertyConstraint& other) const;
 
     /**
      * Add less operator for using property constraint in sets
+     * \param other Other PropertyConstraint to compare against
+     * \return True, if current object is less compared to other
      */
     bool operator<(const PropertyConstraint& other) const;
 
