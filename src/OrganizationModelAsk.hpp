@@ -41,6 +41,7 @@ public:
      * \param modelPool ModelPool that is used for bounding -- only agent models
      * will be considered
      * \param applyFunctionalSaturationBound Set bounding in order to
+     * \param feasibilityCheckTimeoutInMs Allow to limit the time for
      * reduce computed combinations to the functional saturation bound --
      * otherwise all feasible combinations are computed
      */
@@ -62,15 +63,16 @@ public:
     owlapi::model::IRIList getFunctionalities() const;
 
     /**
-     * Retrieve the support of known functionalities
+     * Retrieve the support of known functionalities, i.e., which
+     * functionalities can be supported with the used model pool
+     * \return model pool, where all cardinalities for available functionalites will be set to 1
      */
     ModelPool getSupportedFunctionalities() const;
 
     /**
-     * Set the model pool
-     * A currently set model pool is required for some queries to the
+     * Set the model pool for the organization model
+     * A currently set model pool is required for most queries to the
      * organization model
-     *
      */
     void setModelPool(const ModelPool& modelPool) { mModelPool = modelPool; }
 
@@ -81,22 +83,24 @@ public:
     const ModelPool& getModelPool() const { return mModelPool; }
 
     /**
-     * Compute the functionality mapping for the model pool this object was
-     * initialized with
+     * Compute the functionality mapping for currently set model pool
      */
     FunctionalityMapping computeFunctionalityMapping(const ModelPool& pool, bool applyFunctionalSaturationBound = false) const;
 
     /*
-     * Get the set of resource that support a given collection of
-     * functionalities and accounting for the resource requirements
+     * Get the set of resources that support a given collection of
+     * functionalities while accounting for the resource requirements
+     * \param functionalityRequirement a functionality requirement
      * \return available combinations to support this set of functionalities
      * with the given constraints
      */
     ModelPool::Set getResourceSupport(const FunctionalityRequirement& functionalityRequirement) const;
 
     /**
-     * Get the set of resource that support a given collection of
-     * functionalities and accounting for the resource requirements
+     * Get the set of resources that support a given collection of
+     * functionalities while accounting for the resource requirements
+     * \param functionalityRequirements A set of functionalities and their
+     * requirements
      * \return available combinations to support this set of functionalities
      * with the given constraints
      */
@@ -108,6 +112,8 @@ public:
      * That means, that services are either supported by separate systems or
      * combined systems
      * \param functionalities should be a set of functionalities / functionality models
+     * \param functionalityRequirements requirement to narrow the given set of
+     * functionalities
      * \return available resources (or combination thereof) to support this set of functionalities
      */
     ModelPool::Set getResourceSupport(const Functionality::Set& functionalities,
@@ -151,7 +157,7 @@ public:
      * \param functionality Functionality to be available
      * \param model Model that is tested for support of this functionality
      * \param cardinalityOfModel Allow to specify a support for quantified
-     * number of these services, i.e., factor of resources to be available
+     * number of resources, i.e., acts as factor for contained resources to be available
      * \see getFunctionalSaturationBound in order to find the minimum number
      * \return required to provide the functionality (if full support can be achieved)
      */
@@ -162,8 +168,8 @@ public:
     /**
      * Check how a functionality is supported by a model pool, i.e. number of
      * models with cardinalities provided
-     * \param functionality Functionality to be available
-     * \param models ModelPool that is available or represent the combination of
+     * \param functionalities Set of functionalities to be available
+     * \param models ModelPool that is available and represents the combination of
      * systems
      * \return type of support
      */
@@ -174,7 +180,7 @@ public:
      * Check how a functionality is supported by a model pool, i.e. number of
      * models with cardinalities provided
      * \param functionality Functionality to be available
-     * \param models ModelPool that is available or represent the combination of
+     * \param models ModelPool that is available and represents the combination of
      * systems
      * \return type of support
      */
@@ -275,6 +281,9 @@ public:
     ModelPool::Set getIntersection(const Functionality::Set& functionalities) const;
 
     /**
+     * Check is the given model pool supports a given set of services
+     * \param modelPool Model pool to query
+     * \return True if the model pool supports the set of services, false
      * otherwise
      */
     bool isSupporting(const ModelPool& modelPool, const Functionality::Set& functionalities) const;

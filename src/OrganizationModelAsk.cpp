@@ -69,8 +69,6 @@ owlapi::model::IRIList OrganizationModelAsk::getFunctionalities() const
 {
     bool directSubclassOnly = false;
     IRIList subclasses = mOntologyAsk.allSubClassesOf(vocabulary::OM::Functionality(), directSubclassOnly);
-    LOG_DEBUG_S << "Functionalities: " << subclasses;
-
     return subclasses;
 }
 
