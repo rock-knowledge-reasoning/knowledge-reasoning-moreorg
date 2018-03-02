@@ -221,6 +221,20 @@ public:
     bool isNegative() const;
 
     /**
+     * Check if pool assignment is null, i.e. contains only 0 cardinalities or
+     * is overall empty
+     * \return True if pool assignment is null
+     */
+    bool isNull() const;
+
+    /**
+     * Check if the pool assignment is positive, i.e. is not negative and not
+     * null
+     * \return True if pool assignment is positive
+     */
+    bool isPositive() const { return !(isNegative() || isNull()); }
+
+    /**
      * Convert to model pool
      * \throws if conversion is not possible, due to negative values
      * \return ModelPool

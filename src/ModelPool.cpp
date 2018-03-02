@@ -277,6 +277,19 @@ bool ModelPoolDelta::isNegative() const
     return false;
 }
 
+bool ModelPoolDelta::isNull() const
+{
+    ModelPoolDelta::const_iterator cit = this->begin();
+    for(; cit != this->end(); ++cit)
+    {
+        if(cit->second != 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 ModelPool ModelPoolDelta::toModelPool() const
 {
     ModelPool modelPool;

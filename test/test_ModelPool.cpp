@@ -9,6 +9,27 @@ using namespace organization_model::vocabulary;
 
 BOOST_AUTO_TEST_SUITE(model_pool)
 
+BOOST_AUTO_TEST_CASE(negative_positive_null)
+{
+    ModelPoolDelta a;
+    a["a"] = -1;
+    a["b"] = 0;
+    a["c"] = 0;
+    BOOST_REQUIRE_MESSAGE(a.isNegative(), "Model pool is negative");
+    BOOST_REQUIRE_MESSAGE(!a.isPositive(), "Model pool is not positive");
+    BOOST_REQUIRE_MESSAGE(!a.isNull(), "Model pool is not null");
+
+    a["a"] = 2;
+    BOOST_REQUIRE_MESSAGE(!a.isNegative(), "Model pool is not negative");
+    BOOST_REQUIRE_MESSAGE(a.isPositive(), "Model pool is positive");
+    BOOST_REQUIRE_MESSAGE(!a.isNull(), "Model pool is not null");
+
+    a["a"] = 0;
+    BOOST_REQUIRE_MESSAGE(!a.isNegative(), "Model pool is not negative");
+    BOOST_REQUIRE_MESSAGE(!a.isPositive(), "Model pool is not positive");
+    BOOST_REQUIRE_MESSAGE(a.isNull(), "Model pool is null");
+}
+
 BOOST_AUTO_TEST_CASE(equals)
 {
     ModelPool a;
