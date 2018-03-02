@@ -830,7 +830,7 @@ bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelC
     return delta.isNegative();
 }
 
-bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functionality::Set& functionalities) const
+ModelPool::Set OrganizationModelAsk::getIntersection(const Functionality::Set& functionalities) const
 {
     // Requires the functionality mapping to be properly initialized
     Functionality::Set::const_iterator cit = functionalities.begin();
@@ -858,31 +858,36 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functi
         } catch(const std::invalid_argument& e)
         {
             LOG_WARN_S << "Could not find functionality: " << functionality.getModel().toString() << std::endl
-                << modelPool.toString(4) << std::endl
                 << "current functionality mappping: " << std::endl
                 << mFunctionalityMapping.toString(4);
 
             throw std::runtime_error("organization_model::OrganizationModelAsk::isSupporting"
                     " could not find functionality '" + functionality.getModel().toString() + "'");
         }
-
     }
+    return previousModelPools;
+}
 
-    // Check if any of the previous models is a minimal subset, e.g. with
+bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functionality::Set& functionalities) const
+{
+
+    ModelPool::Set supportPools = getIntersection(functionalities);
+
+    // Any of the support models is assumed to be a minimal subset, e.g. with
     // functional saturation
     //
     // TODO: this does not yet account for any negative effects, i.e., when the
     // coalition is large and for example mass constraints prevent it from
     // functioning -- find a general way for representation:
     // by sat bound limited agents + negative effects
-    ModelPool::Set::const_iterator pit = std::find_if(previousModelPools.begin(), previousModelPools.end(),
+    ModelPool::Set::const_iterator pit = std::find_if(supportPools.begin(), supportPools.end(),
             [modelPool](const ModelPool& other)
             {
                 // check if other is a subset of the given model pool
                 return Algebra::isSubset(other, modelPool);
             });
 
-    if(pit != previousModelPools.end())
+    if(pit != supportPools.end())
     {
         return true;
     } else {

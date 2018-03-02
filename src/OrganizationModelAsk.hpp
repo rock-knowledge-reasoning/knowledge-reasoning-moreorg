@@ -269,8 +269,12 @@ public:
     bool canBeDistinct(const ModelCombination& a, const ModelCombination& b) const;
 
     /**
-     * Check is the model combination supports a given set of services
-     * \return True if the combination support the set of services, false
+     * Get the intersection of model pools for a given set of functionalities
+     *
+     */
+    ModelPool::Set getIntersection(const Functionality::Set& functionalities) const;
+
+    /**
      * otherwise
      */
     bool isSupporting(const ModelPool& modelPool, const Functionality::Set& functionalities) const;
