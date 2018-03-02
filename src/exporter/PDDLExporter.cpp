@@ -92,8 +92,8 @@ pddl_planner::representation::Domain PDDLExporter::toDomain()
     IRIList functionalities = mAsk.ontology().allSubClassesOf( OM::Functionality(), false);
     for(const owlapi::model::IRI& functionality : functionalities)
     {
-        Functionality::Set functionalitySet;
-        functionalitySet.insert(functionality);
+        Resource::Set functionalitySet;
+        functionalitySet.insert( Resource(functionality) );
 
         // Adding the functionality constant
         try {

@@ -76,8 +76,8 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        Functionality::Set functionalities;
-        functionalities.insert( Functionality(OM::resolve("StereoImageProvider")) );
+        Resource::Set functionalities;
+        functionalities.insert( Resource(OM::resolve("StereoImageProvider")) );
 
         ModelPool::Set modelPools = ask.getResourceSupport(functionalities);
         BOOST_REQUIRE_MESSAGE(modelPools.size() == 0, "No combinations that support stereo image provider expected 0 was " << modelPools.size());
@@ -89,8 +89,8 @@ BOOST_AUTO_TEST_CASE(resource_support)
 
         OrganizationModelAsk ask(om, items, false);
 
-        Functionality::Set functionalities;
-        functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
+        Resource::Set functionalities;
+        functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
 
         ModelPool::Set combinations = ask.getResourceSupport(functionalities);
         BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, but were " << combinations.size()
@@ -105,8 +105,8 @@ BOOST_AUTO_TEST_CASE(resource_support)
         {
             OrganizationModelAsk ask(om, items, false);
 
-            Functionality::Set functionalities;
-            functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
+            Resource::Set functionalities;
+            functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
 
             ModelPool::Set combinations = ask.getResourceSupport(functionalities);
             BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, but were " << combinations.size()
@@ -116,8 +116,8 @@ BOOST_AUTO_TEST_CASE(resource_support)
         {
             OrganizationModelAsk ask(om, items, true);
 
-            Functionality::Set functionalities;
-            functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
+            Resource::Set functionalities;
+            functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
 
             ModelPool::Set combinations = ask.getResourceSupport(functionalities);
             BOOST_REQUIRE_MESSAGE(combinations.size() == 1, "With functional bound only one combination that supports stereo image provider, but were " << combinations.size()
@@ -138,10 +138,10 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        Functionality::Set functionalities;
-        functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
-        functionalities.insert( Functionality(OM::resolve("ImageProvider") ) );
-        functionalities.insert( Functionality(OM::resolve("EmiPowerProvider") ) );
+        Resource::Set functionalities;
+        functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
+        functionalities.insert( Resource(OM::resolve("ImageProvider") ) );
+        functionalities.insert( Resource(OM::resolve("EmiPowerProvider") ) );
 
         //std::set<ModelCombinationSet> combinations = ask.getResourceSupport(services);
         //std::set<ModelCombinationSet>::const_iterator cit = combinations.begin();
@@ -215,8 +215,8 @@ BOOST_AUTO_TEST_CASE(resource_support_crex)
         // http://www.rock-robotics.org/2014/01/om-schema#ImageProvider,
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
-        Functionality::Set functionalities;
-        functionalities.insert( Functionality(OM::resolve("StereoImageProvider") ) );
+        Resource::Set functionalities;
+        functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
 
         ModelPool::Set combinations = ask.getResourceSupport(functionalities);
 

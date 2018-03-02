@@ -5,7 +5,6 @@
 #include <organization_model/SharedPtr.hpp>
 #include <owlapi/model/OWLOntology.hpp>
 #include "FunctionalityMapping.hpp"
-#include "Functionality.hpp"
 #include "Service.hpp"
 
 namespace organization_model {

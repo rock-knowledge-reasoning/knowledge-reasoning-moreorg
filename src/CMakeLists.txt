@@ -17,9 +17,7 @@ rock_library(organization_model
         ccf/Scenario.cpp
         exporter/PDDLExporter.cpp
         facades/Robot.cpp
-        Functionality.cpp
         FunctionalityMapping.cpp
-        FunctionalityRequirement.cpp
         Heuristics.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
@@ -41,6 +39,7 @@ rock_library(organization_model
         policies/TransportProviderPolicy.cpp
         reasoning/ModelBound.cpp
         reasoning/ResourceMatch.cpp
+        Resource.cpp
         Service.cpp
         StatusSample.cpp
         Types.cpp
@@ -64,8 +63,6 @@ rock_library(organization_model
         exporter/PDDLExporter.hpp
         facades/Facade.hpp
         facades/Robot.hpp
-        Functionality.hpp
-        FunctionalityRequirement.hpp
         FunctionalityMapping.hpp
         Heuristics.hpp
         metrics/Redundancy.hpp
@@ -86,6 +83,7 @@ rock_library(organization_model
         organization_model/Statistics.hpp
         policies/EnergyProviderPolicy.hpp
         policies/TransportProviderPolicy.hpp
+        Resource.hpp
         Service.hpp
         SharedPtr.hpp
         StatusSample.hpp

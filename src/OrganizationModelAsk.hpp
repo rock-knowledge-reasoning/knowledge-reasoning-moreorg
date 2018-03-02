@@ -7,7 +7,7 @@
 #include "OrganizationModel.hpp"
 #include "algebra/ResourceSupportVector.hpp"
 #include "Algebra.hpp"
-#include "FunctionalityRequirement.hpp"
+#include "Resource.hpp"
 #include "vocabularies/OM.hpp"
 
 namespace organization_model {
@@ -64,7 +64,8 @@ public:
 
     /**
      * Retrieve the support of known functionalities, i.e., which
-     * functionalities can be supported with the used model pool
+     * functionalities can be supported with the used model pool in general,
+     * without further specifying under what constraints
      * \return model pool, where all cardinalities for available functionalites will be set to 1
      */
     ModelPool getSupportedFunctionalities() const;
@@ -90,44 +91,21 @@ public:
     /*
      * Get the set of resources that support a given collection of
      * functionalities while accounting for the resource requirements
-     * \param functionalityRequirement a functionality requirement
+     * \param resource A resource including constraints
      * \return available combinations to support this set of functionalities
      * with the given constraints
      */
-    ModelPool::Set getResourceSupport(const FunctionalityRequirement& functionalityRequirement) const;
+    ModelPool::Set getResourceSupport(const Resource& resource) const;
 
     /**
      * Get the set of resources that support a given collection of
      * functionalities while accounting for the resource requirements
-     * \param functionalityRequirements A set of functionalities and their
-     * requirements
+     * \param resources A set of resource (here: functionalities and their
+     * constraints)
      * \return available combinations to support this set of functionalities
      * with the given constraints
      */
-    ModelPool::Set getResourceSupport(const FunctionalityRequirement::Map& functionalityRequirements) const;
-
-    /**
-     * Get the set of resources (or combination thereof) that support a given
-     * union of services
-     * That means, that services are either supported by separate systems or
-     * combined systems
-     * \param functionalities should be a set of functionalities / functionality models
-     * \param functionalityRequirements requirement to narrow the given set of
-     * functionalities
-     * \return available resources (or combination thereof) to support this set of functionalities
-     */
-    ModelPool::Set getResourceSupport(const Functionality::Set& functionalities,
-            const FunctionalityRequirement::Map& functionalityRequirements) const;
-
-    /**
-     * Get the set of resources (or combination thereof) that support a given
-     * union of services
-     * That means, that services are either supported by separate systems or
-     * combined systems
-     * \param functionalities should be a set of functionalities / functionality models
-     * \return available resources (or combination thereof) to support this set of functionalities
-     */
-    ModelPool::Set getResourceSupport(const Functionality::Set& functionalities) const;
+    ModelPool::Set getResourceSupport(const Resource::Set& resources) const;
 
     /**
      * Get the set of resources that should support a given union of services,
@@ -135,56 +113,56 @@ public:
      * of resources that support the given union of services
      * \return bound set of combinations
      */
-    ModelPool::Set getBoundedResourceSupport(const Functionality::Set& functionalities) const;
+    ModelPool::Set getBoundedResourceSupport(const Resource::Set& resources) const;
 
     /**
      * Check how a list of functionalities is supported by a model if given cardinality
      * of this model is provided
-     * \param functionalities Functionality to be available
+     * \param resources Resource to be available
      * \param model Model that is tested for support of this functionality
      * \param cardinalityOfModel Allow to specify a support for quantified
-     * number of these services, i.e., factor of resources to be available
+     * number of instances of these resource models, i.e., factor of resources to be available
      * \see getFunctionalSaturationBound in order to find the minimum number
      * \return required to provide the functionality (if full support can be achieved)
      */
-    algebra::SupportType getSupportType(const Functionality::Set& functionality,
+    algebra::SupportType getSupportType(const Resource::Set& resources,
             const owlapi::model::IRI& model,
             uint32_t cardinalityOfModel = 1) const;
 
     /**
      * Check how a service is supported by a model if given cardinality
      * of this model is provided
-     * \param functionality Functionality to be available
+     * \param resource Resource to be available
      * \param model Model that is tested for support of this functionality
      * \param cardinalityOfModel Allow to specify a support for quantified
      * number of resources, i.e., acts as factor for contained resources to be available
      * \see getFunctionalSaturationBound in order to find the minimum number
      * \return required to provide the functionality (if full support can be achieved)
      */
-    algebra::SupportType getSupportType(const Functionality& functionality,
+    algebra::SupportType getSupportType(const Resource& resource,
             const owlapi::model::IRI& model,
             uint32_t cardinalityOfModel = 1) const;
 
     /**
-     * Check how a functionality is supported by a model pool, i.e. number of
+     * Check how a resource (functionality) is supported by a model pool, i.e. number of
      * models with cardinalities provided
      * \param functionalities Set of functionalities to be available
      * \param models ModelPool that is available and represents the combination of
      * systems
      * \return type of support
      */
-    algebra::SupportType getSupportType(const Functionality::Set& functionalities,
+    algebra::SupportType getSupportType(const Resource::Set& resources,
             const ModelPool& models) const;
 
     /**
      * Check how a functionality is supported by a model pool, i.e. number of
      * models with cardinalities provided
-     * \param functionality Functionality to be available
+     * \param resource Resource to be available
      * \param models ModelPool that is available and represents the combination of
      * systems
      * \return type of support
      */
-    algebra::SupportType getSupportType(const Functionality& functionality,
+    algebra::SupportType getSupportType(const Resource& resource,
             const ModelPool& models) const;
 
     /**
@@ -207,45 +185,24 @@ public:
      * for a given service
      * This function does take into account the model pool, but computes
      * a global bound
-     * \param functionality for which the functional saturation bound needs to
+     * \param resource Resource/functionality for which the functional saturation bound needs to
      * be computed
      * \return Cardinality bound for resource models
      */
-    ModelPool getFunctionalSaturationBound(const Functionality& functionality) const;
+    ModelPool getFunctionalSaturationBound(const Resource& resource) const;
 
     /**
      * Compute the upper bound for the cardinality of each resource model
      * to support the given set of services (union of services)
      * This function does take into account the model pool, but computes
      * a global bound
-     * \param functionalities set of functionalities for which the functional saturation bound needs to
+     * \param resources Set of resources (formerly: functionalities) for which the functional saturation bound needs to
      * be computed
      * \return Cardinality bound for resource models
      * \throw std::invalid_argument when the model pool is empty
      */
-    ModelPool getFunctionalSaturationBound(const Functionality::Set& functionalities) const;
+    ModelPool getFunctionalSaturationBound(const Resource::Set& resources) const;
 
-    /**
-     * Compute the upper bound for the cardinality of each resource model
-     * to support the given set of services (union of services) under
-     * consideration of the given constraints
-     * \param functionalities set of functionalities for which the functional saturation bound needs to
-     * be computed
-     * \return Cardinality bound for resource models
-     * \throw std::invalid_argument when the model pool is empty
-     */
-    ModelPool getFunctionalSaturationBound(const Functionality::Set& functionalities, const FunctionalityRequirement& constraints) const;
-
-    /**
-     * Compute the upper bound for the cardinality of each resource model
-     * to support the given set of services (union of services) under
-     * consideration of the given constraints
-     * \param functionalities set of functionalities for which the functional saturation bound needs to
-     * be computed
-     * \return Cardinality bound for resource models
-     * \throw std::invalid_argument when the model pool is empty
-     */
-    ModelPool getFunctionalSaturationBound(const Functionality::Set& functionalities, const FunctionalityRequirement::Map& constraints) const;
     ///**
     // * Get the set of resources
     // * \return available resources to support this set of services
@@ -275,31 +232,32 @@ public:
     bool canBeDistinct(const ModelCombination& a, const ModelCombination& b) const;
 
     /**
-     * Get the intersection of model pools for a given set of functionalities
+     * Get the intersection of model pools for a given set of resources
      *
      */
-    ModelPool::Set getIntersection(const Functionality::Set& functionalities) const;
+    ModelPool::Set getIntersection(const Resource::Set& resources) const;
 
     /**
-     * Check is the given model pool supports a given set of services
+     * Check is the given model pool supports a given set of resources
      * \param modelPool Model pool to query
+     * \param resources Resources for which support is questioned
      * \return True if the model pool supports the set of services, false
      * otherwise
      */
-    bool isSupporting(const ModelPool& modelPool, const Functionality::Set& functionalities) const;
+    bool isSupporting(const ModelPool& modelPool, const Resource::Set& resources) const;
 
     /**
-     * Check is the model combination supports a given set of services
+     * Check is the model combination supports a resource
      * \return True if the combination support the set of services, false
      * otherwise
      */
-    bool isSupporting(const ModelPool& modelPool, const Functionality& functionality) const;
+    bool isSupporting(const ModelPool& modelPool, const Resource& resource) const;
 
     /**
-     * Check if the model supports a service
+     * Check if the model supports a resource (service,functionality)
      * \return true if the robot supports the set of services
      */
-    bool isSupporting(const owlapi::model::IRI& model, const Functionality& functionality) const;
+    bool isSupporting(const owlapi::model::IRI& model, const Resource& resource) const;
 
     /**
      * Provide debug information about the status of this object
@@ -338,7 +296,7 @@ public:
      * Check if a model pool exceeds the saturation bound with respect to a
      * given functionality set
      */
-    bool isMinimal(const ModelPool& modelPool, const Functionality::Set& functionalities) const;
+    bool isMinimal(const ModelPool& modelPool, const Resource::Set& resources) const;
 
     /**
      * Get the data property value of the complete combination given by the pool
@@ -418,7 +376,7 @@ protected:
     FunctionalityMapping computeBoundedFunctionalityMapping(const ModelPool& pool, const owlapi::model::IRIList& functionalityModels) const;
     FunctionalityMapping computeUnboundedFunctionalityMapping(const ModelPool& pool, const owlapi::model::IRIList& functionalityModels) const;
 
-    ModelPool::Set filterNonMinimal(const ModelPool::Set& modelPoolSet, const Functionality::Set& functionalities) const;
+    ModelPool::Set filterNonMinimal(const ModelPool::Set& modelPoolSet, const Resource::Set& resources) const;
 
     /**
      * Given a modelPool (which support the requested functionality) provide an
@@ -428,7 +386,10 @@ protected:
      * functionality requirements and embedded property constraints
      * \return scaling factor
      */
-    double getScalingFactor(const ModelPool& modelPool, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport=false) const;
+    double getScalingFactor(const ModelPool& modelPool,
+            const Resource& resource,
+            bool doCheckSupport=false
+            ) const;
 
     /**
      * Given a number of modelPools (which support the requested functionality) provide an
@@ -436,14 +397,19 @@ protected:
      * modelPool) are needed to fulfill the requirement
      * \return scaling factor
      */
-    std::vector<double> getScalingFactors(const ModelPool::Set& modelPoolSet, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport=false) const;
+    std::vector<double> getScalingFactors(const ModelPool::Set& modelPoolSet,
+            const Resource& resource,
+            bool doCheckSupport=false
+            ) const;
 
     /**
      * Update the list of scaling factors, which tell how many instances of a
      * 'model pool' are required to support a requested (set of) functionality
      * \see getScalingFactor
      */
-    static void updateScalingFactor(std::vector<double>& factors, size_t idx, double newValue);
+    static void updateScalingFactor(std::vector<double>& factors,
+            size_t idx,
+            double newValue);
 
 private:
     OrganizationModel::Ptr mpOrganizationModel;

@@ -57,7 +57,7 @@ struct AnalyserFixture
                 100,
                 true,
                 activity::ACTIVE_OPERATIVE,
-                FunctionalityRequirement());
+                Resource::Set());
 
         StatusSample sample1(agent1,
                 base::Position(0,0,0),
@@ -66,7 +66,7 @@ struct AnalyserFixture
                 100,
                 true,
                 activity::ACTIVE_OPERATIVE,
-                FunctionalityRequirement());
+                Resource::Set());
 
         analyser = new Analyser(ask);
         analyser->add(sample0);

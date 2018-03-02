@@ -10,7 +10,6 @@
 #include "reasoning/ResourceMatch.hpp"
 #include "vocabularies/OM.hpp"
 #include "algebra/Connectivity.hpp"
-#include "FunctionalityRequirement.hpp"
 #include "PropertyConstraintSolver.hpp"
 
 
@@ -116,7 +115,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
     //
     // LocationImageProvider: CREX --> 1, Sherpa --> 1
     // Compute service set of all known functionalities
-    Functionality::Set functionalities = Functionality::toFunctionalitySet(functionalityModels);
+    Resource::Set functionalities = Resource::toResourceSet(functionalityModels);
 
     // Compute the bound for all services
     LOG_DEBUG_S << "Get functional saturation bound for '" << functionalityModels;
@@ -139,10 +138,10 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
     }
 
     FunctionalityMapping functionalityMapping(modelPool, functionalityModels, functionalSaturationBound);
-    Functionality::Set::const_iterator fit = functionalities.begin();
+    Resource::Set::const_iterator fit = functionalities.begin();
     for(; fit != functionalities.end(); ++fit)
     {
-        const Functionality& functionality = *fit;
+        const Resource& functionality = *fit;
         ModelPool bound = getFunctionalSaturationBound(functionality);
         ModelPool boundedModelPool = functionalSaturationBound.applyUpperBound(bound);
         if(boundedModelPool.empty())
@@ -166,7 +165,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
                 << combinationModelPool.toString(4);
 
 
-            Functionality::Set functionalities;
+            Resource::Set functionalities;
             functionalities.insert(functionality);
             if(isMinimal(combinationModelPool, functionalities))
             {
@@ -188,7 +187,8 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
     return functionalityMapping;
 }
 
-FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(const ModelPool& modelPool, const IRIList& functionalityModels) const
+FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(const ModelPool& modelPool,
+        const IRIList& functionalityModels) const
 {
     std::pair<Pool2FunctionMap, Function2PoolMap> functionalityMaps;
     ModelPool functionalSaturationBound = modelPool;
@@ -224,8 +224,8 @@ FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(
         owlapi::model::IRIList::const_iterator cit = functionalityModels.begin();
         for(; cit != functionalityModels.end(); ++cit)
         {
-            const Functionality& functionality = *cit;
-            algebra::SupportType supportType = getSupportType(*cit, combinationModelPool);
+            Resource functionality(*cit);
+            algebra::SupportType supportType = getSupportType(functionality, combinationModelPool);
             if(algebra::FULL_SUPPORT == supportType)
             {
                 functionalityMapping.add(combinationModelPool, functionality.getModel());
@@ -237,13 +237,13 @@ FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(
 }
 
 
-bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functionality::Set& functionalities) const
+bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Resource::Set& functionalities) const
 {
     // Check overall support
     algebra::SupportType supportType = getSupportType(functionalities, modelPool);
     if(algebra::FULL_SUPPORT != supportType)
     {
-        LOG_INFO_S << "No full support for " << Functionality::toString(functionalities) << " by " << std::endl << modelPool.toString(4);
+        LOG_INFO_S << "No full support for " << Resource::toString(functionalities) << " by " << std::endl << modelPool.toString(4);
         return false;
     }
 
@@ -277,7 +277,7 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
         LOG_INFO_S << "Full support: " << std::endl
             << modelPool.toString(4) << std::endl
             << "    for " << std::endl
-            << "    " << Functionality::toString(functionalities);
+            << "    " << Resource::toString(functionalities);
 
         if(modelPool.size() == 1)
         {
@@ -295,7 +295,7 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
         LOG_DEBUG_S << "Partial support: " << std::endl
             << modelPool.toString(4) << std::endl
             << "    for " << std::endl
-            << "    " << Functionality::toString(functionalities);
+            << "    " << Resource::toString(functionalities);
 
         // has partial support, thus check that for that particular
         // combination that it contains no redundancies, i.e. we cannot
@@ -322,7 +322,9 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Functiona
     return true;
 }
 
-double OrganizationModelAsk::getDataPropertyValue(const ModelPool& modelPool, const owlapi::model::IRI& dataProperty, Algebra::OperationType opType) const
+double OrganizationModelAsk::getDataPropertyValue(const ModelPool& modelPool,
+        const owlapi::model::IRI& dataProperty,
+        Algebra::OperationType opType) const
 {
     bool initialized = false;
     double value = 0;
@@ -451,7 +453,7 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
     return allAvailableResources;
 }
 
-ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& modelPoolSet, const Functionality::Set& functionalities) const
+ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& modelPoolSet, const Resource::Set& functionalities) const
 {
     ModelPool::Set filtered;
     ModelPool::Set::const_iterator mit = modelPoolSet.begin();
@@ -465,12 +467,12 @@ ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& mode
     return filtered;
 }
 
-ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequirement& functionalityRequirement) const
+ModelPool::Set OrganizationModelAsk::getResourceSupport(const Resource& resource) const
 {
-    const owlapi::model::IRI& functionalityModel = functionalityRequirement.getFunctionality().getModel();
+    const owlapi::model::IRI& functionalityModel = resource.getModel();
 
     // If there are no property constraints
-    if(functionalityRequirement.getPropertyConstraints().empty())
+    if(resource.getPropertyConstraints().empty())
     {
         return mFunctionalityMapping.getModelPools(functionalityModel);
     }
@@ -480,7 +482,7 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequi
         ModelPool::Set modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
         ModelPool::Set supportPool;
 
-        std::vector<double> scalingFactors = getScalingFactors(modelPoolSet, functionalityRequirement);
+        std::vector<double> scalingFactors = getScalingFactors(modelPoolSet, resource);
 
         size_t index = 0;
         for(const ModelPool& pool : modelPoolSet)
@@ -516,15 +518,15 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequi
     }
 }
 
-ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequirement::Map& functionalitiesRequirements) const
+ModelPool::Set OrganizationModelAsk::getResourceSupport(const Resource::Set& resources) const
 {
     ModelPool::Set supportingCompositions;
-    for(const FunctionalityRequirement::Map::value_type& pair : functionalitiesRequirements)
+    for(const Resource& resource : resources)
     {
         // Requesting from the functionality mapping will in most cases
         // embed the functional saturation bound, e.g.
         // the minimum to provide a certain functionality (per se, without
-        // accouting for a particular dataProperty requirement)
+        // accounting for a particular dataProperty requirement)
         //
         // In principle one will need a special join function for each kind
         // of data property -- right now we assume that we can 'sum' the
@@ -532,12 +534,11 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequi
         //
         try {
             // deal with additional constraints
-            const FunctionalityRequirement& functionalityRequirement = pair.second;
-            ModelPool::Set modelPoolSet = getResourceSupport(functionalityRequirement);
+            ModelPool::Set modelPoolSet = getResourceSupport(resource);
             supportingCompositions = Algebra::maxCompositions(supportingCompositions, modelPoolSet);
         } catch(const std::invalid_argument& e)
         {
-            LOG_DEBUG_S << "Could not find resource support for service: '" << pair.first.getModel();
+            LOG_DEBUG_S << "Could not find support for resource: '" << resource.getModel() << "'";
             return ModelPool::Set();
         }
     }
@@ -545,94 +546,7 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const FunctionalityRequi
     return supportingCompositions;
 }
 
-ModelPool::Set OrganizationModelAsk::getResourceSupport(const Functionality::Set& functionalities, const FunctionalityRequirement::Map& functionalityRequirements) const
-{
-    // Functionality requirements:
-    if(functionalities.empty())
-    {
-        std::invalid_argument("organization_model::OrganizationModelAsk::getResourceSupport:"
-                " no functionality given in request");
-    }
-
-    /// Retrieve the systems that support the functionalities and create
-    /// 'compositions'
-    /// i.e. per requested function the combination of models that support it,
-    /// while accounting for the (data property constraints)
-    Function2PoolMap functionalityProviders;
-    ModelPool::Set supportingCompositions;
-    {
-        Functionality::Set::const_iterator cit = functionalities.begin();
-        for(; cit != functionalities.end(); ++cit)
-        {
-            const Functionality& functionality = *cit;
-            const owlapi::model::IRI& functionalityModel = functionality.getModel();
-            // Requesting from the functionality mapping will in most cases
-            // embed the functional saturation bound, e.g.
-            // the minimum to provide a certain functionality (per se, without
-            // accouting for a particular dataProperty requirement)
-            //
-            // In principle one will need a special join function for each kind
-            // of data property -- right now we assume that we can 'sum' the
-            // dataproperties in order to deal with the requirements
-            //
-            try {
-                // Computing all model combination that support this
-                // functionality
-                FunctionalityRequirement::Map::const_iterator cit = functionalityRequirements.find(functionality);
-                ModelPool::Set modelPoolSet;
-                if(cit == functionalityRequirements.end())
-                {
-                    // no constraints need to be considered
-                    modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
-                } else {
-                    // deal with additional constraints
-                    modelPoolSet = getResourceSupport(cit->second);
-                }
-
-                supportingCompositions = Algebra::maxCompositions(supportingCompositions, modelPoolSet);
-            } catch(const std::invalid_argument& e)
-            {
-                LOG_DEBUG_S << "Could not find resource support for service: '" << functionalityModel;
-                return ModelPool::Set();
-            }
-        }
-    }
-    return supportingCompositions;
-}
-
-ModelPool::Set OrganizationModelAsk::getResourceSupport(const Functionality::Set& functionalities) const
-{
-    if(functionalities.empty())
-    {
-        std::invalid_argument("organization_model::OrganizationModelAsk::getResourceSupport:"
-                " no functionality given in request");
-    }
-
-    /// Retrieve the systems that support the functionalities and create
-    //'compositions'
-    /// i.e. per requested function the combination of models that support it,
-    Function2PoolMap functionalityProviders;
-    ModelPool::Set supportingCompositions;
-    {
-        Functionality::Set::const_iterator cit = functionalities.begin();
-        for(; cit != functionalities.end(); ++cit)
-        {
-            const Functionality& functionality = *cit;
-            const owlapi::model::IRI& functionalityModel = functionality.getModel();
-            try {
-                 ModelPool::Set modelPoolSet = mFunctionalityMapping.getModelPools(functionalityModel);
-                 supportingCompositions = Algebra::maxCompositions(supportingCompositions, modelPoolSet);
-            } catch(const std::invalid_argument& e)
-            {
-                LOG_DEBUG_S << "Could not find resource support for service: '" << functionalityModel;
-                return ModelPool::Set();
-            }
-        }
-    }
-    return supportingCompositions;
-}
-
-ModelPool::Set OrganizationModelAsk::getBoundedResourceSupport(const Functionality::Set& functionalities) const
+ModelPool::Set OrganizationModelAsk::getBoundedResourceSupport(const Resource::Set& functionalities) const
 {
     ModelPool::Set modelPools = getResourceSupport(functionalities);
     modelPools = filterNonMinimal(modelPools, functionalities);
@@ -640,24 +554,29 @@ ModelPool::Set OrganizationModelAsk::getBoundedResourceSupport(const Functionali
     return ModelPool::applyUpperBound(modelPools, bound);
 }
 
-algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality::Set& functionalities, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
+algebra::SupportType OrganizationModelAsk::getSupportType(const Resource::Set& functionalities,
+        const owlapi::model::IRI& model,
+        uint32_t cardinalityOfModel) const
 {
     ModelPool modelPool;
     modelPool[model] = cardinalityOfModel;
     return getSupportType(functionalities, modelPool);
 }
 
-algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const owlapi::model::IRI& model, uint32_t cardinalityOfModel) const
+algebra::SupportType OrganizationModelAsk::getSupportType(const Resource& functionality,
+        const owlapi::model::IRI& model,
+        uint32_t cardinalityOfModel) const
 {
-    Functionality::Set functionalities;
+    Resource::Set functionalities;
     functionalities.insert(functionality);
     return getSupportType(functionalities, model, cardinalityOfModel);
 }
 
-algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality::Set& functionalities, const ModelPool& modelPool) const
+algebra::SupportType OrganizationModelAsk::getSupportType(const Resource::Set& functionalities,
+        const ModelPool& modelPool) const
 {
     IRIList functionalityModels;
-    Functionality::Set::const_iterator fit = functionalities.begin();
+    Resource::Set::const_iterator fit = functionalities.begin();
     for(; fit != functionalities.end(); ++fit)
     {
         functionalityModels.push_back(fit->getModel());
@@ -687,14 +606,16 @@ algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality::S
     return functionalitySupportVector.getSupportFrom(modelPoolSupportVector, *this);
 }
 
-algebra::SupportType OrganizationModelAsk::getSupportType(const Functionality& functionality, const ModelPool& modelPool) const
+algebra::SupportType OrganizationModelAsk::getSupportType(const Resource& functionality,
+        const ModelPool& modelPool) const
 {
-    Functionality::Set functionalities;
+    Resource::Set functionalities;
     functionalities.insert(functionality);
     return getSupportType(functionalities, modelPool);
 }
 
-uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const owlapi::model::IRI& requirementModel, const owlapi::model::IRI& model) const
+uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const owlapi::model::IRI& requirementModel,
+        const owlapi::model::IRI& model) const
 {
     LOG_DEBUG_S << "Get functional saturation bound for " << requirementModel << " for model '" << model << "'";
     // Collect requirements, i.e., max cardinalities
@@ -744,7 +665,7 @@ uint32_t OrganizationModelAsk::getFunctionalSaturationBound(const owlapi::model:
     return static_cast<uint32_t>( std::ceil(max) );
 }
 
-ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality& functionality) const
+ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Resource& resource) const
 {
     if(mModelPool.empty())
     {
@@ -756,58 +677,42 @@ ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality
     ModelPool::const_iterator cit = mModelPool.begin();
     for(; cit != mModelPool.end(); ++cit)
     {
-        uint32_t saturation = getFunctionalSaturationBound(functionality.getModel(), cit->first);
+        uint32_t saturation = getFunctionalSaturationBound(resource.getModel(), cit->first);
         upperBounds[cit->first] = saturation;
     }
+
+    if(!resource.getPropertyConstraints().empty())
+    {
+        // Account for any given constraint
+        for(ModelPool::value_type& pair : upperBounds)
+        {
+            ModelPool m;
+            m.insert(pair);
+            try {
+                double p = getScalingFactor(m, resource);
+                // the functional saturation bound
+                pair.second = p;
+            } catch(const std::invalid_argument& e)
+            {
+                // does not contribute towards a solution
+                pair.second = 0;
+            }
+        }
+    }
     return upperBounds;
 }
 
-ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality::Set& functionalities) const
+ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Resource::Set& functionalities) const
 {
     ModelPool upperBounds;
-    Functionality::Set::const_iterator cit = functionalities.begin();
+    Resource::Set::const_iterator cit = functionalities.begin();
     for(; cit != functionalities.end(); ++cit)
     {
+        // Return the functional saturation for this functionality
         ModelPool saturation = getFunctionalSaturationBound(*cit);
 
-        ModelPool::const_iterator mit = saturation.begin();
-        for(; mit != saturation.end(); ++mit)
-        {
-            upperBounds[mit->first] = std::max(upperBounds[mit->first], saturation[mit->first]);
-        }
-    }
-    return upperBounds;
-}
-
-ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality::Set& functionalities, const FunctionalityRequirement& constraints) const
-{
-    ModelPool modelSupport = getFunctionalSaturationBound(functionalities);
-    for(ModelPool::value_type& pair : modelSupport)
-    {
-        ModelPool m;
-        m.insert(pair);
-        try {
-            double p = getScalingFactor(m, constraints);
-            // the functional saturation bound
-            pair.second = p;
-        } catch(const std::invalid_argument& e)
-        {
-            // does not contribute towards a solution
-            pair.second = 0;
-        }
-    }
-
-    return modelSupport;
-}
-
-ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Functionality::Set& functionalities, const FunctionalityRequirement::Map& constraints) const
-{
-    ModelPool upperBounds;
-    for(const FunctionalityRequirement::Map::value_type& v : constraints)
-    {
-        const FunctionalityRequirement& constraint = v.second;
-        ModelPool saturation = getFunctionalSaturationBound(functionalities, constraint);
-
+        // the maximum required value for a functionality sets the functional
+        // saturation bound
         ModelPool::const_iterator mit = saturation.begin();
         for(; mit != saturation.end(); ++mit)
         {
@@ -828,15 +733,15 @@ bool OrganizationModelAsk::canBeDistinct(const ModelCombination& a, const ModelC
     return delta.isNegative();
 }
 
-ModelPool::Set OrganizationModelAsk::getIntersection(const Functionality::Set& functionalities) const
+ModelPool::Set OrganizationModelAsk::getIntersection(const Resource::Set& functionalities) const
 {
     // Requires the functionality mapping to be properly initialized
-    Functionality::Set::const_iterator cit = functionalities.begin();
+    Resource::Set::const_iterator cit = functionalities.begin();
     ModelPool::Set previousModelPools;
     bool init = true;
     for(; cit != functionalities.end(); ++cit)
     {
-        const Functionality& functionality = *cit;
+        const Resource& functionality = *cit;
         try {
             const ModelPool::Set& modelPools = mFunctionalityMapping.getModelPools(functionality.getModel());
 
@@ -866,10 +771,10 @@ ModelPool::Set OrganizationModelAsk::getIntersection(const Functionality::Set& f
     return previousModelPools;
 }
 
-bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functionality::Set& functionalities) const
+bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Resource::Set& resources) const
 {
 
-    ModelPool::Set supportPools = getIntersection(functionalities);
+    ModelPool::Set supportPools = getIntersection(resources);
 
     // Any of the support models is assumed to be a minimal subset, e.g. with
     // functional saturation
@@ -893,26 +798,28 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functi
     }
 }
 
-bool OrganizationModelAsk::isSupporting(const ModelPool& pool, const Functionality& functionality) const
+bool OrganizationModelAsk::isSupporting(const ModelPool& pool,
+        const Resource& resource) const
 {
-    Functionality::Set functionalities;
-    functionalities.insert(functionality);
-    return isSupporting(pool, functionalities);
+    Resource::Set resources;
+    resources.insert(resource);
+    return isSupporting(pool, resources);
 }
 
-bool OrganizationModelAsk::isSupporting(const owlapi::model::IRI& model, const Functionality& functionality) const
+bool OrganizationModelAsk::isSupporting(const owlapi::model::IRI& model,
+        const Resource& resource) const
 {
     ModelPool modelPool;
     modelPool.setResourceCount(model, 1);
 
-    Functionality::Set functionalities;
-    functionalities.insert(functionality);
-    if( isSupporting(modelPool, functionalities) )
+    Resource::Set resources;
+    resources.insert(resource);
+    if( isSupporting(modelPool, resources) )
     {
-        LOG_DEBUG_S << "model '" << model << "' supports '" << functionality.getModel() << "'";
+        LOG_DEBUG_S << "model '" << model << "' supports '" << resource.getModel() << "'";
         return true;
     } else {
-        LOG_DEBUG_S << "model '" << model << "' does not support '" << functionality.getModel() << "'";
+        LOG_DEBUG_S << "model '" << model << "' does not support '" << resource.getModel() << "'";
         return false;
     }
 }
@@ -1062,52 +969,16 @@ std::string OrganizationModelAsk::toString() const
     return ss.str();
 }
 
-//owlapi::model::IRIList OrganizationModelAsk::filterSupportedModels(const owlapi::model::IRIList& combinations,
-//        const owlapi::model::IRIList& serviceModels)
-//{
-//    using namespace owlapi::model;
-//
-//    std::vector<OWLCardinalityRestriction::Ptr> providerRestrictions =
-//            ontology()->getCardinalityRestrictions(combinations);
-//    owlapi::model::IRIList supportedModels;
-//
-//    owlapi::model::IRIList::const_iterator it = serviceModels.begin();
-//    for(; it != serviceModels.end(); ++it)
-//    {
-//        owlapi::model::IRI serviceModel = *it;
-//        std::vector<OWLCardinalityRestriction::Ptr> serviceRestrictions =
-//            ontology()->getCardinalityRestrictions(serviceModel);
-//
-//        std::map<IRI, OWLCardinalityRestriction::MinMax> serviceModelCount = OWLCardinalityRestriction::getBounds(serviceRestrictions);
-//        // get minimum requirements
-//        bool useMaxCardinality = false;
-//        ResourceSupportVector serviceSupportVector = getSupportVector(serviceModelCount, IRIList(), useMaxCardinality);
-//
-//        std::map<IRI, OWLCardinalityRestriction::MinMax> providerModelCount = OWLCardinalityRestriction::getBounds(providerRestrictions);
-//        // Use all available
-//        useMaxCardinality = true;
-//        ResourceSupportVector providerSupportVector = getSupportVector(providerModelCount, serviceSupportVector.getLabels(), useMaxCardinality);
-//
-//        if( serviceSupportVector.fullSupportFrom(providerSupportVector) )
-//        {
-//            supportedModels.push_back(serviceModel);
-//            LOG_DEBUG_S << "Full support for: ";
-//            LOG_DEBUG_S << "    service model: " << serviceModel;
-//            LOG_DEBUG_S << "    from combination of provider models: " << combinations;
-//        }
-//    }
-//    return supportedModels;
-//}
-
-
-std::vector<double> OrganizationModelAsk::getScalingFactors(const ModelPool::Set& modelPoolSet, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport) const
+std::vector<double> OrganizationModelAsk::getScalingFactors(const ModelPool::Set& modelPoolSet,
+        const Resource& resource,
+        bool doCheckSupport) const
 {
     std::vector<double> scalingFactors(modelPoolSet.size(), 1.0);
     size_t index = 0;
     for(const ModelPool& pool : modelPoolSet)
     {
         try {
-            double scalingFactor = getScalingFactor(pool, functionalityRequirement, doCheckSupport);
+            double scalingFactor = getScalingFactor(pool, resource, doCheckSupport);
             updateScalingFactor(scalingFactors, index, scalingFactor);
         } catch(const std::runtime_error& e)
         {
@@ -1119,19 +990,21 @@ std::vector<double> OrganizationModelAsk::getScalingFactors(const ModelPool::Set
     return scalingFactors;
 }
 
-double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool, const FunctionalityRequirement& functionalityRequirement, bool doCheckSupport) const
+double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool,
+        const Resource& resource,
+        bool doCheckSupport) const
 {
-    // Either assume that model is supporting the particular functionality, or
-    // perform a dedicated check
+    // Either assume that model is supporting the particular resource (e.g. functionality)
+    // , or perform a dedicated check
     if(doCheckSupport)
     {
-        if(!isSupporting(modelPool, functionalityRequirement.getFunctionality()))
+        if(!isSupporting(modelPool, resource))
         {
             return 0.0;
         }
     }
 
-    const PropertyConstraint::Set& constraints = functionalityRequirement.getPropertyConstraints();
+    const PropertyConstraint::Set& constraints = resource.getPropertyConstraints();
     // Set of property constraint set, where each set is referring to a
     // particular property
     PropertyConstraint::Clusters clusteredConstraints = PropertyConstraint::getClusters(constraints);

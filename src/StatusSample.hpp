@@ -5,7 +5,7 @@
 #include <map>
 #include <base/Pose.hpp>
 #include "Agent.hpp"
-#include "FunctionalityRequirement.hpp"
+#include "Resource.hpp"
 #include "Types.hpp"
 #include "OrganizationModelAsk.hpp"
 
@@ -36,7 +36,7 @@ public:
             size_t toTime,
             bool active,
             activity::Type activity,
-            const FunctionalityRequirement& functionalityRequirement);
+            const Resource::Set& resourceRequirements);
 
     const Agent& getAgent() const { return mAgent; }
     const base::Position& getFromLocation() const { return mFromLocation; }
@@ -46,7 +46,7 @@ public:
     size_t getAvailableTime() const { return mToTime - mFromTime; }
     bool isActive() const { return mIsActive; }
     activity::Type getActivityType() const { return mActivityType; }
-    FunctionalityRequirement getFunctionalityRequirement() const { return mFunctionalityRequirement; }
+    const Resource::Set& getResourceRequirements() const { return mResourceRequirements; }
 
     /**
      * Check if the status sample intersects with the given time
@@ -63,7 +63,7 @@ private:
     size_t mToTime;
     bool mIsActive;
     activity::Type mActivityType;
-    FunctionalityRequirement mFunctionalityRequirement;
+    Resource::Set mResourceRequirements;
 };
 
 } // end namespace organization_model

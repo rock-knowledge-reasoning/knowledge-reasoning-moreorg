@@ -57,7 +57,7 @@ struct HeuristicsFixture
                 100,
                 true,
                 activity::ACTIVE_OPERATIVE,
-                FunctionalityRequirement());
+                Resource::Set());
 
         StatusSample sample1(agent1,
                 base::Position(0,0,0),
@@ -66,7 +66,7 @@ struct HeuristicsFixture
                 100,
                 true,
                 activity::ACTIVE_OPERATIVE,
-                FunctionalityRequirement());
+                Resource::Set());
 
         statusSamples.push_back(sample0);
         statusSamples.push_back(sample1);

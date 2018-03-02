@@ -12,7 +12,7 @@ StatusSample::StatusSample(const Agent& instance,
             size_t toTime,
             bool active,
             activity::Type activity,
-            const FunctionalityRequirement& functionalityRequirement)
+            const Resource::Set& resourceRequirements)
     : mAgent(instance)
     , mFromLocation(fromLocation)
     , mToLocation(toLocation)
@@ -20,7 +20,7 @@ StatusSample::StatusSample(const Agent& instance,
     , mToTime(toTime)
     , mIsActive(active)
     , mActivityType(activity)
-    , mFunctionalityRequirement(functionalityRequirement)
+    , mResourceRequirements(resourceRequirements)
 {
 }
 
