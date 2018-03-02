@@ -467,4 +467,27 @@ BOOST_AUTO_TEST_CASE(connectivity_multiple_interfaces)
     }
 }
 
+BOOST_AUTO_TEST_CASE(subset_superset)
+{
+    ModelPool modelPoolA;
+    ModelPool modelPoolB;
+
+    BOOST_REQUIRE_MESSAGE( Algebra::isSubset(modelPoolA, modelPoolB), "Empty models are subsets" );
+    BOOST_REQUIRE_MESSAGE( Algebra::isSuperset(modelPoolA, modelPoolB), "Empty models are supersets" );
+
+    modelPoolA[vocabulary::OM::resolve("RobotA")] = 1;
+    modelPoolB[vocabulary::OM::resolve("RobotA")] = 1;
+
+    BOOST_REQUIRE_MESSAGE( Algebra::isSubset(modelPoolA, modelPoolB), "Equal model pool are subsets" );
+    BOOST_REQUIRE_MESSAGE( Algebra::isSubset(modelPoolB, modelPoolA), "Equal model pool are subsets" );
+    BOOST_REQUIRE_MESSAGE( Algebra::isSuperset(modelPoolA, modelPoolB), "Equal model pool are supersets" );
+    BOOST_REQUIRE_MESSAGE( Algebra::isSuperset(modelPoolB, modelPoolA), "Equal model pool are supersets" );
+
+    modelPoolA[vocabulary::OM::resolve("RobotB")] = 1;
+    BOOST_REQUIRE_MESSAGE( Algebra::isSubset(modelPoolA, modelPoolB), "A is not subset of B");
+    BOOST_REQUIRE_MESSAGE( Algebra::isSubset(modelPoolB, modelPoolA), "B is subset of A");
+    BOOST_REQUIRE_MESSAGE( Algebra::isSuperset(modelPoolA, modelPoolB), "A is superset of B");
+    BOOST_REQUIRE_MESSAGE( !Algebra::isSuperset(modelPoolB, modelPoolA), "B is not a superset of A");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

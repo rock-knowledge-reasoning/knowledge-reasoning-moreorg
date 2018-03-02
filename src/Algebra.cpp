@@ -228,10 +228,11 @@ ModelPool::Set Algebra::maxCompositions(const ModelPool::Set& a, const ModelPool
 
 bool Algebra::isSubset(const ModelPool& a, const ModelPool& b)
 {
-    return !Algebra::delta(b, a).isNegative();
+    // a-b
+    return !Algebra::delta(a, b).isNegative();
 }
 
-bool Algebra::isSuperSet(const ModelPool& a, const ModelPool& b)
+bool Algebra::isSuperset(const ModelPool& a, const ModelPool& b)
 {
     return isSubset(b,a);
 }

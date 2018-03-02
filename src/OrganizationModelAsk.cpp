@@ -878,7 +878,8 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Functi
     ModelPool::Set::const_iterator pit = std::find_if(previousModelPools.begin(), previousModelPools.end(),
             [modelPool](const ModelPool& other)
             {
-                return Algebra::isSubset(modelPool, other);
+                // check if other is a subset of the given model pool
+                return Algebra::isSubset(other, modelPool);
             });
 
     if(pit != previousModelPools.end())

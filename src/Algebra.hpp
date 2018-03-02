@@ -15,7 +15,7 @@ public:
     static ModelPoolDelta delta(const ModelPoolDelta& a, const ModelPoolDelta& b) { return substract(a,b); }
 
     /**
-     * Substract a from b
+     * Substract a from b, i.e. b-a
      */
     static ModelPoolDelta substract(const ModelPoolDelta& a, const ModelPoolDelta& b);
     static ModelPoolDelta sum(const ModelPoolDelta& a, const ModelPoolDelta& b);
@@ -81,16 +81,24 @@ public:
     static ModelPool::Set maxCompositions(const ModelPool::Set& a, const ModelPool::Set& b);
 
     /**
-     * Test if a is a subset of b
+     * Test if a is a subset of b, i.e., a equal b or b includes a.
+     * By definition are empty set subsets of all sets
+     \f[
+         a \subseteq b
+     \f]
      * \return True if a is a subset of b, false otherwise
      */
     static bool isSubset(const ModelPool& a, const ModelPool& b);
 
     /**
-     * Test if a is a superset of b
+     * Test if a is a superset of b, i.e., if a includes b or a equals b
+     * By definition all set are superset for an empty set
+     \f[
+         a \supseteq b
+     \f]
      * \return True if a is a superset of b, false otherwise
      */
-    static bool isSuperSet(const ModelPool& a, const ModelPool& b);
+    static bool isSuperset(const ModelPool& a, const ModelPool& b);
 };
 
 } // end namespace organization_model
