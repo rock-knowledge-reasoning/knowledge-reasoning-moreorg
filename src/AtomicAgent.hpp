@@ -51,6 +51,11 @@ public:
     static std::string toString(const Set& agents, size_t indent = 0);
     static organization_model::ModelPool getModelPool(const List& agents);
     static organization_model::ModelPool getModelPool(const Set& agents);
+    /**
+     * Compute the cardinality of an agent model inside a given list of agents
+     */
+    static size_t getCardinality(const List& agents, const owlapi::model::IRI& agentModel) {
+    return getModelPool(agents)[agentModel]; }
 
     static AtomicAgent::List getIntersection(const AtomicAgent::Set& a0, const AtomicAgent::Set& a1);
     static AtomicAgent::List getDifference(const AtomicAgent::Set& a0, const AtomicAgent::Set& a1);
