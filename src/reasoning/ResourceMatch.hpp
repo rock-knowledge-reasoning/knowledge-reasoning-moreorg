@@ -95,12 +95,12 @@ protected:
      * This copy constructor is required for the search engine
      * and it has to provide a deep copy
      */
-    ResourceMatch(bool share, ResourceMatch& s);
+    ResourceMatch(ResourceMatch& s);
 
     /**
      * This method is called by the search engine
      */
-    virtual Gecode::Space* copy(bool share);
+    virtual Gecode::Space* copy(void);
 
 public:
 

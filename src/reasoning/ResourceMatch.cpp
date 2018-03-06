@@ -168,17 +168,17 @@ ResourceMatch::ResourceMatch(const ModelBound::List& required,
 
 }
 
-ResourceMatch::ResourceMatch(bool share, ResourceMatch& other)
-    : Gecode::Space(share, other)
+ResourceMatch::ResourceMatch(ResourceMatch& other)
+    : Gecode::Space(other)
     , mRequiredModelBound(other.mRequiredModelBound)
     , mAvailableModelBound(other.mAvailableModelBound)
 {
-    mModelAssignment.update(*this, share, other.mModelAssignment);
+    mModelAssignment.update(*this,other.mModelAssignment);
 }
 
-Gecode::Space* ResourceMatch::copy(bool share)
+Gecode::Space* ResourceMatch::copy()
 {
-    return new ResourceMatch(share,*this);
+    return new ResourceMatch(*this);
 }
 
 ResourceMatch::Solution ResourceMatch::solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& modelRequirements,

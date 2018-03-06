@@ -4,7 +4,6 @@
 #include <numeric/Combinatorics.hpp>
 #include <gecode/int.hh>
 #include <gecode/minimodel.hh>
-#include <gecode/search/meta/rbs.hh>
 #include <gecode/search.hh>
 #include <graph_analysis/GraphIO.hpp>
 #include <iostream>
@@ -317,8 +316,8 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     branch(*this, mConnections, Gecode::INT_VAR_MERIT_MIN(&merit), Gecode::INT_VAL_MAX(), symmetries);
 }
 
-Connectivity::Connectivity(bool share, Connectivity& other)
-    : Gecode::Space(share, other)
+Connectivity::Connectivity(Connectivity& other)
+    : Gecode::Space(other)
     , mModelPool(other.mModelPool)
     , mAsk(other.mAsk)
     , mModelCombination(other.mModelCombination)
@@ -328,13 +327,13 @@ Connectivity::Connectivity(bool share, Connectivity& other)
     , mIdx2Agents(other.mIdx2Agents)
     , mRnd(other.mRnd)
 {
-    mConnections.update(*this, share, other.mConnections);
-    mAgentConnections.update(*this, share, other.mAgentConnections);
+    mConnections.update(*this, other.mConnections);
+    mAgentConnections.update(*this, other.mAgentConnections);
 }
 
-Gecode::Space* Connectivity::copy(bool share)
+Gecode::Space* Connectivity::copy()
 {
-    return new Connectivity(share, *this);
+    return new Connectivity(*this);
 }
 
 bool Connectivity::isComplete() const

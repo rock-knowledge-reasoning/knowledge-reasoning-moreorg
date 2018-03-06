@@ -16,11 +16,11 @@ class PropertyConstraintSolver : public Gecode::Space
 public:
     PropertyConstraintSolver();
 
-    PropertyConstraintSolver(bool share, PropertyConstraintSolver& other);
+    PropertyConstraintSolver(PropertyConstraintSolver& other);
 
     virtual ~PropertyConstraintSolver();
 
-    virtual Gecode::Space* copy(bool share);
+    virtual Gecode::Space* copy(void);
 
     /**
      * Merge a list of constraints a returns the corresponding allowed value bound

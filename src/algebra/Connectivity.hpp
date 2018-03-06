@@ -107,7 +107,7 @@ public:
      * This copy constructor is required for the search engine
      * and it has to provide a deep copy
      */
-    Connectivity(bool share, Connectivity& s);
+    Connectivity(Connectivity& s);
 
     virtual ~Connectivity() {};
 
@@ -115,7 +115,7 @@ public:
      * Create a copy of this space
      * This method is called by the search engine
      */
-    virtual Gecode::Space* copy(bool share);
+    virtual Gecode::Space* copy(void);
 
     /**
      * Check whether a model pool can be fully connected

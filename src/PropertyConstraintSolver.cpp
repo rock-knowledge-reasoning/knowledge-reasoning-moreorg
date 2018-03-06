@@ -9,18 +9,18 @@ PropertyConstraintSolver::PropertyConstraintSolver()
     , mValue(*this, Gecode::Float::Limits::min, Gecode::Float::Limits::max)
 {}
 
-PropertyConstraintSolver::PropertyConstraintSolver(bool share, PropertyConstraintSolver& other)
-    : Gecode::Space(share, other)
+PropertyConstraintSolver::PropertyConstraintSolver(PropertyConstraintSolver& other)
+    : Gecode::Space(other)
 {
-    mValue.update(*this, share, other.mValue);
+    mValue.update(*this, other.mValue);
 }
 
 PropertyConstraintSolver::~PropertyConstraintSolver()
 {}
 
-Gecode::Space* PropertyConstraintSolver::copy(bool share)
+Gecode::Space* PropertyConstraintSolver::copy()
 {
-    return new PropertyConstraintSolver(share, *this);
+    return new PropertyConstraintSolver(*this);
 }
 
 ValueBound PropertyConstraintSolver::merge(const PropertyConstraint::List& constraints)
