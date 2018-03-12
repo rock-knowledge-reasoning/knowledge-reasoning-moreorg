@@ -141,7 +141,10 @@ Resource::Set Resource::merge(const Resource::Set& resources)
     Resource::Set remainingResources = resources;
 
     Resource::Set::const_iterator ait = remainingResources.begin();
-    for(; ait != std::prev(remainingResources.end()); ++ait)
+    // Using std::distance function here, to make sure to stop for loop,
+    // when second last, or last element have been hit
+    // (last one can happen due to erase operation in the for loop
+    for(; std::distance(ait,remainingResources.end()) > 1; ++ait)
     {
         Resource a = *ait;
 

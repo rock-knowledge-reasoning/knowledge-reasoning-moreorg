@@ -54,4 +54,22 @@ BOOST_AUTO_TEST_CASE(merge)
     }
 }
 
+BOOST_AUTO_TEST_CASE(merge_single_set)
+{
+    owlapi::model::IRI modelA("http://test/a");
+    owlapi::model::IRI modelB("http://test/b");
+    owlapi::model::IRI propertyA("http://test/propertyA");
+
+    Resource a0(modelA);
+    PropertyConstraint pcA0(propertyA, PropertyConstraint::GREATER_EQUAL, 3);
+    a0.addPropertyConstraint(pcA0);
+
+    Resource a1(modelA);
+    PropertyConstraint pcA1(propertyA, PropertyConstraint::GREATER_EQUAL, 4);
+    a1.addPropertyConstraint(pcA1);
+
+    Resource::Set resources = { a0, a1 };
+    Resource::Set resource = Resource::merge(resources);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
