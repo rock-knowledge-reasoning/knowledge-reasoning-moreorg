@@ -4,9 +4,9 @@
       reason and plan with it.
   </description>
   <author>Thomas Roehr/thomas.roehr@dfki.de</author>
+  <maintainer>Thomas Roehr/thomas.roehr@dfki.de</maintainer>
   <license></license>
-  <url>http://www.rock-robotics.org</url>
-  <logo>http://</logo>
+  <url>https://git.hb.dfki.de:dfki-libraries/organization_model</url>
   <depend package="base/cmake" />
   <depend package="boost" />
   <depend package="base/types" />
@@ -16,4 +16,17 @@
   <depend package="tools/graph_analysis" />
   <!-- gnu linear programming kit -->
   <depend package="glpk" />
+  <keywords>
+      <keyword>reasoning</keyword>
+      <keyword>representation</keyword>
+  </keywords>
+  <stage>0</stage>
+  <use>single project</use>
+  <activity>active</activity>
+  <classifiers>
+      <classifier>c++</classifier>
+      <classifier>rock</classifier>
+      <classifier>owl</classifier>
+      <classifier>multiagent</classifier>
+  </classifiers>
 </package>
