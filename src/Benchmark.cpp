@@ -100,9 +100,10 @@ std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const Organizat
             std::stringstream ss;
             ss << "/tmp/organization-model-bm-connectivity-";
             ss << i;
-            ss << ".dot";
 
-            graph_analysis::io::GraphIO::write(ss.str(), baseGraph);
+            graph_analysis::io::GraphIO::write(ss.str(), baseGraph, graph_analysis::representation::GEXF);
+            graph_analysis::io::GraphIO::write(ss.str(), baseGraph, graph_analysis::representation::GRAPHVIZ);
+
         }
 
         stats.push_back( algebra::Connectivity::getStatistics() );
@@ -164,10 +165,10 @@ void printUsage(char** argv)
     std::cout << "usage: " << argv[0] << std::endl;
     std::cout << "    -o <organization-model-file>" << std::endl;
     std::cout << "    -e <number-of-epochs>" << std::endl;
-    std::cout << "    -m <number-of-mininum-feasible-solutions> (default is /tmp/organization-model-benchmark.log)" << std::endl;
+    std::cout << "    -m <number-of-minimum-feasible-solutions>"  << std::endl;
     std::cout << "    -s <test-specification-file>" << std::endl;
-    std::cout << "    -l <logfile-to-generate>" << std::endl;
-    std::cout << "    -t <benchmark-type: fsat (functional saturation) or con (connectivity)" << std::endl;
+    std::cout << "    -l <logfile-to-generate> (default is /tmp/organization-model-benchmark.log)" << std::endl;
+    std::cout << "    -t <benchmark-type: functional_saturation (fsat) or connectivity (con)" << std::endl;
 }
 
 
@@ -226,6 +227,14 @@ int main(int argc, char** argv)
                 case 't':
                 {
                     type = optarg;
+                    if(type == "functional_saturation")
+                    {
+                        type = "fsat";
+                    } else if(type == "connectivity")
+                    {
+                        type = "con";
+                    }
+
                     if(!(type == "con" || type == "fsat"))
                     {
                         std::cout << "Error: test type '" << type << "' unknown" << std::endl;
