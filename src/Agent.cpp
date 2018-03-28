@@ -53,6 +53,30 @@ std::string Agent::toString(size_t indent) const
     return ss.str();
 }
 
+std::string Agent::toString(const List& agents, size_t indent)
+{
+    std::string hspace(indent,' ');
+    std::stringstream ss;
+    ss << hspace << "Agents:" << std::endl;
+    for(const Agent& a : agents)
+    {
+        ss << a.toString(indent + 4);
+    }
+    return ss.str();
+}
+
+std::string Agent::toString(const Set& agents, size_t indent)
+{
+    std::string hspace(indent,' ');
+    std::stringstream ss;
+    ss << hspace << "Agents:" << std::endl;
+    for(const Agent& a : agents)
+    {
+        ss << a.toString(indent + 4);
+    }
+    return ss.str();
+}
+
 AtomicAgent::Set Agent::allAtomicAgents(const Agent::Set& agents)
 {
     AtomicAgent::Set atomicAgents;

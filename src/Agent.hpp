@@ -83,6 +83,8 @@ public:
      * \return string
      */
     std::string toString(size_t indent = 0) const;
+    static std::string toString(const List& agents, size_t indent = 0);
+    static std::string toString(const Set& agents, size_t indent = 0);
 
     /**
      * Get the list of all atomic agents that are part of the agent set
@@ -107,9 +109,9 @@ public:
 
 private:
     AtomicAgent::Set mAtomicAgents;
+
     policies::EnergyProviderPolicy mEnergyProviderPolicy;
     policies::TransportProviderPolicy mTransportProviderPolicy;
-
 };
 
 typedef Agent::List CoalitionStructure;
