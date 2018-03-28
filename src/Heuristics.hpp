@@ -97,7 +97,10 @@ public:
      * \see getReconfigurationCost
      */
     double getReconfigurationCost(const Agent::Set& from,
-            const Agent::Set& to) const;
+            const Agent::Set& to,
+            double cooperationTimeInS = 600,
+            double transferTimePerAtomicAgentInS = 180
+            ) const;
 
     /**
      * Compute the reconfiguration to form a particular target agent from a set

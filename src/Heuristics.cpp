@@ -106,13 +106,20 @@ double Heuristics::getEnergyReductionAbsolute(const StatusSample* sample,
 }
 
 double Heuristics::getReconfigurationCost(const Agent::Set& _from,
-        const Agent::Set& _to) const
+        const Agent::Set& _to,
+        double cooperationTimeInS,
+        double transferTimePerAtomicAgentInS
+        ) const
 {
-    AtomicAgent::Set atomicAgents = Agent::allAtomicAgents(_from);
-    if( atomicAgents != Agent::allAtomicAgents(_to))
+    AtomicAgent::Set atomicFromAgents = Agent::allAtomicAgents(_from);
+    AtomicAgent::Set atomicToAgents = Agent::allAtomicAgents(_to);
+    if( atomicFromAgents != atomicToAgents)
     {
         throw std::invalid_argument("organization_model::Heuristics::getReconfigurationCost: "
-                " from set and to set contain not the same atomic agents");
+                " from set and to set contain not the same atomic agents:\n"
+                " from set: " + AtomicAgent::toString(atomicFromAgents,4) + "\n"
+                " to set: " + AtomicAgent::toString(atomicToAgents,4)
+                );
     }
 
     if(_from == _to)
@@ -142,7 +149,8 @@ double Heuristics::getReconfigurationCost(const Agent::Set& _from,
             }
         }
 
-        cost += getReconfigurationCost(toAgent, originFromAgents);
+        cost += getReconfigurationCost(toAgent, originFromAgents,
+                    cooperationTimeInS, transferTimePerAtomicAgentInS);
     }
     return cost;
 }
@@ -153,7 +161,7 @@ double Heuristics::getReconfigurationCost(const Agent& target,
         double transferTimePerAtomicAgentInS
         ) const
 {
-    double cost = 0;
+    double cost = 0.0;
     std::vector<size_t> deltas;
     for(const std::pair<Agent, AtomicAgent::List>& p : origins)
     {
