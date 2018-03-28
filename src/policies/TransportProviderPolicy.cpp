@@ -7,6 +7,7 @@ namespace policies {
 
 const AtomicAgent::Set& TransportProviderPolicy::activeTransportProviders(const Agent& agent, const organization_model::OrganizationModelAsk& ask) const
 {
+    // Check the cache first
     std::map<Agent, AtomicAgent::Set>::const_iterator cit = mActiveTransportProviders.find(agent);
     if(cit != mActiveTransportProviders.end())
     {
@@ -15,6 +16,7 @@ const AtomicAgent::Set& TransportProviderPolicy::activeTransportProviders(const 
 
     AtomicAgent::Set activeTransportAgents;
 
+    // Assume there can be only one active transport provider
     double maxCapacity = std::numeric_limits<double>::min();
     AtomicAgent activeAgent;
     // identify active transport system

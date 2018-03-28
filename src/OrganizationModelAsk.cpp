@@ -117,13 +117,14 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
     // Compute service set of all known functionalities
     Resource::Set functionalities = Resource::toResourceSet(functionalityModels);
 
-    // Compute the bound for all services
+    // Compute the bound for the combination of all known services
     LOG_DEBUG_S << "Get functional saturation bound for '" << functionalityModels;
     ModelPool functionalSaturationBound = getFunctionalSaturationBound(functionalities);
     LOG_DEBUG_S << "Functional saturation bound for '" << functionalityModels << "' is "
         << functionalSaturationBound.toString();
 
-    // Apply bound to the existing model pool
+    // Apply bound to the existing model pool - thus creating the global upper
+    // bound
     functionalSaturationBound = modelPool.applyUpperBound(functionalSaturationBound);
     LOG_INFO_S << "Model pool after applying the functional saturation bound for '" << functionalityModels << "' is "
         << functionalSaturationBound.toString();
@@ -137,6 +138,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
         throw std::runtime_error(msg);
     }
 
+    // Apply for each functionality individually the functional saturation bound
     FunctionalityMapping functionalityMapping(modelPool, functionalityModels, functionalSaturationBound);
     Resource::Set::const_iterator fit = functionalities.begin();
     for(; fit != functionalities.end(); ++fit)

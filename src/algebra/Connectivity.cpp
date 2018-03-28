@@ -571,7 +571,7 @@ Gecode::Symmetries Connectivity::identifySymmetries(Gecode::IntVarArray& connect
 
 double Connectivity::merit(const Gecode::Space& space, Gecode::IntVar x, int idx)
 {
-    // prefer the highly constrained
+    // prefer the less constrained
     const Connectivity& connectivity = static_cast<const Connectivity&>(space);
     return connectivity.computeMerit(x,idx);
 }
@@ -580,6 +580,7 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
 {
     std::pair<size_t, size_t> agents = mIdx2Agents[idx];
 
+    // find number of existing connections for both agents
     size_t existingConnections0 = 0;
     size_t existingConnections1 = 0;
     Gecode::Matrix<Gecode::IntVarArray> agentConnections(mAgentConnections, mModelCombination.size(), mModelCombination.size());
@@ -619,6 +620,7 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
 
     double bias = 1/(100.0 + mRnd(1000));
 
+    // existing connections/
     if(existingConnections0 != 0)
     {
         // a0: # of interfaces

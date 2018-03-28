@@ -295,6 +295,11 @@ public:
     /**
      * Check if a model pool exceeds the saturation bound with respect to a
      * given functionality set
+     * \return false, if the set of resources is not fully supported or the set
+     * contains redundancies, i.e. return a single resource model provides
+     * full support, but model pool contains more (thus redundant models),
+     * false when partial support model overall exceed the minimum required set
+     *
      */
     bool isMinimal(const ModelPool& modelPool, const Resource::Set& resources) const;
 
