@@ -169,6 +169,7 @@ void printUsage(char** argv)
     std::cout << "    -s <test-specification-file>" << std::endl;
     std::cout << "    -l <logfile-to-generate> (default is /tmp/organization-model-benchmark.log)" << std::endl;
     std::cout << "    -t <benchmark-type: functional_saturation (fsat) or connectivity (con)" << std::endl;
+    std::cout << "    -c <configuration-file>" << std::endl;
 }
 
 
@@ -180,17 +181,23 @@ int main(int argc, char** argv)
 {
     int c;
     std::string filename;
+    std::string configurationFile;
     std::string specfile;
     std::string logfile = "/tmp/organization-model-benchmark.log";
     size_t epochs = 1;
     size_t minFeasible = 1;
     std::string type = "con";
-    while((c = getopt(argc,argv, "o:e:m:s:l:t:")) != -1)
+    while((c = getopt(argc,argv, "o:e:m:s:l:t:c:")) != -1)
     {
         if(optarg)
         {
             switch(c)
             {
+                case 'c':
+                {
+                    configurationFile = optarg;
+                    break;
+                }
                 // filename for organization model
                 case 'o':
                     filename = optarg;
@@ -274,6 +281,14 @@ int main(int argc, char** argv)
     } else {
         om = OrganizationModel::Ptr(new OrganizationModel(spec.organizationModelIRI));
     }
+
+    qxcfg::Configuration configuration;
+    if(!configurationFile.empty())
+    {
+        configuration = qxcfg::Configuration(configurationFile);
+        algebra::Connectivity::setConfiguration(configuration);
+    }
+
     std::cout << "Logging into: " << logfile << std::endl;
     std::stringstream log;
 

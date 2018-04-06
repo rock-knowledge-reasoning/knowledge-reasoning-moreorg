@@ -1,0 +1,12 @@
+<organization-model>
+    <connectivity>
+        <branching>
+            <!-- MERIT_MIN | MIN_MIN | DEGREE_MIN | RND -->
+            <variable-selection>MERIT_MIN</variable-selection>
+            <!-- MIN | MED | MAX | RND | SPLIT_MIN | SPLIT_MAX | RANGE_MIN | RANGE_MAX |
+                 VAL_COMMIT, VALUES_MIN, VALUES_MAX
+                 -->
+            <value-selection>MAX</value-selection>
+        </branching>
+    </connectivity>
+</organization-model>

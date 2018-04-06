@@ -1,6 +1,5 @@
 #include "Connectivity.hpp"
 #include <base/Time.hpp>
-#include <organization_model/vocabularies/OM.hpp>
 #include <numeric/Combinatorics.hpp>
 #include <gecode/int.hh>
 #include <gecode/minimodel.hh>
@@ -8,12 +7,16 @@
 #include <graph_analysis/GraphIO.hpp>
 #include <iostream>
 
+#include "../vocabularies/OM.hpp"
+#include "../utils/GecodeUtils.hpp"
+
 using namespace owlapi::model;
 
 namespace organization_model {
 namespace algebra {
 
 Connectivity::Statistics Connectivity::msStatistics;
+qxcfg::Configuration Connectivity::msConfiguration;
 
 Connectivity::Statistics::Statistics()
     : evaluations(0)
@@ -302,18 +305,59 @@ Connectivity::Connectivity(const ModelPool& modelPool,
         mIdx2Agents.push_back( std::pair<size_t,size_t>(agent0,agent1) );
     }
 
-    // Ideally prefer the assignment of feasible 'connections' for a system,
-    // which is the MAX of the domain -> 1
-    // Propagation will set the other invalid connections to 0, thus speeding up
-    // the assignment process
-    //branch(*this, mConnections, Gecode::INT_VAR_MIN_MIN(), Gecode::INT_VAL_MAX(), symmetries);
+    Gecode::Rnd rnd;
+    rnd.hw();
 
-    //// Which variable to pick
-    //branch(*this, mConnections, Gecode::INT_VAR_DEGREE_MIN(), Gecode::INT_VAL_MAX(), symmetries);
-    //Gecode::Rnd rnd;
-    //rnd.hw();
-    //branch(*this, mConnections, Gecode::INT_VAR_RND(rnd), Gecode::INT_VAL_MAX(), symmetries);
-    branch(*this, mConnections, Gecode::INT_VAR_MERIT_MIN(&merit), Gecode::INT_VAL_MAX(), symmetries);
+    std::string valueSelection = msConfiguration.getValue("connectivity/branching/value-selection", "MAX");
+    Gecode::IntValBranch::Select valSelect = utils::GecodeUtils::getIntValSelect(valueSelection);
+    Gecode::IntValBranch* valBranch = 0;
+    if(valSelect == Gecode::IntValBranch::SEL_RND)
+    {
+        valBranch = new Gecode::IntValBranch(rnd);
+    } else {
+        valBranch = new Gecode::IntValBranch(valSelect);
+    }
+
+    std::string variableSelection = msConfiguration.getValue("connectivity/branching/variable-selection", "MERIT_MIN");
+    Gecode::IntVarBranch::Select varSelect = utils::GecodeUtils::getIntVarSelect(variableSelection);
+    Gecode::IntVarBranch* varBranch = 0;
+
+    LOG_INFO_S << "Using selection strategies: " << std::endl
+        << "    variable: " << variableSelection << std::endl
+        << "    value: " << valueSelection << std::endl;
+
+    switch(varSelect)
+    {
+        // Ideally prefer the assignment of feasible 'connections' for a system,
+        // which is the MAX of the domain -> 1
+        // Propagation will set the other invalid connections to 0, thus speeding up
+        // the assignment process
+        case Gecode::IntVarBranch::SEL_MERIT_MIN:
+        case Gecode::IntVarBranch::SEL_MERIT_MAX:
+            varBranch = new Gecode::IntVarBranch(varSelect, &merit, nullptr);
+            break;
+        case Gecode::IntVarBranch::SEL_RND:
+            varBranch = new Gecode::IntVarBranch(rnd);
+            break;
+        case Gecode::IntVarBranch::SEL_MIN_MIN:
+        case Gecode::IntVarBranch::SEL_MIN_MAX:
+        case Gecode::IntVarBranch::SEL_MAX_MIN:
+        case Gecode::IntVarBranch::SEL_MAX_MAX:
+        case Gecode::IntVarBranch::SEL_DEGREE_MIN:
+        case Gecode::IntVarBranch::SEL_DEGREE_MAX:
+            varBranch = new Gecode::IntVarBranch(varSelect, nullptr);
+            break;
+        default:
+            throw std::runtime_error("organization_model::algebra::Connectivity: selected value selection"
+                " strategy is not supported: '" + variableSelection + "'");
+
+
+    }
+
+    branch(*this, mConnections, *varBranch, *valBranch, symmetries);
+
+    delete valBranch;
+    delete varBranch;
 }
 
 Connectivity::Connectivity(Connectivity& other)

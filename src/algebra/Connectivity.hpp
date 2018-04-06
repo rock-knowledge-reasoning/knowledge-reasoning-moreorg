@@ -8,6 +8,7 @@
 #include <graph_analysis/BaseGraph.hpp>
 #include "../OrganizationModelAsk.hpp"
 #include "../vocabularies/OM.hpp"
+#include <qxcfg/Configuration.hpp>
 
 namespace organization_model {
 namespace algebra {
@@ -111,6 +112,10 @@ public:
 
     virtual ~Connectivity() {};
 
+    static void setConfiguration(const qxcfg::Configuration& configuration) { msConfiguration = configuration; }
+
+    qxcfg::Configuration& getConfiguration() { return msConfiguration; }
+
     /**
      * Create a copy of this space
      * This method is called by the search engine
@@ -157,8 +162,11 @@ public:
      */
     static const Connectivity::Statistics& getStatistics() { return msStatistics; }
 
-private:
+protected:
     static Connectivity::Statistics msStatistics;
+
+    // General configuration to control, e.g. the branching behaviour
+    static qxcfg::Configuration msConfiguration;
 
 };
 

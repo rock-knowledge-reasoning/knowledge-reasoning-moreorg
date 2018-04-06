@@ -15,6 +15,7 @@
   <depend package="knowledge_reasoning/owlapi" />
   <depend package="tools/graph_analysis" />
   <depend package="tools/gecode" />
+  <depend package="tools/qxcfg" />
   <!-- gnu linear programming kit -->
   <depend package="glpk" />
   <keywords>

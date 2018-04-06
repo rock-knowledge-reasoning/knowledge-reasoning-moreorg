@@ -44,6 +44,7 @@ rock_library(organization_model
         StatusSample.cpp
         Types.cpp
         utils/CoalitionStructureGeneration.cpp
+        utils/GecodeUtils.cpp
         ValueBound.cpp
     HEADERS
         AtomicAgent.hpp
@@ -92,12 +93,16 @@ rock_library(organization_model
         reasoning/ResourceMatch.hpp
         utils/CoalitionStructureGeneration.hpp
         utils/CorrelationClustering.hpp
+        utils/GecodeUtils.hpp
         vocabularies/OM.hpp
         vocabularies/Robot.hpp
         vocabularies/VRP.hpp
         ValueBound.hpp
-    DEPS_PKGCONFIG numeric pddl_planner owlapi
+    DEPS_PKGCONFIG numeric
+        pddl_planner
+        owlapi
         graph_analysis
+        qxcfg
     LIBS glpk ${Boost_THREAD_LIBRARY}
 )
 
