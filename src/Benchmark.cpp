@@ -84,7 +84,8 @@ Spec loadSpec(const std::string& filename)
 
 std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const OrganizationModel::Ptr& om, const ModelPool& modelPool,
         size_t epochs,
-        size_t minFeasible)
+        size_t minFeasible,
+        size_t timeoutInS)
 {
     OrganizationModelAsk ask(om, modelPool, true);
     std::vector<algebra::Connectivity::Statistics> stats;
@@ -94,7 +95,7 @@ std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const Organizat
     for(size_t i = 0; i < epochs; ++i)
     {
         BaseGraph::Ptr baseGraph;
-        algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, 60000, minFeasible);
+        bool feasible = algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, timeoutInS*1000, minFeasible);
         if(baseGraph)
         {
             std::stringstream ss;
@@ -107,6 +108,11 @@ std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const Organizat
         }
 
         stats.push_back( algebra::Connectivity::getStatistics() );
+
+        if(!feasible)
+        {
+            LOG_WARN_S << "organization_model::Benchmark: graph is not feasible in epoch #" << i;
+        }
     }
 
     //std::cout << algebra::Connectivity::Statistics::toString(stats) << std::endl;
@@ -187,12 +193,18 @@ int main(int argc, char** argv)
     size_t epochs = 1;
     size_t minFeasible = 1;
     std::string type = "con";
-    while((c = getopt(argc,argv, "o:e:m:s:l:t:c:")) != -1)
+    size_t timeoutInS = 60;
+    while((c = getopt(argc,argv, "o:e:m:s:l:t:c:a:")) != -1)
     {
         if(optarg)
         {
             switch(c)
             {
+                case 'a':
+                {
+                    timeoutInS = boost::lexical_cast<size_t>(optarg);
+                    break;
+                }
                 case 'c':
                 {
                     configurationFile = optarg;
@@ -297,6 +309,7 @@ int main(int argc, char** argv)
         log << "from: " << spec.from.toString(4) << std::endl;
         log << "to: " << spec.to.toString(4) << std::endl;
         log << "step: " << spec.stepSize.toString(4) << std::endl;
+        log << "timeout in s: " << timeoutInS << std::endl;
         log << "# number of epochs: " << epochs << std::endl;
         log << "# minfeasible: " << minFeasible << std::endl;
         log << "# [model #] " << algebra::Connectivity::Statistics::getStatsDescription() << std::endl;
@@ -305,7 +318,7 @@ int main(int argc, char** argv)
         while(mit.next())
         {
             ModelPool current = mit.current();
-            std::vector<algebra::Connectivity::Statistics> stats = runModelPoolTest(om, current, epochs, minFeasible);
+            std::vector<algebra::Connectivity::Statistics> stats = runModelPoolTest(om, current, epochs, minFeasible, timeoutInS);
 
             std::vector<numeric::Stats<double> > numericStats = algebra::Connectivity::Statistics::compute(stats);
             // record the number of model instances
