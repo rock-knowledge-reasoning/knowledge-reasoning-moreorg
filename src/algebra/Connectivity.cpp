@@ -106,11 +106,102 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     , mInterfaceBaseClass(interfaceBaseClass)
     , mProperty(property)
     , mModelCombination(mModelPool.toModelCombination())
+    , mExistingConnections(*this, mModelCombination.size(), 0, mModelCombination.size())
     , mAgentConnections(*this, mModelCombination.size()*mModelCombination.size(), 0, mModelCombination.size())
 {
     // Use hw() (not time -- since resolution of time seem to be rather low)
     mRnd.hw();
 
+    identifyInterfaces();
+
+    Gecode::IntVarArray connections(*this, mInterfaces.size()*mInterfaces.size(),0,1);
+    enforceSymmetricMatrix(connections);
+    applyCompatibilityConstraints(connections);
+    cacheExistingConnections(connections);
+    maxOneLink(connections);
+
+    mConnections = connections;
+
+    LOG_INFO_S << "Connectivity: after initial propagation" << toString();
+
+    // Avoid computation of solutions that are redunant
+    // Gecode documentation says however in 8.10.2 that "Symmetry breaking by
+    // LDSB is not guaranteed to be complete. That is, a search may still return
+    // two distinct solutions that are symmetric."
+    //
+    Gecode::Symmetries symmetries = identifySymmetries(connections);
+
+    std::string valueSelection = msConfiguration.getValue("connectivity/branching/value-selection", "MAX");
+    Gecode::IntValBranch::Select valSelect = utils::GecodeUtils::getIntValSelect(valueSelection);
+    Gecode::IntValBranch* valBranch = 0;
+    if(valSelect == Gecode::IntValBranch::SEL_RND)
+    {
+        valBranch = new Gecode::IntValBranch(mRnd);
+    } else {
+        valBranch = new Gecode::IntValBranch(valSelect);
+    }
+
+    std::string variableSelection = msConfiguration.getValue("connectivity/branching/variable-selection", "MERIT_MIN");
+    Gecode::IntVarBranch::Select varSelect = utils::GecodeUtils::getIntVarSelect(variableSelection);
+    Gecode::IntVarBranch* varBranch = 0;
+
+    LOG_INFO_S << "Using selection strategies: " << std::endl
+        << "    variable: " << variableSelection << std::endl
+        << "    value: " << valueSelection << std::endl;
+
+    switch(varSelect)
+    {
+        // Ideally prefer the assignment of feasible 'connections' for a system,
+        // which is the MAX of the domain -> 1
+        // Propagation will set the other invalid connections to 0, thus speeding up
+        // the assignment process
+        case Gecode::IntVarBranch::SEL_MERIT_MIN:
+        case Gecode::IntVarBranch::SEL_MERIT_MAX:
+            varBranch = new Gecode::IntVarBranch(varSelect, &merit, nullptr);
+            break;
+        case Gecode::IntVarBranch::SEL_RND:
+            varBranch = new Gecode::IntVarBranch(mRnd);
+            break;
+        case Gecode::IntVarBranch::SEL_MIN_MIN:
+        case Gecode::IntVarBranch::SEL_MIN_MAX:
+        case Gecode::IntVarBranch::SEL_MAX_MIN:
+        case Gecode::IntVarBranch::SEL_MAX_MAX:
+        case Gecode::IntVarBranch::SEL_DEGREE_MIN:
+        case Gecode::IntVarBranch::SEL_DEGREE_MAX:
+            varBranch = new Gecode::IntVarBranch(varSelect, nullptr);
+            break;
+        default:
+            throw std::runtime_error("organization_model::algebra::Connectivity: selected value selection"
+                " strategy is not supported: '" + variableSelection + "'");
+
+
+    }
+
+    branch(*this, mConnections, *varBranch, *valBranch, symmetries);
+    //branch(*this, mConnections, Gecode::INT_VAR_RND(mRnd), Gecode::INT_VAL_MAX());
+
+    delete valBranch;
+    delete varBranch;
+}
+
+Connectivity::Connectivity(Connectivity& other)
+    : Gecode::Space(other)
+    , mModelPool(other.mModelPool)
+    , mAsk(other.mAsk)
+    , mModelCombination(other.mModelCombination)
+    , mInterfaces(other.mInterfaces)
+    , mInterfaceMapping(other.mInterfaceMapping)
+    , mInterfaceIndexRanges(other.mInterfaceIndexRanges)
+    , mIdx2Agents(other.mIdx2Agents)
+    , mRnd(other.mRnd)
+{
+    mConnections.update(*this, other.mConnections);
+    mAgentConnections.update(*this, other.mAgentConnections);
+    mExistingConnections.update(*this, other.mExistingConnections);
+}
+
+void Connectivity::identifyInterfaces()
+{
     assert(!mModelCombination.empty());
     // Identify interfaces -- we assume here ElectroMechanicalInterface
     IRIList::const_iterator mit = mModelCombination.begin();
@@ -138,7 +229,7 @@ Connectivity::Connectivity(const ModelPool& modelPool,
         if(interfaces.empty())
         {
             throw std::invalid_argument("organization_model::algebra::Connecticity:"
-                    " cannot construct problem since model '" + model.toString() + "' does not have any associated interfaces of type '" + interfaceBaseClass.toString() );
+                    " cannot construct problem since model '" + model.toString() + "' does not have any associated interfaces of type '" + mInterfaceBaseClass.toString() );
         }
 
         std::pair<IRI, IRIList> interfacesOfModel(model, interfaces);
@@ -152,9 +243,36 @@ Connectivity::Connectivity(const ModelPool& modelPool,
         mInterfaceMapping.push_back(interfacesOfModel);
     }
 
-    Gecode::IntVarArray connections(*this, mInterfaces.size()*mInterfaces.size(),0,1);
-    Gecode::Matrix<Gecode::IntVarArray> connectionMatrix(connections, mInterfaces.size(), mInterfaces.size());
+    for(size_t idx = 0; idx < mInterfaces.size()*mInterfaces.size(); ++idx)
+    {
+        size_t a1Idx = idx%mInterfaces.size();
+        size_t a0Idx = (idx - a1Idx)/mInterfaces.size();
 
+        IndexRange idxRange0;
+        IndexRange idxRange1;
+
+        for(IndexRange range : mInterfaceIndexRanges)
+        {
+            if(a0Idx >= range.first && a0Idx <= range.second)
+            {
+                idxRange0 = range;
+            }
+            if(a1Idx >= range.first && a1Idx <= range.second )
+            {
+                idxRange1 = range;
+            }
+        }
+
+        size_t agent0 = std::distance(mInterfaceIndexRanges.begin(), std::find(mInterfaceIndexRanges.begin(), mInterfaceIndexRanges.end(),idxRange0));
+        size_t agent1 = std::distance(mInterfaceIndexRanges.begin(), std::find(mInterfaceIndexRanges.begin(), mInterfaceIndexRanges.end(),idxRange1));
+
+        mIdx2Agents.push_back( std::pair<size_t,size_t>(agent0,agent1) );
+    }
+}
+
+void Connectivity::enforceSymmetricMatrix(Gecode::IntVarArray& connections)
+{
+    Gecode::Matrix<Gecode::IntVarArray> connectionMatrix(connections, mInterfaces.size(), mInterfaces.size());
     //          a0-0 a0-1 a0-2 a0-3 a1-0   a1-1   a1-2
     //  a0-0     [0]  [0]  [0]  [0] [0,1]  [0,1]  [0,1]
     //  a0-1     [0]  [0]
@@ -185,6 +303,11 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     }
     Gecode::IntVar linkCount(*this, mInterfaceIndexRanges.size()-1, mInterfaceIndexRanges.size());
     rel(*this, sum(exactNumberOfConnections) == linkCount);
+}
+
+void Connectivity::applyCompatibilityConstraints(Gecode::IntVarArray& connections)
+{
+    Gecode::Matrix<Gecode::IntVarArray> connectionMatrix(connections, mInterfaces.size(), mInterfaces.size());
 
     // for all interfaces check compatibility and set domain (0) or (0,1)
     // accordingly 1 means connection (can be) established
@@ -230,28 +353,40 @@ Connectivity::Connectivity(const ModelPool& modelPool,
             }
             // There should be maximum one connection between two systems
             rel(*this, sum( agentInterconnection ) <= 1);
-
             Gecode::Matrix<Gecode::IntVarArray> agentConnectionMatrix(mAgentConnections, mModelCombination.size(), mModelCombination.size());
             rel(*this, agentConnectionMatrix(a0, a1) == sum( agentInterconnection ) );
         }
     }
 
+}
+
+void Connectivity::cacheExistingConnections(Gecode::IntVarArray& connections)
+{
+    Gecode::Matrix<Gecode::IntVarArray> connectionMatrix(connections, mInterfaces.size(), mInterfaces.size());
+
     // This constraint implicitly holds through the other constraints
     // of # of overall links, agent interconnection and max one connection per
     // interface
-    //for(size_t a = 0; a < mInterfaceIndexRanges.size(); ++a)
-    //{
-    //    IndexRange aInterfaceIndexes = mInterfaceIndexRanges[a];
-    //    Gecode::IntVarArgs agentConnections;
-    //    // Interfaces of Agent A
-    //    for(size_t i = aInterfaceIndexes.first; i <= aInterfaceIndexes.second; ++i)
-    //    {
-    //        agentConnections << connectionMatrix.col(i);
-    //    }
+    for(size_t a = 0; a < mInterfaceIndexRanges.size(); ++a)
+    {
+        IndexRange aInterfaceIndexes = mInterfaceIndexRanges[a];
+        Gecode::IntVarArgs agentConnections;
+        // Interfaces of Agent A
+        for(size_t i = aInterfaceIndexes.first; i <= aInterfaceIndexes.second; ++i)
+        {
+            agentConnections << connectionMatrix.col(i);
+        }
 
-    //    // there should be at least one outgoing connection to another system
-    //    rel(*this, sum(agentConnections) >= 1);
-    //}
+        // there should be at least one outgoing connection to another system
+        //rel(*this, sum(agentConnections) >= 1);
+        rel(*this, mExistingConnections[a] == sum(agentConnections));
+    }
+
+}
+
+void Connectivity::maxOneLink(Gecode::IntVarArray& connections)
+{
+    Gecode::Matrix<Gecode::IntVarArray> connectionMatrix(connections, mInterfaces.size(), mInterfaces.size());
 
     // Maximum of one connection per interface
     for(size_t c = 0; c < mInterfaces.size(); ++c)
@@ -267,112 +402,6 @@ Connectivity::Connectivity(const ModelPool& modelPool,
         // There should be maximum one connection per interface
         rel(*this, sum( interfaceUsage ) <= 1);
     }
-
-    mConnections = connections;
-
-    LOG_INFO_S << "Connectivity: after initial propagation" << toString();
-
-    // Avoid computation of solutions that are redunant
-    // Gecode documentation says however in 8.10.2 that "Symmetry breaking by
-    // LDSB is not guaranteed to be complete. That is, a search may still return
-    // two distinct solutions that are symmetric."
-    //
-    Gecode::Symmetries symmetries = identifySymmetries(connections);
-
-    for(size_t idx = 0; idx < mInterfaces.size()*mInterfaces.size(); ++idx)
-    {
-        size_t a1Idx = idx%mInterfaces.size();
-        size_t a0Idx = (idx - a1Idx)/mInterfaces.size();
-
-        IndexRange idxRange0;
-        IndexRange idxRange1;
-
-        for(IndexRange range : mInterfaceIndexRanges)
-        {
-            if(a0Idx >= range.first && a0Idx <= range.second)
-            {
-                idxRange0 = range;
-            }
-            if(a1Idx >= range.first && a1Idx <= range.second )
-            {
-                idxRange1 = range;
-            }
-        }
-
-        size_t agent0 = std::distance(mInterfaceIndexRanges.begin(), std::find(mInterfaceIndexRanges.begin(), mInterfaceIndexRanges.end(),idxRange0));
-        size_t agent1 = std::distance(mInterfaceIndexRanges.begin(), std::find(mInterfaceIndexRanges.begin(), mInterfaceIndexRanges.end(),idxRange1));
-
-        mIdx2Agents.push_back( std::pair<size_t,size_t>(agent0,agent1) );
-    }
-
-    Gecode::Rnd rnd;
-    rnd.hw();
-
-    std::string valueSelection = msConfiguration.getValue("connectivity/branching/value-selection", "MAX");
-    Gecode::IntValBranch::Select valSelect = utils::GecodeUtils::getIntValSelect(valueSelection);
-    Gecode::IntValBranch* valBranch = 0;
-    if(valSelect == Gecode::IntValBranch::SEL_RND)
-    {
-        valBranch = new Gecode::IntValBranch(rnd);
-    } else {
-        valBranch = new Gecode::IntValBranch(valSelect);
-    }
-
-    std::string variableSelection = msConfiguration.getValue("connectivity/branching/variable-selection", "MERIT_MIN");
-    Gecode::IntVarBranch::Select varSelect = utils::GecodeUtils::getIntVarSelect(variableSelection);
-    Gecode::IntVarBranch* varBranch = 0;
-
-    LOG_INFO_S << "Using selection strategies: " << std::endl
-        << "    variable: " << variableSelection << std::endl
-        << "    value: " << valueSelection << std::endl;
-
-    switch(varSelect)
-    {
-        // Ideally prefer the assignment of feasible 'connections' for a system,
-        // which is the MAX of the domain -> 1
-        // Propagation will set the other invalid connections to 0, thus speeding up
-        // the assignment process
-        case Gecode::IntVarBranch::SEL_MERIT_MIN:
-        case Gecode::IntVarBranch::SEL_MERIT_MAX:
-            varBranch = new Gecode::IntVarBranch(varSelect, &merit, nullptr);
-            break;
-        case Gecode::IntVarBranch::SEL_RND:
-            varBranch = new Gecode::IntVarBranch(rnd);
-            break;
-        case Gecode::IntVarBranch::SEL_MIN_MIN:
-        case Gecode::IntVarBranch::SEL_MIN_MAX:
-        case Gecode::IntVarBranch::SEL_MAX_MIN:
-        case Gecode::IntVarBranch::SEL_MAX_MAX:
-        case Gecode::IntVarBranch::SEL_DEGREE_MIN:
-        case Gecode::IntVarBranch::SEL_DEGREE_MAX:
-            varBranch = new Gecode::IntVarBranch(varSelect, nullptr);
-            break;
-        default:
-            throw std::runtime_error("organization_model::algebra::Connectivity: selected value selection"
-                " strategy is not supported: '" + variableSelection + "'");
-
-
-    }
-
-    branch(*this, mConnections, *varBranch, *valBranch, symmetries);
-
-    delete valBranch;
-    delete varBranch;
-}
-
-Connectivity::Connectivity(Connectivity& other)
-    : Gecode::Space(other)
-    , mModelPool(other.mModelPool)
-    , mAsk(other.mAsk)
-    , mModelCombination(other.mModelCombination)
-    , mInterfaces(other.mInterfaces)
-    , mInterfaceMapping(other.mInterfaceMapping)
-    , mInterfaceIndexRanges(other.mInterfaceIndexRanges)
-    , mIdx2Agents(other.mIdx2Agents)
-    , mRnd(other.mRnd)
-{
-    mConnections.update(*this, other.mConnections);
-    mAgentConnections.update(*this, other.mAgentConnections);
 }
 
 Gecode::Space* Connectivity::copy()
@@ -484,12 +513,13 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
     }
     options.nogoods_limit = 1024;
     //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::geometric(10,2);
-    Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::constant(1);
-   // Gecode::Rnd rnd;
-   // rnd.hw();
-   // Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::rnd(rnd.seed(),1,connectivity->mInterfaces.size(),2);
+    Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::constant(10);
+    //Gecode::Rnd rnd;
+    //rnd.hw();
+    //Gecode::Search::Cutoff * c = Gecode::Search::Cutoff::rnd(rnd.seed(),1,connectivity->mInterfaces.size(),2);
     options.cutoff = c;
     Gecode::RBS<Connectivity, Gecode::DFS> searchEngine(connectivity, options);
+    //Gecode::BAB<Connectivity> searchEngine(connectivity, options);
 
     bool isComplete = false;
     size_t feasibleSolutions = 0;
@@ -507,16 +537,15 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
 
             if(isComplete)
             {
-                LOG_DEBUG_S << "Connection is feasible: found solution " << current->toString();
+                LOG_DEBUG_S << "Connection is feasible: found solution " << current->toString() << std::endl
+                    << "    feasible so far: " << feasibleSolutions << ", required: " << minFeasible;
                 ++feasibleSolutions;
                 if(feasibleSolutions >= minFeasible)
                 {
                     break;
                 }
-            } else {
-                LOG_DEBUG_S << "Connection is not feasible";
-                last = current;
             }
+            last = current;
         }
     } catch(const std::invalid_argument& e)
     {
@@ -624,35 +653,10 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
 {
     std::pair<size_t, size_t> agents = mIdx2Agents[idx];
 
-    // find number of existing connections for both agents
-    size_t existingConnections0 = 0;
-    size_t existingConnections1 = 0;
-    Gecode::Matrix<Gecode::IntVarArray> agentConnections(mAgentConnections, mModelCombination.size(), mModelCombination.size());
-    for(size_t i = 0; i < mModelCombination.size(); ++i)
-    {
-        {
-            Gecode::IntVar v = agentConnections(i, agents.first);
-            if(v.assigned())
-            {
-                if(v.val() == 1)
-                {
-                    ++existingConnections0;
-                }
-            }
-        }
-
-        {
-            Gecode::IntVar v = agentConnections(i, agents.second);
-            if(v.assigned())
-            {
-                if(v.val() == 1)
-                {
-                    ++existingConnections1;
-                }
-            }
-
-        }
-    }
+    // find number of existing connections for both agents using the
+    // cached values
+    size_t existingConnections0 = mExistingConnections[agents.first].min();
+    size_t existingConnections1 = mExistingConnections[agents.second].min();
 
     IndexRange idxRange0 = mInterfaceIndexRanges[agents.first];
     double merit0 = 0;

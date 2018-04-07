@@ -28,6 +28,8 @@ class Connectivity : public Gecode::Space
     owlapi::model::IRI mInterfaceBaseClass;
     owlapi::model::IRI mProperty;
 
+    // Explicitly enumerated type (in contrast to the cardinality based
+    // representation via ModelPool
     ModelCombination mModelCombination;
     owlapi::model::IRIList mInterfaces;
 
@@ -35,16 +37,21 @@ class Connectivity : public Gecode::Space
     // same model instance
     //
     /// List the interfaces and associate the list with corresponding model instance
+    /// as such allows to map an agent (as model instance) to the list of
+    //interfaces
     std::vector< std::pair<owlapi::model::IRI, owlapi::model::IRIList> > mInterfaceMapping;
     /// Register the interface index ranges
     typedef std::pair<uint32_t, uint32_t> IndexRange;
+    // Per model instance, list the range of interfaces that are associated with
+    // this model to speed up information access
     std::vector< IndexRange > mInterfaceIndexRanges;
 
-    /// Map from the index of a variable to the two agents/index of index ranges
+    /// Map from the index of a (connection) variable to the two agents/index of index ranges
     std::vector< std::pair<size_t, size_t> > mIdx2Agents;
 
     // |#ofInterface|*a0Idx + a1Idx
     Gecode::IntVarArray mConnections;
+    Gecode::IntVarArray mExistingConnections;
 
     // Helper class to improve computation of merit function
     Gecode::IntVarArray mAgentConnections;
@@ -56,9 +63,18 @@ class Connectivity : public Gecode::Space
 
     Gecode::Symmetries identifySymmetries(Gecode::IntVarArray& connections);
 
-    //static void doPostCheckGraphCompleteness(Gecode::Space& home);
-    //void checkGraphCompleteness();
     bool isComplete() const;
+
+    /**
+     * Populate the
+     * InterfaceIndexRange and InterfaceMapping to allow identification of
+     * interfaces which belong to an atomic agent (model instance)
+     */
+    void identifyInterfaces();
+    void enforceSymmetricMatrix(Gecode::IntVarArray& connections);
+    void applyCompatibilityConstraints(Gecode::IntVarArray& connections);
+    void cacheExistingConnections(Gecode::IntVarArray& connections);
+    void maxOneLink(Gecode::IntVarArray& connections);
 
 public:
 
