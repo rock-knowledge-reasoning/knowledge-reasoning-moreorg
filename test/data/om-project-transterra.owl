@@ -27,6 +27,7 @@
         <owl:imports rdf:resource="http://www.rock-robotics.org/2015/12/robots/CoyoteIII"/>
         <owl:imports rdf:resource="http://www.rock-robotics.org/2015/12/robots/Payload"/>
         <owl:imports rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa"/>
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2015/12/robots/SherpaTT"/>
     </owl:Ontology>
     
 
@@ -83,6 +84,18 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Sherpa -->
 
     <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Sherpa">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;hasTransportCapacity"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2015/12/projects/TransTerrA#BulkyAgent"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </rdf:Description>
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#Sherpa -->
+
+    <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-schema#SherpaTT">
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;hasTransportCapacity"/>

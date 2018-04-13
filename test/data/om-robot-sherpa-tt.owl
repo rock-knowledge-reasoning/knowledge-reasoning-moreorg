@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY om-base "http://www.rock-robotics.org/2014/01/om-base#" >
+    <!ENTITY om-schema "http://www.rock-robotics.org/2014/01/om-schema#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.rock-robotics.org/2015/12/robots/SherpaTT#"
+     xml:base="http://www.rock-robotics.org/2015/12/robots/SherpaTT"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:om-base="http://www.rock-robotics.org/2014/01/om-base#">
+    <owl:Ontology rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT">
+        <rdfs:comment>* v0.1
+ * change base uri to om-schema</rdfs:comment>
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#SherpaTT -->
+
+    <owl:Class rdf:about="&om-schema;SherpaTT">
+        <rdfs:subClassOf rdf:resource="&om-schema;Actor"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;EmiActive"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;Manipulator"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;Localization"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;ForceTorqueSensor"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;Mapping"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;Locomotion"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;Camera"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;EmiPassive"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">4</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;hasTransportCapacity"/>
+                <owl:onClass rdf:resource="&om-schema;Actor"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">10</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;Manipulation"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="&om-schema;Power"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#SherpaTT -->
+
+    <owl:NamedIndividual rdf:about="&om-schema;SherpaTT">
+        <rdf:type rdf:resource="&om-schema;SherpaTT"/>
+        <om-schema:minAcceleration rdf:datatype="&xsd;double">-0.1</om-schema:minAcceleration>
+        <om-schema:nominalAcceleration rdf:datatype="&xsd;double">0.0</om-schema:nominalAcceleration>
+        <om-schema:minVelocity rdf:datatype="&xsd;double">0.0</om-schema:minVelocity>
+        <om-schema:maxAcceleration rdf:datatype="&xsd;double">0.1</om-schema:maxAcceleration>
+        <om-schema:nominalVelocity rdf:datatype="&xsd;double">0.5</om-schema:nominalVelocity>
+        <om-schema:probabilityOfFailure rdf:datatype="&xsd;double">0.5</om-schema:probabilityOfFailure>
+        <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">120</om-schema:nominalPowerConsumption>
+        <om-schema:transportDemand rdf:datatype="&xsd;double">1.0</om-schema:transportDemand>
+        <om-schema:maxVelocity rdf:datatype="&xsd;double">1.0</om-schema:maxVelocity>
+        <om-schema:minHeight rdf:datatype="&xsd;double">1.5</om-schema:minHeight>
+        <om-schema:nominalWidth rdf:datatype="&xsd;integer">10</om-schema:nominalWidth>
+        <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">360000.0</om-schema:maxEnergyCapacity>
+        <om-schema:transportCapacity rdf:datatype="&xsd;double">10.0</om-schema:transportCapacity>
+        <om-schema:energyCapacity rdf:datatype="&xsd;double">360000.0</om-schema:energyCapacity>
+        <om-schema:mass rdf:datatype="&xsd;double">160.0</om-schema:mass>
+        <om-schema:nominalWidth rdf:datatype="&xsd;double">2.0</om-schema:nominalWidth>
+        <om-schema:minWidth rdf:datatype="&xsd;double">2.0</om-schema:minWidth>
+        <om-schema:nominalHeight rdf:datatype="&xsd;double">2.0</om-schema:nominalHeight>
+        <om-schema:maxHeight rdf:datatype="&xsd;double">2.5</om-schema:maxHeight>
+        <om-schema:maxWidth rdf:datatype="&xsd;double">2.5</om-schema:maxWidth>
+        <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.5.0) http://owlapi.sourceforge.net -->
+
