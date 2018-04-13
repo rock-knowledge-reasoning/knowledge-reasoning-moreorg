@@ -35,15 +35,6 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#transportSupplyDemand -->
-
-    <owl:AnnotationProperty rdf:about="&om-schema;transportSupplyDemand"/>
-    
-
-
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -51,15 +42,6 @@
     //
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
-
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#has -->
-
-    <owl:ObjectProperty rdf:about="&om-schema;has"/>
-    
-
 
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -69,117 +51,6 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#energyCapacity -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;energyCapacity"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#mass -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;mass"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxAcceleration -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;maxAcceleration"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxEnergyCapacity -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;maxEnergyCapacity"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxHeight -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;maxHeight"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxVelocity -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;maxVelocity"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxWidth -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;maxWidth"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#minAcceleration -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;minAcceleration"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#minHeight -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;minHeight"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#minVelocity -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;minVelocity"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#minWidth -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;minWidth"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalAcceleration -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;nominalAcceleration"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalHeight -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;nominalHeight"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalPowerConsumption -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;nominalPowerConsumption"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalVelocity -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;nominalVelocity"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalWidth -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;nominalWidth"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#probabilityOfFailure -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;probabilityOfFailure"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#supplyVoltage -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;supplyVoltage"/>
-    
-
-
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -187,75 +58,6 @@
     //
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
-
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Actor -->
-
-    <owl:Class rdf:about="&om-schema;Actor"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Camera -->
-
-    <owl:Class rdf:about="&om-schema;Camera"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#EmiActive -->
-
-    <owl:Class rdf:about="&om-schema;EmiActive"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#EmiPassive -->
-
-    <owl:Class rdf:about="&om-schema;EmiPassive"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#ForceTorqueSensor -->
-
-    <owl:Class rdf:about="&om-schema;ForceTorqueSensor"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Localization -->
-
-    <owl:Class rdf:about="&om-schema;Localization"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Locomotion -->
-
-    <owl:Class rdf:about="&om-schema;Locomotion"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Manipulation -->
-
-    <owl:Class rdf:about="&om-schema;Manipulation"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Manipulator -->
-
-    <owl:Class rdf:about="&om-schema;Manipulator"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Mapping -->
-
-    <owl:Class rdf:about="&om-schema;Mapping"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Power -->
-
-    <owl:Class rdf:about="&om-schema;Power"/>
-    
-
 
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Sherpa -->
 
