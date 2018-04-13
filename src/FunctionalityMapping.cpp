@@ -40,6 +40,7 @@ void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::
     {
         mFunction2Pool[function].insert(modelPool);
         mSupportedFunctionalities.insert(function);
+        mActiveModelPools.insert(modelPool);
     }
 }
 

@@ -34,6 +34,9 @@ class FunctionalityMapping
     /// Cache to map from a function to supported ModelPools
     Function2PoolMap mFunction2Pool;
 
+    /// All models pools for will a mapping exists
+    ModelPool::Set mActiveModelPools;
+
 public:
     FunctionalityMapping();
 
@@ -67,6 +70,11 @@ public:
     const ModelPool& getModelPool() const { return mModelPool; }
 
     /**
+     * Get the model pools which are considered in the functionality mapping
+     */
+    const ModelPool::Set& getActiveModelPools() const { return mActiveModelPools; }
+
+    /**
      * Set the general functional saturation bound
      */
     void setFunctionalSaturationBound(const ModelPool& bounds) { mFunctionalSaturationBound = bounds; }
@@ -75,6 +83,11 @@ public:
      * Retrieve the general functional saturation bound
      */
     const ModelPool& getFunctionalSaturationBound() const { return mFunctionalSaturationBound; }
+
+    /**
+     * Retrieve the cache / lookup table
+     */
+    const Function2PoolMap& getCache() const { return mFunction2Pool; }
 
     /**
      * Add a supported function for a model pool
