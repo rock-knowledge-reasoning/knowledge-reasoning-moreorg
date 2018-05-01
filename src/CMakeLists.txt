@@ -1,4 +1,4 @@
-find_package(Boost REQUIRED thread serialization)
+find_package(Boost REQUIRED thread serialization program_options)
 rock_library(organization_model
     SOURCES
         AtomicAgent.cpp
@@ -130,7 +130,8 @@ rock_executable(multiagent_caf ccf/CAF.cpp
     DEPS organization_model)
 
 rock_executable(multiagent_scenario_analysis utils/ScenarioAnalysis.cpp
-    DEPS organization_model)
+    DEPS organization_model
+    LIBS ${Boost_LIBRARIES})
 
 rock_executable(organization_model-bm Benchmark.cpp
     DEPS organization_model)

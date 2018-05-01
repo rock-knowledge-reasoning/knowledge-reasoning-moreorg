@@ -24,7 +24,12 @@ LinkGroup Link::getGroup() const
 
 LinkType Link::getType() const
 {
-    return LinkType(mFirst.getType(), mSecond.getType());
+    // Make sure that link direction does not matter
+    if(mFirst.getType() < mSecond.getType())
+    {
+        return LinkType(mFirst.getType(), mSecond.getType());
+    }
+    return LinkType(mSecond.getType(), mFirst.getType());
 }
 
 bool Link::operator<(const Link& other) const

@@ -142,14 +142,21 @@ std::vector<numeric::Stats<double> > runFunctionalSaturationBoundTest(const Orga
 {
     numeric::Stats<double> timeWithSatBound;
     numeric::Stats<double> timeWithoutSatBound;
+    numeric::Stats<double> numberOfFunctionsWithSatBounds;
+    numeric::Stats<double> numberOfAgentsWithSatBound;
+    numeric::Stats<double> numberOfFunctionsWithoutSatBounds;
+    numeric::Stats<double> numberOfAgentsWithoutSatBound;
     for(size_t i = 0; i < epochs; ++i)
     {
+        std::cout << "Epoch #" << i << std::endl;
         double duration;
         {
             base::Time start = base::Time::now();
             OrganizationModelAsk ask(om, modelPool, false);
             duration = (base::Time::now() - start).toSeconds();
             timeWithoutSatBound.update(duration);
+            numberOfFunctionsWithoutSatBounds.update( ask.getFunctionalityMapping().getCache().size());
+            numberOfAgentsWithoutSatBound.update( ask.getFunctionalityMapping().getActiveModelPools().size());
         }
 
         {
@@ -157,12 +164,23 @@ std::vector<numeric::Stats<double> > runFunctionalSaturationBoundTest(const Orga
             OrganizationModelAsk ask(om, modelPool, true);
             duration = (base::Time::now() - start).toSeconds();
             timeWithSatBound.update(duration);
+            numberOfFunctionsWithSatBounds.update( ask.getFunctionalityMapping().getCache().size());
+            numberOfAgentsWithSatBound.update( ask.getFunctionalityMapping().getActiveModelPools().size());
+            if(i == 0)
+            {
+                std::cout << "Functionality map using saturation bound: " << std::endl;
+                std::cout << ask.getFunctionalityMapping().toString() << std::endl;
+            }
         }
     }
 
     std::vector< numeric::Stats<double> > stats;
     stats.push_back(timeWithoutSatBound);
     stats.push_back(timeWithSatBound);
+    stats.push_back(numberOfFunctionsWithoutSatBounds);
+    stats.push_back(numberOfFunctionsWithSatBounds);
+    stats.push_back(numberOfAgentsWithoutSatBound);
+    stats.push_back(numberOfAgentsWithSatBound);
     return stats;
 }
 
@@ -340,7 +358,11 @@ int main(int argc, char** argv)
     } else if(type == "fsat")
     {
         log << "# number of epochs: " << epochs << std::endl;
-        log << "# [model #] [timeInS w/o sat bound][stdev][timeInS w sat bound][stdev]" << std::endl;
+        log << "# [model #] [time w/o sat bound] [stdev] [time w sat bound] [stdev]"
+            << " [functions w/o sat bound] [stdev] [functions w sat bound] [stdev]"
+            << " [agent w/o sat bound] [stdev] [agents w sat bound] [stddev]"
+            << std::endl;
+
         ModelPoolIterator mit(spec.from, spec.to, spec.stepSize);
         while(mit.next())
         {
@@ -348,7 +370,6 @@ int main(int argc, char** argv)
             std::cout << "Current: " << current.toString(4) << std::endl;
             std::vector<numeric::Stats<double> > numericStats = runFunctionalSaturationBoundTest(om, current, epochs);
 
-            // record the number of model instances
             ModelPool::const_iterator cit = current.begin();
             for(; cit != current.end(); ++cit)
             {

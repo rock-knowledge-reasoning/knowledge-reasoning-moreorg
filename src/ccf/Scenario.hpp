@@ -21,11 +21,15 @@ class Scenario
 {
     friend std::ostream& operator<<(std::ostream& os, const Scenario& scenario);
 
+    size_t mMaxCoalitionSize;
+
     std::vector<ActorType> mActorTypes;
     std::vector<CompatibilityType> mInterfaceCompatibilityTypes;
     std::map<CompatibilityType, std::vector<CompatibilityType> > mInterfaceCompatibility;
 
     std::map<Actor, ActorDescription> mActors;
+    std::vector<Actor> mActorList;
+    /// The maximum number of composite agent instances (actor combinations up)
     uint32_t mNumberOfActorCombinations;
     std::vector<Interface> mInterfaces;
 
@@ -48,13 +52,12 @@ class Scenario
 
 protected:
     void createLinks();
-    void compute();
 
     std::vector<LinkType> getValidLinkTypeList() const;
 
 public:
     Scenario();
-    void createCompositeActorTypes();
+    void compute(size_t maxCoalitionSize);
 
     std::vector<Link> getValidLinks() { return mValidLinks; }
     std::vector<Link> getInvalidLinks() { return mInvalidLinks; }
@@ -68,8 +71,15 @@ public:
     std::map<Actor, std::set<Link> > getActorLinkMap() const { return mActorLinkMap; }
     std::map<Interface, std::set<Link> > getInterfaceLinkMap() const { return mInterfaceLinkMap; }
 
+
     size_t getNumberOfActors() const { return mActors.size(); }
     static Scenario fromConsole();
+    static Scenario fromFile(const std::string& filename);
+
+    std::string rowDescription() const;
+    std::string report() const;
+
+
 };
 
 } // end namespace ccf

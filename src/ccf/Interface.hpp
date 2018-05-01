@@ -15,13 +15,15 @@ class Interface
     LocalInterfaceId mLocalId;
     CompatibilityType mCompatibilityType;
     InterfaceType mType;
-    
+
 public:
     Interface();
     Interface(Actor actor, LocalInterfaceId interfaceId, CompatibilityType type);
 
     Actor getActor() const { return mActor; }
-    LocalInterfaceId getLocalId() const { return mLocalId; } 
+    LocalInterfaceId getLocalId() const { return mLocalId; }
+
+    // Interface type consists of an actor and local interface id
     InterfaceType getType() const { return mType; }
     CompatibilityType getCompatibilityType() const { return mCompatibilityType; }
 
