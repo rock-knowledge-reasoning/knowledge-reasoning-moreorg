@@ -8,6 +8,10 @@
 namespace organization_model {
 namespace reasoning {
 
+/**
+ * ModelBound represents
+ * the allowed interval for cardinalities of a particular model
+ */
 struct ModelBound
 {
     typedef std::vector<ModelBound> List;
@@ -16,7 +20,9 @@ struct ModelBound
 
     owlapi::model::IRI model;
 
+    /// lower bound
     uint32_t min;
+    /// upper bound
     uint32_t max;
 
     ModelBound();
@@ -49,7 +55,7 @@ struct ModelBound
      */
     void decrement();
 
-    bool operator<(const ModelBound& other) const { return model < other.model; }
+    bool operator<(const ModelBound& other) const;
 };
 
 } // end namespace reasoning

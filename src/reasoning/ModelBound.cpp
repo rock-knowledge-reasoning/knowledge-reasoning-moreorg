@@ -102,7 +102,7 @@ ModelBound::List ModelBound::substractMin(const ModelBound::List& _a, const Mode
         }
 
         try {
-            LOG_DEBUG_S << "SubstractMin: lval: a " << ait->toString() << 
+            LOG_DEBUG_S << "SubstractMin: lval: a " << ait->toString() <<
                 " rval: b " << modelBound.toString();
             ModelBound deltaBound = ait->substractMin(modelBound);
             result.push_back(deltaBound);
@@ -125,12 +125,26 @@ ModelBound::List ModelBound::substractMin(const ModelBound::List& _a, const Mode
 
 void ModelBound::decrement()
 {
-    if(min > 0 && max > 0)
+    if(max > min)
     {
-        --min;
         --max;
     } else {
-        throw std::runtime_error("owlapi::csp::ModelBound::decrement: cannot further decrement 0 value");
+        throw std::runtime_error("owlapi::csp::ModelBound::decrement: cannot further decremented: min value reached");
+    }
+}
+
+bool ModelBound::operator<(const ModelBound& other) const
+{
+    if(model == other.model)
+    {
+        if(min == other.min)
+        {
+            return max < other.max;
+        } else {
+            return min < other.min;
+        }
+    } else {
+        return model < other.model;
     }
 }
 
