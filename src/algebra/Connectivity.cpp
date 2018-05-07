@@ -108,6 +108,7 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     , mModelCombination(mModelPool.toModelCombination())
     , mExistingConnections(*this, mModelCombination.size(), 0, mModelCombination.size())
     , mAgentConnections(*this, mModelCombination.size()*mModelCombination.size(), 0, mModelCombination.size())
+    , mIsTree(true)
 {
     // Use hw() (not time -- since resolution of time seem to be rather low)
     mRnd.hw();
@@ -194,6 +195,7 @@ Connectivity::Connectivity(Connectivity& other)
     , mInterfaceIndexRanges(other.mInterfaceIndexRanges)
     , mIdx2Agents(other.mIdx2Agents)
     , mRnd(other.mRnd)
+    , mIsTree(other.mIsTree)
 {
     mConnections.update(*this, other.mConnections);
     mAgentConnections.update(*this, other.mAgentConnections);
@@ -301,8 +303,14 @@ void Connectivity::enforceSymmetricMatrix(Gecode::IntVarArray& connections)
             exactNumberOfConnections << v;
         }
     }
+
     Gecode::IntVar linkCount(*this, mInterfaceIndexRanges.size()-1, mInterfaceIndexRanges.size());
-    rel(*this, sum(exactNumberOfConnections) == linkCount);
+    if(mIsTree)
+    {
+        rel(*this, sum(exactNumberOfConnections) == linkCount);
+    } else {
+        rel(*this, sum(exactNumberOfConnections) >= linkCount);
+    }
 }
 
 void Connectivity::applyCompatibilityConstraints(Gecode::IntVarArray& connections)
@@ -381,7 +389,6 @@ void Connectivity::cacheExistingConnections(Gecode::IntVarArray& connections)
         //rel(*this, sum(agentConnections) >= 1);
         rel(*this, mExistingConnections[a] == sum(agentConnections));
     }
-
 }
 
 void Connectivity::maxOneLink(Gecode::IntVarArray& connections)

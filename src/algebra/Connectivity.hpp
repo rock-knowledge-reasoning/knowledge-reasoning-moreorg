@@ -61,6 +61,11 @@ class Connectivity : public Gecode::Space
 
     mutable graph_analysis::BaseGraph::Ptr mpBaseGraph;
 
+    /// Make sure the connected system forms a tree
+    bool mIsTree;
+
+    void setTreeRequirement(bool isTree) { mIsTree = isTree; }
+
     Gecode::Symmetries identifySymmetries(Gecode::IntVarArray& connections);
 
     bool isComplete() const;
