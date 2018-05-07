@@ -102,6 +102,7 @@ double Metric::computeSharedUse(const owlapi::model::IRISet& functions, const Mo
 double Metric::computeExclusiveUse(const ModelPool& required, const ModelPool& available) const
 {
     using namespace owlapi::model;
+    // Sum all collected cardinality restrictions
     std::vector<OWLCardinalityRestriction::Ptr> r_available = mOrganizationModelAsk.getCardinalityRestrictions(available, mProperty, OWLCardinalityRestriction::SUM_OP, false);
     std::vector<OWLCardinalityRestriction::Ptr> r_required = mOrganizationModelAsk.getCardinalityRestrictions(required, mProperty, OWLCardinalityRestriction::SUM_OP, true);
 

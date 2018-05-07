@@ -170,7 +170,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         // Sort based on probability of survival -- try to maximize redundancy
         std::sort(models.begin(), models.end(), [](const ModelSurvivability& a, const ModelSurvivability& b)
                 {
-                return a.getProbabilityOfSurvival() < b.getProbabilityOfSurvival();
+                    return a.getProbabilityOfSurvival() < b.getProbabilityOfSurvival();
                 });
 
         ModelBound::List::iterator rit = modelBoundRemaining.begin();
@@ -188,8 +188,6 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
                     try {
                         remaining.decrement();
 
-                        // Increase redundancy
-                        // (mit->getCardinality)
                         mit->increment();
                         updated = true;
                     } catch(...)

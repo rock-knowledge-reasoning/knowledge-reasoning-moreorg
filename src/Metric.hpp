@@ -57,27 +57,33 @@ public:
 
     /**
      * Compute the metric for a given function (service) and a agent defined by
-     * a model pool
+     * a model pool, based on the exclusive resource usage
      */
     double compute(const owlapi::model::IRI& function, const ModelPool& modelPool) const;
 
     /**
      * Compute the exclusive use metric for two model pools
+     * \param required Set of required resources
+     * \param available Set of available resources
+     * \see computeExclusiveUse
      */
     double computeExclusiveUse(const ModelPool& required, const ModelPool& available) const;
 
     /**
      * Compute the metric for a given set of functions (services)
-     * \param functions Set of function that require
+     * \param functions Set of functions that require
      * the exclusive use of available resource, i.e., function requirements
      * add(!) up
-     * \param modelPool describing a composite actor
+     * \param modelPool The available set of resources
      * \return metric
      */
     double computeExclusiveUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const;
 
     /**
-     * Compute the shared use metric for two model pools
+     * Compute the shared use metric to compute a metric for required vs.
+     * available resources
+     * \param required Required resources
+     * \param available Available resources
      */
     double computeSharedUse(const ModelPool& required, const ModelPool& available) const;
 
@@ -92,7 +98,7 @@ public:
     double computeSharedUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const;
 
     /**
-     *
+     * Compute metric based on the given list of cardinality restrictions
      */
     virtual double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const { throw std::runtime_error("organization_model::metrics::Metric::compute: not implemented"); }
 
@@ -118,6 +124,9 @@ public:
 
     static std::string toString(const MetricMap& map, uint32_t indent = 0);
 
+    /**
+     * Compute the metrics for a given sequential chain of components
+     */
     virtual double sequentialUse(const std::vector<double>& values) const { throw std::runtime_error("organization_model::metrics::Metric::sequentialUse  not implemented"); }
 
 protected:

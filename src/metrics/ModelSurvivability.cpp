@@ -11,12 +11,6 @@ ModelSurvivability::ModelSurvivability(const owlapi::model::OWLCardinalityRestri
 
 double ModelSurvivability::getProbabilityOfSurvival() const
 {
-    // The cardinality gives the number of components which have to be in serial
-    // for this model to work
-    // e.g. stereo camera: 2 cameras
-    //
-    // Redundancy provides the information about the overall redundancy, e.g.,
-    // if 4 cameras are available, we assume a redundancy of 2
     double pSerialSystem = pow(mModelProbabilityOfSurvival, getCardinality());
     return 1 - pow(1-pSerialSystem, mRedundancy);
 }
@@ -26,12 +20,12 @@ owlapi::model::IRI ModelSurvivability::getQualification() const
     return mRestriction->getQualification();
 }
 
-uint32_t ModelSurvivability::getCardinality() const 
-{ 
+uint32_t ModelSurvivability::getCardinality() const
+{
     return mRestriction->getCardinality();
 }
 
-std::string ModelSurvivability::toString() const 
+std::string ModelSurvivability::toString() const
 {
     std::stringstream ss;
     ss << " ModelSurvivability: " << std::endl;
