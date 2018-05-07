@@ -10,7 +10,8 @@ namespace organization_model {
 
 /**
  * \class Heuristics
- * \brief Collection of heuristic functions
+ * \brief Collection of heuristic functions in order to estimate, e.g., travel
+ * time of an agent and reconfiguration cost
  */
 class Heuristics
 {
