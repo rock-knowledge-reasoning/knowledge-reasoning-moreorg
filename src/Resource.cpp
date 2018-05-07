@@ -55,6 +55,16 @@ Resource::Set Resource::toResourceSet(const owlapi::model::IRIList& models)
     return resources;
 }
 
+owlapi::model::IRISet Resource::getModels(const Resource::Set& a)
+{
+    owlapi::model::IRISet models;
+    for(const Resource r : a)
+    {
+        models.insert(r.getModel());
+    }
+    return models;
+}
+
 void Resource::addPropertyConstraint(const PropertyConstraint& constraint)
 {
     mPropertyConstraints.insert(constraint);

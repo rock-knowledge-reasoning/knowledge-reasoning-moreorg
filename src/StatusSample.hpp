@@ -8,6 +8,7 @@
 #include "Resource.hpp"
 #include "Types.hpp"
 #include "OrganizationModelAsk.hpp"
+#include "Sample.hpp"
 
 namespace organization_model {
 
@@ -18,7 +19,7 @@ namespace organization_model {
  * \details The status sample serve as basis to (a) monitor a system, and (b)
  * analyse a plan of a system
  */
-class StatusSample
+class StatusSample : public Sample
 {
 public:
     typedef std::vector<StatusSample> List;
@@ -36,7 +37,6 @@ public:
      * \param operationalStatus Operational status of the agent as operative or
      * dormant
      * \param activity The type of activity if the agent is operative
-     * \param resourceRequirement actively used resources for the activity
      */
     StatusSample(const Agent& instance,
             const base::Position& fromLocation,
@@ -44,32 +44,17 @@ public:
             size_t fromTime,
             size_t toTime,
             Agent::OperationalStatus operationalStatus,
-            activity::Type activity,
-            const Resource::Set& resourceRequirements);
+            activity::Type activity
+    );
+
+    virtual ~StatusSample();
 
     const Agent& getAgent() const { return mAgent; }
-    const base::Position& getFromLocation() const { return mFromLocation; }
-    const base::Position& getToLocation() const { return mToLocation; }
-    size_t getFromTime() const { return mFromTime; }
-    size_t getToTime() const { return mToTime; }
-    size_t getAvailableTime() const { return mToTime - mFromTime; }
     Agent::OperationalStatus getOperationalStatus() const { return mOperationalStatus; }
     activity::Type getActivityType() const { return mActivityType; }
-    const Resource::Set& getResourceRequirements() const { return mResourceRequirements; }
-
-    /**
-     * Check if the status sample intersects with the given time
-     * \return true if \p time lies in the interval of getFromTime and
-     * getToTime
-     */
-    bool matchesTime(size_t time) const { return time >= mFromTime && time <= mToTime; }
 
 private:
     Agent mAgent;
-    base::Position mFromLocation;
-    base::Position mToLocation;
-    size_t mFromTime;
-    size_t mToTime;
     Agent::OperationalStatus mOperationalStatus;
     activity::Type mActivityType;
     Resource::Set mResourceRequirements;

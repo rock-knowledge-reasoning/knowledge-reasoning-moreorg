@@ -13,24 +13,40 @@ using namespace organization_model;
 using namespace owlapi;
 using namespace owlapi::model;
 
+struct RedundancyFixture
+{
+    RedundancyFixture()
+        : has("http://property/has")
+    {
+        om = make_shared<OrganizationModel>(getOMSchema());
+
+        OWLOntologyTell tell(om->ontology());
+
+        a = tell.klass("http://klass/base");
+        b = tell.klass("http://klass/base-derived");
+        c = tell.klass("http://klass/base-derived-derived");
+
+        property = tell.objectProperty( has );
+
+        tell.subClassOf(c,b);
+        tell.subClassOf(b,a);
+        om->ontology()->refresh();
+    }
+
+    IRI has;
+
+    OWLClass::Ptr a;
+    OWLClass::Ptr b;
+    OWLClass::Ptr c;
+
+    OWLObjectProperty::Ptr property;
+    OrganizationModel::Ptr om;
+};
+
 BOOST_AUTO_TEST_SUITE(model_metrics)
 
-BOOST_AUTO_TEST_CASE(redundancy)
+BOOST_FIXTURE_TEST_CASE(redundancy, RedundancyFixture )
 {
-    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()) );
-
-    OWLOntologyTell tell(om->ontology());
-
-    OWLClass::Ptr a = tell.klass("http://klass/base");
-    OWLClass::Ptr b = tell.klass("http://klass/base-derived");
-    OWLClass::Ptr c = tell.klass("http://klass/base-derived-derived");
-    IRI has("http://property/has");
-    OWLObjectProperty::Ptr property = tell.objectProperty( has );
-
-    tell.subClassOf(c,b);
-    tell.subClassOf(b,a);
-    om->ontology()->refresh();
-
     // query =2.has.A and =2.has.C
     std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
     {
@@ -64,6 +80,29 @@ BOOST_AUTO_TEST_CASE(redundancy)
     BOOST_REQUIRE_MESSAGE(redundancyVal == expected, "Redundancy expected: " << expected << " but got " << redundancyVal);
 }
 
+BOOST_FIXTURE_TEST_CASE(redundancy_same_parallel_in_series, RedundancyFixture)
+{
+    std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
+    {
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
+        query.push_back(restriction);
+    }
+    {
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
+        resourcePool.push_back(restriction);
+    }
+    {
+        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
+        resourcePool.push_back(restriction);
+    }
+
+    OrganizationModelAsk ask(om);
+    metrics::Redundancy redundancy(ask, 0.5, has);
+    double expected = (1 -pow( 1-pow(0.5,2),2))*pow(0.5,2);
+    double redundancyVal = redundancy.computeMetric(query, resourcePool);
+    BOOST_REQUIRE_MESSAGE(redundancyVal == expected, "Redundancy expected: " << expected << " but got " << redundancyVal);
+}
+
 BOOST_AUTO_TEST_CASE(redundancy_computation)
 {
     OrganizationModel om(getRootDir() + "/test/data/om-project-transterra.owl");
@@ -71,14 +110,28 @@ BOOST_AUTO_TEST_CASE(redundancy_computation)
     metrics::Redundancy redundancy(omAsk);
 
     IRI sherpa = organization_model::vocabulary::OM::resolve("Sherpa");
+    IRI payloadCamera = organization_model::vocabulary::OM::resolve("PayloadCamera");
+    IRI payloadBattery = organization_model::vocabulary::OM::resolve("PayloadBattery");
     IRI transportProvider = organization_model::vocabulary::OM::resolve("TransportProvider");
 
+    //{
+    //    ModelPool availableModelPool;
+    //    availableModelPool[sherpa] = 1;
+
+    //    IRIList functionalities;
+    //    functionalities.push_back(transportProvider);
+    //    BOOST_TEST_MESSAGE("TEST: " << redundancy.computeSequential(functionalities, availableModelPool));
+    //}
+
+    IRI stereoCameraProvider = organization_model::vocabulary::OM::resolve("StereoImageProvider");
     {
         ModelPool availableModelPool;
         availableModelPool[sherpa] = 1;
+        availableModelPool[payloadCamera] = 1;
 
         IRIList functionalities;
         functionalities.push_back(transportProvider);
+        functionalities.push_back(stereoCameraProvider);
         BOOST_TEST_MESSAGE("TEST: " << redundancy.computeSequential(functionalities, availableModelPool));
     }
 

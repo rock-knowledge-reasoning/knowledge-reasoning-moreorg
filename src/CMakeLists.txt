@@ -41,6 +41,8 @@ rock_library(organization_model
         reasoning/ResourceMatch.cpp
         Resource.cpp
         Service.cpp
+        Sample.cpp
+        RequirementSample.cpp
         StatusSample.cpp
         Types.cpp
         utils/CoalitionStructureGeneration.cpp
@@ -87,6 +89,8 @@ rock_library(organization_model
         Resource.hpp
         Service.hpp
         SharedPtr.hpp
+        Sample.hpp
+        RequirementSample.hpp
         StatusSample.hpp
         Types.hpp
         reasoning/ModelBound.hpp

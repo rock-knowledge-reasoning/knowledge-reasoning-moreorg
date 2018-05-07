@@ -50,27 +50,86 @@ struct AnalyserFixture
         atomicAgents.insert(sherpas.begin(), sherpas.end());
         atomicAgents.insert(payloads.begin(), payloads.end());
 
-        StatusSample sample0(agent0,
+        StatusSample sample00(agent0,
                 base::Position(0,0,0),
                 base::Position(0,100,0),
                 0,
+                25,
+                Agent::OPERATIVE,
+                activity::BUSY);
+
+        StatusSample sample01(agent0,
+                base::Position(0,100,0),
+                base::Position(0,100,0),
+                26,
+                75,
+                Agent::OPERATIVE,
+                activity::BUSY);
+
+        StatusSample sample02(agent0,
+                base::Position(0,100,0),
+                base::Position(0,120,0),
+                76,
                 100,
                 Agent::OPERATIVE,
-                activity::BUSY,
-                Resource::Set());
+                activity::BUSY);
 
-        StatusSample sample1(agent1,
+        StatusSample sample10(agent1,
                 base::Position(0,0,0),
                 base::Position(100,0,0),
                 0,
                 100,
                 Agent::OPERATIVE,
-                activity::BUSY,
-                Resource::Set());
+                activity::BUSY);
+
+
+        Resource::Set resources;
+        resources.insert(Resource(OM::resolve("TransportProvider")) );
+
+        RequirementSample r00(resources,
+                ModelPool(),
+                base::Position(0,0,0),
+                base::Position(0,100,0),
+                0,
+                25
+        );
+
+        Resource::Set stereoImageProvider;
+        stereoImageProvider.insert(Resource(OM::resolve("StereoImageProvider")) );
+
+        RequirementSample r01(stereoImageProvider,
+                ModelPool(),
+                base::Position(0,100,0),
+                base::Position(0,100,0),
+                26,
+                75
+        );
+
+        RequirementSample r02(resources,
+                ModelPool(),
+                base::Position(0,100,0),
+                base::Position(0,120,0),
+                76,
+                100
+        );
+        RequirementSample r10(resources,
+                ModelPool(),
+                base::Position(0,0,0),
+                base::Position(100,0,0),
+                0,
+                100
+        );
 
         analyser = new Analyser(ask);
-        analyser->add(sample0);
-        analyser->add(sample1);
+        analyser->add(sample00);
+        analyser->add(sample01);
+        analyser->add(sample02);
+        analyser->add(sample10);
+
+        analyser->add(r00);
+        analyser->add(r01);
+        analyser->add(r10);
+
 
         analyser->createIndex();
     }
@@ -136,6 +195,16 @@ BOOST_FIXTURE_TEST_CASE(get_energy, AnalyserFixture)
     for(size_t i = 0; i < 100; ++i)
     {
         BOOST_TEST_MESSAGE("getEnergyAvailableMinRelative: " << analyser->getEnergyAvailableMinRelative(i));
+    }
+}
+
+BOOST_FIXTURE_TEST_CASE(samples, AnalyserFixture)
+{
+    BOOST_TEST_MESSAGE("All samples at: 0 #" << analyser->getSampleColumnDescriptionO());
+    for(int i = 0; i < 100; ++i)
+    {
+        std::vector<double> row = analyser->getSampleO(i);
+        BOOST_TEST_MESSAGE("Sample: " << Analyser::toString(row));
     }
 }
 

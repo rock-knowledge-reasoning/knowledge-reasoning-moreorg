@@ -35,6 +35,12 @@ public:
      */
     static Set toResourceSet(const owlapi::model::IRIList& model);
 
+    /**
+     * Get the list of models
+     */
+    static owlapi::model::IRISet getModels(const Resource::Set& a);
+
+
 
     void setPropertyConstraints(const PropertyConstraint::Set& constraints) { mPropertyConstraints = constraints; }
     const PropertyConstraint::Set& getPropertyConstraints() const { return mPropertyConstraints; }

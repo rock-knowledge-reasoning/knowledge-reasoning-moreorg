@@ -2,7 +2,7 @@
 
 namespace organization_model {
 
-StatusSample::StatusSample()
+StatusSample::~StatusSample()
 {}
 
 StatusSample::StatusSample(const Agent& instance,
@@ -11,16 +11,12 @@ StatusSample::StatusSample(const Agent& instance,
             size_t fromTime,
             size_t toTime,
             Agent::OperationalStatus operationalStatus,
-            activity::Type activity,
-            const Resource::Set& resourceRequirements)
-    : mAgent(instance)
-    , mFromLocation(fromLocation)
-    , mToLocation(toLocation)
-    , mFromTime(fromTime)
-    , mToTime(toTime)
+            activity::Type activity
+)
+    : Sample(fromLocation, toLocation, fromTime, toTime)
+    , mAgent(instance)
     , mOperationalStatus(operationalStatus)
     , mActivityType(activity)
-    , mResourceRequirements(resourceRequirements)
 {
 }
 
