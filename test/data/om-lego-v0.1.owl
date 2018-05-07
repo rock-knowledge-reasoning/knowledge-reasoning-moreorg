@@ -41,7 +41,29 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#LowerInterface"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
                 <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#FlatInterface"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-lego#Block11 -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-lego#Block11">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#LegoBlock"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#UpperInterface"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -50,6 +72,28 @@
                 <owl:onProperty rdf:resource="&om-schema;has"/>
                 <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#LowerInterface"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2017/10/om-lego#Block12 -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2017/10/om-lego#Block12">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#LegoBlock"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#UpperInterface"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&om-schema;has"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#LowerInterface"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -126,14 +170,14 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#LowerInterface"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#UpperInterface"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="&om-schema;has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#UpperInterface"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2017/10/om-lego#LowerInterface"/>
                 <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">2</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
