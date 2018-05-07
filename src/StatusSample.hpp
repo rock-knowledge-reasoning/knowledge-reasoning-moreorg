@@ -15,6 +15,8 @@ namespace organization_model {
  * \class StatusSample
  * \brief A StatusSample describes the status of an agent (composite) for a
  * certain time interval
+ * \details The status sample serve as basis to (a) monitor a system, and (b)
+ * analyse a plan of a system
  */
 class StatusSample
 {
@@ -28,13 +30,20 @@ public:
     /**
      * \brief StatusSample constructor
      * \details A status sample represent
+     * \param instance The (composite) agent
+     * \param fromLocation the location the agent is at time fromTime
+     * \param toTime the location the agent is at time toTime
+     * \param operationalStatus Operational status of the agent as operative or
+     * dormant
+     * \param activity The type of activity if the agent is operative
+     * \param resourceRequirement actively used resources for the activity
      */
     StatusSample(const Agent& instance,
             const base::Position& fromLocation,
             const base::Position& toLocation,
             size_t fromTime,
             size_t toTime,
-            bool active,
+            Agent::OperationalStatus operationalStatus,
             activity::Type activity,
             const Resource::Set& resourceRequirements);
 
@@ -44,7 +53,7 @@ public:
     size_t getFromTime() const { return mFromTime; }
     size_t getToTime() const { return mToTime; }
     size_t getAvailableTime() const { return mToTime - mFromTime; }
-    bool isActive() const { return mIsActive; }
+    Agent::OperationalStatus getOperationalStatus() const { return mOperationalStatus; }
     activity::Type getActivityType() const { return mActivityType; }
     const Resource::Set& getResourceRequirements() const { return mResourceRequirements; }
 
@@ -61,7 +70,7 @@ private:
     base::Position mToLocation;
     size_t mFromTime;
     size_t mToTime;
-    bool mIsActive;
+    Agent::OperationalStatus mOperationalStatus;
     activity::Type mActivityType;
     Resource::Set mResourceRequirements;
 };

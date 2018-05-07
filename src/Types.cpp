@@ -7,9 +7,8 @@ std::map<Type, std::string> TypeTxt = {
     { UNKNOWN, "unknown"},
     { TRANSPORT, "transport" },
     { RECONFIGURATION, "reconfiguration" },
-    { ACTIVE_WAIT, "active-wait" },
-    { ACTIVE_OPERATIVE, "active-operative" },
-    { DORMANT, "dormant"}
+    { IDLE, "idle" },
+    { BUSY, "busy" },
 };
 
 } // end namespace activity

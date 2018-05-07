@@ -2,6 +2,13 @@
 
 namespace organization_model {
 
+std::map<Agent::OperationalStatus, std::string> Agent::OperationalStatusTxt =
+{
+     { Agent::UNKNOWN_OPERATIONAL_STATUS, "unknown operational status" },
+     { Agent::OPERATIVE,                  "operative" },
+     { Agent::DORMANT,                    "dormant"   }
+};
+
 Agent::Agent()
 {}
 

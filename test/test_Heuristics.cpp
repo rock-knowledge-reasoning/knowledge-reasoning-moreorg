@@ -55,8 +55,8 @@ struct HeuristicsFixture
                 base::Position(0,100,0),
                 0,
                 100,
-                true,
-                activity::ACTIVE_OPERATIVE,
+                Agent::OPERATIVE,
+                activity::BUSY,
                 Resource::Set());
 
         StatusSample sample1(agent1,
@@ -64,8 +64,8 @@ struct HeuristicsFixture
                 base::Position(100,0,0),
                 0,
                 100,
-                true,
-                activity::ACTIVE_OPERATIVE,
+                Agent::OPERATIVE,
+                activity::BUSY,
                 Resource::Set());
 
         statusSamples.push_back(sample0);
@@ -178,9 +178,6 @@ BOOST_FIXTURE_TEST_CASE(reconfiguration_cost, HeuristicsFixture)
         double expectedCost = 600*2 + 180*3;
         BOOST_REQUIRE_MESSAGE(cost == expectedCost, "Reconfiguration cost should be '" << expectedCost << "', was " << cost);
     }
-
-
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

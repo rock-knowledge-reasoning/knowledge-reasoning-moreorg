@@ -11,12 +11,21 @@ namespace organization_model {
 /**
  * \class Agent
  * \brief General agent representation
+ * \details The general agent consists of the composition of multiple atomic
+ * agents. This class provides methods in order to work with agents.
+ * The method \a update has to be called when the agent has been updated in
+ * order to refresh the setting of the internal policies
  */
 class Agent
 {
 public:
     typedef std::vector<Agent> List;
     typedef std::set<Agent> Set;
+
+    /// The operational status of a agent
+    enum OperationalStatus { UNKNOWN_OPERATIONAL_STATUS = 0, OPERATIVE, DORMANT };
+
+    static std::map<OperationalStatus, std::string> OperationalStatusTxt;
 
     /**
      * Default constructor to allow lists and map usage
@@ -88,22 +97,25 @@ public:
 
     /**
      * Get the list of all atomic agents that are part of the agent set
+     * \return return all atomic agents that are part of a set of (composite) agents
      */
     static AtomicAgent::Set allAtomicAgents(const Agent::Set& agents);
 
     /**
-     * Compute intersection with other agent
+     * Compute intersection with other agent (considering the set of atomic * agents)
      * \return intersection of atomic agents
      */
     AtomicAgent::List getIntersection(const Agent& other) const;
 
     /**
      * Check if this agent and other agent share atomic agents
+     * \return true if this agent shares atomic agents with other, false
+     * otherwise
      */
     bool intersectsWith(const Agent& other) const;
 
     /**
-     * Get the difference between two agents
+     * Get the difference between two agents in terms of atomic agents
      */
     AtomicAgent::List getDifference(const Agent& other) const;
 
@@ -114,6 +126,7 @@ private:
     policies::TransportProviderPolicy mTransportProviderPolicy;
 };
 
+/// A coalition structure is a list of (composite) agents
 typedef Agent::List CoalitionStructure;
 
 } // end namespace organization_model

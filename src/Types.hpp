@@ -6,20 +6,30 @@
 
 namespace organization_model {
 namespace activity {
-
-    enum Type { UNKNOWN,
+    enum Type { UNKNOWN = 0x00,
+        /// The system is idle
+        IDLE = 0x01,
+        /// Actively performing operation general activity
+        BUSY = 0x02,
+        /// More detailed activities (sub flags of BUSY)
         /// Transport between two locations
-        TRANSPORT,
+        TRANSPORT = (0x02 & 0x12),
         /// Reconfiguration
-        RECONFIGURATION,
-        /// Active, but waiting for other agent(s) to complete tasks in order
-        /// to procees
-        ACTIVE_WAIT,
-        /// Actively performing operation
-        ACTIVE_OPERATIVE,
+        RECONFIGURATION = (0x02 & 0x22),
         /// Not an active or even assembled agent
-        DORMANT
     };
+
+    /**
+     * Allow checking of activity via
+     * if(activity & (TRANSPORT | RECONFIGURATION))
+     * {
+     * ...
+     * }
+     */
+    inline Type operator|(Type a, Type b)
+    {
+        return static_cast<Type>(static_cast<int>(a) | static_cast<int>(b));
+    }
 
     extern std::map<Type, std::string> TypeTxt;
 

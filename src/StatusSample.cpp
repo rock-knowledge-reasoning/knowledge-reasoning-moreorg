@@ -10,7 +10,7 @@ StatusSample::StatusSample(const Agent& instance,
             const base::Position& toLocation,
             size_t fromTime,
             size_t toTime,
-            bool active,
+            Agent::OperationalStatus operationalStatus,
             activity::Type activity,
             const Resource::Set& resourceRequirements)
     : mAgent(instance)
@@ -18,7 +18,7 @@ StatusSample::StatusSample(const Agent& instance,
     , mToLocation(toLocation)
     , mFromTime(fromTime)
     , mToTime(toTime)
-    , mIsActive(active)
+    , mOperationalStatus(operationalStatus)
     , mActivityType(activity)
     , mResourceRequirements(resourceRequirements)
 {
