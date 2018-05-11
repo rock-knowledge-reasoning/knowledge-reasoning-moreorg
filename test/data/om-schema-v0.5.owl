@@ -354,7 +354,7 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping-requirement-0"/>
-        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0"/>
     </owl:NamedIndividual>
     
 
@@ -519,7 +519,7 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ServiceModel"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-0"/>
-        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0"/>
     </owl:NamedIndividual>
     
 
@@ -529,7 +529,7 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ImageProvider">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ServiceModel"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera-requirement-0"/>
-        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0"/>
     </owl:NamedIndividual>
     
 
@@ -642,7 +642,7 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping-requirement-0"/>
-        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0"/>
     </owl:NamedIndividual>
     
 
@@ -667,19 +667,19 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Power -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerSource -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Power">
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ResourceModel"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0 -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0 -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0">
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Requirement"/>
-        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
+        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
     </owl:NamedIndividual>
     
 
@@ -727,7 +727,7 @@ a StereoImageProvider service cannot depends upon two instances of ImageProvider
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping-requirement-0"/>
-        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0"/>
     </owl:NamedIndividual>
     
 

@@ -129,9 +129,9 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerServiceModel -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerSourceServiceModel -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerServiceModel">
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSourceServiceModel">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ServiceModel"/>
     </owl:Class>
     
@@ -187,7 +187,7 @@
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping-requirement-0"/>
-        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0"/>
     </owl:NamedIndividual>
     
 
@@ -202,7 +202,7 @@
         <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization-instance-20"/>
         <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion-instance-20"/>
         <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping-instance-20"/>
-        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-instance-20"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-instance-20"/>
     </owl:NamedIndividual>
     
 
@@ -521,10 +521,10 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerServiceModel"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSourceServiceModel"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive-requirement-0"/>
-        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0"/>
     </owl:NamedIndividual>
     
 
@@ -534,7 +534,7 @@
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ImageProvider">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ServiceModel"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera-requirement-0"/>
-        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0"/>
     </owl:NamedIndividual>
     
 
@@ -758,7 +758,7 @@
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping-requirement-0"/>
-        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0"/>
     </owl:NamedIndividual>
     
 
@@ -795,46 +795,46 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Power -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerSource -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Power">
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ResourceModel"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Power-instance-0 -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerSource-instance-0 -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Power-instance-0">
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-instance-0">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
-        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
+        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Power-instance-10 -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerSource-instance-10 -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Power-instance-10">
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-instance-10">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
-        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
+        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Power-instance-20 -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerSource-instance-20 -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Power-instance-20">
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-instance-20">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
-        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
+        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0 -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0 -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0">
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ResourceRequirement"/>
-        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
+        <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
     </owl:NamedIndividual>
     
 
@@ -853,7 +853,7 @@
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion-requirement-0"/>
         <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping-requirement-0"/>
-        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-requirement-0"/>
+        <dependsOn rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-requirement-0"/>
     </owl:NamedIndividual>
     
 
@@ -871,7 +871,7 @@
         <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization-instance-10"/>
         <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion-instance-10"/>
         <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping-instance-10"/>
-        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power-instance-10"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource-instance-10"/>
         <modelledBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Sherpa"/>
     </owl:NamedIndividual>
     

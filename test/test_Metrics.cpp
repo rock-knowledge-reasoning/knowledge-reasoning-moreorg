@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE(metric_map_computation)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Localization' (1, 1000000)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Locomotion' (1, 1000000)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Mapping' (1, 1000000)
-//            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Power' (1, 1000000)
+//            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#PowerSource' (1, 1000000)
 //            //
 //            //    available:
 //            //            ModelBound::List
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(metric_map_computation)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Localization' (0, 3)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Locomotion' (0, 3)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Mapping' (0, 3)
-//            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Power' (0, 3)
+//            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#PowerSource' (0, 3)
 //
 //            double redundancyLevel = i;
 //            double parallel = 1 - pow((1-0.5),redundancyLevel);
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE(metric_map_computation)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Localization' (1, 1000000)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Locomotion' (1, 1000000)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Mapping' (1, 1000000)
-//            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Power' (1, 1000000)
+//            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#PowerSource' (1, 1000000)
 //            //
 //            //    available:
 //            //            ModelBound::List
@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE(metric_map_computation)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Localization' (0, 3)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Locomotion' (0, 3)
 //            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Mapping' (0, 3)
-//            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#Power' (0, 3)
+//            //            ModelBound: 'http://www.rock-robotics.org/2014/01/om-schema#PowerSource' (0, 3)
 //
 //            double redundancyLevel = i;
 //            double parallel = 1 - pow((1-0.5),redundancyLevel);

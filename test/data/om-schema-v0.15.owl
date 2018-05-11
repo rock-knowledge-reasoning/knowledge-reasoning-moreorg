@@ -438,7 +438,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -468,7 +468,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -613,7 +613,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Power"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
                 <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -651,9 +651,9 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Power -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerSource -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Power">
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PhysicalEntity"/>
     </owl:Class>
     

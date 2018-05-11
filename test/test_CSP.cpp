@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
         BOOST_REQUIRE_MESSAGE(modelBound.min == 1 && modelBound.max == 1, "Model bound for '" << modelBound.model << "', expected min 1, max 1, but got: " << modelBound.toString());
     }
     {
-        std::string capabilityName = "Power";
+        std::string capabilityName = "PowerSource";
         ModelBound::List modelBounds = fulfillment.getAssignments(organization_model::vocabulary::OM::resolve(capabilityName));
         BOOST_REQUIRE_MESSAGE(modelBounds.size() == 1, "Matching of 1 provided resource expected, but got '" << modelBounds.size());
 

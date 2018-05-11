@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //    ontology->instanceOf("Locomotion", OM::ResourceModel());
 //
 //    ontology->instanceOf("Camera", OM::ResourceModel());
-//    ontology->instanceOf("Power", OM::ResourceModel());
+//    ontology->instanceOf("PowerSource", OM::ResourceModel());
 //
 //    ontology->instanceOf("MechanicalInterface", OM::InterfaceModel());
 //    ontology->instanceOf("ElectricalInterface", OM::InterfaceModel());
@@ -323,8 +323,8 @@ BOOST_AUTO_TEST_SUITE_END()
 //    om.createInstance("Camera/instance#20" , OM::Resource(), "Camera");
 //    om.createInstance("Camera/instance#30" , OM::Resource(), "Camera");
 //
-//    om.createInstance("Power/requirement#0", OM::Requirement(), "Power");
-//    om.createInstance("Power/instance#0", OM::Resource(), "Power");
+//    om.createInstance("PowerSource/requirement#0", OM::Requirement(), "PowerSource");
+//    om.createInstance("PowerSource/instance#0", OM::Resource(), "PowerSource");
 //
 //    ontology->instanceOf("ImageProvider", OM::ServiceModel());
 //    // to allow a higher arity, e.g., for a stereo camera that requires distinct services
@@ -343,19 +343,19 @@ BOOST_AUTO_TEST_SUITE_END()
 //    om.createInstance("Localization/requirement#0", OM::Requirement(), "Mapping");
 //    om.createInstance("Locomotion/requirement#0", OM::Requirement(), "Mapping");
 //    // The following requirement is already defined
-//    // om.createInstance("Power/requirement#0", OM::Requirement(), "Power");
+//    // om.createInstance("PowerSource/requirement#0", OM::Requirement(), "PowerSource");
 //
 //    ontology->relatedTo("MoveTo", OM::dependsOn(), "Mapping/requirement#0");
 //    ontology->relatedTo("MoveTo", OM::dependsOn(), "Localization/requirement#0");
 //    ontology->relatedTo("MoveTo", OM::dependsOn(), "Locomotion/requirement#0");
-//    ontology->relatedTo("MoveTo", OM::dependsOn(), "Power/requirement#0");
+//    ontology->relatedTo("MoveTo", OM::dependsOn(), "PowerSource/requirement#0");
 //
 //    BOOST_REQUIRE_MESSAGE( ontology->isRelatedTo("MoveTo", OM::dependsOn(), "Mapping/requirement#0"), "Check dependency");
 //
 //    om.createInstance("Camera/requirement#0", OM::Requirement(), "Camera");
-//    om.createInstance("Power/requirement#0", OM::Requirement(), "Power");
+//    om.createInstance("PowerSource/requirement#0", OM::Requirement(), "PowerSource");
 //    ontology->relatedTo("ImageProvider", OM::dependsOn(), "Camera/requirement#0");
-//    ontology->relatedTo("ImageProvider", OM::dependsOn(), "Power/requirement#0");
+//    ontology->relatedTo("ImageProvider", OM::dependsOn(), "PowerSource/requirement#0");
 //
 //
 //    ontology->instanceOf("StereoImageProvider", OM::ServiceModel());
@@ -382,8 +382,8 @@ BOOST_AUTO_TEST_SUITE_END()
 //    om.createInstance("EmiPowerProvider", OM::Service(), "PowerProvider");
 //    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(), "EmiActive/requirement#0");
 //    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(), "EmiPassive/requirement#0");
-//    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(), "Power/requirement#0");
-//    om.createInstance("EmiPowerPower/requirement#0", OM::Requirement(), "EmiPowerProvider");
+//    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(), "PowerSource/requirement#0");
+//    om.createInstance("EmiPowerPowerSource/requirement#0", OM::Requirement(), "EmiPowerProvider");
 //
 //    //// Actor definition
 //    ontology->instanceOf("Sherpa",OM::ActorModel());
@@ -409,14 +409,14 @@ BOOST_AUTO_TEST_SUITE_END()
 //    ontology->relatedTo("Sherpa", OM::has(), "EmiPassive/instance#11");
 //    ontology->relatedTo("Sherpa", OM::has(), "EmiPassive/instance#12");
 //    ontology->relatedTo("Sherpa", OM::has(), "EmiPassive/instance#13");
-//    ontology->relatedTo("Sherpa", OM::has(), "Power/instance#0");
+//    ontology->relatedTo("Sherpa", OM::has(), "PowerSource/instance#0");
 //
 //    ontology->relatedTo("CREX", OM::has(), "Mapping/instance#20");
 //    ontology->relatedTo("CREX", OM::has(), "Localization/instance#20");
 //    ontology->relatedTo("CREX", OM::has(), "Locomotion/instance#20");
 //    ontology->relatedTo("CREX", OM::has(), "Camera/instance#20");
 //    ontology->relatedTo("CREX", OM::has(), "EmiPassive/instance#20");
-//    ontology->relatedTo("CREX", OM::has(), "Power/instance#0");
+//    ontology->relatedTo("CREX", OM::has(), "PowerSource/instance#0");
 //
 //    ontology->relatedTo("PayloadCamera", OM::has(), "Camera/instance#30");
 //    ontology->relatedTo("PayloadCamera", OM::has(), "EmiPassive/instance#30");
