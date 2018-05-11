@@ -31,8 +31,8 @@ int main()
 
     size_t numberOfAtoms = numeric::LimitedCombination<char>::totalNumberOfAtoms(availabilityMap);
 
-    std::cout << "#Exact sizeOfDraw   #Combinations" << std::endl;
-    for(int i=1; i <= numberOfAtoms; ++i)
+    std::vector<size_t> exactCombinations;
+    for(size_t i=1; i <= numberOfAtoms; ++i)
     {
         int count = 0;
         numeric::LimitedCombination<char> combinations(availabilityMap, i, numeric::EXACT);
@@ -40,11 +40,11 @@ int main()
             std::vector<char> charactorCombo = combinations.current();
             count++;
         } while(combinations.next());
-        std::cout << i << " " << count << std::endl;
+        exactCombinations.push_back(count);
     }
 
-    std::cout << "#MaxSizeOfDraw   #Combinations" << std::endl;
-    for(int i=1; i <= numberOfAtoms; ++i)
+    std::vector<size_t> maxCombinations;
+    for(size_t i=1; i <= numberOfAtoms; ++i)
     {
         int count = 0;
         numeric::LimitedCombination<char> combinations(availabilityMap, i, numeric::MAX);
@@ -52,7 +52,14 @@ int main()
             std::vector<char> charactorCombo = combinations.current();
             count++;
         } while(combinations.next());
-        std::cout << i << " " << count << std::endl;
+        maxCombinations.push_back(count);
+    }
+
+    std::cout << "# Computing the number of agent given and exact or maximum coalition size" << std::endl;
+    std::cout << "#SizeOfDraw ExactCoalitionSize MaxCoalitionSize" << std::endl;
+    for(size_t i = 1; i <= numberOfAtoms; ++i)
+    {
+        std::cout << i << " " << exactCombinations[i-1] << " " << maxCombinations[i-1] << std::endl;
     }
 
     return 0;

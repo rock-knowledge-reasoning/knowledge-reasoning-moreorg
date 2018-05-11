@@ -126,6 +126,8 @@ set(GECODE_LIBRARIES
 )
 target_link_libraries(organization_model ${GECODE_LIBRARIES})
 
+rock_executable(limited_combinations utils/LimitedCombination.cpp
+    DEPS organization_model)
 
 #rock_executable(organization_model_bin Main.cpp
 #    DEPS organization_model)
