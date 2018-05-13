@@ -332,6 +332,13 @@ public:
             const owlapi::model::IRI& objectProperty = vocabulary::OM::has(),
             owlapi::model::OWLCardinalityRestriction::OperationType type = owlapi::model::OWLCardinalityRestriction::SUM_OP, bool max2Min = false) const;
 
+
+    /**
+     * Allow only subclasses of a particular type in a model pool
+     */
+    ModelPool allowSubclasses(const ModelPool& modelPool,
+            const owlapi::model::IRI& parent) const;
+
 protected:
 
     /**

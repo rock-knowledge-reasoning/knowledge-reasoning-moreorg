@@ -46,14 +46,7 @@ OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
 
 void OrganizationModelAsk::prepare(const ModelPool& modelPool, bool applyFunctionalSaturationBound)
 {
-    for(const ModelPool::value_type& value : modelPool)
-    {
-        const IRI& model = value.first;
-        if( mOntologyAsk.isSubClassOf(model, vocabulary::OM::Actor()))
-        {
-            mModelPool[model] = value.second;
-        }
-    }
+    mModelPool = allowSubclasses(modelPool, vocabulary::OM::Actor());
     mFunctionalityMapping = computeFunctionalityMapping(mModelPool, applyFunctionalSaturationBound);
 }
 
@@ -1077,6 +1070,20 @@ void OrganizationModelAsk::updateScalingFactor(std::vector<double>& factors, siz
         // maximum value
         v = std::max(v, newValue);
     }
+}
+
+ModelPool OrganizationModelAsk::allowSubclasses(const ModelPool& modelPool,
+        const owlapi::model::IRI& parent) const
+{
+    ModelPool filteredModelPool;
+    for(const ModelPool::value_type p : modelPool)
+    {
+        if( mOntologyAsk.isSubClassOf(p.first, parent) )
+        {
+            filteredModelPool.insert(p);
+        }
+    }
+    return filteredModelPool;
 }
 
 } // end namespace organization_model

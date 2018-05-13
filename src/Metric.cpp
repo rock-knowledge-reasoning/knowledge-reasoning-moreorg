@@ -77,7 +77,10 @@ double Metric::compute(const owlapi::model::IRI& function, const ModelPool& mode
 double Metric::computeSharedUse(const ModelPool& required, const ModelPool& available) const
 {
     using namespace owlapi::model;
-    std::vector<OWLCardinalityRestriction::Ptr> r_available = mOrganizationModelAsk.getCardinalityRestrictions(available, mProperty, OWLCardinalityRestriction::SUM_OP, false);
+
+    ModelPool availableAgents = mOrganizationModelAsk.allowSubclasses(available, vocabulary::OM::Actor());
+
+    std::vector<OWLCardinalityRestriction::Ptr> r_available = mOrganizationModelAsk.getCardinalityRestrictions(availableAgents, mProperty, OWLCardinalityRestriction::SUM_OP, false);
     std::vector<OWLCardinalityRestriction::Ptr> r_required = mOrganizationModelAsk.getCardinalityRestrictions(required, mProperty, OWLCardinalityRestriction::MAX_OP, true);
 
     return computeMetric(r_required, r_available);
