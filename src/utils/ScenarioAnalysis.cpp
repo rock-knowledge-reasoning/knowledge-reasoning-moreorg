@@ -54,6 +54,7 @@ int main(int argc, char** argv)
     }
 
     std::stringstream ss;
+    std::cout << scenario.rowDescription() << std::endl;
     ss << scenario.rowDescription() << std::endl;;
 
     for(size_t coalitionSize = 2; coalitionSize <= maxCoalitionSize; ++coalitionSize)
@@ -62,6 +63,7 @@ int main(int argc, char** argv)
         Scenario s = scenario;
         s.compute(coalitionSize);
         ss << s.report();
+        std::cout << s.report();
         start = base::Time::now();
         //size_t count = s.createCompositeActorTypes(coalitionSize);
         //std::cout << "Agent types: " << count << std::endl;

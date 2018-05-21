@@ -61,5 +61,24 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Link>& links)
     return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const std::set<Link>& links)
+{
+    for(const Link& link : links)
+    {
+        os << link;
+        os << ",";
+    }
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::set< std::set<Link> >& linkSets)
+{
+    for(const std::set<Link>& linkSet : linkSets)
+    {
+        os << linkSet << std::endl;
+    }
+    return os;
+}
+
 } // end namespace ccf
 } // end namespace multiagent

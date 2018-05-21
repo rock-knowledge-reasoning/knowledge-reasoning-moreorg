@@ -5,6 +5,7 @@
 #include <set>
 #include <vector>
 #include <organization_model/ccf/Link.hpp>
+#include <organization_model/ModelPool.hpp>
 
 namespace multiagent {
 namespace ccf {
@@ -22,6 +23,7 @@ class Scenario
     friend std::ostream& operator<<(std::ostream& os, const Scenario& scenario);
 
     size_t mMaxCoalitionSize;
+    std::map<char, size_t> mModelPool;
 
     std::vector<ActorType> mActorTypes;
     std::vector<CompatibilityType> mInterfaceCompatibilityTypes;
@@ -35,8 +37,10 @@ class Scenario
 
     std::vector<Link> mValidLinks;
     std::vector<Link> mInvalidLinks;
-    uint32_t mNumberOfLinkTypeCombinations;
     uint32_t mNumberOfLinkCombinations;
+    uint32_t mNumberOfActorTypesAgentSpace;
+    uint32_t mNumberOfActorTypesLinkSpace;
+    uint32_t mNumberOfActorTypesTheoreticalBound;
 
     // Record how many link of a type do actually exist, i.e.
     // the distribution
@@ -71,6 +75,11 @@ public:
     std::map<Actor, std::set<Link> > getActorLinkMap() const { return mActorLinkMap; }
     std::map<Interface, std::set<Link> > getInterfaceLinkMap() const { return mInterfaceLinkMap; }
 
+    void collectCombinations(
+            const std::vector<Actor>& allowedActors,
+            std::vector<Actor> actors, std::set<Link> links,
+            organization_model::ModelPool::Set& agentSpaceModelPools,
+            std::set< std::set<Link> >& linkSpaceSets);
 
     size_t getNumberOfActors() const { return mActors.size(); }
     static Scenario fromConsole();
@@ -79,6 +88,7 @@ public:
     std::string rowDescription() const;
     std::string report() const;
 
+    void setModelCount(char key, uint32_t value) { mModelPool[key] = value; }
 
 };
 

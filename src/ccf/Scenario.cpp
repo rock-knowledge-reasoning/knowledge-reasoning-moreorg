@@ -5,6 +5,7 @@
 #include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
+#include "../ModelPool.hpp"
 
 using namespace numeric;
 
@@ -59,6 +60,8 @@ Scenario Scenario::fromConsole()
             Actor actor(currentActorType, localActorId++);
             scenario.mActors[actor] = actorDescription;
         }
+
+        scenario.setModelCount(currentActorType, numberPerActorType);
         ++currentActorType;
     }
 
@@ -110,6 +113,7 @@ Scenario Scenario::fromFile(const std::string& filename)
                 Actor actor(actorTypeId, i);
                 spec.mActors[actor] = actorDescription;
             }
+            spec.setModelCount(actorTypeId, numberOfInstances);
 
             ++actorType;
         }
@@ -125,7 +129,6 @@ void Scenario::compute(size_t maxCoalitionSize)
 {
     mMaxCoalitionSize = maxCoalitionSize;
 
-    std::vector<Actor> mActorList;
     std::map<Actor, ActorDescription>::const_iterator ait = mActors.begin();
     for(; ait != mActors.end(); ++ait)
     {
@@ -146,13 +149,11 @@ void Scenario::compute(size_t maxCoalitionSize)
             {
                 Interface interface(actor,localInterfaceId++, interfaceType);
                 mInterfaces.push_back(interface);
-                LOG_DEBUG_S << "Add interface: " << interface << std::endl;
             }
         }
 
         mActorList.push_back(actor);
     }
-
 
     // Compute the maximum number of actor combinations
     Combination<Actor> combination(mActorList, mMaxCoalitionSize, MAX);
@@ -213,13 +214,117 @@ void Scenario::createLinks()
         mActorLinkMap[link.getSecondActor()].insert(link);
     }
 
-    // Generate number of theoretically possible agent types based (from link instances) space
-    Combination<LinkType> linkTypeCombinations( getValidLinkTypeList(), mMaxCoalitionSize-1, MAX);
-    mNumberOfLinkTypeCombinations = linkTypeCombinations.numberOfCombinations();
+    organization_model::ModelPool::Set agentSpaceModelPools;
+    std::set< std::set<Link> > linkSpaceModelPools;
 
-    // Generate number of theoretically possible agent instances (from link instances)
-    Combination<Link> linkCombinations( mValidLinks, mMaxCoalitionSize-1, MAX);
-    mNumberOfLinkCombinations = linkCombinations.numberOfCombinations();
+    int count = 0;
+    numeric::LimitedCombination<char> linkCombinations(mModelPool, mMaxCoalitionSize, numeric::MAX);
+    do {
+        ++count;
+        std::vector<char> agentTypes = linkCombinations.current();
+        if(agentTypes.size() == 1)
+        {
+            continue;
+        }
+
+        // Create a representative actor combination for this type
+        std::vector<Actor> actors = mActorList;
+        std::vector<Actor> representativeActor;
+        for(char agentType: agentTypes)
+        {
+            std::vector<Actor>::iterator it = std::find_if(actors.begin(), actors.end(), [agentType](const Actor& actor)
+                    {
+                        return actor.getType() == agentType;
+                    });
+            representativeActor.push_back(*it);
+            actors.erase(it);
+        }
+
+        // Find all feasible combinations for this type in link space
+     //   std::cout << "Collect: " << count << std::endl;
+        size_t coalitionSize = std::min(mMaxCoalitionSize, representativeActor.size());
+        Combination<Actor> actorCombination(representativeActor, coalitionSize, EXACT);
+        do {
+            std::vector<Actor> actors = actorCombination.current();
+    //        std::cout << "Actors: " << actors.size() << std::endl;
+            collectCombinations(actors, actors, std::set<Link>(), agentSpaceModelPools, linkSpaceModelPools);
+        } while(actorCombination.next());
+    } while(linkCombinations.next());
+
+    mNumberOfActorTypesTheoreticalBound = count;
+    mNumberOfActorTypesAgentSpace = agentSpaceModelPools.size() + mActorTypes.size();
+    mNumberOfActorTypesLinkSpace = linkSpaceModelPools.size() + mActorTypes.size();
+
+    std::cout << "Max: " << mMaxCoalitionSize << std::endl;
+    std::cout << "ModelPool: Agents " << agentSpaceModelPools.size() << std::endl << organization_model::ModelPool::toString(agentSpaceModelPools) << std::endl;
+    //std::cout << "ModelPool: Link " << linkSpaceModelPools << std::endl;
+}
+
+void Scenario::collectCombinations(
+        const std::vector<Actor>& allowedActors,
+        std::vector<Actor> actors, std::set<Link> links,
+        organization_model::ModelPool::Set& agentSpaceModelPools,
+        std::set< std::set<Link> >& linkSpaceSets
+        )
+{
+    if(actors.size() == 1)
+    {
+        actors.clear();
+
+        std::set<Actor> actors;
+        for(const Link& l : links)
+        {
+            actors.insert(l.getFirstActor());
+            actors.insert(l.getSecondActor());
+        }
+
+        if(actors.size() == links.size() + 1)
+        {
+            organization_model::ModelPool agentSpaceAgentType;
+            organization_model::ModelPool linkSpaceAgentType;
+            for(Actor actor : actors)
+            {
+                std::string id;
+                {
+                    id += (char) actor.getType();
+                    agentSpaceAgentType["http://actor-type#" + id] += 1;
+                }
+            }
+            agentSpaceModelPools.insert(agentSpaceAgentType);
+            linkSpaceSets.insert(links);
+        }
+    } else {
+        std::set<Link> actorLinks = mActorLinkMap[actors.back()];
+        std::set<Link> allowedLinks;
+        for(const Link& l : actorLinks)
+        {
+            Actor a0 = l.getFirstActor();
+            Actor a1 = l.getSecondActor();
+
+            if( actors.end() != std::find(allowedActors.begin(), allowedActors.end(), a0) )
+            {
+                if(actors.end() != std::find(allowedActors.begin(), allowedActors.end(), a1))
+                {
+                    allowedLinks.insert(l);
+                }
+            }
+        }
+        actors.pop_back();
+
+        //std::cout << "ActorLinks: " << allowedLinks.size() << std::endl;
+        //for(const Link& l : allowedLinks)
+        //{
+        //    std::cout << "    " << l << std::endl;
+        //}
+
+        for(const Link& link : allowedLinks)
+        {
+            std::set<Link> addedLink = links;
+            addedLink.insert(link);
+
+            collectCombinations(allowedActors, actors, addedLink, agentSpaceModelPools, linkSpaceSets);
+        }
+    }
 }
 
 std::vector<LinkType> Scenario::getValidLinkTypeList() const
@@ -244,8 +349,9 @@ std::string Scenario::rowDescription() const
     ss << " <valid links>";
     ss << " <invalid links>";
     ss << " <link space: bound on composite actors>";
-    ss << " <link space: composite actors>";
+    ss << " <agent space: composite actor types>";
     ss << " <link space: composite actor types>";
+    ss << " <agent space: bound on composite actor types>";
     ss << std::endl;
     return ss.str();
 }
@@ -260,21 +366,24 @@ std::string Scenario::report() const
     ss << " " << mValidLinks.size();
     ss << " " << mInvalidLinks.size();
     ss << " " << mNumberOfLinkCombinations;
-    ss << " " << mNumberOfLinkTypeCombinations;
+    ss << " " << mNumberOfActorTypesAgentSpace;
+    ss << " " << mNumberOfActorTypesLinkSpace;
+    ss << " " << mNumberOfActorTypesTheoreticalBound;
     ss << std::endl;
     return ss.str();
 }
 
 std::ostream& operator<<(std::ostream& os, const Scenario& scenario)
 {
-    os << "# actors:                  " << scenario.mActors.size() << std::endl;
-    os << "# max actor combos:        " << scenario.mNumberOfActorCombinations << std::endl;
-    os << "# interfaces:              " << scenario.mInterfaces.size() << std::endl;
-    os << "# valid links:             " << scenario.mValidLinks.size() << std::endl;
-    os << "# invalid links:           " << scenario.mInvalidLinks.size() << std::endl;
-    os << "# valid link combos:       " << scenario.mNumberOfLinkCombinations << std::endl;
-    os << "# valid link types:        " << scenario.mValidLinkTypes.size() << std::endl;
-    os << "# valid link type combos:  " << scenario.mNumberOfLinkTypeCombinations << std::endl;
+    os << "# actors:                   " << scenario.mActors.size() << std::endl;
+    os << "# max actor combos:         " << scenario.mNumberOfActorCombinations << std::endl;
+    os << "# interfaces:               " << scenario.mInterfaces.size() << std::endl;
+    os << "# valid links:              " << scenario.mValidLinks.size() << std::endl;
+    os << "# invalid links:            " << scenario.mInvalidLinks.size() << std::endl;
+    os << "# valid link combos:        " << scenario.mNumberOfLinkCombinations << std::endl;
+    os << "# valid link types:         " << scenario.mValidLinkTypes.size() << std::endl;
+    os << "# valid agents (agent space)" << scenario.mNumberOfActorTypesAgentSpace << std::endl;
+    os << "# valid agents (link space) " << scenario.mNumberOfActorTypesLinkSpace << std::endl;
 
     std::map<LinkType, size_t>::const_iterator cit = scenario.mValidLinkTypes.begin();
     for(; cit != scenario.mValidLinkTypes.end(); ++cit)

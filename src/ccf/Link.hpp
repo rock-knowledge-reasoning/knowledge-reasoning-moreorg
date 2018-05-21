@@ -2,6 +2,7 @@
 #define MULTIAGENT_CCF_LINK_HPP
 
 #include <vector>
+#include <set>
 
 #include <organization_model/ccf/Actor.hpp>
 #include <organization_model/ccf/Interface.hpp>
@@ -18,7 +19,7 @@ class Link
     Interface mFirst;
     Interface mSecond;
 
-public: 
+public:
     Link();
 
     Link(Interface first, Interface second);
@@ -36,6 +37,8 @@ public:
 
 std::ostream& operator<<(std::ostream& os, const Link& link);
 std::ostream& operator<<(std::ostream& os, const std::vector<Link>& links);
+std::ostream& operator<<(std::ostream& os, const std::set<Link>& links);
+std::ostream& operator<<(std::ostream& os, const std::set< std::set<Link> >& links);
 
 } // end namespace ccf
 } // end namespace multiagent
