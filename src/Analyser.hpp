@@ -422,6 +422,16 @@ public:
      */
     std::vector<double> getRedundancy(size_t time) const;
 
+    /**
+     * Return metric to compute safety property
+     */
+    Metric::Ptr getMetric(metrics::Type metric = metrics::REDUNDANCY) const { return Metric::getInstance(metric, mAsk); }
+
+    /**
+     * Get the heuristic
+     */
+    const Heuristics& getHeuristics() const { return mHeuristics; }
+
 private:
     /// Resources
     OrganizationModelAsk mAsk;
