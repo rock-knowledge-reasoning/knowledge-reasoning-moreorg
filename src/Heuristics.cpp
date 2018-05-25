@@ -16,7 +16,7 @@ base::Position Heuristics::positionLinear(const Agent& agent,
         size_t progressedTime) const
 {
     ModelPool m = agent.getType();
-    facades::Robot robot(m, mAsk);
+    facades::Robot robot = facades::Robot::getInstance(m, mAsk);
 
     double nominalVelocity = robot.getNominalVelocity();
 
@@ -34,7 +34,7 @@ double Heuristics::travelTime(const Agent& agent,
         const base::Position& to) const
 {
     ModelPool m = agent.getType();
-    facades::Robot robot(m, mAsk);
+    facades::Robot robot = facades::Robot::getInstance(m, mAsk);
 
     double nominalVelocity = robot.getNominalVelocity();
     // s = v*t
