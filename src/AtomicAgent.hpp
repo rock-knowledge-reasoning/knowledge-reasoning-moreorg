@@ -56,10 +56,10 @@ public:
 
     /**
      * Get a list of atomic agents from a model pool
-     * alias for createAtomicAgents
      * \return agent list
      */
-    static List fromModelPool(const ModelPool& modelPool) { createAtomicAgents(modelPool); }
+    static List toList(const ModelPool& modelPool);
+
     /**
      * Compute the cardinality of an agent model inside a given list of agents
      * \return cardinality
@@ -91,12 +91,6 @@ public:
         ar & mId;
         ar & mName;
     }
-
-    /**
-     * Creates the list of agents, that can be created from a given model pool,
-     * assuming that it contains only types as keys
-     */
-    static List createAtomicAgents(const organization_model::ModelPool& modelPool);
 
     /**
      * Create the robot facade

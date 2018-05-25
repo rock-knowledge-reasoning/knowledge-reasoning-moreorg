@@ -46,6 +46,7 @@ rock_library(organization_model
         StatusSample.cpp
         Types.cpp
         utils/CoalitionStructureGeneration.cpp
+        utils/OrganizationStructureGeneration.cpp
         utils/GecodeUtils.cpp
         ValueBound.cpp
     HEADERS
@@ -96,6 +97,7 @@ rock_library(organization_model
         reasoning/ModelBound.hpp
         reasoning/ResourceMatch.hpp
         utils/CoalitionStructureGeneration.hpp
+        utils/OrganizationStructureGeneration.hpp
         utils/CorrelationClustering.hpp
         utils/GecodeUtils.hpp
         vocabularies/OM.hpp

@@ -244,7 +244,8 @@ public:
      * \return True if the model pool supports the set of services, false
      * otherwise
      */
-    bool isSupporting(const ModelPool& modelPool, const Resource::Set& resources) const;
+    bool isSupporting(const ModelPool& modelPool, const Resource::Set& resources,
+            double feasibilityCheckTimeoutInMs = 20) const;
 
     /**
      * Check is the model combination supports a resource
@@ -338,6 +339,19 @@ public:
      */
     ModelPool allowSubclasses(const ModelPool& modelPool,
             const owlapi::model::IRI& parent) const;
+
+    /**
+     * Check feasibility of a given model pool
+     */
+    bool isFeasible(const ModelPool& modelPool, double feasibilityCheckTimeoutInMs = 0.0) const;
+
+    /**
+     * Find a feasible coalition structure where all systems support a list of
+     * functionality
+     */
+    ModelPool::List findFeasibleCoalitionStructure(const ModelPool& modelPool,
+            const Resource::Set& supportedResourceSet,
+            double feasibilityCheckTimeoutInMs);
 
 protected:
 

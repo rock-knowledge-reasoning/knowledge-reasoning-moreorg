@@ -486,4 +486,99 @@ BOOST_AUTO_TEST_CASE(property_constraint_solver)
     }
 }
 
+BOOST_AUTO_TEST_CASE(organization_structure_generation)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
+    IRI sherpa = OM::resolve("Sherpa");
+    IRI payload = OM::resolve("Payload");
+    IRI coyote = OM::resolve("CoyoteIII");
+    IRI basecamp = OM::resolve("BaseCamp");
+    {
+        ModelPool modelPool;
+        modelPool[sherpa] = 1;
+
+        OrganizationModelAsk ask(om, modelPool, true);
+
+        Resource::Set resources;
+        resources.insert( Resource( OM::resolve("MoveTo") ) );
+
+        ModelPool::List csg = ask.findFeasibleCoalitionStructure(modelPool,
+                resources,
+                1);
+        BOOST_REQUIRE_MESSAGE(!csg.empty(), "Found feasible coalition structure for transport" << modelPool.toString(4));
+    }
+
+    {
+        ModelPool modelPool;
+        modelPool[sherpa] = 1;
+        modelPool[coyote] = 3;
+        modelPool[payload] = 3;
+
+        OrganizationModelAsk ask(om, modelPool, true);
+
+        Resource::Set resources;
+        resources.insert( Resource( OM::resolve("MoveTo") ) );
+
+        ModelPool::List csg = ask.findFeasibleCoalitionStructure(modelPool,
+                resources,
+                1);
+        BOOST_REQUIRE_MESSAGE(!csg.empty(), "Found feasible coalition structure for transport" << modelPool.toString(4));
+    }
+
+
+    {
+        ModelPool modelPool;
+        modelPool[sherpa] = 1;
+        modelPool[payload] = 4;
+        modelPool[coyote] = 3;
+
+        OrganizationModelAsk ask(om, modelPool, true);
+
+        Resource::Set resources;
+        resources.insert( Resource( OM::resolve("MoveTo") ) );
+
+        ModelPool::List csg = ask.findFeasibleCoalitionStructure(modelPool,
+                resources,
+                1);
+        BOOST_REQUIRE_MESSAGE(!csg.empty(), "Found feasible coalition structure for transport" << modelPool.toString(4));
+    }
+
+    {
+        ModelPool modelPool;
+        modelPool[sherpa] = 1;
+        modelPool[payload] = 4;
+        modelPool[coyote] = 2;
+
+        OrganizationModelAsk ask(om, modelPool, true);
+
+        Resource::Set resources;
+        resources.insert( Resource( OM::resolve("MoveTo") ) );
+
+        ModelPool::List csg = ask.findFeasibleCoalitionStructure(modelPool,
+                resources,
+                1);
+        BOOST_REQUIRE_MESSAGE(!csg.empty(), "Found feasible coalition structure for transport for " << modelPool.toString(4));
+    }
+
+    {
+        ModelPool modelPool;
+        modelPool[payload] = 4;
+        modelPool[basecamp] = 2;
+
+        OrganizationModelAsk ask(om, modelPool, true);
+
+        Resource::Set resources;
+        resources.insert( Resource( OM::resolve("MoveTo") ) );
+
+        ModelPool::List csg = ask.findFeasibleCoalitionStructure(modelPool,
+                resources,
+                1);
+        BOOST_REQUIRE_MESSAGE(csg.empty(), "No feasible coalition structure for transport for " << modelPool.toString(4));
+    }
+
+}
+
 BOOST_AUTO_TEST_SUITE_END()

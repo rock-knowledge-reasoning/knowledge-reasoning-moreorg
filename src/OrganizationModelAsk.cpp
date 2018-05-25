@@ -11,6 +11,7 @@
 #include "vocabularies/OM.hpp"
 #include "algebra/Connectivity.hpp"
 #include "PropertyConstraintSolver.hpp"
+#include "utils/OrganizationStructureGeneration.hpp"
 
 
 using namespace owlapi::model;
@@ -766,7 +767,9 @@ ModelPool::Set OrganizationModelAsk::getIntersection(const Resource::Set& functi
     return previousModelPools;
 }
 
-bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Resource::Set& resources) const
+bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool,
+        const Resource::Set& resources,
+        double feasibilityCheckTimeoutInMs) const
 {
 
     ModelPool::Set supportPools = getIntersection(resources);
@@ -787,7 +790,8 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool, const Resour
 
     if(pit != supportPools.end())
     {
-        return true;
+        // what is left to be checked is whether this pool is actually feasible
+        return algebra::Connectivity::isFeasible(modelPool, *this, feasibilityCheckTimeoutInMs);
     } else {
         return false;
     }
@@ -798,7 +802,7 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& pool,
 {
     Resource::Set resources;
     resources.insert(resource);
-    return isSupporting(pool, resources);
+    return isSupporting(pool, resources, mFeasibilityCheckTimeoutInMs);
 }
 
 bool OrganizationModelAsk::isSupporting(const owlapi::model::IRI& model,
@@ -809,7 +813,7 @@ bool OrganizationModelAsk::isSupporting(const owlapi::model::IRI& model,
 
     Resource::Set resources;
     resources.insert(resource);
-    if( isSupporting(modelPool, resources) )
+    if( isSupporting(modelPool, resources, mFeasibilityCheckTimeoutInMs) )
     {
         LOG_DEBUG_S << "model '" << model << "' supports '" << resource.getModel() << "'";
         return true;
@@ -1084,6 +1088,55 @@ ModelPool OrganizationModelAsk::allowSubclasses(const ModelPool& modelPool,
         }
     }
     return filteredModelPool;
+}
+
+bool OrganizationModelAsk::isFeasible(const ModelPool& modelPool,
+        double feasibilityCheckTimeoutInMs) const
+{
+    return algebra::Connectivity::isFeasible(modelPool, *this, feasibilityCheckTimeoutInMs);
+}
+
+ModelPool::List OrganizationModelAsk::findFeasibleCoalitionStructure(const ModelPool& modelPool,
+        const Resource::Set& resourceSet,
+        double feasibilityCheckTimeoutInMs)
+{
+
+    AtomicAgent::List agents = AtomicAgent::toList(modelPool);
+    utils::CoalitionStructureGeneration csg(agents,
+            [this, resourceSet, feasibilityCheckTimeoutInMs](const AtomicAgent::List& agents) -> double
+            {
+                ModelPool pool = AtomicAgent::getModelPool(agents);
+                if(isSupporting(pool, resourceSet, feasibilityCheckTimeoutInMs))
+                {
+                    return 1.0;
+                }
+                return 0.0;
+            },
+            [this, resourceSet, feasibilityCheckTimeoutInMs](const std::vector<AtomicAgent::List>& csg) -> double
+            {
+                for(const AtomicAgent::List& agents : csg)
+                {
+                    ModelPool pool = AtomicAgent::getModelPool(agents);
+                    if(!isSupporting(pool, resourceSet, feasibilityCheckTimeoutInMs))
+                    {
+                        return 0.0;
+                    }
+                }
+                return 1.0;
+
+            });
+
+    ModelPool::List coalitionStructure;
+    std::vector<AtomicAgent::List> solution = csg.findBest(1.0);
+    if(!solution.empty())
+    {
+        for(const AtomicAgent::List& agents : solution)
+        {
+            coalitionStructure.push_back( AtomicAgent::getModelPool(agents) );
+        }
+        return coalitionStructure;
+    }
+    return coalitionStructure;
 }
 
 } // end namespace organization_model

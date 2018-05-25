@@ -125,7 +125,7 @@ bool AtomicAgent::operator<(const AtomicAgent& other) const
     return mModel < other.mModel;
 }
 
-AtomicAgent::List AtomicAgent::createAtomicAgents(const organization_model::ModelPool& modelPool)
+AtomicAgent::List AtomicAgent::toList(const organization_model::ModelPool& modelPool)
 {
     List agents;
     organization_model::ModelPool::const_iterator cit = modelPool.cbegin();
