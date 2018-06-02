@@ -62,6 +62,16 @@ owlapi::model::IRIList OrganizationModelAsk::getFunctionalities() const
 {
     bool directSubclassOnly = false;
     IRIList subclasses = mOntologyAsk.allSubClassesOf(vocabulary::OM::Functionality(), directSubclassOnly);
+    IRIList blacklist = { vocabulary::OM::Service(), vocabulary::OM::Capability() };
+    for(const owlapi::model::IRI& label : blacklist)
+    {
+        IRIList::iterator it = std::find_if(subclasses.begin(), subclasses.end(), [label](const owlapi::model::IRI& subclass)
+                {
+                    return subclass == label;
+                });
+        subclasses.erase(it);
+    }
+
     return subclasses;
 }
 
