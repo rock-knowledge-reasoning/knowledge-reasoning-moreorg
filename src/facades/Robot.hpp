@@ -36,6 +36,12 @@ public:
      */
     Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizationModelAsk);
 
+    /**
+     * Get the model pool behind the robot facade
+     * \return ModelPool
+     */
+    const ModelPool& getModelPool() const { return mModelPool; }
+
     double getMinAcceleration() const { return mMinAcceleration; }
     double getMaxAcceleration() const { return mMaxAcceleration; }
     /**
