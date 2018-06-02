@@ -83,6 +83,11 @@ ResourceSupportVector ResourceSupportVector::operator+(const ResourceSupportVect
 
 ResourceSupportVector& ResourceSupportVector::operator+=(const ResourceSupportVector& other)
 {
+    if(other.mSizes.norm() == 0)
+    {
+        return *this;
+    }
+
     if(other.mLabels != this->mLabels)
     {
         throw std::invalid_argument("organization_mode::algebra::ResourceSupportVector::operator+"
