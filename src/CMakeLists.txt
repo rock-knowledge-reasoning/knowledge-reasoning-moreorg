@@ -19,6 +19,7 @@ rock_library(organization_model
         facades/Robot.cpp
         FunctionalityMapping.cpp
         Heuristics.cpp
+        io/LatexWriter.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
         Metric.cpp
@@ -69,6 +70,7 @@ rock_library(organization_model
         facades/Robot.hpp
         FunctionalityMapping.hpp
         Heuristics.hpp
+        io/LatexWriter.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
         Metric.hpp
@@ -143,3 +145,7 @@ rock_executable(multiagent_scenario_analysis utils/ScenarioAnalysis.cpp
 
 rock_executable(organization_model-bm Benchmark.cpp
     DEPS organization_model)
+
+rock_executable(organization_model-reader utils/OrganizationModelReader.cpp
+    DEPS organization_model
+    LIBS ${Boost_LIBRARIES})
