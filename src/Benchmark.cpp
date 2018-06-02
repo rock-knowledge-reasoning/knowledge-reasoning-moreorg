@@ -194,6 +194,7 @@ void printUsage(char** argv)
     std::cout << "    -l <logfile-to-generate> (default is /tmp/organization-model-benchmark.log)" << std::endl;
     std::cout << "    -t <benchmark-type: functional_saturation (fsat) or connectivity (con)" << std::endl;
     std::cout << "    -c <configuration-file>" << std::endl;
+    std::cout << "    -a <abort/timeout in s>" << std::endl;
 }
 
 
