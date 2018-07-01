@@ -50,6 +50,11 @@ public:
             bool applyFunctionalSaturationBound = false,
             double feasibilityCheckTimeoutInMs = 20000);
 
+    static const OrganizationModelAsk& getInstance(const OrganizationModel::Ptr& om,
+            const ModelPool& modelPool = ModelPool(),
+            bool applyFunctionalSaturationBound = false,
+            double feasibilityCheckTimeoutInMs = 20000);
+
     /**
      * Retrieve the list of all known service models
      * \return list of all known service models
@@ -451,6 +456,7 @@ private:
     ModelPool mModelPool;
 
     double mFeasibilityCheckTimeoutInMs;
+    static std::vector<OrganizationModelAsk> msOrganizationModelAsk;
 };
 
 } // end namespace organization_model

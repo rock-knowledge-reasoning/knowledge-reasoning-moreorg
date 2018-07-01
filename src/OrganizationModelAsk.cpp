@@ -19,6 +19,8 @@ using namespace owlapi::vocabulary;
 
 namespace organization_model {
 
+std::vector<OrganizationModelAsk> OrganizationModelAsk::msOrganizationModelAsk;
+
 OrganizationModelAsk::OrganizationModelAsk()
     : mOntologyAsk( OWLOntology::Ptr() )
 {}
@@ -42,6 +44,35 @@ OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
         prepare(modelPool, mApplyFunctionalSaturationBound);
     } else {
         LOG_INFO_S << "No model pool provided: did not prepare functionality mappings";
+    }
+}
+
+const OrganizationModelAsk& OrganizationModelAsk::getInstance(const OrganizationModel::Ptr& om,
+        const ModelPool& modelPool,
+        bool applyFunctionalSaturationBound,
+        double feasibilityCheckTimeoutInMs
+        )
+{
+    std::vector<OrganizationModelAsk>::const_iterator it = std::find_if(msOrganizationModelAsk.begin(), msOrganizationModelAsk.end(),
+            [om,modelPool,applyFunctionalSaturationBound,feasibilityCheckTimeoutInMs](const OrganizationModelAsk& other)
+            {
+                if(om == other.mpOrganizationModel
+                        && applyFunctionalSaturationBound == other.mApplyFunctionalSaturationBound
+                        && feasibilityCheckTimeoutInMs == other.mFeasibilityCheckTimeoutInMs
+                        && modelPool == other.mModelPool)
+                {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+    if(it != msOrganizationModelAsk.end())
+    {
+        return *it;
+    } else {
+        OrganizationModelAsk ask(om,modelPool, applyFunctionalSaturationBound, feasibilityCheckTimeoutInMs);
+        msOrganizationModelAsk.push_back(ask);
+        return msOrganizationModelAsk.back();
     }
 }
 
