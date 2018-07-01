@@ -203,6 +203,19 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          * Get model if this describes an atomic model
          */
         const owlapi::model::IRI& getAtomic() const;
+
+        /**
+         * Get a model pool with all cardinalities unequal to zero
+         * \return model pool without zero cardinalities
+         */
+        ModelPool compact() const;
+
+        /**
+         * Check if pool assignment is null, i.e. contains only 0 cardinalities or
+         * is overall empty
+         * \return True if pool assignment is null
+         */
+        bool isNull() const;
 };
 
 /**

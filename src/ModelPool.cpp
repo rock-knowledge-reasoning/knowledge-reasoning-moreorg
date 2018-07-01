@@ -255,6 +255,32 @@ const owlapi::model::IRI& ModelPool::getAtomic() const
     }
 }
 
+ModelPool ModelPool::compact() const
+{
+    ModelPool pool;
+    for(const ModelPool::value_type& v : *this)
+    {
+        if(v.second != 0)
+        {
+            pool.insert(v);
+        }
+    }
+    return pool;
+}
+
+bool ModelPool::isNull() const
+{
+    ModelPool::const_iterator cit = this->begin();
+    for(; cit != this->end(); ++cit)
+    {
+        if(cit->second != 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 ModelPoolDelta::ModelPoolDelta(const ModelPool& pool)
 {
     ModelPool::const_iterator cit = pool.begin();
