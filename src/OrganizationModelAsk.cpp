@@ -48,6 +48,7 @@ OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
 void OrganizationModelAsk::prepare(const ModelPool& modelPool, bool applyFunctionalSaturationBound)
 {
     mModelPool = allowSubclasses(modelPool, vocabulary::OM::Actor());
+    mModelPool = mModelPool.compact();
     mFunctionalityMapping = computeFunctionalityMapping(mModelPool, applyFunctionalSaturationBound);
 }
 
