@@ -11,7 +11,7 @@ void updateCostMap(std::map<Coalition, double>& costMap, const std::string& desc
     for(size_t i = 0; i < desc.size(); ++i)
     {
         std::string name = desc.substr(i,1);
-        c.push_back(name); 
+        c.push_back(name);
     }
     std::sort(c.begin(), c.end());
     costMap[c] = cost;

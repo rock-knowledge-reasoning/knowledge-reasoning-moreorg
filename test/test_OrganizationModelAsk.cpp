@@ -496,6 +496,7 @@ BOOST_AUTO_TEST_CASE(organization_structure_generation)
     IRI payload = OM::resolve("Payload");
     IRI coyote = OM::resolve("CoyoteIII");
     IRI basecamp = OM::resolve("BaseCamp");
+    IRI crex = OM::resolve("CREX");
     {
         ModelPool modelPool;
         modelPool[sherpa] = 1;
@@ -577,6 +578,24 @@ BOOST_AUTO_TEST_CASE(organization_structure_generation)
                 resources,
                 1);
         BOOST_REQUIRE_MESSAGE(csg.empty(), "No feasible coalition structure for transport for " << modelPool.toString(4));
+    }
+    {
+        ModelPool modelPool;
+        modelPool[payload] = 9;
+        modelPool[sherpa] = 1;
+        modelPool[coyote] = 1;
+        modelPool[crex] = 1;
+        modelPool[basecamp] = 1;
+
+        OrganizationModelAsk ask(om, modelPool, true);
+
+        Resource::Set resources;
+        resources.insert( Resource( OM::resolve("MoveTo") ) );
+
+        ModelPool::List csg = ask.findFeasibleCoalitionStructure(modelPool,
+                resources,
+                1);
+        BOOST_REQUIRE_MESSAGE(!csg.empty(), "Feasible coalition structure for transport for " << modelPool.toString(4));
     }
 
 }

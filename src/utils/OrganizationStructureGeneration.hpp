@@ -34,10 +34,13 @@ struct Bounds
 std::ostream& operator<<(std::ostream& os, const Bounds& bounds);
 
 /**
- * This is an implementation of the coalition structure generation as described in:
+ * This is an adapted implementation of the coalition structure generation as described in:
  * "An Anytime Algorithm for Optimal Coalition Structure Generation", (Rahwan et al., 2009)
- *
  * Please note that the current implementation uses recursion
+ *
+ * The adaption allows to account for a use of model pools and looking at the
+ * identification coalition functions that have a boolean as characteristic value (1.0 or 0.0)
+ * and thus represent an activation
  */
 class CoalitionStructureGeneration
 {
@@ -100,8 +103,13 @@ private:
     numeric::IntegerPartition selectIntegerPartition(const IntegerPartitionBoundsMap& boundMap, double maximumBound) const;
 
     /**
-     *
-     * \param globalUpperBound
+     * Search a subspace
+     * \param partition The integer partition to be used
+     * \param k index of the entry to start partial coalition with (mainly required for recursive use), e.g., of the integer partition [2,1,1]
+     * \param alpha
+     * \param agents list of agents that have to be considered for appending to
+     * the existing coalition structure
+     * \param currentStructure the already constructed coalition structure
      * \param bestStar Quality of the solution, i.e. 1.05 means 95% percent of the optimal solution
      * \return true if this subspace contained a better solution than already existed
      */
