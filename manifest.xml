@@ -14,6 +14,7 @@
   <depend package="planning/pddl_planner" />
   <depend package="knowledge_reasoning/owlapi" />
   <depend package="tools/graph_analysis" />
+  <depend package="tools/gecode" />
   <!-- gnu linear programming kit -->
   <depend package="glpk" />
   <keywords>
