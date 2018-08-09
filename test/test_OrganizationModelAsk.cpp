@@ -597,7 +597,36 @@ BOOST_AUTO_TEST_CASE(organization_structure_generation)
                 1);
         BOOST_REQUIRE_MESSAGE(!csg.empty(), "Feasible coalition structure for transport for " << modelPool.toString(4));
     }
-
 }
+
+BOOST_AUTO_TEST_CASE(organization_structure_generation_vrp)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om(new
+            OrganizationModel(IRI("http://www.rock-robotics.org/2017/11/vrp#") ));
+
+    owlapi::vocabulary::Custom vocabulary("http://www.rock-robotics.org/2017/11/vrp#");
+
+    IRI vehicle = vocabulary.resolve("Vehicle");
+    IRI commodity = vocabulary.resolve("Commodity");
+    {
+        ModelPool modelPool;
+        modelPool[vehicle] = 1;
+        modelPool[commodity] = 30;
+
+        OrganizationModelAsk ask(om, modelPool, true);
+
+        Resource::Set resources;
+        resources.insert( Resource( OM::resolve("MoveTo") ) );
+
+        ModelPool::List csg = ask.findFeasibleCoalitionStructure(modelPool,
+                resources,
+                1000);
+        BOOST_REQUIRE_MESSAGE(!csg.empty(), "Found feasible coalition structure for transport" << modelPool.toString(4));
+    }
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
