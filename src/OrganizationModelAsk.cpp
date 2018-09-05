@@ -107,6 +107,11 @@ owlapi::model::IRIList OrganizationModelAsk::getFunctionalities() const
     return subclasses;
 }
 
+owlapi::model::IRIList OrganizationModelAsk::getSupportedFunctionalities(const ModelPool& model) const
+{
+    return mFunctionalityMapping.getFunctionalities(model);
+}
+
 ModelPool OrganizationModelAsk::getSupportedFunctionalities() const
 {
     ModelPool modelPool;
@@ -123,8 +128,9 @@ FunctionalityMapping OrganizationModelAsk::computeFunctionalityMapping(const Mod
 {
     if(modelPool.empty())
     {
-        throw std::invalid_argument("organization_model::OrganizationModel::computeFunctionalityMaps"
-                " cannot compute functionality map for empty model pool");
+        LOG_WARN_S << "organization_model::OrganizationModelAsk::computeFunctionalityMapping"
+                " cannot compute functionality map for empty model pool";
+        return FunctionalityMapping();
     }
 
     IRIList functionalityModels = getFunctionalities();

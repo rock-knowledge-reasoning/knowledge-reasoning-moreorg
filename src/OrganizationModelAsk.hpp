@@ -63,9 +63,17 @@ public:
 
     /**
      * Retrieve the list of all known functionalities
-     * \return list of all known funtionalities
+     * \return list of all known generally known functionalities
      */
     owlapi::model::IRIList getFunctionalities() const;
+
+    /**
+      * Retrieve the list of functionalities based on the existing organization
+      * \throw std::invalid_argument if pool is not a subset of the model pool
+      * which has been use for initialization of the OrganizationModelAsk object
+      * \return list of all functionalities available for a given model pool
+      */
+    owlapi::model::IRIList getSupportedFunctionalities(const ModelPool& pool) const;
 
     /**
      * Retrieve the support of known functionalities, i.e., which

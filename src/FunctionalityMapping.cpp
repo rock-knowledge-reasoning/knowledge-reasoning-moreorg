@@ -1,6 +1,7 @@
 #include "FunctionalityMapping.hpp"
 #include <sstream>
 #include <algorithm>
+#include "Algebra.hpp"
 
 namespace organization_model {
 
@@ -32,6 +33,29 @@ const ModelPool::Set& FunctionalityMapping::getModelPools(const owlapi::model::I
         throw std::invalid_argument("organization_model::FunctionalityMapping::getModelPools: could not find"
                 " model pools with function: " + iri.toString());
     }
+}
+
+owlapi::model::IRIList FunctionalityMapping::getFunctionalities(const ModelPool& pool) const
+{
+    owlapi::model::IRIList functions;
+    for(const Function2PoolMap::value_type& p : mFunction2Pool)
+    {
+        bool supported = false;
+        for(const ModelPool& fPool : p.second)
+        {
+            ModelPoolDelta delta = Algebra::substract(fPool, pool);
+            if(Algebra::isSubset(fPool, pool))
+            {
+                supported = true;
+                break;
+            }
+        }
+        if(supported)
+        {
+            functions.push_back(p.first);
+        }
+    }
+    return functions;
 }
 
 void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRI& function)

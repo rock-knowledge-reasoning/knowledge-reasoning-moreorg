@@ -403,6 +403,39 @@ BOOST_AUTO_TEST_CASE(get_resource_support)
     }
 }
 
+BOOST_AUTO_TEST_CASE(get_functionalities)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
+
+    IRI sherpa = OM::resolve("Sherpa");
+    IRI crex = OM::resolve("CREX");
+    IRI payload = OM::resolve("Payload");
+    IRI payloadCamera = OM::resolve("PayloadCamera");
+
+    {
+        ModelPool modelPool;
+        modelPool[sherpa] = 2;
+        modelPool[payload] = 10;
+        OrganizationModelAsk ask(om, modelPool);
+
+        {
+            owlapi::model::IRIList functionalities = ask.getSupportedFunctionalities(ModelPool());
+            BOOST_REQUIRE_MESSAGE(functionalities.empty(), "Supported functionalities should be empty for empty model pool");
+        }
+        {
+            ModelPool modelPoolQuery;
+            modelPoolQuery[sherpa] = 2;
+            modelPoolQuery[payload] = 12;
+
+            owlapi::model::IRIList functionalities = ask.getSupportedFunctionalities(modelPoolQuery);
+            BOOST_REQUIRE_MESSAGE(!functionalities.empty(), "Supported functionalities by model pool: " << modelPoolQuery.toString() << ":" << functionalities);
+        }
+    }
+}
+
 BOOST_AUTO_TEST_CASE(to_string)
 {
     using namespace owlapi::vocabulary;

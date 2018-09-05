@@ -34,7 +34,7 @@ class FunctionalityMapping
     /// Cache to map from a function to supported ModelPools
     Function2PoolMap mFunction2Pool;
 
-    /// All models pools for will a mapping exists
+    /// All models pools for which a mapping exists
     ModelPool::Set mActiveModelPools;
 
 public:
@@ -58,6 +58,11 @@ public:
      * \return set of ModelPool that support the function
      */
     const ModelPool::Set& getModelPools(const owlapi::model::IRI& functionModel) const;
+
+    /**
+     * Get set of supported functionalities for a given model pool
+     */
+    owlapi::model::IRIList getFunctionalities(const ModelPool& model) const;
 
     /**
      * Set the model pool
