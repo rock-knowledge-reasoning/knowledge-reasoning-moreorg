@@ -5,7 +5,6 @@
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
-    <!ENTITY om-base "http://www.rock-robotics.org/2014/01/om-base#" >
     <!ENTITY om-schema "http://www.rock-robotics.org/2014/01/om-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
 ]>
@@ -17,11 +16,8 @@
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-     xmlns:om-base="http://www.rock-robotics.org/2014/01/om-base#">
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2015/12/projects/TransTerrA">
-        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base#"/>
-        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#"/>
         <owl:imports rdf:resource="http://www.rock-robotics.org/2015/12/robots/BaseCamp"/>
         <owl:imports rdf:resource="http://www.rock-robotics.org/2015/12/robots/CREX"/>
         <owl:imports rdf:resource="http://www.rock-robotics.org/2015/12/robots/CoyoteIII"/>
