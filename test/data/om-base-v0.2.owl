@@ -381,7 +381,7 @@
 
     <!-- http://www.rock-robotics.org/2014/01/om-base#Agent -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Agent">
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Agent">
         <owl:equivalentClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Actor"/>
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
     </owl:Class>
