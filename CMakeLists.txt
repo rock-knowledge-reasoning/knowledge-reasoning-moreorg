@@ -32,3 +32,8 @@ owlapi_install_ontology("http://www.rock-robotics.org/2017/10/om-icaps"
     "test/data/om-icaps-v0.1.owl")
 owlapi_install_ontology("http://www.rock-robotics.org/2017/11/vrp"
     "test/data/om-vrp-v0.1.owl")
+
+owlapi_install_ontology("http://www.rock-robotics.org/2018/10/robots/extrabots"
+    "test/data/om-extrabots.owl")
+owlapi_install_ontology("http://www.rock-robotics.org/2018/10/robots/robotpool"
+    "test/data/om-robotpool.owl")

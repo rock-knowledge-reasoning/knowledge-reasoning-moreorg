@@ -8,6 +8,8 @@
 #include <gecode/search.hh>
 #include "test_utils.hpp"
 
+#include <organization_model/facades/Robot.hpp>
+
 using namespace organization_model;
 using namespace organization_model::reasoning;
 using namespace organization_model::vocabulary;
@@ -658,6 +660,26 @@ BOOST_AUTO_TEST_CASE(organization_structure_generation_vrp)
                 resources,
                 1000);
         BOOST_REQUIRE_MESSAGE(!csg.empty(), "Found feasible coalition structure for transport" << modelPool.toString(4));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(robotpool)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(owlapi::model::IRI("http://www.rock-robotics.org/2018/10/robots/robotpool"));
+    owlapi::vocabulary::Custom vocabulary("http://www.rock-robotics.org/2018/10/robots/extrabots#");
+
+    IRI vehicle = vocabulary.resolve("WalkingBot");
+    {
+        ModelPool modelPool;
+        modelPool[vehicle] = 2;
+
+        OrganizationModelAsk ask(om, modelPool, true);
+        facades::Robot robot(modelPool, ask);
+
+        BOOST_REQUIRE_MESSAGE( robot.isMobile(), "WalkingBot is mobile");
     }
 }
 
