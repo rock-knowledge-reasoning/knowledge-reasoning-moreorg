@@ -6,6 +6,7 @@ rock_library(organization_model
         Algebra.cpp
         Analyser.cpp
         algebra/Connectivity.cpp
+        algebra/CompositionFunction.cpp
         algebra/ResourceSupportVector.cpp
         ccf/Actor.cpp
         ccf/CombinedActor.cpp
@@ -55,6 +56,7 @@ rock_library(organization_model
         Agent.hpp
         Algebra.hpp
         Analyser.hpp
+        algebra/CompositionFunction.hpp
         algebra/Connectivity.hpp
         algebra/ResourceSupportVector.hpp
         ccf/Actor.hpp

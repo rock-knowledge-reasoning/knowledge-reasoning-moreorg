@@ -246,6 +246,21 @@ bool Robot::isMobile() const
     return supporting;
 }
 
+double Robot::getNumericValue(const owlapi::model::IRI& property,
+        algebra::CompositionFunc cf)
+{
+    std::map<owlapi::model::IRI,double> values;
+    for(const ModelPool::value_type& pair : mModelPool)
+    {
+        const owlapi::model::IRI& actorModel = pair.first;
+        double value = organizationAsk().ontology().
+            getDataValue(actorModel, property)->getDouble();
+        values[actorModel] = value;
+    }
+
+    return cf(mModelPool, values);
+}
+
 
 } // end namespace facades
 } // end namespace organization_model

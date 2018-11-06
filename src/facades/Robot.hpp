@@ -1,7 +1,8 @@
 #ifndef ORGANIZATION_MODEL_FACADES_ROBOT_HPP
 #define ORGANIZATION_MODEL_FACADES_ROBOT_HPP
 
-#include <organization_model/facades/Facade.hpp>
+#include "Facade.hpp"
+#include "../algebra/CompositionFunction.hpp"
 
 namespace organization_model {
 namespace facades {
@@ -131,6 +132,17 @@ public:
      * Return if robot is mobile
      */
     bool isMobile() const;
+
+    /**
+     * Get the numeric value for a particular property using a
+     * composition function. The default is a weightedSum of the
+     * numericProperty value
+     * \param property Name of the property
+     * \param cf CompositionFunction of the numeric property values
+     */
+    double getNumericValue(const owlapi::model::IRI& property,
+            algebra::CompositionFunc cf =
+            bind(&algebra::CompositionFunction::weightedSum,placeholder::_1,placeholder::_2));
 
 private:
 

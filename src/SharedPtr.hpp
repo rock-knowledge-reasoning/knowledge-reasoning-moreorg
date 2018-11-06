@@ -22,11 +22,16 @@ namespace organization_model
     using ::boost::dynamic_pointer_cast;
     using ::boost::static_pointer_cast;
     using ::boost::function1;
+    using ::boost::bind;
+    namespace placeholder = ::boost;
 #else
     using ::std::shared_ptr;
     using ::std::make_shared;
     using ::std::dynamic_pointer_cast;
     using ::std::static_pointer_cast;
+    using ::std::function;
+    using ::std::bind;
+    namespace placeholder = ::std::placeholders;
     template <class T, class U>
     using function1 = ::std::function<T(U)>;
 #endif

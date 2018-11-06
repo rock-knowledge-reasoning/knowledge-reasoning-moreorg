@@ -27,6 +27,8 @@ BOOST_AUTO_TEST_CASE(robot)
     {
         organization_model::facades::Robot robot(sherpa, ask);
         BOOST_REQUIRE_MESSAGE(robot.isMobile(), "Robot " << sherpa << " is mobile");
+        BOOST_REQUIRE_MESSAGE(robot.getNumericValue(vocabulary::OM::mass()) ==
+                robot.getMass(), "Mass via numeric value should be equal to the robot mass");
     }
     {
         organization_model::facades::Robot robot(payload, ask);
@@ -40,9 +42,7 @@ BOOST_AUTO_TEST_CASE(robot)
         OrganizationModelAsk ask(om,modelPool,true);
         {
             owlapi::model::IRI f = vocabulary::OM::resolve("Capability");
-            bool supporting = ask.isSupporting(sherpa, f);
-            BOOST_TEST_MESSAGE(ask.toString());
-            BOOST_REQUIRE_MESSAGE(supporting, "Robot is supporting '" << f << "'");
+            BOOST_REQUIRE_THROW(ask.isSupporting(sherpa, f), std::runtime_error);
         }
         {
             owlapi::model::IRI f = vocabulary::OM::resolve("LogisticHubProvider");
@@ -55,6 +55,11 @@ BOOST_AUTO_TEST_CASE(robot)
             bool supporting = ask.isSupporting(sherpa, f);
             BOOST_TEST_MESSAGE(ask.toString());
             BOOST_REQUIRE_MESSAGE(supporting, "Robot is supporting '" << f << "'");
+        }
+        {
+            organization_model::facades::Robot robot(modelPool, ask);
+            BOOST_REQUIRE_MESSAGE(robot.getNumericValue(vocabulary::OM::mass()) ==
+                    robot.getMass(), "Composite agent: Mass via numeric value should be equal to the robot mass");
         }
     }
 }
@@ -94,9 +99,7 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
         OrganizationModelAsk ask(om,modelPool,true);
         {
             owlapi::model::IRI f = vocabulary::OM::resolve("Capability");
-            bool supporting = ask.isSupporting(sherpa, f);
-            BOOST_TEST_MESSAGE(ask.toString());
-            BOOST_REQUIRE_MESSAGE(supporting, "Robot is supporting '" << f << "'");
+            BOOST_REQUIRE_THROW(ask.isSupporting(sherpa, f), std::runtime_error);
         }
         {
             owlapi::model::IRI f = vocabulary::OM::resolve("LogisticHubProvider");
