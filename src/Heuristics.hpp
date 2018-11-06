@@ -1,6 +1,5 @@
 #ifndef ORGANIZATION_MODEL_HEURISTICS_HPP
 #define ORGANIZATION_MODEL_HEURISTICS_HPP
-#
 #include <base/Pose.hpp>
 #include "Agent.hpp"
 #include "OrganizationModelAsk.hpp"
