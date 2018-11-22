@@ -189,6 +189,14 @@ protected:
     // General configuration to control, e.g. the branching behaviour
     static qxcfg::Configuration msConfiguration;
 
+    class NoConnectionInterfaces : public std::runtime_error
+    {
+        public:
+            NoConnectionInterfaces(const std::string& message)
+                : std::runtime_error(message)
+            {}
+    };
+
 };
 
 

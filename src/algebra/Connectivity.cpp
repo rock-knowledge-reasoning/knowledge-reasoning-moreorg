@@ -230,7 +230,7 @@ void Connectivity::identifyInterfaces()
 
         if(interfaces.empty())
         {
-            throw std::invalid_argument("organization_model::algebra::Connecticity:"
+            throw NoConnectionInterfaces("organization_model::algebra::Connecticity:"
                     " cannot construct problem since model '" + model.toString() + "' does not have any associated interfaces of type '" + mInterfaceBaseClass.toString() );
         }
 
@@ -512,7 +512,14 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
     msStatistics.evaluations = 0;
 
     Connectivity* last = NULL;
-    Connectivity* connectivity = new Connectivity(modelPool, ask, interfaceBaseClass);
+    Connectivity* connectivity = NULL;
+    try {
+        connectivity = new Connectivity(modelPool, ask, interfaceBaseClass);
+    } catch(const NoConnectionInterfaces& e)
+    {
+        return false;
+    }
+
     Gecode::Search::Options options;
     if(timeoutInMs > 0)
     {
