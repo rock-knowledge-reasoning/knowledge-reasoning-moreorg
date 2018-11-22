@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(robot)
     {
         organization_model::facades::Robot robot(sherpa, ask);
         BOOST_REQUIRE_MESSAGE(robot.isMobile(), "Robot " << sherpa << " is mobile");
-        BOOST_REQUIRE_MESSAGE(robot.getNumericValue(vocabulary::OM::mass()) ==
+        BOOST_REQUIRE_MESSAGE(robot.getPropertyValue(vocabulary::OM::mass()) ==
                 robot.getMass(), "Mass via numeric value should be equal to the robot mass");
     }
     {
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(robot)
         }
         {
             organization_model::facades::Robot robot(modelPool, ask);
-            BOOST_REQUIRE_MESSAGE(robot.getNumericValue(vocabulary::OM::mass()) ==
+            BOOST_REQUIRE_MESSAGE(robot.getPropertyValue(vocabulary::OM::mass()) ==
                     robot.getMass(), "Composite agent: Mass via numeric value should be equal to the robot mass");
         }
     }

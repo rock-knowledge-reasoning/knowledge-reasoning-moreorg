@@ -140,9 +140,11 @@ public:
      * \param property Name of the property
      * \param cf CompositionFunction of the numeric property values
      */
-    double getNumericValue(const owlapi::model::IRI& property,
+    double getDataPropertyValue(const owlapi::model::IRI& property,
             algebra::CompositionFunc cf =
-            bind(&algebra::CompositionFunction::weightedSum,placeholder::_1,placeholder::_2));
+            bind(&algebra::CompositionFunction::weightedSum,placeholder::_1,placeholder::_2)) const;
+
+    double getPropertyValue(const owlapi::model::IRI& property) const;
 
 private:
 

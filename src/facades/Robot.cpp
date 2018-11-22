@@ -246,8 +246,8 @@ bool Robot::isMobile() const
     return supporting;
 }
 
-double Robot::getNumericValue(const owlapi::model::IRI& property,
-        algebra::CompositionFunc cf)
+double Robot::getDataPropertyValue(const owlapi::model::IRI& property,
+        algebra::CompositionFunc cf) const
 {
     std::map<owlapi::model::IRI,double> values;
     for(const ModelPool::value_type& pair : mModelPool)
@@ -259,6 +259,34 @@ double Robot::getNumericValue(const owlapi::model::IRI& property,
     }
 
     return cf(mModelPool, values);
+}
+
+double Robot::getPropertyValue(const owlapi::model::IRI& property) const
+{
+    try {
+        double value = getDataPropertyValue(property,
+            bind(&algebra::CompositionFunction::weightedSum,placeholder::_1,placeholder::_2));
+        return value;
+    } catch(const std::runtime_error& e)
+    {
+        // data property does not exist or value is not set
+    }
+
+    using namespace owlapi::model;
+    std::vector<OWLCardinalityRestriction::Ptr> restrictions = organizationAsk().getCardinalityRestrictions(mModelPool,
+            property,
+            OWLCardinalityRestriction::SUM_OP
+            );
+    for(OWLCardinalityRestriction::Ptr restriction : restrictions)
+    {
+        if(restriction->getCardinalityRestrictionType() == OWLCardinalityRestriction::MAX)
+        {
+            return restriction->getCardinality();
+        }
+    }
+    throw std::invalid_argument("organization_model::OrganizationModelAsk::getPropertyValue: failed to identify value for '"
+            + property.toString() + "' for model pool: " + mModelPool.toString(8));
+
 }
 
 

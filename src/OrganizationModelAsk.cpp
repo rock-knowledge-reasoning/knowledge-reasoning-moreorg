@@ -366,76 +366,11 @@ bool OrganizationModelAsk::isMinimal(const ModelPool& modelPool, const Resource:
     return true;
 }
 
-double OrganizationModelAsk::getDataPropertyValue(const ModelPool& modelPool,
-        const owlapi::model::IRI& dataProperty,
-        Algebra::OperationType opType) const
-{
-    bool initialized = false;
-    double value = 0;
-    for(const ModelPool::value_type& p : modelPool)
-    {
-        try {
-            const owlapi::model::IRI& model = p.first;
-            if(!initialized)
-            {
-                value = mOntologyAsk.getDataValue(model, dataProperty)->getDouble();
-                initialized = true;
-            } else {
-                double nValue = mOntologyAsk.getDataValue(model, dataProperty)->getDouble();
-                switch(opType)
-                {
-                    case Algebra::SUM_OP:
-                        value += nValue;
-                        break;
-                    case Algebra::MIN_OP:
-                        value += std::min(value, nValue);
-                        break;
-                    case Algebra::MAX_OP:
-                        value += std::max(value, nValue);
-                        break;
-                    default:
-                        throw std::invalid_argument("organization_model::OrganizationModelAsk::getDataValue: unsupported operation selected");
-                }
-            }
-        } catch(const std::exception& e)
-        {
-            LOG_WARN_S << e.what();
-        }
-    }
-
-    if(!initialized)
-    {
-        throw std::runtime_error("organization_model::OrganizationModelAsk::getDataPropertyValue: the data property '" + dataProperty.toString() + "' is not extractable for the model pool: " + modelPool.toString());
-    }
-
-    return value;
-}
-
 double OrganizationModelAsk::getPropertyValue(const ModelPool& modelPool,
         const owlapi::model::IRI& property) const
 {
-    try {
-        double value = getDataPropertyValue(modelPool, property, Algebra::SUM_OP);
-        return value;
-    } catch(const std::runtime_error& e)
-    {
-        // data property does not exist or value is not set
-    }
-
-    using namespace owlapi::model;
-    std::vector<OWLCardinalityRestriction::Ptr> restrictions = getCardinalityRestrictions(modelPool,
-            vocabulary::OM::hasTransportCapacity(),
-            OWLCardinalityRestriction::SUM_OP
-            );
-    for(OWLCardinalityRestriction::Ptr restriction : restrictions)
-    {
-        if(restriction->getCardinalityRestrictionType() == OWLCardinalityRestriction::MAX)
-        {
-            return restriction->getCardinality();
-        }
-    }
-    throw std::invalid_argument("organization_model::OrganizationModelAsk::getPropertyValue: failed to identify value for '"
-            + property.toString() + "' for model pool: " + modelPool.toString(8));
+    facades::Robot robot = facades::Robot::getInstance(modelPool, *this);
+    return robot.getPropertyValue(property);
 }
 
 std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getCardinalityRestrictions(const ModelPool& modelPool,
