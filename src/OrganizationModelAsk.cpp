@@ -28,12 +28,14 @@ OrganizationModelAsk::OrganizationModelAsk()
 OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
         const ModelPool& modelPool,
         bool applyFunctionalSaturationBound,
-        double feasibilityCheckTimeoutInMs
+        double feasibilityCheckTimeoutInMs,
+        const owlapi::model::IRI& interfaceBaseClass
         )
     : mpOrganizationModel(om)
     , mOntologyAsk(om->ontology())
     , mApplyFunctionalSaturationBound(applyFunctionalSaturationBound)
     , mFeasibilityCheckTimeoutInMs(feasibilityCheckTimeoutInMs)
+    , mInterfaceBaseClass(interfaceBaseClass)
 {
     if(!modelPool.empty())
     {
@@ -50,16 +52,19 @@ OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
 const OrganizationModelAsk& OrganizationModelAsk::getInstance(const OrganizationModel::Ptr& om,
         const ModelPool& modelPool,
         bool applyFunctionalSaturationBound,
-        double feasibilityCheckTimeoutInMs
+        double feasibilityCheckTimeoutInMs,
+        const owlapi::model::IRI& interfaceBaseClass
         )
 {
     std::vector<OrganizationModelAsk>::const_iterator it = std::find_if(msOrganizationModelAsk.begin(), msOrganizationModelAsk.end(),
-            [om,modelPool,applyFunctionalSaturationBound,feasibilityCheckTimeoutInMs](const OrganizationModelAsk& other)
+            [om,modelPool,applyFunctionalSaturationBound,feasibilityCheckTimeoutInMs,
+            interfaceBaseClass](const OrganizationModelAsk& other)
             {
                 if(om == other.mpOrganizationModel
                         && applyFunctionalSaturationBound == other.mApplyFunctionalSaturationBound
                         && feasibilityCheckTimeoutInMs == other.mFeasibilityCheckTimeoutInMs
-                        && modelPool == other.mModelPool)
+                        && modelPool == other.mModelPool
+                        && interfaceBaseClass == other.mInterfaceBaseClass)
                 {
                     return true;
                 } else {
@@ -70,7 +75,9 @@ const OrganizationModelAsk& OrganizationModelAsk::getInstance(const Organization
     {
         return *it;
     } else {
-        OrganizationModelAsk ask(om,modelPool, applyFunctionalSaturationBound, feasibilityCheckTimeoutInMs);
+        OrganizationModelAsk ask(om,
+                modelPool, applyFunctionalSaturationBound,
+                feasibilityCheckTimeoutInMs, interfaceBaseClass);
         msOrganizationModelAsk.push_back(ask);
         return msOrganizationModelAsk.back();
     }
@@ -215,7 +222,11 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
             {
                 LOG_DEBUG_S << "combination is minimal for " << functionality.getModel().toString() << std::endl
                     << combinationModelPool.toString(4);
-                if(algebra::Connectivity::isFeasible(combinationModelPool, *this, mFeasibilityCheckTimeoutInMs))
+                if(algebra::Connectivity::isFeasible(combinationModelPool,
+                            *this,
+                            mFeasibilityCheckTimeoutInMs,
+                            1,
+                            mInterfaceBaseClass))
                 {
                     LOG_DEBUG_S << "combination is feasible " << std::endl
                     << combinationModelPool.toString(4);
@@ -774,7 +785,10 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool,
     if(pit != supportPools.end())
     {
         // what is left to be checked is whether this pool is actually feasible
-        return algebra::Connectivity::isFeasible(modelPool, *this, feasibilityCheckTimeoutInMs);
+        return algebra::Connectivity::isFeasible(modelPool, *this,
+                feasibilityCheckTimeoutInMs,
+                1,
+                mInterfaceBaseClass);
     } else {
         return false;
     }
@@ -785,7 +799,8 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& pool,
 {
     Resource::Set resources;
     resources.insert(resource);
-    return isSupporting(pool, resources, mFeasibilityCheckTimeoutInMs);
+    return isSupporting(pool, resources,
+            mFeasibilityCheckTimeoutInMs);
 }
 
 bool OrganizationModelAsk::isSupporting(const owlapi::model::IRI& model,
@@ -796,7 +811,9 @@ bool OrganizationModelAsk::isSupporting(const owlapi::model::IRI& model,
 
     Resource::Set resources;
     resources.insert(resource);
-    if( isSupporting(modelPool, resources, mFeasibilityCheckTimeoutInMs) )
+    if( isSupporting(modelPool, resources,
+                mFeasibilityCheckTimeoutInMs
+                ) )
     {
         LOG_DEBUG_S << "model '" << model << "' supports '" << resource.getModel() << "'";
         return true;
@@ -1074,14 +1091,17 @@ ModelPool OrganizationModelAsk::allowSubclasses(const ModelPool& modelPool,
 }
 
 bool OrganizationModelAsk::isFeasible(const ModelPool& modelPool,
-        double feasibilityCheckTimeoutInMs) const
+        double feasibilityCheckTimeoutInMs
+        ) const
 {
-    return algebra::Connectivity::isFeasible(modelPool, *this, feasibilityCheckTimeoutInMs);
+    return algebra::Connectivity::isFeasible(modelPool, *this,
+            feasibilityCheckTimeoutInMs);
 }
 
 ModelPool::List OrganizationModelAsk::findFeasibleCoalitionStructure(const ModelPool& modelPool,
         const Resource::Set& resourceSet,
-        double feasibilityCheckTimeoutInMs)
+        double feasibilityCheckTimeoutInMs
+        )
 {
 
     AtomicAgent::List agents = AtomicAgent::toList(modelPool);
@@ -1089,7 +1109,9 @@ ModelPool::List OrganizationModelAsk::findFeasibleCoalitionStructure(const Model
             [this, resourceSet, feasibilityCheckTimeoutInMs](const AtomicAgent::List& agents) -> double
             {
                 ModelPool pool = AtomicAgent::getModelPool(agents);
-                if(isSupporting(pool, resourceSet, feasibilityCheckTimeoutInMs))
+                if(isSupporting(pool, resourceSet,
+                            feasibilityCheckTimeoutInMs))
+
                 {
                     return 1.0;
                 }
@@ -1100,7 +1122,8 @@ ModelPool::List OrganizationModelAsk::findFeasibleCoalitionStructure(const Model
                 for(const AtomicAgent::List& agents : csg)
                 {
                     ModelPool pool = AtomicAgent::getModelPool(agents);
-                    if(!isSupporting(pool, resourceSet, feasibilityCheckTimeoutInMs))
+                    if(!isSupporting(pool, resourceSet,
+                                feasibilityCheckTimeoutInMs))
                     {
                         return 0.0;
                     }

@@ -48,12 +48,15 @@ public:
     explicit OrganizationModelAsk(const OrganizationModel::Ptr& om,
             const ModelPool& modelPool = ModelPool(),
             bool applyFunctionalSaturationBound = false,
-            double feasibilityCheckTimeoutInMs = 20000);
+            double feasibilityCheckTimeoutInMs = 20000,
+            const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface"));
 
     static const OrganizationModelAsk& getInstance(const OrganizationModel::Ptr& om,
             const ModelPool& modelPool = ModelPool(),
             bool applyFunctionalSaturationBound = false,
-            double feasibilityCheckTimeoutInMs = 20000);
+            double feasibilityCheckTimeoutInMs = 20000,
+            const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface"));
+
 
     /**
      * Retrieve the list of all known service models
@@ -257,8 +260,10 @@ public:
      * \return True if the model pool supports the set of services, false
      * otherwise
      */
-    bool isSupporting(const ModelPool& modelPool, const Resource::Set& resources,
-            double feasibilityCheckTimeoutInMs = 20) const;
+    bool isSupporting(const ModelPool& modelPool,
+            const Resource::Set& resources,
+            double feasibilityCheckTimeoutInMs = 20
+            ) const;
 
     /**
      * Check is the model combination supports a resource
@@ -356,7 +361,8 @@ public:
     /**
      * Check feasibility of a given model pool
      */
-    bool isFeasible(const ModelPool& modelPool, double feasibilityCheckTimeoutInMs = 0.0) const;
+    bool isFeasible(const ModelPool& modelPool,
+            double feasibilityCheckTimeoutInMs = 0.0) const;
 
     /**
      * Find a feasible coalition structure where all systems support a list of
@@ -418,7 +424,7 @@ protected:
     ModelPool::Set filterNonMinimal(const ModelPool::Set& modelPoolSet, const Resource::Set& resources) const;
 
     /**
-     * Given a modelPool (which support the requested functionality) provide an
+     * Given a modelPool (which supports the requested functionality) provide an
      * indication on how many of these composite agents (represented by this
      * modelPool) are needed to fulfill the requirement
      * Relies on proper CSP-based bound checking to merge the provided
@@ -431,7 +437,7 @@ protected:
             ) const;
 
     /**
-     * Given a number of modelPools (which support the requested functionality) provide an
+     * Given a number of modelPools (which supports the requested functionality) provide an
      * indication on how many of these composite agents (represented by this
      * modelPool) are needed to fulfill the requirement
      * \return scaling factor
@@ -464,6 +470,7 @@ private:
     ModelPool mModelPool;
 
     double mFeasibilityCheckTimeoutInMs;
+    owlapi::model::IRI mInterfaceBaseClass;
     static std::vector<OrganizationModelAsk> msOrganizationModelAsk;
 };
 
