@@ -7,6 +7,9 @@
 #include <owlapi/model/IRI.hpp>
 
 namespace organization_model {
+namespace facades {
+    class Robot;
+}
 
 /**
  * A property constraint represents a triple P RT D, where
@@ -56,6 +59,15 @@ public:
     PropertyConstraint(const owlapi::model::IRI& dataProperty, ConstraintType c, double value);
 
     /**
+     * Standard constructor for a property constraint
+     * \param dataProperty The identifier for the property
+     * \param c constraint/relation type
+     * \param rvalDataProperty Reference to constraining data property
+     */
+    PropertyConstraint(const owlapi::model::IRI& dataProperty, ConstraintType c,
+            const owlapi::model::IRI& rvalDataProperty);
+
+    /**
      * Get the constraint type
      * \return constraint type
      */
@@ -72,6 +84,11 @@ public:
      * \return constraining value
      */
     double getValue() const { return mValue; }
+
+    /**
+     * Dynamically retrieve a valueProperty with respect to a robot (maybe composite system);
+     */
+    double getValue(const facades::Robot& robot) const;
 
     /**
      * Stringify this object
@@ -103,6 +120,10 @@ private:
     ConstraintType mType;
     owlapi::model::IRI mDataProperty;
     double mValue;
+    /// If the property constraint refers to a property that has
+    /// to be dynamically extracted
+    /// mass < transportCapacity
+    owlapi::model::IRI mRValProperty;
 };
 
 } // end namespace organization_model

@@ -1,6 +1,7 @@
 #include "PropertyConstraint.hpp"
 #include <sstream>
 #include <tuple>
+#include "facades/Robot.hpp"
 
 namespace organization_model {
 
@@ -17,6 +18,7 @@ std::map<PropertyConstraint::ConstraintType, std::string> PropertyConstraint::Ty
 
 PropertyConstraint::PropertyConstraint()
     : mType(UNKNOWN)
+    , mRValProperty()
 {}
 
 PropertyConstraint::PropertyConstraint(const owlapi::model::IRI& dataProperty,
@@ -25,19 +27,36 @@ PropertyConstraint::PropertyConstraint(const owlapi::model::IRI& dataProperty,
     : mType(c)
     , mDataProperty(dataProperty)
     , mValue(value)
+    , mRValProperty()
+{
+}
+
+PropertyConstraint::PropertyConstraint(const owlapi::model::IRI& dataProperty,
+        ConstraintType c,
+        const owlapi::model::IRI& rvalProperty)
+    : mType(c)
+    , mDataProperty(dataProperty)
+    , mValue()
+    , mRValProperty(rvalProperty)
 {
 }
 
 std::string PropertyConstraint::toString() const
 {
     std::stringstream ss;
-    ss << mDataProperty.toString() << " " << TypeTxt[mType] << " " << mValue;
+    if(mRValProperty.empty())
+    {
+        ss << mDataProperty.toString() << " " << TypeTxt[mType] << " " << mRValProperty.toString();
+    } else {
+        ss << mDataProperty.toString() << " " << TypeTxt[mType] << " " << mValue;
+    }
     return ss.str();
 }
 
 bool PropertyConstraint::operator==(const PropertyConstraint& other) const
 {
-    return other.mType == mType && other.mDataProperty == mDataProperty && other.mValue == mValue;
+    return other.mType == mType && other.mDataProperty == mDataProperty && other.mValue == mValue
+        && other.mRValProperty == mRValProperty;
 }
 
 bool PropertyConstraint::operator<(const PropertyConstraint& other) const
@@ -57,7 +76,12 @@ bool PropertyConstraint::operator<(const PropertyConstraint& other) const
             return true;
         } else if(mDataProperty == other.mDataProperty)
         {
-            return mValue < other.mValue;
+            if(mRValProperty < other.mRValProperty)
+            {
+                return true;
+            } else {
+                return mValue < other.mValue;
+            }
         }
     }
     return false;
@@ -71,6 +95,11 @@ PropertyConstraint::Clusters PropertyConstraint::getClusters(const PropertyConst
         clustered[constraint.getProperty()].insert( constraint );
     }
     return clustered;
+}
+
+double PropertyConstraint::getValue(const facades::Robot& robot) const
+{
+    return robot.getPropertyValue(mRValProperty);
 }
 
 } // end namespace organization_model
