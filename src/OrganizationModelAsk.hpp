@@ -429,7 +429,13 @@ protected:
      * modelPool) are needed to fulfill the requirement
      * Relies on proper CSP-based bound checking to merge the provided
      * functionality requirements and embedded property constraints
-     * \return scaling factor
+     * \param modelPool ModelPool describing a composite system
+     * \param resource Functionality description including constraints, which
+     * shall be provided by this modelPool
+     * \param doCheckSupport Whether the general support for a functionality
+     * should be checked first
+     * \return the minimum scaling factor to achieve the desired support for a
+     * resource
      */
     double getScalingFactor(const ModelPool& modelPool,
             const Resource& resource,
