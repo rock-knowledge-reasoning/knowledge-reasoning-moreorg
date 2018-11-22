@@ -158,7 +158,7 @@ std::string ResourceSupportVector::toString(uint32_t indent) const
     ss << hspace << "ResourceSupportVector: " << std::endl;
     for(size_t i = 0; i < mLabels.size(); ++i)
     {
-        if(mSizes.size() > i)
+        if(mSizes.size() > static_cast<int>(i) )
         {
             ss << hspace << "    " << mLabels[i] << ": " << mSizes(i) << std::endl;
         } else {
