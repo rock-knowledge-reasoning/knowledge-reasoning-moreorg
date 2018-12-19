@@ -8,8 +8,8 @@
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#">
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2018/10/robots/extrabots">
-        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base#"/>
-        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#"/>
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base"/>
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema"/>
     </owl:Ontology>
     
 

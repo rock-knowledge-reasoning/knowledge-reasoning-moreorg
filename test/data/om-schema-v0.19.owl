@@ -15,7 +15,7 @@
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-    <owl:Ontology rdf:about="http://www.rock-robotics.org/2014/01/om-schema#">
+    <owl:Ontology rdf:about="http://www.rock-robotics.org/2014/01/om-schema">
         <rdfs:comment>Changelog:
 * 0.19
   * change to using om-base
@@ -42,7 +42,7 @@
 * 0.10
  * added data properties such as mass etc. for Sherpa, CREX, Payload
  * add PayloadBattery</rdfs:comment>
-        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base#"/>
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base"/>
     </owl:Ontology>
     
 

@@ -15,7 +15,7 @@
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-    <owl:Ontology rdf:about="http://www.rock-robotics.org/2014/01/om-base#">
+    <owl:Ontology rdf:about="http://www.rock-robotics.org/2014/01/om-base">
         <rdfs:comment>Changelog:
 * 0.2
  * use hasTransportCapacity to allow commodity dependant transport capability

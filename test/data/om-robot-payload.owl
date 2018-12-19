@@ -26,7 +26,7 @@
  * adapt base uri to om-schema
 * 0.1
  * Add PayloadCamera, PayloadBattery and PayloadSoilSampler as individuals</rdfs:comment>
-        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#"/>
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema"/>
     </owl:Ontology>
 
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Payload -->

@@ -22,7 +22,7 @@
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT">
         <rdfs:comment>* v0.1
  * change base uri to om-schema</rdfs:comment>
-        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#"/>
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema"/>
     </owl:Ontology>
     
 

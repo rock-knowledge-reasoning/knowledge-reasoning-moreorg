@@ -17,9 +17,9 @@
      xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-    <owl:Ontology rdf:about="http://www.rock-robotics.org/2017/11/vrp#">
-        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base#"/>
-        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#"/>
+    <owl:Ontology rdf:about="http://www.rock-robotics.org/2017/11/vrp">
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base"/>
+        <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema"/>
     </owl:Ontology>
     
 

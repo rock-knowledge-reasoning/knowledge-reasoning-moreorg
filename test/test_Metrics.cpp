@@ -84,23 +84,45 @@ BOOST_FIXTURE_TEST_CASE(redundancy_same_parallel_in_series, RedundancyFixture)
 {
     std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction =
+            make_shared<OWLExactCardinalityRestriction>(property, 2, a->getIRI());
         query.push_back(restriction);
     }
-    {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
-        resourcePool.push_back(restriction);
-    }
-    {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
-        resourcePool.push_back(restriction);
-    }
 
-    OrganizationModelAsk ask(om);
-    metrics::Redundancy redundancy(ask, 0.5, has);
-    double expected = (1 -pow( 1-pow(0.5,2),2))*pow(0.5,2);
-    double redundancyVal = redundancy.computeMetric(query, resourcePool);
-    BOOST_REQUIRE_MESSAGE(redundancyVal == expected, "Redundancy expected: " << expected << " but got " << redundancyVal);
+    // Resources
+    {
+        {
+            OWLCardinalityRestriction::Ptr restriction =
+                make_shared<OWLExactCardinalityRestriction>(property, 2, a->getIRI());
+            resourcePool.push_back(restriction);
+        }
+        {
+            OWLCardinalityRestriction::Ptr restriction =
+                make_shared<OWLExactCardinalityRestriction>(property, 2, a->getIRI());
+            resourcePool.push_back(restriction);
+        }
+
+        OrganizationModelAsk ask(om);
+        metrics::Redundancy redundancy(ask, 0.5, has);
+        // when the structure be considered then: (1 -pow( 1-pow(0.5,2),2))*pow(0.5,2);
+        double expected = 0.25;
+        double redundancyVal = redundancy.computeMetric(query, resourcePool);
+        BOOST_REQUIRE_MESSAGE(redundancyVal == expected, "Redundancy expected: " << expected << " but got " << redundancyVal);
+    }
+    {
+        {
+            OWLCardinalityRestriction::Ptr restriction =
+                make_shared<OWLExactCardinalityRestriction>(property, 4, a->getIRI());
+            resourcePool.push_back(restriction);
+        }
+
+        OrganizationModelAsk ask(om);
+        metrics::Redundancy redundancy(ask, 0.5, has);
+        // --> (1 - (1-0.25)^2)
+        double expected = 0.4375;
+        double redundancyVal = redundancy.computeMetric(query, resourcePool);
+        BOOST_REQUIRE_MESSAGE(redundancyVal == expected, "Redundancy expected: " << expected << " but got " << redundancyVal);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(redundancy_computation)
@@ -178,7 +200,7 @@ BOOST_AUTO_TEST_CASE(function_redundancy)
     modelPool[organization_model::vocabulary::OM::resolve("BaseCamp")] = 3;
     modelPool[organization_model::vocabulary::OM::resolve("Payload")] = 10;
 
-    OrganizationModel::Ptr om(new OrganizationModel(filename) );
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(filename);
     OrganizationModelAsk ask(om, modelPool, true);
 
     {
