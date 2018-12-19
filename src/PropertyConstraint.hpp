@@ -56,7 +56,8 @@ public:
      * \param c constraint/relation type
      * \param value Constraining value
      */
-    PropertyConstraint(const owlapi::model::IRI& dataProperty, ConstraintType c, double value);
+    PropertyConstraint(const owlapi::model::IRI& dataProperty, ConstraintType c,
+            double value);
 
     /**
      * Standard constructor for a property constraint

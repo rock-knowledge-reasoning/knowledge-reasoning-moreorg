@@ -44,7 +44,7 @@ PropertyConstraint::PropertyConstraint(const owlapi::model::IRI& dataProperty,
 std::string PropertyConstraint::toString() const
 {
     std::stringstream ss;
-    if(mRValProperty.empty())
+    if(!mRValProperty.empty())
     {
         ss << mDataProperty.toString() << " " << TypeTxt[mType] << " " << mRValProperty.toString();
     } else {
