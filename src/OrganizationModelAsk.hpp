@@ -424,7 +424,7 @@ protected:
     ModelPool::Set filterNonMinimal(const ModelPool::Set& modelPoolSet, const Resource::Set& resources) const;
 
     /**
-     * Given a modelPool (which supports the requested functionality) provide an
+     * Given a modelPool (which supports/satisfies the requested functionality) provide an
      * indication on how many of these composite agents (represented by this
      * modelPool) are needed to fulfill the requirement
      * Relies on proper CSP-based bound checking to merge the provided
