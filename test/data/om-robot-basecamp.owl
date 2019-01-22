@@ -25,118 +25,13 @@
         <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema"/>
     </owl:Ontology>
     
-
-
-    <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Object Properties
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#has -->
-
-    <owl:ObjectProperty rdf:about="&om-schema;has"/>
-    
-
-
-    <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Data properties
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#energyCapacity -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;energyCapacity"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#locomotionProperty -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;locomotionProperty"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#mass -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;mass"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxHeight -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;maxHeight"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxWidth -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;maxWidth"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#minHeight -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;minHeight"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#minWidth -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;minWidth"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalHeight -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;nominalHeight"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalPowerConsumption -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;nominalPowerConsumption"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalWidth -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;nominalWidth"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#supplyVoltage -->
-
-    <owl:DatatypeProperty rdf:about="&om-schema;supplyVoltage"/>
-    
-
-
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Classes
     //
     ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#Actor -->
-
-    <owl:Class rdf:about="&om-schema;Actor"/>
-    
-
+    -->
 
     <!-- http://www.rock-robotics.org/2014/01/om-schema#BaseCamp -->
 
@@ -165,20 +60,6 @@
         </rdfs:subClassOf>
     </owl:Class>
     
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#EmiPassive -->
-
-    <owl:Class rdf:about="&om-schema;EmiPassive"/>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#LogisticHubProvider -->
-
-    <owl:Class rdf:about="&om-schema;LogisticHubProvider"/>
-    
-
-
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -196,7 +77,7 @@
         <rdf:type rdf:resource="&om-schema;BaseCamp"/>
         <om-schema:locomotionProperty rdf:datatype="&xsd;double"></om-schema:locomotionProperty>
         <om-schema:transportCapacity rdf:datatype="&xsd;nonNegativeInteger">0</om-schema:transportCapacity>
-        <om-schema:energyCapacity rdf:datatype="&xsd;double">0.0</om-schema:energyCapacity>
+        <om-schema:powerSourceCapacity rdf:datatype="&xsd;double">0.0</om-schema:powerSourceCapacity>
         <om-schema:nominalPowerConsumption rdf:datatype="&xsd;double">0.0</om-schema:nominalPowerConsumption>
         <om-schema:minHeight rdf:datatype="&xsd;double">0.3</om-schema:minHeight>
         <om-schema:maxHeight rdf:datatype="&xsd;double">0.3</om-schema:maxHeight>

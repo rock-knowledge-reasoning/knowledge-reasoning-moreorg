@@ -64,8 +64,16 @@ public:
     double getEnergy() const { return mEnergy; }
 
     /**
-     * Available Energy W in As, e.g.
-     * 10 Ah => 36000 Ah
+     * Available power source capacity in Ah
+     * The associated power source capacity in Wh
+     */
+    double getPowerSourceCapacity() const { return mPowerSourceCapacity; }
+
+    /**
+     * Available energy capacity in Ws
+     * The associated power source's energy capacity in Ws,
+     * this function returns batteries' capacity[Ah]*supply
+     * voltage[V]*3600 => [Ws]
      */
     double getEnergyCapacity() const { return mEnergyCapacity; }
 
@@ -162,6 +170,7 @@ private:
     double mSupplyVoltage;
     double mEnergy;
     double mEnergyCapacity;
+    double mPowerSourceCapacity;
     double mNominalPowerConsumption;
 
     uint32_t mTransportCapacity;

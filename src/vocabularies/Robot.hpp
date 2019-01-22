@@ -23,6 +23,7 @@ public:
 
     VOCABULARY_ADD_WORD(energy);
     VOCABULARY_ADD_WORD(energyCapacity);
+    VOCABULARY_ADD_WORD(powerSourceCapacity);
     VOCABULARY_ADD_WORD(supplyVoltage);
     VOCABULARY_ADD_WORD(nominalPowerConsumption);
 

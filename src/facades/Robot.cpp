@@ -47,6 +47,7 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
     , mSupplyVoltage(0.0)
     , mEnergy(0.0)
     , mEnergyCapacity(0.0)
+    , mPowerSourceCapacity(0.0)
     , mNominalPowerConsumption(0.0)
     , mTransportCapacity(0)
     // A physical item has always a transport demand (here assuming at least 1 standard unit)
@@ -59,7 +60,9 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
         mNominalPowerConsumption = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalPowerConsumption())->getDouble();
         mMass = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::mass())->getDouble();
         mSupplyVoltage = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::supplyVoltage())->getDouble();
-        mEnergyCapacity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::energyCapacity())->getDouble();
+        mPowerSourceCapacity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::powerSourceCapacity())->getDouble();
+        // convert from Ah (battery capacity to Ws)
+        mEnergyCapacity = mPowerSourceCapacity*mSupplyVoltage*3600;
     } catch(const std::exception& e)
     {
         LOG_WARN_S << e.what();
@@ -92,6 +95,7 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
 
     } catch(const std::exception& e)
     {
+
         LOG_INFO_S << e.what();
     }
 }
@@ -109,6 +113,7 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
     , mSupplyVoltage(0.0)
     , mEnergy(0.0)
     , mEnergyCapacity(0.0)
+    , mPowerSourceCapacity(0.0)
     , mNominalPowerConsumption(0.0)
     , mTransportCapacity(0)
     // A physical item has always a transport demand (here assuming at least 1 standard unit)
@@ -122,8 +127,9 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
         try {
             mNominalPowerConsumption += modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalPowerConsumption())->getDouble();
             mMass += modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::mass())->getDouble();
-            mSupplyVoltage = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::supplyVoltage())->getDouble();
-            mEnergyCapacity = modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::energyCapacity())->getDouble();
+            // TODO: check consistency of supply voltage
+            mSupplyVoltage = std::max(organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::supplyVoltage())->getDouble(), mSupplyVoltage);
+            mPowerSourceCapacity += organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::powerSourceCapacity())->getDouble();
         } catch(const std::exception& e)
         {
             LOG_WARN_S << e.what();
@@ -157,6 +163,7 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
         }
     }
 
+    mEnergyCapacity = mPowerSourceCapacity*mSupplyVoltage*3600;
     // Assume there is only a single system transporting
     mTransportCapacity = mTransportCapacity - mModelPool.numberOfInstances() + 1;
 }
@@ -228,7 +235,7 @@ std::string Robot::toString(size_t indent) const
     ss << hspace << "Robot: " << mModelPool.toString(indent + 4) << std::endl;
     ss << hspace << "    mass (kg):                     " << mMass << std::endl;
     ss << hspace << "    supply voltage (V):            " << mSupplyVoltage << std::endl;
-    ss << hspace << "    energy capacity (Wh):          " << mEnergyCapacity << std::endl;
+    ss << hspace << "    energy capacity (Wh):          " << mEnergyCapacity/3600.0 << std::endl;
     ss << hspace << "    nominal power consumption (W): " << mNominalPowerConsumption << std::endl;
     ss << hspace << "    min accelleration (m/s):       " << mMinAcceleration << std::endl;
     ss << hspace << "    max accelleration (m/s):       " << mMaxAcceleration << std::endl;

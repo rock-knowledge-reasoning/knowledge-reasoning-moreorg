@@ -124,8 +124,7 @@
         <om-schema:mass rdf:datatype="&xsd;double">27.0</om-schema:mass>
         <om-schema:maxHeight rdf:datatype="&xsd;double">4.0</om-schema:maxHeight>
         <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>
-        <om-schema:maxEnergyCapacity rdf:datatype="&xsd;double">259200</om-schema:maxEnergyCapacity>
-        <om-schema:energyCapacity rdf:datatype="&xsd;double">259200</om-schema:energyCapacity>
+        <om-schema:powerSourceCapacity rdf:datatype="&xsd;double">2.4</om-schema:powerSourceCapacity>
     </owl:NamedIndividual>
 </rdf:RDF>
 
