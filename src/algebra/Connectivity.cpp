@@ -101,7 +101,7 @@ Connectivity::Connectivity(const ModelPool& modelPool,
         const owlapi::model::IRI& interfaceBaseClass,
         const owlapi::model::IRI& property
         )
-    : mModelPool(modelPool)
+    : mModelPool(modelPool.compact())
     , mAsk(ask.ontology())
     , mInterfaceBaseClass(interfaceBaseClass)
     , mProperty(property)
@@ -504,8 +504,14 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
         const owlapi::model::IRI& interfaceBaseClass)
 {
     // For a single system this check is trivially true
-    if(modelPool.numberOfInstances() < 2)
+    size_t numberOfInstances = modelPool.numberOfInstances();
+    if(numberOfInstances == 0)
     {
+        throw std::invalid_argument("organization_model::algebra::Connectivity::isFeasible: "
+                " the given model pool has a model count of 0");
+    } else if(modelPool.numberOfInstances() == 1)
+    {
+        LOG_DEBUG_S << "An atomic agent is always feasible";
         return true;
     }
 
@@ -517,6 +523,8 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
         connectivity = new Connectivity(modelPool, ask, interfaceBaseClass);
     } catch(const NoConnectionInterfaces& e)
     {
+        LOG_INFO_S << "No connection interfaces of type '" <<
+            interfaceBaseClass << "' found on " << modelPool.toString(4);
         return false;
     }
 
@@ -552,7 +560,7 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
             if(isComplete)
             {
                 LOG_DEBUG_S << "Connection is feasible: found solution " << current->toString() << std::endl
-                    << "    feasible so far: " << feasibleSolutions << ", required: " << minFeasible;
+                    << "    previously found feasible: " << feasibleSolutions << ", required: " << minFeasible;
                 ++feasibleSolutions;
                 if(feasibleSolutions >= minFeasible)
                 {

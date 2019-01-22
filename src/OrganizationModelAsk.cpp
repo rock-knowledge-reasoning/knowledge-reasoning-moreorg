@@ -225,7 +225,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
                 if(algebra::Connectivity::isFeasible(combinationModelPool,
                             *this,
                             mFeasibilityCheckTimeoutInMs,
-                            1,
+                            1, // minFeasible
                             mInterfaceBaseClass))
                 {
                     LOG_DEBUG_S << "combination is feasible " << std::endl
@@ -788,7 +788,7 @@ bool OrganizationModelAsk::isSupporting(const ModelPool& modelPool,
         // what is left to be checked is whether this pool is actually feasible
         return algebra::Connectivity::isFeasible(modelPool, *this,
                 feasibilityCheckTimeoutInMs,
-                1,
+                1, // minFeasible
                 mInterfaceBaseClass);
     } else {
         return false;
@@ -1107,7 +1107,10 @@ bool OrganizationModelAsk::isFeasible(const ModelPool& modelPool,
         ) const
 {
     return algebra::Connectivity::isFeasible(modelPool, *this,
-            feasibilityCheckTimeoutInMs);
+            feasibilityCheckTimeoutInMs,
+            1, // minFeasible
+            mInterfaceBaseClass
+            );
 }
 
 ModelPool::List OrganizationModelAsk::findFeasibleCoalitionStructure(const ModelPool& modelPool,

@@ -149,6 +149,10 @@ public:
      * \param ask OrganizationModel to use for information about available
      * interfaces etc.
      * \param timeoutInMs Timeout of the feasibility check, default is 0
+     * \param minFeasible Minimum number of feasible combinations that need to
+     * be found
+     * \param interfaceBaseClass The base type for the interfaces that have to
+     * be considered
      * \return True if a connection is feasible, false otherwise
      */
     static bool isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask, double timeoutInMs = 0, size_t minFeasible = 1,
