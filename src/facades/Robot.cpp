@@ -49,7 +49,8 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
     , mEnergyCapacity(0.0)
     , mNominalPowerConsumption(0.0)
     , mTransportCapacity(0)
-    , mTransportDemand(0)
+    // A physical item has always a transport demand (here assuming at least 1 standard unit)
+    , mTransportDemand(1)
 {
 
     mModelPool[actorModel] = 1;
@@ -110,7 +111,8 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
     , mEnergyCapacity(0.0)
     , mNominalPowerConsumption(0.0)
     , mTransportCapacity(0)
-    , mTransportDemand(0)
+    // A physical item has always a transport demand (here assuming at least 1 standard unit)
+    , mTransportDemand(1)
 {
 
     for(const ModelPool::value_type& pair : mModelPool)
