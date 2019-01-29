@@ -5,34 +5,50 @@
 namespace organization_model {
 namespace policies {
 
-const AtomicAgent::Set& TransportProviderPolicy::activeTransportProviders(const Agent& agent, const organization_model::OrganizationModelAsk& ask) const
+TransportProviderPolicy::TransportProviderPolicy()
+    : Policy()
 {
-    // Check the cache first
-    std::map<Agent, AtomicAgent::Set>::const_iterator cit = mActiveTransportProviders.find(agent);
-    if(cit != mActiveTransportProviders.end())
-    {
-        return cit->second;
-    }
+}
 
-    AtomicAgent::Set activeTransportAgents;
+TransportProviderPolicy::TransportProviderPolicy(const ModelPool& modelPool, const organization_model::OrganizationModelAsk& ask)
+    : Policy(modelPool, ask)
+{
+    update(modelPool, ask);
+}
 
-    // Assume there can be only one active transport provider
-    double maxCapacity = std::numeric_limits<double>::min();
-    AtomicAgent activeAgent;
-    // identify active transport system
-    for(const AtomicAgent& aa : agent.getAtomicAgents())
+TransportProviderPolicy::~TransportProviderPolicy()
+{}
+
+
+void TransportProviderPolicy::update(const ModelPool& modelPool, const OrganizationModelAsk& ask)
+{
+    ModelPool activeTransportAgents;
+
+    if(modelPool.empty())
     {
-        double capacity = aa.getFacade(ask).getTransportCapacity();
-        if(capacity > maxCapacity)
+        throw
+            std::invalid_argument("owlapi::model::TransportProviderPolicy::update "
+                    " invalid argument: model pool cannot be empty");
+    } else if(modelPool.numberOfInstances() == 1)
+    {
+        mActiveTransportProviders = modelPool;
+    } else {
+        // Assume there can be only one active transport provider
+        double maxCapacity = std::numeric_limits<double>::min();
+        owlapi::model::IRI activeAgent;
+        // identify active transport system
+        for(const ModelPool::value_type p : modelPool)
         {
-            maxCapacity = capacity;
-            activeAgent = aa;
+            const owlapi::model::IRI& agentType = p.first;
+            double capacity = facades::Robot::getInstance(agentType, ask).getTransportCapacity();
+            if(capacity > maxCapacity)
+            {
+                maxCapacity = capacity;
+                activeAgent = agentType;
+            }
         }
+        mActiveTransportProviders[activeAgent] = 1;
     }
-    activeTransportAgents.insert(activeAgent);
-
-    mActiveTransportProviders[agent] = activeTransportAgents;
-    return mActiveTransportProviders[agent];
 }
 
 } // end namespace policies

@@ -4,6 +4,9 @@
 #include "Facade.hpp"
 #include "../algebra/CompositionFunction.hpp"
 
+#include "../policies/EnergyProviderPolicy.hpp"
+#include "../policies/TransportProviderPolicy.hpp"
+
 namespace organization_model {
 namespace facades {
 
@@ -131,6 +134,17 @@ public:
     double estimatedRelativeEnergyCost(double distanceInM) const;
 
     /**
+      * Get energy provider share by agent type (for a full capacity)
+      */
+    const std::map<owlapi::model::IRI, double>& getEnergyProviderShares() const;
+
+    /**
+      * Identify the agents that are relevant for the transport systems
+      * \return modelpool of agents that are relevant for the transport system
+      */
+    const ModelPool& getTransportProvider() const;
+
+    /**
      * Create a string object that list all system
      * charateristics
      */
@@ -178,6 +192,10 @@ private:
 
     // Robot cache
     static std::map<ModelPool, Robot> msRobots;
+
+    // Active policies
+    policies::EnergyProviderPolicy mEnergyProviderPolicy;
+    policies::TransportProviderPolicy mTransportProviderPolicy;
 };
 
 } // end namespace facades

@@ -29,6 +29,7 @@ rock_library(organization_model
         OrganizationModel.cpp
         OrganizationModelAsk.cpp
         OrganizationModelTell.cpp
+        Policy.cpp
         PropertyConstraint.cpp
         PropertyConstraintSolver.cpp
         #RandomModelGenerator.cpp
@@ -81,6 +82,7 @@ rock_library(organization_model
         OrganizationModel.hpp
         OrganizationModelAsk.hpp
         OrganizationModelTell.hpp
+        Policy.hpp
         PropertyConstraint.hpp
         PropertyConstraintSolver.hpp
         #RandomModelGenerator.hpp

@@ -33,11 +33,6 @@ facades::Robot Agent::getFacade(const OrganizationModelAsk& ask) const
     return facades::Robot::getInstance(modelPool, ask);
 }
 
-void Agent::update(const OrganizationModelAsk& ask)
-{
-    mEnergyProviderPolicy.update(*this, ask);
-}
-
 ModelPool Agent::getType() const
 {
     ModelPool pool;

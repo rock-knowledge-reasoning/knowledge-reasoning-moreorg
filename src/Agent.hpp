@@ -3,8 +3,6 @@
 
 #include "AtomicAgent.hpp"
 #include "OrganizationModelAsk.hpp"
-#include "policies/EnergyProviderPolicy.hpp"
-#include "policies/TransportProviderPolicy.hpp"
 
 namespace organization_model {
 
@@ -41,12 +39,6 @@ public:
     void add(const AtomicAgent& agent) { mAtomicAgents.insert(agent); }
 
     /**
-     * Update internal structures, such as energy consumption share when the
-     * agent is complete
-     */
-    void update(const OrganizationModelAsk& ask);
-
-    /**
      * Test if this is an atomic agent, i.e. |A| = 1
      */
     bool isAtomic() const { return mAtomicAgents.size() == 1; }
@@ -77,11 +69,6 @@ public:
      * Get the set of atomic agents
      */
     const AtomicAgent::Set& getAtomicAgents() const { return mAtomicAgents; }
-
-    /**
-     * Get the relative energy consumption for atomic agents
-     */
-    const std::map<AtomicAgent, double>& getEnergyProviderShares() const { return mEnergyProviderPolicy.getShares(); }
 
     bool operator<(const Agent& other) const { return this->mAtomicAgents < other.mAtomicAgents; }
     bool operator==(const Agent& other) const { return this->mAtomicAgents == other.mAtomicAgents; }
@@ -121,9 +108,6 @@ public:
 
 private:
     AtomicAgent::Set mAtomicAgents;
-
-    policies::EnergyProviderPolicy mEnergyProviderPolicy;
-    policies::TransportProviderPolicy mTransportProviderPolicy;
 };
 
 /// A coalition structure is a list of (composite) agents

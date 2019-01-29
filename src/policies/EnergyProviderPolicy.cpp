@@ -1,28 +1,54 @@
 #include "EnergyProviderPolicy.hpp"
-#include "../Agent.hpp"
-#include <iostream>
+#include "../facades/Robot.hpp"
+
+using namespace owlapi::model;
 
 namespace organization_model {
 namespace policies {
 
-void EnergyProviderPolicy::update(const Agent& agent, const OrganizationModelAsk& ask)
+EnergyProviderPolicy::EnergyProviderPolicy()
+    : Policy()
+{}
+
+EnergyProviderPolicy::EnergyProviderPolicy(const ModelPool& pool, const OrganizationModelAsk& ask)
+    : Policy(pool, ask)
 {
-    // set energy consumption policy
-    //
-    double fullCapacity = 0;
-    std::map<AtomicAgent, double> energyCapacity;
+    update(pool, ask);
+}
 
-    for(const AtomicAgent& atomicAgent : agent.getAtomicAgents())
-    {
-        facades::Robot robot = atomicAgent.getFacade(ask);
-        double capacity = robot.getEnergyCapacity();
-        fullCapacity += capacity;
-        energyCapacity[atomicAgent] = capacity;
-    }
+EnergyProviderPolicy::~EnergyProviderPolicy()
+{}
 
-    for(const std::pair<AtomicAgent,double>& p : energyCapacity)
+void EnergyProviderPolicy::update(const ModelPool& modelPool, const OrganizationModelAsk& ask)
+{
+    if(modelPool.empty())
     {
-        mEnergyProviderShares[p.first] = p.second / fullCapacity;
+        throw
+            std::invalid_argument("owlapi::model::EnergyProviderPolicy::update "
+                    " invalid argument: model pool cannot be empty");
+    } else if(modelPool.numberOfInstances() == 1)
+    {
+        mEnergyProviderSharesByType[ modelPool.begin()->first ] = 1.0;
+    } else {
+        // set energy consumption policy
+        double fullCapacity = 0;
+        std::map<IRI, double> energyCapacity;
+        for(const ModelPool::value_type p :  modelPool)
+        {
+            const IRI& agentType = p.first;
+            size_t numberOfInstances = p.second;
+
+            facades::Robot robot = facades::Robot::getInstance(agentType, ask);
+
+            double capacity = robot.getEnergyCapacity();
+            fullCapacity += capacity*numberOfInstances;
+            energyCapacity[agentType] = capacity;
+        }
+
+        for(const std::pair<IRI,double>& p : energyCapacity)
+        {
+            mEnergyProviderSharesByType[p.first] = p.second / fullCapacity;
+        }
     }
 }
 

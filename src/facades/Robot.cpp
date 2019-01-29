@@ -55,6 +55,8 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
 {
 
     mModelPool[actorModel] = 1;
+    mEnergyProviderPolicy = policies::EnergyProviderPolicy(mModelPool, mOrganizationModelAsk);
+    mTransportProviderPolicy = policies::TransportProviderPolicy(mModelPool, mOrganizationModelAsk);
 
     try {
         mNominalPowerConsumption = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalPowerConsumption())->getDouble();
@@ -118,6 +120,8 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
     , mTransportCapacity(0)
     // A physical item has always a transport demand (here assuming at least 1 standard unit)
     , mTransportDemand(1)
+    , mEnergyProviderPolicy(modelPool, organizationModelAsk)
+    , mTransportProviderPolicy(modelPool, organizationModelAsk)
 {
 
     for(const ModelPool::value_type& pair : mModelPool)
@@ -228,6 +232,18 @@ double Robot::estimatedRelativeEnergyCost(double distanceInM) const
     return estimatedEnergyCost(distanceInM) / mEnergyCapacity;
 }
 
+
+const std::map<IRI, double>& Robot::getEnergyProviderShares() const
+{
+    return mEnergyProviderPolicy.getSharesByType();
+}
+
+const ModelPool& Robot::getTransportProvider() const
+{
+    return mTransportProviderPolicy.getActiveTransportProviders();
+}
+
+
 std::string Robot::toString(size_t indent) const
 {
     std::string hspace(indent,' ');
@@ -297,7 +313,6 @@ double Robot::getPropertyValue(const owlapi::model::IRI& property) const
             + property.toString() + "' for model pool: " + mModelPool.toString(8));
 
 }
-
 
 } // end namespace facades
 } // end namespace organization_model

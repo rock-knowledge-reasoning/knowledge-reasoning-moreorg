@@ -36,14 +36,12 @@ struct HeuristicsFixture
         agent0.add(sherpas[0]);
         agent0.add(payloads[0]);
         agent0.add(payloads[1]);
-        agent0.update(ask);
 
         Agent agent1;
         agent1.add(sherpas[1]);
         agent1.add(payloads[2]);
         agent1.add(payloads[3]);
         agent1.add(payloads[4]);
-        agent1.update(ask);
 
         agents.push_back(agent0);
         agents.push_back(agent1);

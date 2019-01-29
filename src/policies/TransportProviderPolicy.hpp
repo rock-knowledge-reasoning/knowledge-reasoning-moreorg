@@ -1,28 +1,35 @@
 #ifndef ORGANIZATION_MODEL_POLICIES_TRANSPORT_PROVIDER_HPP
 #define ORGANIZATION_MODEL_POLICIES_TRANSPORT_PROVIDER_HPP
 
-#include "../AtomicAgent.hpp"
+#include "../Policy.hpp"
 #include "../OrganizationModelAsk.hpp"
-
-namespace organization_model {
-    class Agent;
-}
 
 namespace organization_model {
 namespace policies {
 
-class TransportProviderPolicy
+class TransportProviderPolicy : public Policy
 {
 public:
+
+    TransportProviderPolicy();
+
+    TransportProviderPolicy(const ModelPool& modelPool, const organization_model::OrganizationModelAsk& ask);
+
+    virtual ~TransportProviderPolicy();
+
+    void update(const ModelPool& pool, const OrganizationModelAsk& ask);
+
     /**
      * Identify the transport providers that are active to
      * provide the mobility / transport service for the agent
+     *
+     * This policy assumes is that only one transport system can be active at a
+     * time
      */
-    const AtomicAgent::Set& activeTransportProviders(const Agent& agent,
-            const organization_model::OrganizationModelAsk& ask) const;
+    const ModelPool& getActiveTransportProviders() const { return mActiveTransportProviders; }
 
 private:
-    mutable std::map<Agent, AtomicAgent::Set> mActiveTransportProviders;
+    ModelPool mActiveTransportProviders;
 };
 
 } // end namespace policies

@@ -1,12 +1,7 @@
 #ifndef ORGANIZATION_MODEL_POLICIES_ENERGY_PROVIDER_POLICY_HPP
 #define ORGANIZATION_MODEL_POLICIES_ENERGY_PROVIDER_POLICY_HPP
 
-#include "../OrganizationModelAsk.hpp"
-#include "../AtomicAgent.hpp"
-
-namespace organization_model {
-    class Agent;
-}
+#include "../Policy.hpp"
 
 namespace organization_model {
 namespace policies {
@@ -14,18 +9,21 @@ namespace policies {
 /**
  *
  */
-class EnergyProviderPolicy
+class EnergyProviderPolicy : public Policy
 {
 public:
-    void update(const Agent& agent, const OrganizationModelAsk& ask);
+    EnergyProviderPolicy();
 
-    /**
-     * Get the energy consumption shared
-     */
-    const std::map<AtomicAgent, double>& getShares() const { return mEnergyProviderShares; }
+    EnergyProviderPolicy(const ModelPool& pool, const OrganizationModelAsk& ask);
+
+    virtual ~EnergyProviderPolicy();
+
+    const std::map<owlapi::model::IRI, double>& getSharesByType() const { return mEnergyProviderSharesByType; }
+
+    void update(const ModelPool& pool, const OrganizationModelAsk& ask);
 
 private:
-    std::map<AtomicAgent, double> mEnergyProviderShares;
+    std::map<owlapi::model::IRI, double> mEnergyProviderSharesByType;
 };
 
 } // end namespace policies
