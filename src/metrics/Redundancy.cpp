@@ -128,7 +128,9 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
 
     if(fullModelRedundancy == 0)
     {
-        LOG_WARN_S << "Redundancy: the minimal resource requirements have not been fulfilled. Redundancy cannot be computed";
+        LOG_WARN_S << "Redundancy: the minimal resource requirements have not been fulfilled. Redundancy cannot be computed"
+            << "available: " << ModelBound::toString(modelBoundRemaining,4)
+            << "required: " << ModelBound::toString(modelBoundRequired, 4);
         throw std::runtime_error("owlapi::metrics::Redundancy: minimal resource requirement have not been fulfilled");
     }
 
@@ -148,7 +150,8 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         // default is p=0.5
         double probabilityOfSurvival = 0;
         try {
-            // SCHOKO: Model should have an associated probability of failure
+            // Model should have an associated probability of failure if not
+            // failure of parent component which be used (see punning strategy // in owlapi)
             OWLLiteral::Ptr value = mOrganizationModelAsk.ontology().getDataValue(qualification, vocabulary::OM::probabilityOfFailure());
             LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
             probabilityOfSurvival = 1 - value->getDouble();
