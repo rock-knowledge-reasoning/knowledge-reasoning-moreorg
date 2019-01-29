@@ -58,48 +58,26 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
     mEnergyProviderPolicy = policies::EnergyProviderPolicy(mModelPool, mOrganizationModelAsk);
     mTransportProviderPolicy = policies::TransportProviderPolicy(mModelPool, mOrganizationModelAsk);
 
-    try {
-        mNominalPowerConsumption = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalPowerConsumption())->getDouble();
-        mMass = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::mass())->getDouble();
-        mSupplyVoltage = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::supplyVoltage())->getDouble();
-        mPowerSourceCapacity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::powerSourceCapacity())->getDouble();
+    mNominalPowerConsumption = getDoubleValueOrDefault(actorModel, vocabulary::Robot::nominalPowerConsumption(), 0.0);
+    mMass = getDoubleValueOrDefault(actorModel, vocabulary::Robot::mass(), 0.0);
+    mSupplyVoltage = getDoubleValueOrDefault(actorModel, vocabulary::Robot::supplyVoltage(), 0.0);
+    mPowerSourceCapacity = getDoubleValueOrDefault(actorModel, vocabulary::Robot::powerSourceCapacity(), 0.0);
         // convert from Ah (battery capacity to Ws)
-        mEnergyCapacity = mPowerSourceCapacity*mSupplyVoltage*3600;
-    } catch(const std::exception& e)
-    {
-        LOG_WARN_S << e.what();
+    mEnergyCapacity = mPowerSourceCapacity*mSupplyVoltage*3600;
 
-        throw std::runtime_error("organization_model::facades::Robot loading of model '" + actorModel.toString() + "' failed: " + e.what());
-    }
-
-    // optional base mobility
-    try {
-        mMinAcceleration = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::minAcceleration())->getDouble();
-        mMaxAcceleration = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::maxAcceleration())->getDouble();
-        mNominalAcceleration = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalAcceleration())->getDouble();
+    mMinAcceleration = getDoubleValueOrDefault(actorModel, vocabulary::Robot::minAcceleration(),0.0);
+    mMaxAcceleration = getDoubleValueOrDefault(actorModel, vocabulary::Robot::maxAcceleration(),0.0);
+    mNominalAcceleration = getDoubleValueOrDefault(actorModel, vocabulary::Robot::nominalAcceleration(),0.0);
 
 
-        mMinVelocity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::minVelocity())->getDouble();
-        mMaxVelocity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::maxVelocity())->getDouble();
-        mNominalVelocity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalVelocity())->getDouble();
-    } catch(const std::exception& e)
-    {
-        LOG_INFO_S << e.what();
-    }
+    mMinVelocity = getDoubleValueOrDefault(actorModel, vocabulary::Robot::minVelocity(),0.0);
+    mMaxVelocity = getDoubleValueOrDefault(actorModel, vocabulary::Robot::maxVelocity(),0.0);
+    mNominalVelocity = getDoubleValueOrDefault(actorModel, vocabulary::Robot::nominalVelocity(),0.0);
 
 
-    // optional transport capability
-    try {
-        mTransportDemand = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::transportDemand())->getDouble();
-        // get cardinality constraint
-        mTransportCapacity = organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::transportCapacity())->getDouble();
-
-
-    } catch(const std::exception& e)
-    {
-
-        LOG_INFO_S << e.what();
-    }
+    mTransportDemand = getDoubleValueOrDefault(actorModel, vocabulary::Robot::transportDemand(),1.0);
+    // get cardinality constraint
+    mTransportCapacity = getDoubleValueOrDefault(actorModel, vocabulary::Robot::transportCapacity(),0.0);
 }
 
 Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizationModelAsk)
@@ -128,43 +106,28 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
     {
         const owlapi::model::IRI& actorModel = pair.first;
         size_t modelCount = pair.second;
-        try {
-            mNominalPowerConsumption += modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalPowerConsumption())->getDouble();
-            mMass += modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::mass())->getDouble();
-            // TODO: check consistency of supply voltage
-            mSupplyVoltage = std::max(organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::supplyVoltage())->getDouble(), mSupplyVoltage);
-            mPowerSourceCapacity += organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::powerSourceCapacity())->getDouble();
-        } catch(const std::exception& e)
-        {
-            LOG_WARN_S << e.what();
-
-            throw std::runtime_error("organization_model::facades::Robot loading of model '" + actorModel.toString() + "' failed: " + e.what());
-        }
+        mNominalPowerConsumption +=
+            modelCount*getDoubleValueOrDefault(actorModel, vocabulary::Robot::nominalPowerConsumption(),0.0);
+        mMass += modelCount*getDoubleValueOrDefault(actorModel, vocabulary::Robot::mass(),0.0);
+        // TODO: check consistency of supply voltage
+        mSupplyVoltage = std::max(getDoubleValueOrDefault(actorModel, vocabulary::Robot::supplyVoltage(),0.0), mSupplyVoltage);
+        mPowerSourceCapacity += getDoubleValueOrDefault(actorModel, vocabulary::Robot::powerSourceCapacity(),0.0);
 
         // optional base mobility
-        try {
-            mMinAcceleration = std::max(mMinAcceleration, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::minAcceleration())->getDouble());
-            mMaxAcceleration = std::max(mMaxAcceleration, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::maxAcceleration())->getDouble());
-            mNominalAcceleration = std::max(mNominalAcceleration, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalAcceleration())->getDouble());
+        mMinAcceleration = std::max(mMinAcceleration,
+                getDoubleValueOrDefault(actorModel, vocabulary::Robot::minAcceleration(),0.0));
+        mMaxAcceleration = std::max(mMaxAcceleration,
+                getDoubleValueOrDefault(actorModel, vocabulary::Robot::maxAcceleration(),0.0));
+        mNominalAcceleration = std::max(mNominalAcceleration,
+                getDoubleValueOrDefault(actorModel, vocabulary::Robot::nominalAcceleration(),0.0));
 
-            mMinVelocity = std::max(mMinVelocity, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::minVelocity())->getDouble());
-            mMaxVelocity = std::max(mMaxVelocity, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::maxVelocity())->getDouble());
-            mNominalVelocity = std::max(mNominalVelocity, organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::nominalVelocity())->getDouble());
-        } catch(const std::exception& e)
-        {
-            LOG_INFO_S << e.what();
-        }
+        mMinVelocity = std::max(mMinVelocity, getDoubleValueOrDefault(actorModel, vocabulary::Robot::minVelocity(),0.0));
+        mMaxVelocity = std::max(mMaxVelocity, getDoubleValueOrDefault(actorModel, vocabulary::Robot::maxVelocity(),0.0));
+        mNominalVelocity = std::max(mNominalVelocity, getDoubleValueOrDefault(actorModel, vocabulary::Robot::nominalVelocity(),0.0));
 
-        // optional transport capability
-        try {
-            mTransportDemand += modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::transportDemand())->getDouble();
-            // get cardinality constraint
-            mTransportCapacity += modelCount*organizationAsk().ontology().getDataValue(actorModel, vocabulary::Robot::transportCapacity())->getDouble();
-
-        } catch(const std::exception& e)
-        {
-            LOG_INFO_S << e.what();
-        }
+        mTransportDemand += modelCount*getDoubleValueOrDefault(actorModel, vocabulary::Robot::transportDemand(),0.0);
+        // get cardinality constraint
+        mTransportCapacity += modelCount*getDoubleValueOrDefault(actorModel, vocabulary::Robot::transportCapacity(),0.0);
     }
 
     mEnergyCapacity = mPowerSourceCapacity*mSupplyVoltage*3600;

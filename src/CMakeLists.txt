@@ -17,6 +17,7 @@ rock_library(organization_model
         ccf/LinkType.cpp
         ccf/Scenario.cpp
         exporter/PDDLExporter.cpp
+        facades/Facade.cpp
         facades/Robot.cpp
         FunctionalityMapping.cpp
         Heuristics.cpp
