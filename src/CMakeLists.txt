@@ -1,3 +1,18 @@
+find_library(gecode0 NAMES gecodeflatzinc   PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode1 NAMES gecodedriver     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode2 NAMES gecodegist       PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode3 NAMES gecodesearch     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode4 NAMES gecodeminimodel  PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode5 NAMES gecodeset        PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode6 NAMES gecodefloat      PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode7 NAMES gecodeint        PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode8 NAMES gecodekernel     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+find_library(gecode9 NAMES gecodesupport    PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+
+set(GECODE_LIBRARIES
+    ${gecode0} ${gecode1} ${gecode2} ${gecode3} ${gecode4} ${gecode5} ${gecode6} ${gecode7} ${gecode8} ${gecode9}
+)
+
 find_package(Boost REQUIRED thread serialization program_options)
 rock_library(organization_model
     SOURCES
@@ -119,20 +134,6 @@ rock_library(organization_model
     LIBS glpk ${Boost_THREAD_LIBRARY}
 )
 
-find_library(gecode0 NAMES gecodeflatzinc   PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode1 NAMES gecodedriver     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode2 NAMES gecodegist       PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode3 NAMES gecodesearch     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode4 NAMES gecodeminimodel  PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode5 NAMES gecodeset        PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode6 NAMES gecodefloat      PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode7 NAMES gecodeint        PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode8 NAMES gecodekernel     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode9 NAMES gecodesupport    PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-
-set(GECODE_LIBRARIES
-    ${gecode0} ${gecode1} ${gecode2} ${gecode3} ${gecode4} ${gecode5} ${gecode6} ${gecode7} ${gecode8} ${gecode9}
-)
 target_link_libraries(organization_model ${GECODE_LIBRARIES})
 
 rock_executable(limited_combinations utils/LimitedCombination.cpp
