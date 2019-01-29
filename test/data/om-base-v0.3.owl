@@ -110,9 +110,9 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-base#maxLength -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxLength -->
 
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#maxLength">
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#maxLength">
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
@@ -121,9 +121,9 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-base#minLength -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#minLength -->
 
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#minLength">
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#minLength">
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
@@ -132,9 +132,9 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-base#nominalLength -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalLength -->
 
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#nominalLength">
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#nominalLength">
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
@@ -143,9 +143,9 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-base#powerSourceCapacity -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#powerSourceCapacity -->
 
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#powerSourceCapacity">
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#powerSourceCapacity">
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#energyProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>

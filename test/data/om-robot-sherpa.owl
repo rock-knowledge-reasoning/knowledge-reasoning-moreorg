@@ -177,7 +177,7 @@
         <om-schema:minWidth rdf:datatype="&xsd;double">2.0</om-schema:minWidth>
         <om-schema:maxWidth rdf:datatype="&xsd;double">2.5</om-schema:maxWidth>
         <om-schema:nominalWidth rdf:datatype="&xsd;double">2.0</om-schema:nominalWidth>
-        <om-schema:minHeight rdf:datatype="&xsd;double">1.5</om-schema:maxHeight>
+        <om-schema:minHeight rdf:datatype="&xsd;double">1.5</om-schema:minHeight>
         <om-schema:maxHeight rdf:datatype="&xsd;double">3.5</om-schema:maxHeight>
         <om-schema:nominalHeight rdf:datatype="&xsd;double">2.0</om-schema:nominalHeight>
         <om-schema:supplyVoltage rdf:datatype="&xsd;double">48.0</om-schema:supplyVoltage>

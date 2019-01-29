@@ -104,7 +104,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot"/>
-        <om-schema:energyCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">10000.0</om-schema:energyCapacity>
+        <om-schema:powerSourceCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">10.0</om-schema:powerSourceCapacity>
         <om-schema:mass rdf:datatype="http://www.w3.org/2001/XMLSchema#double">100.0</om-schema:mass>
         <om-schema:maxAcceleration rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-schema:maxAcceleration>
         <om-schema:maxVelocity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">5.0</om-schema:maxVelocity>
