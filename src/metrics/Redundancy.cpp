@@ -177,6 +177,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         for(; rit != modelBoundRemaining.end();++rit)
         {
             ModelBound& remaining = *rit;
+            bool hasPossibleMatch = false;
 
             // Try to fit remaining resources
             std::vector<ModelSurvivability>::iterator mit = models.begin();
@@ -185,9 +186,9 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
                 // Check if model can be used to strengthen the survivability
                 if( mit->getQualification() == remaining.model || mOrganizationModelAsk.ontology().isSubClassOf(remaining.model, mit->getQualification()) )
                 {
+                    hasPossibleMatch = true;
                     try {
                         remaining.decrement();
-
                         mit->increment();
                         updated = true;
                     } catch(...)
@@ -197,6 +198,11 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
                         break;
                     }
                 }
+            }
+            if(!hasPossibleMatch)
+            {
+                modelBoundRemaining.erase(rit);
+                --rit;
             }
         }
     } while(updated);
