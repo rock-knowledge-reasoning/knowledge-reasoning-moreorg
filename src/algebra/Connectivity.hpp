@@ -187,8 +187,15 @@ public:
      */
     static const Connectivity::Statistics& getStatistics() { return msStatistics; }
 
+    /**
+     * Retrieve the connection graph of the last feasibility check
+     * \return connection graph
+     */
+    static const graph_analysis::BaseGraph::Ptr& getConnectionGraph() { return msConnectionGraph; }
+
 protected:
     static Connectivity::Statistics msStatistics;
+    static graph_analysis::BaseGraph::Ptr msConnectionGraph;
 
     // General configuration to control, e.g. the branching behaviour
     static qxcfg::Configuration msConfiguration;

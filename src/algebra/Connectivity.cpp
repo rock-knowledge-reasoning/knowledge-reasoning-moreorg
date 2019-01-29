@@ -16,6 +16,7 @@ namespace organization_model {
 namespace algebra {
 
 Connectivity::Statistics Connectivity::msStatistics;
+graph_analysis::BaseGraph::Ptr Connectivity::msConnectionGraph;
 qxcfg::Configuration Connectivity::msConfiguration;
 
 Connectivity::Statistics::Statistics()
@@ -493,8 +494,8 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
         double timeoutInMs, size_t minFeasible,
         const owlapi::model::IRI& interfaceBaseClass)
 {
-    graph_analysis::BaseGraph::Ptr baseGraph;
-    return Connectivity::isFeasible(modelPool, ask, baseGraph, timeoutInMs, minFeasible, interfaceBaseClass);
+    msConnectionGraph.reset();
+    return Connectivity::isFeasible(modelPool, ask, msConnectionGraph, timeoutInMs, minFeasible, interfaceBaseClass);
 }
 
 bool Connectivity::isFeasible(const ModelPool& modelPool,
