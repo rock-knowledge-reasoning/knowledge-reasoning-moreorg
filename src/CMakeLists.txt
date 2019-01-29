@@ -45,6 +45,7 @@ rock_library(organization_model
         OrganizationModel.cpp
         OrganizationModelAsk.cpp
         OrganizationModelTell.cpp
+        QueryCache.cpp
         Policy.cpp
         PropertyConstraint.cpp
         PropertyConstraintSolver.cpp
@@ -109,6 +110,7 @@ rock_library(organization_model
         organization_model/Statistics.hpp
         policies/EnergyProviderPolicy.hpp
         policies/TransportProviderPolicy.hpp
+        QueryCache.hpp
         Resource.hpp
         Service.hpp
         SharedPtr.hpp

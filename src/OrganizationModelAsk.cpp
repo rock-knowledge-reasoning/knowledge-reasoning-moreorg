@@ -389,6 +389,15 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
     owlapi::model::OWLCardinalityRestriction::OperationType operationType,
     bool max2Min) const
 {
+    std::pair<owlapi::model::OWLCardinalityRestriction::PtrList, bool> result =
+        mpOrganizationModel->mQueryCache.getCachedResult(modelPool, objectProperty,
+            operationType, max2Min);
+
+    if(result.second)
+    {
+        return result.first;
+    }
+
     std::vector<OWLCardinalityRestriction::Ptr> allAvailableResources;
 
     owlapi::model::OWLProperty::Ptr property = ontology().getOWLObjectProperty(objectProperty);
@@ -400,7 +409,7 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
         const IRI& model = mit->first;
         uint32_t modelCount = mit->second;
 
-        std::vector<OWLCardinalityRestriction::Ptr> availableResources = mOntologyAsk.getCardinalityRestrictions(model, objectProperty);
+        OWLCardinalityRestriction::PtrList availableResources = mOntologyAsk.getCardinalityRestrictions(model, objectProperty);
 
         // This is not a meta constraint, but a direct representation of an
         // atomic resource, so add the exact availability of the given high level resource, which is
@@ -421,7 +430,7 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
         }
 
         std::vector<OWLCardinalityRestriction::Ptr> available;
-        for(OWLCardinalityRestriction::Ptr& restriction : availableResources)
+        for(const OWLCardinalityRestriction::Ptr& restriction : availableResources)
         {
             // Update the cardinality with the actual model count
             uint32_t cardinality = modelCount*restriction->getCardinality();
@@ -433,13 +442,20 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
                         OWLCardinalityRestriction::MIN);
                 available.push_back(converted);
             } else {
-                restriction->setCardinality(cardinality);
-                available.push_back(restriction);
+                OWLCardinalityRestriction::Ptr r = restriction->clone();
+                r->setCardinality(cardinality);
+                available.push_back(r);
             }
         }
 
         allAvailableResources = owlapi::model::OWLCardinalityRestriction::join(allAvailableResources, available, operationType );
     }
+
+    mpOrganizationModel->mQueryCache.cacheResult(modelPool, objectProperty,
+            operationType,
+            max2Min,
+            allAvailableResources);
+
     return allAvailableResources;
 }
 

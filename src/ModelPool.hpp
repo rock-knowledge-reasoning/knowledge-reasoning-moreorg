@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <owlapi/model/IRI.hpp>
+#include <boost/functional/hash.hpp>
 
 namespace organization_model {
 
@@ -269,4 +270,23 @@ public:
 };
 
 } // end namespace organization_model
+
+// Enable usage of ModelPool as key in unordered maps
+namespace std {
+template<>
+struct hash<organization_model::ModelPool> {
+    size_t operator()(const organization_model::ModelPool& modelPool) const
+    {
+        size_t seed = 0;
+        for(const organization_model::ModelPool::value_type& v : modelPool)
+        {
+            size_t hashValue = std::hash<owlapi::model::IRI>()(v.first);
+            boost::hash_combine(seed, hashValue);
+            boost::hash_combine(seed, v.second);
+        }
+        return seed;
+    }
+};
+} // end namespace std
+
 #endif // ORGANIZATION_MODEL_MODEL_POOL_HPP

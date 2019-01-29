@@ -6,6 +6,7 @@
 #include <owlapi/model/OWLOntology.hpp>
 #include "FunctionalityMapping.hpp"
 #include "Service.hpp"
+#include "QueryCache.hpp"
 
 namespace organization_model {
 
@@ -89,6 +90,9 @@ public:
 private:
     /// Ontology that serves as basis for this organization model
     owlapi::model::OWLOntology::Ptr mpOntology;
+
+protected:
+    QueryCache mQueryCache;
 };
 
 } // end namespace organization_model
