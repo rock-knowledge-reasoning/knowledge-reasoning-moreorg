@@ -207,39 +207,90 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
             continue;
         }
 
-        numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(boundedModelPool, numberOfAtoms, numeric::MAX);
-        do {
-            IRIList combination = limitedCombination.current();
-            ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
-
-            LOG_DEBUG_S << "Limited combination: " << std::endl
-                << combinationModelPool.toString(4);
-
-
-            Resource::Set functionalities;
-            functionalities.insert(functionality);
-            if(isMinimal(combinationModelPool, functionalities))
+        // Handle a bound that represents only structurally infeasible systems
+        if(!boundedModelPool.isNull() && !isFeasible(boundedModelPool))
+        {
+            // identify the potential additions
+            ModelPool explorePool;
+            // TODO: improve creation of structurally consistent and functionally minimally redundant
+            for(const ModelPool::value_type v :  mModelPool)
             {
-                LOG_DEBUG_S << "combination is minimal for " << functionality.getModel().toString() << std::endl
-                    << combinationModelPool.toString(4);
-                if(algebra::Connectivity::isFeasible(combinationModelPool,
-                            *this,
-                            mFeasibilityCheckTimeoutInMs,
-                            1, // minFeasible
-                            mInterfaceBaseClass))
+                size_t currentModelCardinality = boundedModelPool[v.first];
+                if( currentModelCardinality == 0 && v.second > 0)
                 {
-                    LOG_DEBUG_S << "combination is feasible " << std::endl
-                    << combinationModelPool.toString(4);
-                    functionalityMapping.add(combinationModelPool, functionality.getModel());
+                    explorePool[v.first] = v.second;
                 }
-            } else {
-                LOG_DEBUG_S << "combination is not minimal for " << functionality.getModel().toString() << std::endl
-                    << combinationModelPool.toString(4);
             }
-        } while(limitedCombination.next());
+
+            numberOfAtoms =
+                numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(explorePool);
+            if(numberOfAtoms > 5)
+            {
+                // Maximum # of indirection for connecting
+                numberOfAtoms = 5;
+            }
+
+            numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(explorePool, numberOfAtoms, numeric::MAX);
+            do {
+                IRIList combination = limitedCombination.current();
+                ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
+                ModelPool pool = Algebra::sum(combinationModelPool,
+                        boundedModelPool).toModelPool();
+
+                if( !addFunctionalityMapping(functionalityMapping,
+                        pool, functionality.getModel()) )
+                {
+                    LOG_DEBUG_S << "Failed to add " <<
+                        combinationModelPool.toString(4);
+
+                }
+            } while(limitedCombination.next());
+        } else {
+            numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(boundedModelPool, numberOfAtoms, numeric::MAX);
+            do {
+                IRIList combination = limitedCombination.current();
+                ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
+
+                if( !addFunctionalityMapping(functionalityMapping,
+                        combinationModelPool, functionality.getModel()))
+                {
+                    LOG_DEBUG_S << "Failed to add " <<
+                        combinationModelPool.toString(4);
+                }
+
+            } while(limitedCombination.next());
+        }
     } // end for functionalities
 
     return functionalityMapping;
+}
+
+bool OrganizationModelAsk::addFunctionalityMapping(FunctionalityMapping& functionalityMapping,
+        const ModelPool& combinationModelPool,
+        const owlapi::model::IRI& functionality) const
+{
+        Resource::Set functionalities;
+        functionalities.insert(functionality);
+        if(isMinimal(combinationModelPool, functionalities))
+        {
+            LOG_DEBUG_S << "combination is minimal for " << functionality.toString() << std::endl
+                << combinationModelPool.toString(4);
+            if(algebra::Connectivity::isFeasible(combinationModelPool,
+                        *this,
+                        mFeasibilityCheckTimeoutInMs,
+                        1, // minFeasible
+                        mInterfaceBaseClass))
+            {
+                LOG_DEBUG_S << "combination is feasible " << std::endl
+                << combinationModelPool.toString(4);
+                functionalityMapping.add(combinationModelPool, functionality);
+            }
+            return true;
+        } else {
+            LOG_DEBUG_S << "combination is not minimal for " << functionality.toString() << std::endl
+                << combinationModelPool.toString(4);
+            return false;
+        }
 }
 
 FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(const ModelPool& modelPool,

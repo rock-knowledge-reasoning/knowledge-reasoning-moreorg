@@ -323,6 +323,15 @@ public:
     bool isMinimal(const ModelPool& modelPool, const Resource::Set& resources) const;
 
     /**
+     * Add a functionality mapping and validate the structural consistency
+     * \return true when add successfully, false otherwise (meaning the
+     * combination was not structurally consistent)
+     */
+    bool addFunctionalityMapping(FunctionalityMapping& functionalityMapping,
+            const ModelPool& modelPool,
+            const owlapi::model::IRI& functionality) const;
+
+    /**
      * Get the data property value of the complete combination given by the pool
      * \param dataProperty
      * \throw std::runtime_error if the given data propery does not exist
