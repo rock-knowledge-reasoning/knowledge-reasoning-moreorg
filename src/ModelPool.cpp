@@ -173,15 +173,18 @@ ModelCombinationSet ModelPool::expandToLowerBound(const ModelCombinationSet& com
 
 bool ModelPool::isWithinUpperBound(const ModelPool& upperBound) const
 {
-    LOG_DEBUG_S << "DELTA lval: " << std::endl
-        << ModelPoolDelta(upperBound).toString(4);
-    LOG_DEBUG_S << "DELTA rval: " << std::endl
-        << ModelPoolDelta(*this).toString(4);
-    ModelPoolDelta delta = Algebra::substract(*this, upperBound);
-    LOG_DEBUG_S << "Result: " << std::endl
-        << delta.toString(4);
-
-    return !delta.isNegative();
+    for(const ModelPool::value_type& v : upperBound)
+    {
+        ModelPool::const_iterator cit = this->find(v.first);
+        if(cit != this->end())
+        {
+            if(cit->second > v.second)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 ModelPool::Set ModelPool::applyUpperBound(const ModelPool::Set& modelPools, const ModelPool& upperBound)
@@ -369,6 +372,25 @@ std::string ModelPool::toString(const ModelPool::Set& modelPoolSet, uint32_t ind
         ModelCombination combination = cit->toModelCombination();
         ss << owlapi::model::IRI::toString(combination, true);
         if(cit != modelPoolSet.end())
+        {
+            ss << ",";
+        }
+    }
+    return ss.str();
+}
+
+std::string ModelPool::toString(const ModelPool::List& modelPoolList, uint32_t indent)
+{
+    std::string hspace(indent,' ');
+    std::stringstream ss;
+    ss << hspace;
+
+    ModelPool::List::const_iterator cit = modelPoolList.begin();
+    for(; cit != modelPoolList.end();++cit)
+    {
+        ModelCombination combination = cit->toModelCombination();
+        ss << owlapi::model::IRI::toString(combination, true);
+        if(cit != modelPoolList.end())
         {
             ss << ",";
         }

@@ -136,8 +136,18 @@ BOOST_AUTO_TEST_CASE(apply_upper_bound)
         combinations.insert(combination);
     }
 
-    ModelCombinationSet boundedSet = modelPool.applyUpperBound(combinations, modelPool);
-    BOOST_REQUIRE_MESSAGE(boundedSet.size() == 2, "BoundedSet: expected size: 2 was " << boundedSet.size() << ": " << OrganizationModel::toString(boundedSet) );
+    {
+        ModelCombinationSet boundedSet = modelPool.applyUpperBound(combinations, modelPool);
+        BOOST_REQUIRE_MESSAGE(boundedSet.size() == 2, "BoundedSet: expected size: 2 was " << boundedSet.size() << ": " << OrganizationModel::toString(boundedSet) );
+    }
+
+    {
+        // empty upper bound
+        ModelPool pool;
+        ModelCombinationSet boundedSet = modelPool.applyUpperBound(combinations,
+                pool);
+        BOOST_REQUIRE_MESSAGE(boundedSet.size() == 3, "BoundedSet: expected size: 3 was " << boundedSet.size() << ": " << OrganizationModel::toString(boundedSet) );
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

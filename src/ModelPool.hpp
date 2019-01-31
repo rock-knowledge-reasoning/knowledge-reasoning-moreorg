@@ -132,12 +132,20 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
         ModelCombination toModelCombination() const;
 
         /**
-         * Stringify list a ModelPool::Set
+         * Stringify a ModelPool::Set
          * \param modelPoolSet set to stringify
          * \param indent indentation level
          * \return stringified object
          */
         static std::string toString(const std::set<ModelPool>& modelPoolSet, uint32_t indent = 0);
+
+        /**
+         * Stringify a ModelPool::Vector
+         * \param modelPoolSet set to stringify
+         * \param indent indentation level
+         * \return stringified object
+         */
+        static std::string toString(const std::vector<ModelPool>& modelPoolSet, uint32_t indent = 0);
 
         /**
          * Compute all combinations that can be generated from the given model
