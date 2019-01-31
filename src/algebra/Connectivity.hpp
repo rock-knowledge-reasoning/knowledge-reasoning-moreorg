@@ -4,11 +4,50 @@
 #include <gecode/set.hh>
 #include <gecode/search.hh>
 #include <base/Time.hpp>
+#include <functional>
+#include <unordered_map>
+#include <tuple>
+
 #include <numeric/Stats.hpp>
 #include <graph_analysis/BaseGraph.hpp>
 #include "../OrganizationModelAsk.hpp"
 #include "../vocabularies/OM.hpp"
 #include <qxcfg/Configuration.hpp>
+
+namespace organization_model {
+namespace algebra {
+
+typedef std::tuple<ModelPool, owlapi::model::IRI, owlapi::model::IRI, double, size_t>
+    FeasibilityQuery;
+
+typedef std::unordered_map<FeasibilityQuery,
+        std::pair<graph_analysis::BaseGraph::Ptr, bool> > QueryCache;
+} // end namespace algebra
+} // end namespace organization_model
+
+
+namespace std {
+using namespace owlapi::model;
+using namespace organization_model::algebra;
+template<>
+struct hash< FeasibilityQuery >
+{
+    size_t operator()(const FeasibilityQuery& query) const
+    {
+        size_t seed = 0;
+        for(const ModelPool::value_type& v : get<0>(query))
+        {
+            boost::hash_combine(seed, v.first.toString());
+            boost::hash_combine(seed, v.second);
+        }
+        boost::hash_combine(seed, get<1>(query).toString());
+        boost::hash_combine(seed, get<2>(query).toString());
+        boost::hash_combine(seed, get<3>(query));
+        boost::hash_combine(seed, get<4>(query));
+        return seed;
+    }
+};
+} // end namespace std
 
 namespace organization_model {
 namespace algebra {
@@ -208,6 +247,7 @@ protected:
             {}
     };
 
+    static QueryCache mQueryCache;
 };
 
 

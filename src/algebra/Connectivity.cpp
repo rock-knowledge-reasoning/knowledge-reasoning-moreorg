@@ -15,6 +15,8 @@ using namespace owlapi::model;
 namespace organization_model {
 namespace algebra {
 
+QueryCache Connectivity::mQueryCache;
+
 Connectivity::Statistics Connectivity::msStatistics;
 graph_analysis::BaseGraph::Ptr Connectivity::msConnectionGraph;
 qxcfg::Configuration Connectivity::msConfiguration;
@@ -504,6 +506,20 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
         double timeoutInMs, size_t minFeasible,
         const owlapi::model::IRI& interfaceBaseClass)
 {
+    FeasibilityQuery query = std::make_tuple(modelPool,
+            ask.ontology().getOntology()->getIRI(),
+            interfaceBaseClass,
+            timeoutInMs,
+            minFeasible);
+
+    QueryCache::const_iterator cit = mQueryCache.find(query);
+    if(cit != mQueryCache.end())
+    {
+        std::pair<graph_analysis::BaseGraph::Ptr, bool> cachedResult = cit->second;
+        baseGraph = cachedResult.first;
+        return cachedResult.second;
+    }
+
     // For a single system this check is trivially true
     size_t numberOfInstances = modelPool.numberOfInstances();
     if(numberOfInstances == 0)
@@ -585,6 +601,7 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
     delete current;
     delete connectivity;
 
+    mQueryCache[query] = std::make_pair(baseGraph, isComplete);
     return isComplete;
 }
 
