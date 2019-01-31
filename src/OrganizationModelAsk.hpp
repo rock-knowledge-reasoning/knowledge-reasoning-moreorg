@@ -49,14 +49,18 @@ public:
             const ModelPool& modelPool = ModelPool(),
             bool applyFunctionalSaturationBound = false,
             double feasibilityCheckTimeoutInMs = 20000,
-            const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface"));
+            const owlapi::model::IRI& interfaceBaseClass =
+            vocabulary::OM::resolve("ElectroMechanicalInterface"),
+            size_t neighbourHood = 3);
 
     static const OrganizationModelAsk& getInstance(const OrganizationModel::Ptr& om,
             const ModelPool& modelPool = ModelPool(),
             bool applyFunctionalSaturationBound = false,
             double feasibilityCheckTimeoutInMs = 20000,
-            const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface"));
-
+            const owlapi::model::IRI& interfaceBaseClass =
+            vocabulary::OM::resolve("ElectroMechanicalInterface"),
+            size_t neighbourHood = 3
+            );
 
     /**
      * Retrieve the list of all known service models
@@ -471,6 +475,18 @@ protected:
             size_t idx,
             double newValue);
 
+    /**
+     * Check if there is functionality support in the neighborhood of a
+     * base model pool.
+     * The neighborhood is defined by a permitted upper bound on additional model
+     * instances and a maximum number of instances
+     */
+    void exploreNeighbourhood(FunctionalityMapping& functionalityMapping,
+            const ModelPool& basePool,
+            const ModelPool& maxDelta,
+            const owlapi::model::IRI& functionality,
+            size_t maxAddedInstances) const;
+
 private:
     OrganizationModel::Ptr mpOrganizationModel;
     owlapi::model::OWLOntologyAsk mOntologyAsk;
@@ -485,6 +501,9 @@ private:
     ModelPool mModelPool;
 
     double mFeasibilityCheckTimeoutInMs;
+    /// Size of the neighbourhood for the exploration of structurally feasible
+    /// compositions, starting from the functional saturation bound
+    size_t mStructuralNeighbourhood;
     owlapi::model::IRI mInterfaceBaseClass;
     static std::vector<OrganizationModelAsk> msOrganizationModelAsk;
 };

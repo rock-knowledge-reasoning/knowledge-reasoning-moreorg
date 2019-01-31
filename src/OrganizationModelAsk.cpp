@@ -29,12 +29,14 @@ OrganizationModelAsk::OrganizationModelAsk(const OrganizationModel::Ptr& om,
         const ModelPool& modelPool,
         bool applyFunctionalSaturationBound,
         double feasibilityCheckTimeoutInMs,
-        const owlapi::model::IRI& interfaceBaseClass
+        const owlapi::model::IRI& interfaceBaseClass,
+        size_t neighbourHood
         )
     : mpOrganizationModel(om)
     , mOntologyAsk(om->ontology())
     , mApplyFunctionalSaturationBound(applyFunctionalSaturationBound)
     , mFeasibilityCheckTimeoutInMs(feasibilityCheckTimeoutInMs)
+    , mStructuralNeighbourhood(neighbourHood)
     , mInterfaceBaseClass(interfaceBaseClass)
 {
     if(!modelPool.empty())
@@ -53,7 +55,8 @@ const OrganizationModelAsk& OrganizationModelAsk::getInstance(const Organization
         const ModelPool& modelPool,
         bool applyFunctionalSaturationBound,
         double feasibilityCheckTimeoutInMs,
-        const owlapi::model::IRI& interfaceBaseClass
+        const owlapi::model::IRI& interfaceBaseClass,
+        size_t neighbourHood
         )
 {
     std::vector<OrganizationModelAsk>::const_iterator it = std::find_if(msOrganizationModelAsk.begin(), msOrganizationModelAsk.end(),
@@ -77,7 +80,7 @@ const OrganizationModelAsk& OrganizationModelAsk::getInstance(const Organization
     } else {
         OrganizationModelAsk ask(om,
                 modelPool, applyFunctionalSaturationBound,
-                feasibilityCheckTimeoutInMs, interfaceBaseClass);
+                feasibilityCheckTimeoutInMs, interfaceBaseClass, neighbourHood);
         msOrganizationModelAsk.push_back(ask);
         return msOrganizationModelAsk.back();
     }
@@ -207,59 +210,41 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
             continue;
         }
 
-        // Handle a bound that represents only structurally infeasible systems
-        if(!boundedModelPool.isNull() && !isFeasible(boundedModelPool))
-        {
+        numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(boundedModelPool, numberOfAtoms, numeric::MAX);
+        do {
+            IRIList combination = limitedCombination.current();
+            ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
+
             // identify the potential additions
             ModelPool explorePool;
-            // TODO: improve creation of structurally consistent and functionally minimally redundant
-            for(const ModelPool::value_type v :  mModelPool)
+            // Handle a bound that represents only structurally infeasible systems
+            if(!combinationModelPool.isNull() && !isFeasible(combinationModelPool))
             {
-                size_t currentModelCardinality = boundedModelPool[v.first];
-                if( currentModelCardinality == 0 && v.second > 0)
+                for(const ModelPool::value_type v :  mModelPool)
                 {
-                    explorePool[v.first] = v.second;
+                    size_t currentModelCardinality = boundedModelPool[v.first];
+                    if( currentModelCardinality == 0 && v.second > 0)
+                    {
+                        explorePool[v.first] = v.second;
+                    } else {
+                        // check for types that are funtionally bounded
+                        // (but can still contribute structurally)
+                        size_t remaining = v.second - currentModelCardinality;
+                        if(remaining > 0)
+                        {
+                            explorePool[v.first] = remaining;
+                        }
+                    }
                 }
             }
 
-            numberOfAtoms =
-                numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(explorePool);
-            if(numberOfAtoms > 5)
-            {
-                // Maximum # of indirection for connecting
-                numberOfAtoms = 5;
-            }
+            exploreNeighbourhood(functionalityMapping,
+                    combinationModelPool,
+                    explorePool,
+                    functionality.getModel(),
+                    mStructuralNeighbourhood);
+        } while(limitedCombination.next());
 
-            numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(explorePool, numberOfAtoms, numeric::MAX);
-            do {
-                IRIList combination = limitedCombination.current();
-                ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
-                ModelPool pool = Algebra::sum(combinationModelPool,
-                        boundedModelPool).toModelPool();
-
-                if( !addFunctionalityMapping(functionalityMapping,
-                        pool, functionality.getModel()) )
-                {
-                    LOG_DEBUG_S << "Failed to add " <<
-                        combinationModelPool.toString(4);
-
-                }
-            } while(limitedCombination.next());
-        } else {
-            numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(boundedModelPool, numberOfAtoms, numeric::MAX);
-            do {
-                IRIList combination = limitedCombination.current();
-                ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
-
-                if( !addFunctionalityMapping(functionalityMapping,
-                        combinationModelPool, functionality.getModel()))
-                {
-                    LOG_DEBUG_S << "Failed to add " <<
-                        combinationModelPool.toString(4);
-                }
-
-            } while(limitedCombination.next());
-        }
     } // end for functionalities
 
     return functionalityMapping;
@@ -334,7 +319,13 @@ FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(
             algebra::SupportType supportType = getSupportType(functionality, combinationModelPool);
             if(algebra::FULL_SUPPORT == supportType)
             {
-                functionalityMapping.add(combinationModelPool, functionality.getModel());
+                if( !addFunctionalityMapping(functionalityMapping,combinationModelPool,
+                            functionality.getModel()) )
+                {
+                    LOG_DEBUG_S << "Failed to add to functionality mapping:"
+                        << "functionality: " << functionality.getModel().toString()
+                        << "combination: " << combinationModelPool.toString(4);
+                }
             }
         }
     } while(limitedCombination.next());
@@ -1153,6 +1144,52 @@ void OrganizationModelAsk::updateScalingFactor(std::vector<double>& factors, siz
         // maximum value
         v = std::max(v, newValue);
     }
+}
+
+
+void OrganizationModelAsk::exploreNeighbourhood(FunctionalityMapping& functionalityMapping,
+        const ModelPool& basePool,
+        const ModelPool& maxDelta,
+        const IRI& functionality,
+        size_t maxAddedInstances) const
+{
+    size_t numberOfAtoms =
+        numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(maxDelta);
+    if(numberOfAtoms > maxAddedInstances)
+    {
+        // Maximum # of indirection for connecting or consideration of
+        // additional components to achieve functionality (when structurally
+        // inconsistent)
+        numberOfAtoms = maxAddedInstances;
+    } else if(numberOfAtoms == 0)
+    {
+        // just check the provided base pool
+        if( !addFunctionalityMapping(functionalityMapping,
+                basePool, functionality) )
+        {
+            LOG_DEBUG_S << "Failed to add to functionality mapping:"
+                << "functionality: " << functionality.toString()
+                << "combination: " << basePool.toString(4);
+        }
+        return;
+    }
+
+    // Explore the neighbourhood, but limiting the compositions in size
+    numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(maxDelta, numberOfAtoms, numeric::MAX);
+    do {
+        IRIList combination = limitedCombination.current();
+        ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
+        ModelPool pool = Algebra::sum(basePool, combinationModelPool).toModelPool();
+
+        if( !addFunctionalityMapping(functionalityMapping,
+                pool, functionality) )
+        {
+            LOG_DEBUG_S << "Failed to add to functionality mapping:"
+                << "functionality: " << functionality.toString()
+                << "combination: " << combinationModelPool.toString(4);
+                combinationModelPool.toString(4);
+        }
+    } while(limitedCombination.next());
 }
 
 ModelPool OrganizationModelAsk::allowSubclasses(const ModelPool& modelPool,
