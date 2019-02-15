@@ -97,6 +97,21 @@ public:
     uint32_t getTransportCapacity(const owlapi::model::IRI& model) const;
 
     /**
+     * Get the available mass capacity for transport
+     */
+    double getTransportMass() const;
+
+    /**
+     * Get the available volume for transport
+     */
+    double getTransportVolume() const;
+
+    /**
+     * Get the available surface area for transport
+     */
+    double getLoadArea() const;
+
+    /**
      * For compatibilty reasons provide supplyDemand: positive value represent
      * an available transport capacity while negative value a transport demand
      */
@@ -156,6 +171,22 @@ public:
     bool isMobile() const;
 
     /**
+     * Return if robot can trail if operating in a composite system
+     * which is overall mobile
+     */
+    bool canTrail() const;
+
+    /**
+     * Return true if robot can manipulate
+     */
+    bool canManipulate() const;
+
+    /**
+     * Return true if robot has a load area
+     */
+    bool hasLoadArea() const;
+
+    /**
      * Get the numeric value for a particular property using a
      * composition function. The default is a weightedSum of the
      * numericProperty value
@@ -190,12 +221,27 @@ private:
     uint32_t mTransportCapacity;
     uint32_t mTransportDemand;
 
+    /// The permitted maximum mass of transport
+    mutable double mTransportMass;
+    mutable double mTransportVolume;
+    /// The available load area volume (for arbitrary components)
+    mutable double mLoadArea;
+
+    mutable std::map<owlapi::model::IRI, double> mProperties;
+
     // Robot cache
     static std::map<ModelPool, Robot> msRobots;
 
     // Active policies
     policies::EnergyProviderPolicy mEnergyProviderPolicy;
     policies::TransportProviderPolicy mTransportProviderPolicy;
+
+    double getLoadAreaSize(const owlapi::model::IRI& agent) const;
+
+    /// Try to identify all encountered manipulators in the system
+    void updateManipulationProperties();
+
+    void updateProperty(const owlapi::model::IRI& iri, double value, bool useMin);
 };
 
 } // end namespace facades

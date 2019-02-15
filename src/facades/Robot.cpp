@@ -25,8 +25,15 @@ const Robot& Robot::getInstance(const ModelPool& modelPool, const OrganizationMo
     {
         return cit->second;
     } else {
-        Robot robot(modelPool, organizationModelAsk);
-        msRobots[modelPool] = robot;
+        if(modelPool.numberOfInstances() == 1)
+        {
+            Robot robot( modelPool.compact().begin()->first,
+                    organizationModelAsk);
+            msRobots[modelPool] = robot;
+        } else {
+            Robot robot(modelPool, organizationModelAsk);
+            msRobots[modelPool] = robot;
+        }
         return msRobots[modelPool];
     }
 }
@@ -52,6 +59,9 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
     , mTransportCapacity(0)
     // A physical item has always a transport demand (here assuming at least 1 standard unit)
     , mTransportDemand(1)
+    , mTransportMass(-1)
+    , mTransportVolume(-1)
+    , mLoadArea(-1)
 {
 
     mModelPool[actorModel] = 1;
@@ -78,6 +88,11 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
     mTransportDemand = getDoubleValueOrDefault(actorModel, vocabulary::Robot::transportDemand(),1.0);
     // get cardinality constraint
     mTransportCapacity = getDoubleValueOrDefault(actorModel, vocabulary::Robot::transportCapacity(),0.0);
+
+    // Custom properties that should be added by domain specific rules
+    mProperties[ vocabulary::OM::resolve("loadAreaSize") ] = getLoadArea();
+
+    updateManipulationProperties();
 }
 
 Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizationModelAsk)
@@ -98,6 +113,9 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
     , mTransportCapacity(0)
     // A physical item has always a transport demand (here assuming at least 1 standard unit)
     , mTransportDemand(1)
+    , mTransportMass(-1)
+    , mTransportVolume(-1)
+    , mLoadArea(-1)
     , mEnergyProviderPolicy(modelPool, organizationModelAsk)
     , mTransportProviderPolicy(modelPool, organizationModelAsk)
 {
@@ -133,6 +151,10 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
     mEnergyCapacity = mPowerSourceCapacity*mSupplyVoltage*3600;
     // Assume there is only a single system transporting
     mTransportCapacity = mTransportCapacity - mModelPool.numberOfInstances() + 1;
+
+    // Custom properties that should be added by domain specific rules
+    mProperties[ vocabulary::OM::resolve("loadAreaSize") ] = getLoadArea();
+    updateManipulationProperties();
 }
 
 
@@ -162,6 +184,112 @@ uint32_t Robot::getTransportCapacity(const owlapi::model::IRI& model) const
 
     }
     return capacity;
+}
+
+double Robot::getTransportMass() const
+{
+    if(mTransportMass < 0)
+    {
+        mTransportMass = 0.0;
+        for(const ModelPool::value_type& v : mModelPool)
+        {
+            const owlapi::model::IRI& actorModel = v.first;
+            size_t modelCount = v.second;
+
+            Robot r = Robot::getInstance(v.first, mOrganizationModelAsk);
+            if(r.isMobile() ||  r.canTrail())
+            {
+                mTransportMass += modelCount*getDoubleValueOrDefault(actorModel,
+                        vocabulary::OM::transportMass(), 0.0);
+            }
+        }
+    }
+    return mTransportMass;
+}
+
+double Robot::getTransportVolume() const
+{
+    if(mTransportVolume < 0)
+    {
+        throw
+            std::runtime_error("organization_model::facades::Robot::getTransportVolume:"
+                    " not implemented");
+    }
+    return mTransportVolume;
+}
+
+
+double Robot::getLoadArea() const
+{
+    if(mLoadArea < 0)
+    {
+        mLoadArea = 0.0;
+        if(mModelPool.numberOfInstances() == 1)
+        {
+            mLoadArea = getLoadAreaSize( mModelPool.compact().begin()->first);
+        } else {
+            double truckAndTrail = 0.0;
+            for(const ModelPool::value_type& v : mModelPool)
+            {
+                const owlapi::model::IRI& actorModel = v.first;
+                size_t modelCount = v.second;
+
+                Robot r = Robot::getInstance(actorModel, mOrganizationModelAsk);
+                if(r.hasLoadArea())
+                {
+                    double loadAreaSurface = getLoadAreaSize(actorModel);
+                    if(r.isMobile() || r.canTrail())
+                    {
+                        truckAndTrail += modelCount*loadAreaSurface;
+                    } else {
+                        mLoadArea = std::max(mLoadArea, modelCount*loadAreaSurface);
+                    }
+                }
+            }
+            mLoadArea  = std::max(truckAndTrail, mLoadArea);
+        }
+    }
+    return mLoadArea;
+}
+
+void Robot::updateManipulationProperties()
+{
+    for(const ModelPool::value_type& v : mModelPool)
+    {
+        const owlapi::model::IRI& actorModel = v.first;
+
+        // Identify manipulators on the system
+        std::map<IRI, std::map<IRI, double> > manipulators = mOrganizationModelAsk.getPropertyValues(actorModel, vocabulary::OM::resolve("Manipulator"));
+
+        for(const std::map<IRI, std::map<IRI, double> >::value_type v : manipulators)
+        {
+            const std::map<IRI, double>& properties = v.second;
+            for(const std::pair<IRI, double>& p : properties)
+            {
+                if(vocabulary::OM::resolve("minPickingHeight") == p.first)
+                {
+                    updateProperty(p.first, p.second, true);
+                } else if(vocabulary::OM::resolve("maxPickingHeight") == p.first)
+                {
+                    updateProperty(p.first, p.second, false);
+                } else if(vocabulary::OM::resolve("maxPayloadMass") == p.first)
+                {
+                    updateProperty(p.first, p.second, false);
+                }
+            }
+        }
+    }
+}
+
+void Robot::updateProperty(const owlapi::model::IRI& iri, double value, bool useMin)
+{
+    double existingValue = mProperties[iri];
+    if(useMin)
+    {
+        mProperties[iri] = std::min(value, existingValue);
+    } else {
+        mProperties[iri] = std::max(value, existingValue);
+    }
 }
 
 int32_t Robot::getTransportSupplyDemand() const
@@ -234,6 +362,33 @@ bool Robot::isMobile() const
     return supporting;
 }
 
+bool Robot::canTrail() const
+{
+    owlapi::model::IRI trail = vocabulary::OM::resolve("Trail");
+    bool supporting = false;
+    if(mModelPool.numberOfInstances() == 1)
+    {
+        supporting = organizationAsk().isSupporting(mModelPool, trail);
+    } else {
+        throw std::runtime_error("organization_model::facades::Robot::canTrail:"
+                " not implemented for composite agents");
+    }
+    return supporting;
+}
+
+bool Robot::canManipulate() const
+{
+    owlapi::model::IRI manipulationProvider = vocabulary::OM::resolve("ManipulationProvider");
+    return organizationAsk().isSupporting(mModelPool, manipulationProvider);
+}
+
+bool Robot::hasLoadArea() const
+{
+    owlapi::model::IRI loadArea = vocabulary::OM::resolve("LoadAreaProvider");
+    bool supporting = organizationAsk().isSupporting(mModelPool, loadArea);
+    return supporting;
+}
+
 double Robot::getDataPropertyValue(const owlapi::model::IRI& property,
         algebra::CompositionFunc cf) const
 {
@@ -251,13 +406,24 @@ double Robot::getDataPropertyValue(const owlapi::model::IRI& property,
 
 double Robot::getPropertyValue(const owlapi::model::IRI& property) const
 {
+    std::map<owlapi::model::IRI, double>::const_iterator cit =
+        mProperties.find(property);
+    if(cit != mProperties.end())
+    {
+        return cit->second;
+    } else {
+        LOG_INFO_S << "Property '" << property << "' not in cache";
+    }
+
     try {
         double value = getDataPropertyValue(property,
             bind(&algebra::CompositionFunction::weightedSum,placeholder::_1,placeholder::_2));
+        mProperties[property] = value;
         return value;
     } catch(const std::runtime_error& e)
     {
         // data property does not exist or value is not set
+        LOG_WARN_S << "Data property '" << property << "' could not be computed  " << e.what();
     }
 
     using namespace owlapi::model;
@@ -275,6 +441,27 @@ double Robot::getPropertyValue(const owlapi::model::IRI& property) const
     throw std::invalid_argument("organization_model::OrganizationModelAsk::getPropertyValue: failed to identify value for '"
             + property.toString() + "' for model pool: " + mModelPool.toString(8));
 
+}
+
+
+double Robot::getLoadAreaSize(const owlapi::model::IRI& agent) const
+{
+    owlapi::model::IRIList loadAreas =
+        organizationAsk().ontology().allRelatedInstances(agent,
+                vocabulary::OM::has(),
+                vocabulary::OM::resolve("LoadArea"));
+
+    double loadAreaSurface = 0.0;;
+    for(const owlapi::model::IRI& loadArea :  loadAreas)
+    {
+        double loadAreaWidth = getDoubleValueOrDefault(loadArea,
+                vocabulary::OM::nominalWidth(), 0.0);
+        double loadAreaLength = getDoubleValueOrDefault(loadArea,
+                vocabulary::OM::nominalLength(), 0.0);
+
+        loadAreaSurface = loadAreaWidth*loadAreaLength;
+    }
+    return loadAreaSurface;
 }
 
 } // end namespace facades
