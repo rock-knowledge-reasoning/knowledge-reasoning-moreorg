@@ -134,6 +134,29 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#LoadArea -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#LoadArea">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MechanicalInterface"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#LoadAreaProvider -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#LoadAreaProvider">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Service"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#LoadArea"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Localization -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Localization">
@@ -365,6 +388,15 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#Trail -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Trail">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Capability"/>
+        <rdfs:comment>The capability to trail permits for instance trailers to follow trucks after being towed</rdfs:comment>
+    </owl:Class>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#TransportProvider -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#TransportProvider">
@@ -411,6 +443,14 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#LoadArea -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#LoadArea">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#LoadArea"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 

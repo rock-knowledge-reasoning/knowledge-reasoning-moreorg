@@ -49,6 +49,12 @@ public:
 
     VOCABULARY_ADD_WORD(transportCapacity);
     VOCABULARY_ADD_WORD(transportDemand);
+    VOCABULARY_ADD_WORD(transportMass);
+    VOCABULARY_ADD_WORD(transportVolume);
+
+    VOCABULARY_ADD_WORD(nominalLength);
+    VOCABULARY_ADD_WORD(nominalWidth);
+    VOCABULARY_ADD_WORD(nominalHeight);
 
     VOCABULARY_ADD_WORD(mass);
 

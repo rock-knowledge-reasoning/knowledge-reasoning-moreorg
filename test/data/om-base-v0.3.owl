@@ -110,46 +110,10 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxLength -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#geometricProperty -->
 
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#maxLength">
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty">
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-        <rdfs:comment>in [m]</rdfs:comment>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#minLength -->
-
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#minLength">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-        <rdfs:comment>in [m]</rdfs:comment>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalLength -->
-
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#nominalLength">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-        <rdfs:comment>in [m]</rdfs:comment>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#powerSourceCapacity -->
-
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#powerSourceCapacity">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#energyProperty"/>
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-        <rdfs:comment>in [Ah]</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -180,6 +144,14 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
     </owl:DatatypeProperty>
     
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#manipulationProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#manipulationProperty">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+        <rdfs:domain rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Actor"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <owl:propertyDisjointWith rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#safetyProperty"/>
+    </owl:DatatypeProperty>
 
     <!-- http://www.rock-robotics.org/2014/01/om-schema#locomotionProperty -->
 
@@ -200,8 +172,60 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
         <rdfs:comment>in [kg]</rdfs:comment>
     </owl:DatatypeProperty>
-    
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#positionalAccuracy -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#positionalAccuracy">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <rdfs:comment>The posititional accuracy (e.g. of a manipulator) in [m]</rdfs:comment>
+    </owl:DatatypeProperty>
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#degreeOfFreedoms -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#degreeOfFreedoms">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+        <rdfs:comment>Degrees of freedom that can be associated with a physical entity</rdfs:comment>
+    </owl:DatatypeProperty>
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#minPickingHeight -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#minPickingHeight">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#manipulationProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <rdfs:comment>Minimum possible picking height (with respect to a robot's base reference frame) in [m]</rdfs:comment>
+    </owl:DatatypeProperty>
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxPickingHeight -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#maxPickingHeight">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#manipulationProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <rdfs:comment>Maximum possible picking height (with respect to a robot's base reference frame) in [m]</rdfs:comment>
+    </owl:DatatypeProperty>
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#suspensionType -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#suspensionType">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#manipulationProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Type of a manipulator's suspension</rdfs:comment>
+    </owl:DatatypeProperty>
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxPayloadMass -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#maxPayloadMass">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#manipulationProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <rdfs:comment>Maximum mass of a payload that can be manipulation in [kg]</rdfs:comment>
+    </owl:DatatypeProperty>
 
     <!-- http://www.rock-robotics.org/2014/01/om-schema#maxAcceleration -->
 
@@ -228,7 +252,18 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
     <!-- http://www.rock-robotics.org/2014/01/om-schema#maxHeight -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#maxHeight">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <rdfs:comment>in [m]</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#maxLength -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#maxLength">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
         <rdfs:comment>in [m]</rdfs:comment>
@@ -250,7 +285,7 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
     <!-- http://www.rock-robotics.org/2014/01/om-schema#maxWidth -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#maxWidth">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
         <rdfs:comment>in [m]</rdfs:comment>
@@ -272,7 +307,18 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
     <!-- http://www.rock-robotics.org/2014/01/om-schema#minHeight -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#minHeight">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <rdfs:comment>in [m]</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#minLength -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#minLength">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
         <rdfs:comment>in [m]</rdfs:comment>
@@ -294,7 +340,7 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
     <!-- http://www.rock-robotics.org/2014/01/om-schema#minWidth -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#minWidth">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
         <rdfs:comment>in [m]</rdfs:comment>
@@ -315,7 +361,18 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
     <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalHeight -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#nominalHeight">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <rdfs:comment>in [m]</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalLength -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#nominalLength">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
         <rdfs:comment>in [m]</rdfs:comment>
@@ -348,7 +405,7 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
     <!-- http://www.rock-robotics.org/2014/01/om-schema#nominalWidth -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#nominalWidth">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
         <rdfs:comment>in [m]</rdfs:comment>
@@ -361,6 +418,17 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty">
         <rdfs:domain rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Actor"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#powerSourceCapacity -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#powerSourceCapacity">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#energyProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <rdfs:comment>in [Ah]</rdfs:comment>
     </owl:DatatypeProperty>
     
 
