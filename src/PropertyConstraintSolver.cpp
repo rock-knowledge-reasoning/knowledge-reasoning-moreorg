@@ -58,7 +58,7 @@ ValueBound PropertyConstraintSolver::merge(const PropertyConstraint::Set& constr
             case PropertyConstraint::GREATER_EQUAL:
                 Gecode::rel(propertyConstraintSolver, var, Gecode::FRT_GQ, value);
                 break;
-            case PropertyConstraint::GREATER_THEN:
+            case PropertyConstraint::GREATER_THAN:
                 Gecode::rel(propertyConstraintSolver, var, Gecode::FRT_GR, value);
                 break;
             default:
@@ -112,8 +112,9 @@ Fulfillment PropertyConstraintSolver::fulfills(const facades::Robot& robot,
     PropertyConstraint::Set conflicts;
     for(const PropertyConstraint& constraint : constraints)
     {
-        Gecode::FloatVar& var = propertyConstraintSolver.getVariable(constraint.getProperty());
-        double value = constraint.getValue(robot);
+        Gecode::FloatVar& var = propertyConstraintSolver.getVariable(robot, constraint.getProperty());
+
+        double value = constraint.getReferenceValue(robot);
         switch(constraint.getType())
         {
             case PropertyConstraint::EQUAL:
@@ -128,7 +129,7 @@ Fulfillment PropertyConstraintSolver::fulfills(const facades::Robot& robot,
             case PropertyConstraint::GREATER_EQUAL:
                 Gecode::rel(propertyConstraintSolver, var, Gecode::FRT_GQ, value);
                 break;
-            case PropertyConstraint::GREATER_THEN:
+            case PropertyConstraint::GREATER_THAN:
                 Gecode::rel(propertyConstraintSolver, var, Gecode::FRT_GR, value);
                 break;
             default:
@@ -151,6 +152,19 @@ Gecode::FloatVar& PropertyConstraintSolver::getVariable(const owlapi::model::IRI
     if(it == mValues.end())
     {
         mValues[property] = Gecode::FloatVar(*this, Gecode::Float::Limits::min, Gecode::Float::Limits::max);
+        return mValues[property];
+    }
+    return it->second;
+}
+
+Gecode::FloatVar& PropertyConstraintSolver::getVariable(const facades::Robot& robot, const owlapi::model::IRI& property)
+{
+    std::map<owlapi::model::IRI, Gecode::FloatVar>::iterator it = mValues.find(property);
+    if(it == mValues.end())
+    {
+        double value = robot.getPropertyValue(property);
+        mValues[property] = Gecode::FloatVar(*this, value, value);
+
         return mValues[property];
     }
     return it->second;

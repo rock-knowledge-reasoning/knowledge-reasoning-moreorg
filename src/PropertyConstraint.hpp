@@ -38,7 +38,7 @@ public:
         // >=
         GREATER_EQUAL,
         // >
-        GREATER_THEN,
+        GREATER_THAN,
         // end marker for iterators
         CONSTRAINT_TYPE_END
     };
@@ -89,13 +89,25 @@ public:
     /**
      * Dynamically retrieve a valueProperty with respect to a robot (maybe composite system);
      */
-    double getValue(const facades::Robot& robot) const;
+    double getReferenceValue(const facades::Robot& robot) const;
 
     /**
      * Stringify this object
      * \return string representing this PropertyConstraint
      */
     std::string toString() const;
+
+    /**
+     * Stringify list of objects
+     * \return string representing list of property constraints
+     */
+    static std::string toString(const PropertyConstraint::List& list, size_t indent);
+
+    /**
+     * Stringify list of objects
+     * \return string representing set of property constraints
+     */
+    static std::string toString(const PropertyConstraint::Set& set, size_t indent);
 
     /**
      * Cluster the set of constraints, based on the referred property
@@ -116,6 +128,8 @@ public:
      * \return True, if current object is less compared to other
      */
     bool operator<(const PropertyConstraint& other) const;
+
+    bool usesPropertyReference() const { return !mRValProperty.empty(); }
 
 private:
     ConstraintType mType;

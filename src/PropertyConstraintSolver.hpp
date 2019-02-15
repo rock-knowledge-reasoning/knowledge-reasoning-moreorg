@@ -43,7 +43,7 @@ public:
     virtual Gecode::Space* copy(void);
 
     /**
-     * Merge a list of constraints a returns the corresponding allowed value bound
+     * Merge a list of constraints and returns the corresponding allowed value bound
      * \return ValueBound The allowed value range
      * \throws std::invalid_argument when constraints cannot be fulfilled
      */
@@ -78,7 +78,12 @@ protected:
      * Get the variable that maps to a particular property
      * \return variable
      */
-    Gecode::FloatVar& getVariable(const owlapi::model::IRI& property);
+    Gecode::FloatVar& getVariable( const owlapi::model::IRI& property);
+
+    /**
+     * Get the float variable bound to a particular robot's property value
+     */
+    Gecode::FloatVar& getVariable(const facades::Robot& robot, const owlapi::model::IRI& property);
 
 };
 

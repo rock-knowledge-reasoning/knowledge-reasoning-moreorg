@@ -11,7 +11,7 @@ std::map<PropertyConstraint::ConstraintType, std::string> PropertyConstraint::Ty
     {PropertyConstraint::LESS_THAN, "<"},
     {PropertyConstraint::LESS_EQUAL, "<="},
     {PropertyConstraint::GREATER_EQUAL, ">="},
-    {PropertyConstraint::GREATER_THEN, ">"},
+    {PropertyConstraint::GREATER_THAN, ">"},
     {CONSTRAINT_TYPE_END, "ConstraintTypeEnd"}
     }
     ;
@@ -51,6 +51,23 @@ std::string PropertyConstraint::toString() const
         ss << mDataProperty.toString() << " " << TypeTxt[mType] << " " << mValue;
     }
     return ss.str();
+}
+
+std::string PropertyConstraint::toString(const PropertyConstraint::List& list, size_t indent)
+{
+    std::string hspace(indent,' ');
+    std::stringstream ss;
+    for(const PropertyConstraint& pc : list)
+    {
+        ss << pc.toString() << std::endl;
+    }
+    return ss.str();
+}
+
+std::string PropertyConstraint::toString(const PropertyConstraint::Set& set, size_t indent)
+{
+    PropertyConstraint::List list(set.begin(), set.end());
+    return toString(list, indent);
 }
 
 bool PropertyConstraint::operator==(const PropertyConstraint& other) const
@@ -97,9 +114,13 @@ PropertyConstraint::Clusters PropertyConstraint::getClusters(const PropertyConst
     return clustered;
 }
 
-double PropertyConstraint::getValue(const facades::Robot& robot) const
+double PropertyConstraint::getReferenceValue(const facades::Robot& robot) const
 {
-    return robot.getPropertyValue(mRValProperty);
+    if(usesPropertyReference())
+    {
+        return robot.getPropertyValue(mRValProperty);
+    }
+    return mValue;
 }
 
 } // end namespace organization_model

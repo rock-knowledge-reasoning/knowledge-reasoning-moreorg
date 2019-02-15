@@ -1,0 +1,105 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://www.rock-robotics.org/2015/12/robots/SherpaTT#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix om-schema: <http://www.rock-robotics.org/2014/01/om-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix om-base: <http://www.rock-robotics.org/2014/01/om-base#> .
+
+om-schema:SherpaTT
+    om-schema:has :LoadArea_15x15 ;
+    om-schema:mass 160.0 ;
+    om-schema:maxAcceleration 0.1 ;
+    om-schema:maxHeight 3.5 ;
+    om-schema:maxLength 2.5 ;
+    om-schema:maxVelocity 1.0 ;
+    om-schema:maxWidth 2.5 ;
+    om-schema:minAcceleration -0.1 ;
+    om-schema:minHeight 1.5 ;
+    om-schema:minLength 2.0 ;
+    om-schema:minVelocity 0.0 ;
+    om-schema:minWidth 2.0 ;
+    om-schema:nominalAcceleration 0.0 ;
+    om-schema:nominalHeight 2.0 ;
+    om-schema:nominalLength 2.0 ;
+    om-schema:nominalPowerConsumption 120 ;
+    om-schema:nominalVelocity 0.5 ;
+    om-schema:nominalWidth 2.0 ;
+    om-schema:powerSourceCapacity 10.0 ;
+    om-schema:probabilityOfFailure 0.5 ;
+    om-schema:supplyVoltage 48.0 ;
+    om-schema:transportCapacity 10.0 ;
+    om-schema:transportDemand 1.0 ;
+    a om-schema:SherpaTT, owl:Class, owl:NamedIndividual ;
+    rdfs:subClassOf om-schema:Actor, [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "2"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:EmiActive ;
+        owl:onProperty om-schema:has
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:Manipulation ;
+        owl:onProperty om-schema:has
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:PowerSource ;
+        owl:onProperty om-schema:has
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:Manipulator ;
+        owl:onProperty om-schema:has
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:Localization ;
+        owl:onProperty om-schema:has
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:ForceTorqueSensor ;
+        owl:onProperty om-schema:has
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:Mapping ;
+        owl:onProperty om-schema:has
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:Locomotion ;
+        owl:onProperty om-schema:has
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "2"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:Camera ;
+        owl:onProperty om-schema:has
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "4"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:EmiPassive ;
+        owl:onProperty om-schema:has
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "10"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:Actor ;
+        owl:onProperty om-schema:hasTransportCapacity
+    ], [
+        a owl:Restriction ;
+        owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onClass om-schema:LoadAreaProvider ;
+        owl:onProperty om-schema:has
+    ] .
+
+:LoadArea_15x15
+    om-schema:nominalLength 0.15 ;
+    om-schema:nominalWidth 0.15 ;
+    a om-schema:LoadArea, owl:NamedIndividual .
+
+
+<http://www.rock-robotics.org/2015/12/robots/SherpaTT>
+    a owl:Ontology ;
+    owl:imports <http://www.rock-robotics.org/2014/01/om-schema> .
+
