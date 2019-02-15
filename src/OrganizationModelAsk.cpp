@@ -1272,4 +1272,31 @@ ModelPool::List OrganizationModelAsk::findFeasibleCoalitionStructure(const Model
     return coalitionStructure;
 }
 
+std::map< owlapi::model::IRI, std::map<owlapi::model::IRI, double> > OrganizationModelAsk::getPropertyValues(const
+        owlapi::model::IRI& agent,
+        const owlapi::model::IRI& componentKlass,
+        const owlapi::model::IRI& relation) const
+{
+
+    std::map< IRI, std::map<IRI, double> > propertyValues;
+
+    IRIList instances = mOntologyAsk.allRelatedInstances(agent, relation, componentKlass);
+    for(const IRI& instance : instances)
+    {
+        IRISet relatedDataProperties = mOntologyAsk.getRelatedDataProperties(instance);
+        for(const IRI& dataProperty : relatedDataProperties)
+        {
+            try {
+                OWLLiteral::Ptr literal = mOntologyAsk.getDataValue(instance, dataProperty);
+                double value = literal->getDouble();
+                propertyValues[instance][dataProperty] = value;
+            } catch(const std::exception& e)
+            {
+                LOG_INFO_S << "No numeric data property '" << dataProperty << "' found on instance '" << instance
+                    << "' for agent model '" <<  agent << " -- " << e.what();
+            }
+        }
+    }
+    return propertyValues;
+}
 } // end namespace organization_model

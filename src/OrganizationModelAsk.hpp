@@ -385,6 +385,17 @@ public:
             const Resource::Set& supportedResourceSet,
             double feasibilityCheckTimeoutInMs);
 
+    /**
+      * Get all property values describing a component a an agent model
+      * \return object properties map by the property path, where the key is
+      * [instance,dataProperty]
+      */
+    std::map< owlapi::model::IRI, std::map<owlapi::model::IRI, double> > getPropertyValues(const
+            owlapi::model::IRI& agent,
+            const owlapi::model::IRI& componentKlass,
+            const owlapi::model::IRI& relation =
+            vocabulary::OM::has()) const;
+
 protected:
 
     /**
