@@ -27,6 +27,7 @@ public:
             const PropertyConstraint::Set& propertyConstraints);
 
     bool operator<(const Resource& other) const;
+    bool operator==(const Resource& other) const;
 
     const owlapi::model::IRI& getModel() const { return mModel; }
 

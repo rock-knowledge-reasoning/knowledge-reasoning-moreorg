@@ -69,7 +69,41 @@ BOOST_AUTO_TEST_CASE(merge_single_set)
     a1.addPropertyConstraint(pcA1);
 
     Resource::Set resources = { a0, a1 };
-    Resource::Set resource = Resource::merge(resources);
+    Resource::Set mergedResources = Resource::merge(resources);
+    BOOST_REQUIRE_MESSAGE(mergedResources.size() == 1, "Merged resources of size"
+            " 1");
+
+    PropertyConstraint::Set constraints = mergedResources.begin()->getPropertyConstraints();
+    BOOST_REQUIRE_MESSAGE(constraints.size() == 2, "There should be two"
+            "constraints, was " << constraints.size());
+    PropertyConstraint::Set expectedConstraints = { pcA1, pcA0 };
+    BOOST_REQUIRE_MESSAGE(constraints == expectedConstraints, "Property constraint should equal "
+            << PropertyConstraint::toString(expectedConstraints, 4)
+            << " was "
+            << PropertyConstraint::toString(constraints, 4));
+}
+
+BOOST_AUTO_TEST_CASE(merge_single_resource)
+{
+    owlapi::model::IRI modelA("http://test/a");
+    owlapi::model::IRI propertyA("http://test/propertyA");
+
+    Resource a0(modelA);
+
+    Resource a1(modelA);
+    PropertyConstraint pcA1(propertyA, PropertyConstraint::GREATER_EQUAL, 4);
+    a1.addPropertyConstraint(pcA1);
+
+    Resource::Set resources = { a0, a1 };
+    Resource::Set mergedResources = Resource::merge(resources);
+    BOOST_REQUIRE_MESSAGE(mergedResources.size() == 1, "There should be only"
+            " one resource");
+
+    PropertyConstraint::Set constraints = mergedResources.begin()->getPropertyConstraints();
+    BOOST_REQUIRE_MESSAGE(constraints.size() == 1, "There should be one constraint");
+    PropertyConstraint constraint = *constraints.begin();
+    BOOST_REQUIRE_MESSAGE(constraint == pcA1, "Property constraint should equal "
+            << pcA1.toString() << ", was " << constraint.toString());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

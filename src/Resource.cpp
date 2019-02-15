@@ -42,6 +42,11 @@ bool Resource::operator<(const Resource& other) const
     return false;
 }
 
+bool Resource::operator==(const Resource& other) const
+{
+    return mModel == other.mModel && mPropertyConstraints == other.mPropertyConstraints;
+}
+
 Resource::Set Resource::toResourceSet(const owlapi::model::IRIList& models)
 {
     Resource::Set resources;
@@ -123,13 +128,7 @@ std::string Resource::toString(const Resource::Set& resources, size_t indent)
 
 void Resource::merge(const Resource& other)
 {
-    if(mModel != other.mModel)
-    {
-        throw std::invalid_argument("organization_model::Resource::merge: cannot merge resources: "
-                " model are different: '" + mModel.toString() + "' and '" + other.mModel.toString());
-    }
-
-    addPropertyConstraints(other.getPropertyConstraints());
+    *this = merge(*this, other);
 }
 
 Resource Resource::merge(const Resource& a, const Resource& b)
@@ -137,7 +136,7 @@ Resource Resource::merge(const Resource& a, const Resource& b)
     if(a.mModel != b.mModel)
     {
         throw std::invalid_argument("organization_model::Resource::merge: cannot merge resources: "
-                " model are different: '" + a.mModel.toString() + "' and '" + b.mModel.toString());
+                " models are different: '" + a.mModel.toString() + "' and '" + b.mModel.toString());
     }
 
     Resource resource = a;
@@ -145,36 +144,27 @@ Resource Resource::merge(const Resource& a, const Resource& b)
     return resource;
 }
 
-Resource::Set Resource::merge(const Resource::Set& resources)
+Resource::Set Resource::merge(const Resource::Set& _resources)
 {
-    Resource::Set mergedResources;
-    Resource::Set remainingResources = resources;
+    Resource::List resources(_resources.begin(), _resources.end());
 
-    Resource::Set::const_iterator ait = remainingResources.begin();
-    // Using std::distance function here, to make sure to stop for loop,
-    // when second last, or last element have been hit
-    // (last one can happen due to erase operation in the for loop
-    for(; std::distance(ait,remainingResources.end()) > 1; ++ait)
+    for(size_t a = 0; a < resources.size(); ++a)
     {
-        Resource a = *ait;
-
-        Resource::Set::iterator bit;
-        for(bit = std::next(ait,1); bit != remainingResources.end();)
+        Resource& resourceA = resources[a];
+        for(size_t b = a+1; b < resources.size();)
         {
-            const Resource& b = *bit;
+            const Resource& resourceB = resources[b];
 
-            if(a.mModel == b.mModel)
+            if(resourceA.mModel == resourceB.mModel)
             {
-                a.merge(b);
-                remainingResources.erase(bit++);
-            } else
-            {
-                ++bit;
+                resourceA.merge(resourceB);
+                resources.erase(resources.begin() + b);
+            } else {
+                ++b;
             }
         }
-        mergedResources.insert(a);
     }
-    return remainingResources;
+    return Resource::Set(resources.begin(), resources.end());
 }
 
 Resource::Set Resource::merge(const Resource::Set& resourcesA, const Resource::Set& resourcesB)
