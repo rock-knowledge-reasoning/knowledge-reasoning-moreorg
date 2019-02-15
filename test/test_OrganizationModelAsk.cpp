@@ -14,13 +14,14 @@ using namespace organization_model;
 using namespace organization_model::reasoning;
 using namespace organization_model::vocabulary;
 
+using namespace owlapi::vocabulary;
+using namespace owlapi::model;
+
+
 BOOST_AUTO_TEST_SUITE(organization_model_ask)
 
 BOOST_AUTO_TEST_CASE(supported_functionalities)
 {
-    using namespace owlapi::vocabulary;
-    using namespace owlapi::model;
-
     OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
     IRI sherpa = OM::resolve("Sherpa");
     ModelPool modelPool;
@@ -28,6 +29,12 @@ BOOST_AUTO_TEST_CASE(supported_functionalities)
 
     OrganizationModelAsk ask(om, modelPool, true);
     BOOST_TEST_MESSAGE("Supported functionalities by " << sherpa << ": " <<  ask.getSupportedFunctionalities().toString() );
+
+    Resource::Set resources;
+    resources.insert( { Resource(vocabulary::OM::resolve("MoveTo")) });
+
+    BOOST_REQUIRE_MESSAGE(ask.isSupporting(modelPool, resources),
+            "Sherpa supports 'MoveTo'");
 }
 
 BOOST_AUTO_TEST_CASE(recursive_resolution)
@@ -230,7 +237,9 @@ BOOST_AUTO_TEST_CASE(functional_saturation)
         functionalitySet.insert(functionality);
 
         ModelPool::Set combinations = ask.getBoundedResourceSupport(functionalitySet);
-        BOOST_REQUIRE_MESSAGE(!combinations.empty(), "Bounded resource support for: " << stereoImageProvider.toString() << " by '" << ModelPool::toString(combinations) << "'");
+        BOOST_REQUIRE_MESSAGE(combinations.empty(), "Bounded resource support"
+                " for: " << stereoImageProvider.toString() << " by '"
+                << ModelPool::toString(combinations) << "' is not given ");
 
         BOOST_REQUIRE_MESSAGE(ask.isMinimal(modelPool, functionalitySet), "ModelPool " << modelPool.toString() << " is minimal");
 

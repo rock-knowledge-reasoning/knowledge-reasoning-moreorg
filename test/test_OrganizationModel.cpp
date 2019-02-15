@@ -93,7 +93,9 @@ BOOST_AUTO_TEST_CASE(resource_support)
         functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
 
         ModelPool::Set combinations = ask.getResourceSupport(functionalities);
-        BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, but were " << combinations.size()
+        BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations of "
+                << items.toString(4)
+                << " that support stereo image provider, but were " << combinations.size()
                 << " "
                 << ModelPool::toString(combinations) );
     }
@@ -109,7 +111,9 @@ BOOST_AUTO_TEST_CASE(resource_support)
             functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
 
             ModelPool::Set combinations = ask.getResourceSupport(functionalities);
-            BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations that support stereo image provider, but were " << combinations.size()
+            BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations "
+                    << items.toString(4)
+                    << " that support stereo image provider, but were " << combinations.size()
                     << " "
                     << ModelPool::toString(combinations) );
         }
