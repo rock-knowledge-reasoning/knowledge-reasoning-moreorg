@@ -131,7 +131,7 @@ public:
      * Get the set of resources that should support a given union of services,
      * bounded by the FunctionalSaturationBound, i.e., the minimum combination
      * of resources that support the given union of services
-     * \return bound set of combinations
+     * \return bound set of feasible combinations
      */
     ModelPool::Set getBoundedResourceSupport(const Resource::Set& resources) const;
 
