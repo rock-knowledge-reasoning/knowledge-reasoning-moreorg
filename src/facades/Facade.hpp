@@ -21,7 +21,7 @@ public:
      */
     double getDoubleValueOrDefault(const owlapi::model::IRI& agentModel,
             const owlapi::model::IRI& propertyName,
-            double defaultValue);
+            double defaultValue) const;
 
 protected:
     Facade();

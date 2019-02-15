@@ -15,7 +15,7 @@ Facade::~Facade()
 {}
 
 double Facade::getDoubleValueOrDefault(const owlapi::model::IRI& agentModel, const
-        owlapi::model::IRI& propertyName, double defaultValue)
+        owlapi::model::IRI& propertyName, double defaultValue) const
 {
     double value;
     try {
