@@ -487,6 +487,12 @@ protected:
             const owlapi::model::IRI& functionality,
             size_t maxAddedInstances) const;
 
+    /**
+      * Get the interface base class that is used for performing
+      * feasibility checking
+      */
+    const owlapi::model::IRI& getInterfaceBaseClass() const { return mInterfaceBaseClass; }
+
 private:
     OrganizationModel::Ptr mpOrganizationModel;
     owlapi::model::OWLOntologyAsk mOntologyAsk;
