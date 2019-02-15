@@ -351,14 +351,30 @@ void Connectivity::applyCompatibilityConstraints(Gecode::IntVarArray& connection
                         LOG_DEBUG_S << "Same agents that shall be connected";
                         // no connection possible within the same agent
                         rel(*this, v, Gecode::IRT_EQ, 0);
-                    } else if( mAsk.isRelatedTo(interfaceModel0, vocabulary::OM::compatibleWith(), interfaceModel1))
-                    {
-                        LOG_DEBUG_S << interfaceModel0.toString() << " isCompatibleWith " << interfaceModel1.toString();
-                        rel(*this, v, Gecode::IRT_LQ,1);
                     } else {
-                        // no connection possible between these two models
-                        LOG_DEBUG_S << interfaceModel0.toString() << " isNotCompatibleWith " << interfaceModel1.toString();
-                        rel(*this, v, Gecode::IRT_EQ, 0);
+                        bool hasRelation = false;
+                        try {
+                            hasRelation = mAsk.isRelatedTo(interfaceModel0,
+                                    vocabulary::OM::compatibleWith(),
+                                    interfaceModel1);
+                        } catch(const std::invalid_argument& e)
+                        {
+                            LOG_INFO_S << "No relation found between " <<
+                                interfaceModel0 << " and " << interfaceModel1 <<
+                                " -- " << e.what();
+                            // seems there is not even an individual for this
+                            // interface type
+                        }
+
+                        if(hasRelation)
+                        {
+                            LOG_DEBUG_S << interfaceModel0.toString() << " isCompatibleWith " << interfaceModel1.toString();
+                            rel(*this, v, Gecode::IRT_LQ,1);
+                        } else {
+                            // no connection possible between these two models
+                            LOG_DEBUG_S << interfaceModel0.toString() << " isNotCompatibleWith " << interfaceModel1.toString();
+                            rel(*this, v, Gecode::IRT_EQ, 0);
+                        }
                     }
                 }
             }
