@@ -1224,6 +1224,11 @@ ModelPool::List OrganizationModelAsk::findFeasibleCoalitionStructure(const Model
         double feasibilityCheckTimeoutInMs
         )
 {
+    std::pair<ModelPool::List, bool> result = mpOrganizationModel->mQueryCache.getCachedResult(modelPool, resourceSet);
+    if(result.second)
+    {
+        return result.first;
+    }
 
     AtomicAgent::List agents = AtomicAgent::toList(modelPool);
     utils::CoalitionStructureGeneration csg(agents,
@@ -1261,8 +1266,9 @@ ModelPool::List OrganizationModelAsk::findFeasibleCoalitionStructure(const Model
         {
             coalitionStructure.push_back( AtomicAgent::getModelPool(agents) );
         }
-        return coalitionStructure;
     }
+
+    mpOrganizationModel->mQueryCache.cacheResult(modelPool, resourceSet, coalitionStructure);
     return coalitionStructure;
 }
 

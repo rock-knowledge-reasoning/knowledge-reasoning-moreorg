@@ -31,6 +31,30 @@ void QueryCache::cacheResult(const ModelPool& modelPool,
     mQueryResults.emplace(query, list);
 }
 
+std::pair<ModelPool::List, bool> QueryCache::getCachedResult(const ModelPool& modelPool,
+        const Resource::Set& r) const
+{
+    std::pair<ModelPool::List, bool> result;
+    CoalitionStructureQuery query = std::make_tuple(modelPool, r);
+    CSQueryResults::const_iterator cit = mCSQueryResults.find(query);
+    if(cit == mCSQueryResults.end())
+    {
+        result.second = false;
+    } else {
+        result.first = cit->second;
+        result.second = true;
+    }
+    return result;
+}
+
+void QueryCache::cacheResult(const ModelPool& modelPool,
+        const Resource::Set& r,
+        const ModelPool::List& list)
+{
+    CoalitionStructureQuery query = std::make_tuple(modelPool, r);
+    mCSQueryResults.emplace(query, list);
+}
+
 } // end namespace organization_model
 
 

@@ -7,6 +7,7 @@
 #include <boost/functional/hash.hpp>
 #include <owlapi/OWLApi.hpp>
 #include "ModelPool.hpp"
+#include "Resource.hpp"
 
 namespace std {
 using namespace owlapi::model;
@@ -29,6 +30,25 @@ struct hash< tuple<ModelPool, IRI, OWLCardinalityRestriction::OperationType, boo
         return seed;
     }
 };
+
+template<>
+struct hash< tuple<ModelPool, Resource::Set> >
+{
+    size_t operator()(const tuple<ModelPool, Resource::Set>& tpl) const
+    {
+        size_t seed = 0;
+        for(const ModelPool::value_type& v : get<0>(tpl))
+        {
+            boost::hash_combine(seed, v.first.toString());
+            boost::hash_combine(seed, v.second);
+        }
+        for(const Resource& r : get<1>(tpl))
+        {
+            boost::hash_combine(seed, r.getModel().toString());
+        }
+        return seed;
+    }
+};
 } // end namespace std
 
 namespace organization_model {
@@ -40,7 +60,13 @@ public:
         owlapi::model::OWLCardinalityRestriction::OperationType,
         bool> CRQuery;
 
+    typedef std::tuple<ModelPool, Resource::Set> CoalitionStructureQuery;
+
+
+    /// Cardinality Restriction Query Results
     typedef std::unordered_map< CRQuery, owlapi::model::OWLCardinalityRestriction::PtrList> CRQueryResults;
+    /// Coalition Structure Query Results
+    typedef std::unordered_map< CoalitionStructureQuery, ModelPool::List> CSQueryResults;
 
     std::pair<owlapi::model::OWLCardinalityRestriction::PtrList, bool> getCachedResult(const ModelPool& modelPool,
         const owlapi::model::IRI& objectProperty,
@@ -53,9 +79,16 @@ public:
         bool max2Min,
         const owlapi::model::OWLCardinalityRestriction::PtrList& list);
 
+    std::pair<ModelPool::List, bool> getCachedResult(const ModelPool& modelPool,
+            const Resource::Set& r) const;
+
+    void cacheResult(const ModelPool& modelPool,
+            const Resource::Set& r,
+            const ModelPool::List& list);
 protected:
     // From propery key
     CRQueryResults mQueryResults;
+    CSQueryResults mCSQueryResults;
 };
 
 } // end namespace organization_model
