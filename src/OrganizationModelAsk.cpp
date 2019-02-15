@@ -814,7 +814,8 @@ ModelPool::Set OrganizationModelAsk::getIntersection(const Resource::Set& functi
                 << mFunctionalityMapping.toString(4);
 
             throw std::runtime_error("organization_model::OrganizationModelAsk::isSupporting"
-                    " could not find functionality '" + functionality.getModel().toString() + "'");
+                    " could not find functionality '" +
+                    functionality.getModel().toString() + "' -- " + e.what());
         }
     }
     return previousModelPools;
@@ -976,7 +977,6 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std:
         labels = filterLabels;
     }
 
-    LOG_DEBUG_S << "Use labels: " << labels;
     vector = base::VectorXd::Zero(labels.size());
 
     std::vector<IRI>::const_iterator cit = labels.begin();
@@ -985,28 +985,31 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std:
     {
         const IRI& dimensionLabel = *cit;
         std::map<IRI, OWLCardinalityRestriction::MinMax>::const_iterator mit = modelBounds.begin();
+        bool supportFound = false;
         for(; mit != modelBounds.end(); ++mit)
         {
             const IRI& modelDimensionLabel = mit->first;
-            LOG_DEBUG_S << "Check model support for " << dimensionLabel << "  from " << modelDimensionLabel;
-
             // Sum the requirement/availability of this model type
             if(dimensionLabel == modelDimensionLabel || mOntologyAsk.isSubClassOf(modelDimensionLabel, dimensionLabel))
             {
                 if(useMaxCardinality)
                 {
-                    LOG_DEBUG_S << "update " << dimension << " with " << mit->second.second << " -- min is "<< mit->second.first;
                     // using max value
                     vector(dimension) += mit->second.second;
+                    supportFound = true;
                 } else {
                     // using min value
-                    LOG_DEBUG_S << "update " << dimension << " with min " << mit->second.first << " -- max is "<< mit->second.second;
                     vector(dimension) += mit->second.first;
+                    supportFound = true;
                 }
-            } else {
-                LOG_DEBUG_S << "No support";
-                // nothing to do
             }
+        }
+        if(supportFound)
+        {
+            LOG_INFO_S << "Found support for model: " << dimensionLabel
+                << " with cardinality '" << vector(dimension) << "'";
+        } else {
+            LOG_INFO_S << "Found no support for model: " << dimensionLabel;
         }
         ++dimension;
     }
@@ -1038,7 +1041,7 @@ std::vector<double> OrganizationModelAsk::getScalingFactors(const ModelPool::Set
         try {
             double scalingFactor = getScalingFactor(pool, resource, doCheckSupport);
             updateScalingFactor(scalingFactors, index, scalingFactor);
-        } catch(const std::runtime_error& e)
+        } catch(const std::exception& e)
         {
             // Model pool is not supported
             updateScalingFactor(scalingFactors, index, 0);
@@ -1101,7 +1104,7 @@ double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool,
             if(minScalingFactor*value > vb.getMax())
             {
                 throw
-                    std::runtime_error("Min scaling factor exceeds the allows"
+                    std::runtime_error("Min scaling factor exceeds the allowed"
                             "maximum value");
             }
 
@@ -1118,12 +1121,11 @@ double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool,
             {
                 maxScalingFactor = minScalingFactor;
             }
-        } catch(const std::runtime_error& e)
+        } catch(const std::exception& e)
         {
             throw std::invalid_argument("organization_model::getScalingFactor: functional requirement cannot be fulfilled by this model pool: " + modelPool.toString(12) + " - " + e.what());
         }
     }
-
     return minScalingFactor;
 }
 
