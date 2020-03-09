@@ -211,28 +211,45 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
         }
 
         numeric::LimitedCombination<owlapi::model::IRI> limitedCombination(boundedModelPool, numberOfAtoms, numeric::MAX);
+        size_t count = 0;
         do {
             IRIList combination = limitedCombination.current();
             ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
 
+            LOG_WARN_S << "CHECK COMBINATION: " << count++ << std::endl
+                << combinationModelPool.toString(4);
+            base::Time start = base::Time::now();
+            bool isFeasiblePool = isFeasible(combinationModelPool);
+
+            base::Time end = base::Time::now();
+            if(isFeasiblePool)
+            {
+                LOG_WARN_S << "Is feasible: " << (end-start).toSeconds();
+            } else {
+                LOG_WARN_S << "Is not feasible" << (end-start).toSeconds();
+            }
+
             // identify the potential additions
             ModelPool explorePool;
-            // Handle a bound that represents only structurally infeasible systems
-            if(!combinationModelPool.isNull() && !isFeasible(combinationModelPool))
+            if(mStructuralNeighbourhood > 0)
             {
-                for(const ModelPool::value_type v :  mModelPool)
+                // Handle a bound that represents only structurally infeasible systems
+                if(!combinationModelPool.isNull() && !isFeasible(combinationModelPool))
                 {
-                    size_t currentModelCardinality = boundedModelPool[v.first];
-                    if( currentModelCardinality == 0 && v.second > 0)
+                    for(const ModelPool::value_type v :  mModelPool)
                     {
-                        explorePool[v.first] = v.second;
-                    } else {
-                        // check for types that are funtionally bounded
-                        // (but can still contribute structurally)
-                        size_t remaining = v.second - currentModelCardinality;
-                        if(remaining > 0)
+                        size_t currentModelCardinality = boundedModelPool[v.first];
+                        if( currentModelCardinality == 0 && v.second > 0)
                         {
-                            explorePool[v.first] = remaining;
+                            explorePool[v.first] = v.second;
+                        } else {
+                            // check for types that are funtionally bounded
+                            // (but can still contribute structurally)
+                            size_t remaining = v.second - currentModelCardinality;
+                            if(remaining > 0)
+                            {
+                                explorePool[v.first] = remaining;
+                            }
                         }
                     }
                 }
@@ -1163,15 +1180,18 @@ void OrganizationModelAsk::exploreNeighbourhood(FunctionalityMapping& functional
         // additional components to achieve functionality (when structurally
         // inconsistent)
         numberOfAtoms = maxAddedInstances;
-    } else if(numberOfAtoms == 0)
+    }
+
+    if(numberOfAtoms == 0 || maxAddedInstances == 0)
     {
         // just check the provided base pool
         if( !addFunctionalityMapping(functionalityMapping,
                 basePool, functionality) )
         {
-            LOG_DEBUG_S << "Failed to add to functionality mapping:"
-                << "functionality: " << functionality.toString()
-                << "combination: " << basePool.toString(4);
+            LOG_DEBUG_S << "Failed to add to functionality mapping:" << std::endl
+                << " functionality: " << functionality.toString() << std::endl
+                << "combination: " << basePool.toString(4) << std::endl
+                << "neighbourhoodsize: " << maxAddedInstances << std::endl;
         }
         return;
     }

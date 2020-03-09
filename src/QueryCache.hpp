@@ -85,6 +85,8 @@ public:
     void cacheResult(const ModelPool& modelPool,
             const Resource::Set& r,
             const ModelPool::List& list);
+
+    void clear();
 protected:
     // From propery key
     CRQueryResults mQueryResults;

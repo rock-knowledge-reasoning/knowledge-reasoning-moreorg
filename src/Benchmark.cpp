@@ -137,9 +137,16 @@ std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const Organizat
     return stats;
 }
 
-std::vector<numeric::Stats<double> > runFunctionalSaturationBoundTest(const OrganizationModel::Ptr& om, const ModelPool& modelPool,
-        size_t epochs)
+std::vector<numeric::Stats<double> > runFunctionalSaturationBoundTest(OrganizationModel::Ptr om, const ModelPool& modelPool,
+        size_t epochs,
+        size_t neighbourHoodSize)
 {
+
+    double feasibilityCheckTimeoutInMs = 20000;
+    owlapi::model::IRI interfaceBaseClass =
+        vocabulary::OM::resolve("ElectroMechanicalInterface");
+    size_t neighbourHood = neighbourHoodSize;
+
     numeric::Stats<double> timeWithSatBound;
     numeric::Stats<double> timeWithoutSatBound;
     numeric::Stats<double> numberOfFunctionsWithSatBounds;
@@ -148,20 +155,18 @@ std::vector<numeric::Stats<double> > runFunctionalSaturationBoundTest(const Orga
     numeric::Stats<double> numberOfAgentsWithoutSatBound;
     for(size_t i = 0; i < epochs; ++i)
     {
+        om->resetQueryCache();
+        algebra::Connectivity::resetQueryCache();
+
         std::cout << "Epoch #" << i << std::endl;
         double duration;
-        {
-            base::Time start = base::Time::now();
-            OrganizationModelAsk ask(om, modelPool, false);
-            duration = (base::Time::now() - start).toSeconds();
-            timeWithoutSatBound.update(duration);
-            numberOfFunctionsWithoutSatBounds.update( ask.getFunctionalityMapping().getCache().size());
-            numberOfAgentsWithoutSatBound.update( ask.getFunctionalityMapping().getActiveModelPools().size());
-        }
 
         {
             base::Time start = base::Time::now();
-            OrganizationModelAsk ask(om, modelPool, true);
+            OrganizationModelAsk ask(om, modelPool, true,
+                    feasibilityCheckTimeoutInMs,
+                    interfaceBaseClass,
+                    neighbourHood);
             duration = (base::Time::now() - start).toSeconds();
             timeWithSatBound.update(duration);
             numberOfFunctionsWithSatBounds.update( ask.getFunctionalityMapping().getCache().size());
@@ -213,7 +218,8 @@ int main(int argc, char** argv)
     size_t minFeasible = 1;
     std::string type = "con";
     size_t timeoutInS = 60;
-    while((c = getopt(argc,argv, "o:e:m:s:l:t:c:a:")) != -1)
+    size_t neighbourHoodSize = 0;
+    while((c = getopt(argc,argv, "o:e:m:s:l:t:c:a:n:")) != -1)
     {
         if(optarg)
         {
@@ -279,6 +285,12 @@ int main(int argc, char** argv)
                         printUsage(argv);
                         exit(0);
                     }
+                    break;
+                }
+                case 'n':
+                {
+                    neighbourHoodSize = boost::lexical_cast<size_t>(optarg);
+                    break;
                 }
             }
         }
@@ -308,9 +320,9 @@ int main(int argc, char** argv)
     OrganizationModel::Ptr om;
     if(!filename.empty())
     {
-        om = OrganizationModel::Ptr(new OrganizationModel(filename) );
+        om = make_shared<OrganizationModel>(filename);
     } else {
-        om = OrganizationModel::Ptr(new OrganizationModel(spec.organizationModelIRI));
+        om = make_shared<OrganizationModel>(spec.organizationModelIRI);
     }
 
     qxcfg::Configuration configuration;
@@ -362,6 +374,7 @@ int main(int argc, char** argv)
         log << "# [model #] [time w/o sat bound] [stdev] [time w sat bound] [stdev]"
             << " [functions w/o sat bound] [stdev] [functions w sat bound] [stdev]"
             << " [agent w/o sat bound] [stdev] [agents w sat bound] [stddev]"
+            << " [neighbourhood-size]"
             << std::endl;
 
         ModelPoolIterator mit(spec.from, spec.to, spec.stepSize);
@@ -369,7 +382,9 @@ int main(int argc, char** argv)
         {
             ModelPool current  = mit.current();
             std::cout << "Current: " << current.toString(4) << std::endl;
-            std::vector<numeric::Stats<double> > numericStats = runFunctionalSaturationBoundTest(om, current, epochs);
+            std::vector<numeric::Stats<double> > numericStats =
+                runFunctionalSaturationBoundTest(om, current, epochs,
+                        neighbourHoodSize);
 
             ModelPool::const_iterator cit = current.begin();
             for(; cit != current.end(); ++cit)
@@ -384,6 +399,7 @@ int main(int argc, char** argv)
                     << s.stdev()
                     << " ";
             }
+            log << neighbourHoodSize << " ";
             log << std::endl;
         }
     }

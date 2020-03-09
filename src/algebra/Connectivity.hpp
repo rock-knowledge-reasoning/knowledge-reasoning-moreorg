@@ -232,6 +232,11 @@ public:
      */
     static const graph_analysis::BaseGraph::Ptr& getConnectionGraph() { return msConnectionGraph; }
 
+    /**
+     * Reset / Clear the used query cache
+     */
+    static void resetQueryCache() { msQueryCache.clear(); }
+
 protected:
     static Connectivity::Statistics msStatistics;
     static graph_analysis::BaseGraph::Ptr msConnectionGraph;
@@ -247,7 +252,7 @@ protected:
             {}
     };
 
-    static QueryCache mQueryCache;
+    static QueryCache msQueryCache;
 };
 
 

@@ -55,6 +55,12 @@ void QueryCache::cacheResult(const ModelPool& modelPool,
     mCSQueryResults.emplace(query, list);
 }
 
+void QueryCache::clear()
+{
+    mQueryResults.clear();
+    mCSQueryResults.clear();
+}
+
 } // end namespace organization_model
 
 

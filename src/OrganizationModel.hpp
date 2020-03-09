@@ -87,6 +87,11 @@ public:
      */
     static OrganizationModel::Ptr getInstance(const owlapi::model::IRI& iri);
 
+    /**
+     * Reset / Clear the query cache
+     */
+    void resetQueryCache() { mQueryCache.clear(); }
+
 private:
     /// Ontology that serves as basis for this organization model
     owlapi::model::OWLOntology::Ptr mpOntology;

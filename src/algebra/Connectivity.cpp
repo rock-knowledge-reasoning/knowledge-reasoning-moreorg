@@ -15,7 +15,7 @@ using namespace owlapi::model;
 namespace organization_model {
 namespace algebra {
 
-QueryCache Connectivity::mQueryCache;
+QueryCache Connectivity::msQueryCache;
 
 Connectivity::Statistics Connectivity::msStatistics;
 graph_analysis::BaseGraph::Ptr Connectivity::msConnectionGraph;
@@ -111,11 +111,15 @@ Connectivity::Connectivity(const ModelPool& modelPool,
     , mModelCombination(mModelPool.toModelCombination())
     , mExistingConnections(*this, mModelCombination.size(), 0, mModelCombination.size())
     , mAgentConnections(*this, mModelCombination.size()*mModelCombination.size(), 0, mModelCombination.size())
+    , mRnd(0)
     , mIsTree(true)
 {
-    // Use hw() (not time -- since resolution of time seem to be rather low)
+    // Using hw() potentially requires entropy generator
+    // since Gecode uses /dev/random, which might block
+    // whilw time seem to be rather low resolution it seems now the better
+    // option
+    //mRnd.time();
     mRnd.hw();
-
     identifyInterfaces();
 
     Gecode::IntVarArray connections(*this, mInterfaces.size()*mInterfaces.size(),0,1);
@@ -445,7 +449,8 @@ bool Connectivity::isComplete() const
     mpBaseGraph = BaseGraph::getInstance(BaseGraph::LEMON_DIRECTED_GRAPH);
     for(size_t i = 0; i < mInterfaceMapping.size(); ++i)
     {
-        Vertex::Ptr v(new Vertex(mInterfaceMapping[i].first.getFragment()));
+        Vertex::Ptr v =
+            make_shared<Vertex>(mInterfaceMapping[i].first.getFragment());
         mpBaseGraph->addVertex(v);
 
         vertices.push_back(v);
@@ -481,9 +486,11 @@ bool Connectivity::isComplete() const
                     {
                         // connection exists between these two systems
                         connectionFound = true;
-                        Edge::Ptr e0(new Edge(vertices[a0],vertices[a1]));
+                        Edge::Ptr e0 =
+                            make_shared<Edge>(vertices[a0],vertices[a1]);
                         e0->setLabel(interfaceModel0.getFragment());
-                        Edge::Ptr e1(new Edge(vertices[a1],vertices[a0]));
+                        Edge::Ptr e1 =
+                            make_shared<Edge>(vertices[a1],vertices[a0]);
                         e1->setLabel(interfaceModel1.getFragment());
                         mpBaseGraph->addEdge(e0);
                         mpBaseGraph->addEdge(e1);
@@ -528,8 +535,8 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
             timeoutInMs,
             minFeasible);
 
-    QueryCache::const_iterator cit = mQueryCache.find(query);
-    if(cit != mQueryCache.end())
+    QueryCache::const_iterator cit = msQueryCache.find(query);
+    if(cit != msQueryCache.end())
     {
         std::pair<graph_analysis::BaseGraph::Ptr, bool> cachedResult = cit->second;
         baseGraph = cachedResult.first;
@@ -617,7 +624,7 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
     delete current;
     delete connectivity;
 
-    mQueryCache[query] = std::make_pair(baseGraph, isComplete);
+    msQueryCache[query] = std::make_pair(baseGraph, isComplete);
     return isComplete;
 }
 
