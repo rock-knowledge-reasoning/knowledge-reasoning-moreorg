@@ -122,7 +122,6 @@ rock_library(organization_model
         reasoning/ResourceMatch.hpp
         utils/CoalitionStructureGeneration.hpp
         utils/OrganizationStructureGeneration.hpp
-        utils/CorrelationClustering.hpp
         utils/GecodeUtils.hpp
         vocabularies/OM.hpp
         vocabularies/Robot.hpp
@@ -133,7 +132,7 @@ rock_library(organization_model
         owlapi
         graph_analysis
         qxcfg
-    LIBS glpk ${Boost_THREAD_LIBRARY}
+    LIBS ${Boost_THREAD_LIBRARY}
 )
 
 target_link_libraries(organization_model ${GECODE_LIBRARIES})

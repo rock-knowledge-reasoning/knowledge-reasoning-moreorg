@@ -16,8 +16,6 @@
   <depend package="tools/graph_analysis" />
   <depend package="tools/gecode" />
   <depend package="tools/qxcfg" />
-  <!-- gnu linear programming kit -->
-  <depend package="glpk" />
   <keywords>
       <keyword>reasoning</keyword>
       <keyword>representation</keyword>
