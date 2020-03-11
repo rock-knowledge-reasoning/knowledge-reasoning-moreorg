@@ -1,11 +1,12 @@
 <package>
+  <name>moreorg</name>
   <description brief="Organization modelling library">
       This library allows to create an organization model of a system and
       reason and plan with it.
   </description>
   <author>Thomas Roehr/thomas.roehr@dfki.de</author>
   <maintainer>Thomas Roehr/thomas.roehr@dfki.de</maintainer>
-  <license></license>
+  <license>BSD-3-Clause</license>
   <url>https://git.hb.dfki.de:dfki-libraries/organization_model</url>
   <depend package="base/cmake" />
   <depend package="boost" />
