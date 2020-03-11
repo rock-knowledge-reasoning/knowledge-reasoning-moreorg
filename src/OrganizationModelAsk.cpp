@@ -269,30 +269,31 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
 
 bool OrganizationModelAsk::addFunctionalityMapping(FunctionalityMapping& functionalityMapping,
         const ModelPool& combinationModelPool,
-        const owlapi::model::IRI& functionality) const
+        const owlapi::model::IRI& functionality,
+        bool minimalOnly) const
 {
-        Resource::Set functionalities;
-        functionalities.insert(functionality);
-        if(isMinimal(combinationModelPool, functionalities))
+    Resource::Set functionalities;
+    functionalities.insert(functionality);
+    if(minimalOnly && !isMinimal(combinationModelPool, functionalities))
+    {
+        LOG_DEBUG_S << "combination is not minimal for " << functionality.toString() << std::endl
+            << combinationModelPool.toString(4);
+        return false;
+    } else {
+        LOG_DEBUG_S << "combination is minimal for " << functionality.toString() << std::endl
+            << combinationModelPool.toString(4);
+        if(algebra::Connectivity::isFeasible(combinationModelPool,
+                    *this,
+                    mFeasibilityCheckTimeoutInMs,
+                    1, // minFeasible
+                    mInterfaceBaseClass))
         {
-            LOG_DEBUG_S << "combination is minimal for " << functionality.toString() << std::endl
-                << combinationModelPool.toString(4);
-            if(algebra::Connectivity::isFeasible(combinationModelPool,
-                        *this,
-                        mFeasibilityCheckTimeoutInMs,
-                        1, // minFeasible
-                        mInterfaceBaseClass))
-            {
-                LOG_DEBUG_S << "combination is feasible " << std::endl
-                << combinationModelPool.toString(4);
-                functionalityMapping.add(combinationModelPool, functionality);
-            }
-            return true;
-        } else {
-            LOG_DEBUG_S << "combination is not minimal for " << functionality.toString() << std::endl
-                << combinationModelPool.toString(4);
-            return false;
+            LOG_DEBUG_S << "combination is feasible " << std::endl
+            << combinationModelPool.toString(4);
+            functionalityMapping.add(combinationModelPool, functionality);
         }
+        return true;
+    }
 }
 
 FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(const ModelPool& modelPool,
@@ -322,9 +323,9 @@ FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(
             LOG_INFO_S << "   | --> required time: " << (stopTime - startTime).toSeconds();
         }
 
-        LOG_DEBUG_S << "Check combination #" << ++count;
-        LOG_DEBUG_S << "   | --> combination:             " << combination;
-        LOG_DEBUG_S << "   | --> possible functionality models: " << functionalityModels;
+        LOG_DEBUG_S << "Check combination #" << ++count << std::endl
+                 << "   | --> combination:             " << combination << std::endl
+                 << "   | --> possible functionality models: " << functionalityModels << std::endl;
 
         ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
 
@@ -336,12 +337,13 @@ FunctionalityMapping OrganizationModelAsk::computeUnboundedFunctionalityMapping(
             algebra::SupportType supportType = getSupportType(functionality, combinationModelPool);
             if(algebra::FULL_SUPPORT == supportType)
             {
-                if( !addFunctionalityMapping(functionalityMapping,combinationModelPool,
-                            functionality.getModel()) )
+                if( !addFunctionalityMapping(functionalityMapping,
+                            combinationModelPool,
+                            functionality.getModel(), false) )
                 {
-                    LOG_DEBUG_S << "Failed to add to functionality mapping:"
-                        << "functionality: " << functionality.getModel().toString()
-                        << "combination: " << combinationModelPool.toString(4);
+                    LOG_DEBUG_S << "Failed to add to functionality mapping:" << std::endl
+                        << "    functionality: " << functionality.getModel().toString() << std::endl
+                        << "    combination: \n" << combinationModelPool.toString(8) << std::endl;
                 }
             }
         }
@@ -1189,9 +1191,9 @@ void OrganizationModelAsk::exploreNeighbourhood(FunctionalityMapping& functional
                 basePool, functionality) )
         {
             LOG_DEBUG_S << "Failed to add to functionality mapping:" << std::endl
-                << " functionality: " << functionality.toString() << std::endl
-                << "combination: " << basePool.toString(4) << std::endl
-                << "neighbourhoodsize: " << maxAddedInstances << std::endl;
+                << "    functionality: " << functionality.toString() << std::endl
+                << "    combination: " << basePool.toString(4) << std::endl
+                << "    neighbourhoodsize: " << maxAddedInstances << std::endl;
         }
         return;
     }
@@ -1206,9 +1208,10 @@ void OrganizationModelAsk::exploreNeighbourhood(FunctionalityMapping& functional
         if( !addFunctionalityMapping(functionalityMapping,
                 pool, functionality) )
         {
-            LOG_DEBUG_S << "Failed to add to functionality mapping:"
-                << "functionality: " << functionality.toString()
-                << "combination: " << combinationModelPool.toString(4);
+            LOG_DEBUG_S << "Failed to add to functionality mapping during"
+                << " neighborhood search: "<< std::endl
+                << "    functionality: " << functionality.toString()
+                << "    combination: " << combinationModelPool.toString(4);
                 combinationModelPool.toString(4);
         }
     } while(limitedCombination.next());

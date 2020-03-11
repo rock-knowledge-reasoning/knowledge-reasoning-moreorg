@@ -328,12 +328,14 @@ public:
 
     /**
      * Add a functionality mapping and validate the structural consistency
+     * \param minimalOnly If true a mapping is only added, if the combination is minimal
      * \return true when add successfully, false otherwise (meaning the
      * combination was not structurally consistent)
      */
     bool addFunctionalityMapping(FunctionalityMapping& functionalityMapping,
             const ModelPool& modelPool,
-            const owlapi::model::IRI& functionality) const;
+            const owlapi::model::IRI& functionality,
+            bool minimalOnly = true) const;
 
     /**
      * Get the data property value of the complete combination given by the pool

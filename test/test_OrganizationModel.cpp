@@ -180,7 +180,9 @@ BOOST_AUTO_TEST_CASE(resource_support)
                     BOOST_TEST_MESSAGE("ModelCombination: " << cit->toString() );
                 }
 
-                BOOST_CHECK_MESSAGE(combinations.size() == 8, "Without functional saturation bound: eight combinations that support stereo image provider, image provider and emi power provider, was " << combinations.size() << " "
+
+                BOOST_CHECK_MESSAGE(combinations.size() == 6,
+                        "Without functional saturation bound: six combinations that support stereo image provider, image provider and emi power provider, was " << combinations.size() << " "
                         << ModelPool::toString(combinations, 4) << " "
                         << "\nBounded model pool: " << ModelPoolDelta(modelPoolBounded).toString());
             }
