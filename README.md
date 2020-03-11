@@ -1,5 +1,9 @@
 # Organization modelling with OWL
 
+This model implements MoreOrg (Modular reconfigurable organisations) which is described in the PhD Thesis
+"Autonomous Operation of a Reconfigurable Multi-Robot System for Planetary Space
+Missions" ([Roehr 2019](http://nbn-resolving.de/urn:nbn:de:gbv:46-00107698-18))
+
 The main purpose of this implementation of an organization model is to describe (reconfigurable)
 multirobot systems so that one can reason about structure and function.
 The organization model relies on a basic system
@@ -47,7 +51,7 @@ bool isAMobileCompositeAgent = robot.isMobile();
 
 ### Organisation Model Reader
 The utility *organization_model-reader* allows you to visualise and render the
-information in an ontology. 
+information in an ontology.
 For example, to create a latex table to describe the properties of the agent
 type SherpaTT:
 ```
@@ -82,6 +86,95 @@ http://www.rock-robotics.org/2014/01/om-schema#BaseCamp 1
 http://www.rock-robotics.org/2014/01/om-schema#Payload 4
 ```
 
+# Installation
+
+## Gitlab (internal)
+Create a new Rock-based installation in a development folder, here called dev:
+```
+    mkdir dev
+    cd dev
+    wget http://www.rock-robotics.org/master/autoproj_bootstrap
+    ruby autoproj_bootstrap
+```
+
+In autoproj/manifest add the respective manifest and add the package to the layout section:
+```
+    package_set:
+        - dfkigit: rock-dfki/rock-package_set
+
+    layout:
+        - multiagent/organization_model
+```
+
+Then use the following commands to update your workspace:
+```
+$>source env.sh
+$>autoproj update
+$>autoproj osdeps
+$>amake multiagent/organization_model
+```
+
+## Github
+
+Create a new Rock-based installation in a development folder, here called dev:
+```
+    mkdir dev
+    cd dev
+    wget http://www.rock-robotics.org/master/autoproj_bootstrap
+    ruby autoproj_bootstrap
+```
+
+In autoproj/manifest add the respective manifest and add the package to the layout section:
+```
+    package_set:
+        - github: rock-core/rock-package_set
+
+    layout:
+        - knowledge_reasoning/moreorg
+```
+
+Then use the following commands to update your workspace:
+```
+$>source env.sh
+$>autoproj update
+$>autoproj osdeps
+$>amake knowledge_reasoning/moreorg
+```
+
+# Generate the documentation
+
+To see the documentation of this project please do the following after checkout to generate the doxygen-base documentation:
+
+```
+    mkdir build
+    cd build
+    make doc
+```
+
+Open the doxygen documentation with a browser: build/doc/index.html The doxygen documentation contains all information on how to start using the library along with the general API documentation.
+
+
+# Testing
+
+Running test in Rock is control via the Flag ROCK_TEST_ENABLED. So activate the tests let autoproj set this cmake build flag:
+```
+$> autoproj test enable knowledge_reasoning/moreorg
+$> amake knowledge_reasoning/moreorg
+```
+
+Then you can run the tests, which are implemented with Boost Testing Framework with:
+```
+$> ./build/test/organization_model-test --log_level=all
+```
+
+# Merge Requests and Issue Tracking
+
+Github will be used for pull requests and issue tracking: https://github.com/rock-knowledge-reasoning/knowledge-reasoning-moreorg
+
+# License
+
+This software is distributed under the New/3-clause BSD license.
 
 # Copyright
-Copyright (c) 2013-2018 Thomas M. Roehr, DFKI GmbH Robotics Innovation Center
+
+Copyright (c) 2013-2020 Thomas M. Roehr, DFKI GmbH Robotics Innovation Center
