@@ -1,17 +1,38 @@
-find_library(gecode0 NAMES gecodeflatzinc   PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode1 NAMES gecodedriver     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode2 NAMES gecodegist       PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode3 NAMES gecodesearch     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode4 NAMES gecodeminimodel  PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode5 NAMES gecodeset        PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode6 NAMES gecodefloat      PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode7 NAMES gecodeint        PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode8 NAMES gecodekernel     PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
-find_library(gecode9 NAMES gecodesupport    PATHS ${CMAKE_INSTALL_TARGET}/lib REQUIRED )
+pkg_check_modules(GECODE REQUIRED gecode)
+if(NOT GECODE_FOUND)
+    set(GECODE_COMPONENTS
+            flatzinc
+            driver
+            gist
+            search
+            minimodel
+            set
+            float
+            int
+            kernel
+            support
+    )
 
-set(GECODE_LIBRARIES
-    ${gecode0} ${gecode1} ${gecode2} ${gecode3} ${gecode4} ${gecode5} ${gecode6} ${gecode7} ${gecode8} ${gecode9}
-)
+    foreach(GECODE_COMPONENT ${GECODE_COMPONENTS})
+        find_library(GECODE_${GECODE_COMPONENT}_LIBRARY_PATH
+            NAMES gecode${GECODE_COMPONENT}
+            HINTS ${CMAKE_INSTALL_TARGET}/lib
+                /opt/rock/$ENV{ROCK_DEB_RELEASE_NAME}/lib
+            REQUIRED
+        )
+        get_filename_component(GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY
+            ${GECODE_${GECODE_COMPONENT}_LIBRARY_PATH} DIRECTORY)
+        get_filename_component(GECODE_${GECODE_COMPONENT}_LIBRARY
+            ${GECODE_${GECODE_COMPONENT}_LIBRARY_PATH} NAME)
+        list(APPEND GECODE_LIBRARIES ${GECODE_${GECODE_COMPONENT}_LIBRARY})
+        link_directories(${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY})
+        message(STATUS "Found gecode library: ${GECODE_${GECODE_COMPONENT}_LIBRARY} \
+             in ${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY}")
+    endforeach()
+else()
+    message(STATUS "Found gecode libraries in ${GECODE_LIBRARY_DIRS}")
+    link_directories(${GECODE_LIBRARIES_DIRS})
+endif()
 
 find_package(Boost REQUIRED thread serialization program_options)
 rock_library(organization_model
@@ -127,12 +148,14 @@ rock_library(organization_model
         vocabularies/Robot.hpp
         vocabularies/VRP.hpp
         ValueBound.hpp
-    DEPS_PKGCONFIG numeric
-        pddl_planner
+    DEPS_PKGCONFIG
         owlapi
+        numeric
+        pddl_planner
         graph_analysis
         qxcfg
     LIBS ${Boost_THREAD_LIBRARY}
+        ${GECODE_LIBRARIES}
 )
 
 target_link_libraries(organization_model ${GECODE_LIBRARIES})
