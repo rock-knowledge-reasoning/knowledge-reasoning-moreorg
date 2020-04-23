@@ -11,7 +11,7 @@ struct AnalyserFixture
 {
     AnalyserFixture()
     {
-        OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
+        OrganizationModel::Ptr om = make_shared<OrganizationModel>(getOMSchema());
         IRI sherpa = OM::resolve("Sherpa");
         IRI payload = OM::resolve("Payload");
 

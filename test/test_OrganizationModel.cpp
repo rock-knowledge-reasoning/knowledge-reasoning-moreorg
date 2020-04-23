@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_SUITE(organization_model)
 
 BOOST_AUTO_TEST_CASE(load_file)
 {
-    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()) );
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(getOMSchema());
 
     OrganizationModelAsk ask(om, ModelPool(), false);
     owlapi::model::OWLOntologyAsk ontologyAsk(om->ontology());
