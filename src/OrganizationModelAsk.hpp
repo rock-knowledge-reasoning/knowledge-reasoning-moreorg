@@ -63,6 +63,18 @@ public:
             );
 
     /**
+     * Retrieve the list of all known agent models
+     * \return list of all known agent models
+     */
+    owlapi::model::IRIList getAgentModels() const;
+
+    /**
+     * Retrieve the list of all known agent properties
+     * \return list of all known agent properties
+     */
+    owlapi::model::IRIList getAgentProperties(const owlapi::model::IRI& model = vocabulary::OM::Agent()) const;
+
+    /**
      * Retrieve the list of all known service models
      * \return list of all known service models
      */

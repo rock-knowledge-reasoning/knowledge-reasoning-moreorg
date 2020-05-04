@@ -93,6 +93,19 @@ void OrganizationModelAsk::prepare(const ModelPool& modelPool, bool applyFunctio
     mFunctionalityMapping = computeFunctionalityMapping(mModelPool, applyFunctionalSaturationBound);
 }
 
+owlapi::model::IRIList OrganizationModelAsk::getAgentModels() const
+{
+    bool directSubclassOnly = false;
+    IRIList subclasses = mOntologyAsk.allSubClassesOf(vocabulary::OM::Agent(),
+            directSubclassOnly);
+    return subclasses;
+}
+
+owlapi::model::IRIList OrganizationModelAsk::getAgentProperties(const IRI& model) const
+{
+    return mOntologyAsk.getDataPropertiesForDomain(model);
+}
+
 owlapi::model::IRIList OrganizationModelAsk::getServiceModels() const
 {
     bool directSubclassOnly = false;
