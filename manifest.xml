@@ -20,14 +20,13 @@
   <keywords>
       <keyword>reasoning</keyword>
       <keyword>representation</keyword>
+      <keyword>multiagent</keyword>
+      <keyword>owl</keyword>
   </keywords>
-  <stage>0</stage>
+  <stage>1</stage>
   <use>single project</use>
   <activity>active</activity>
-  <classifiers>
       <classifier>c++</classifier>
       <classifier>rock</classifier>
-      <classifier>owl</classifier>
-      <classifier>multiagent</classifier>
   </classifiers>
 </package>

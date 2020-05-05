@@ -1,24 +1,22 @@
-# Organization modelling with OWL
+# MoreOrg - Model for Reconfigurable Multi-Robot Organizations
 
-This model implements MoreOrg (Modular reconfigurable organisations) which is described in the PhD Thesis
+This library implements MoreOrg which is described in the PhD Thesis
 "Autonomous Operation of a Reconfigurable Multi-Robot System for Planetary Space
 Missions" ([Roehr 2019](http://nbn-resolving.de/urn:nbn:de:gbv:46-00107698-18))
 
-The main purpose of this implementation of an organization model is to describe (reconfigurable)
-multirobot systems so that one can reason about structure and function.
+This implementation of an organization model allows to describe (reconfigurable)
+multirobot systems, so that one can reason on structure and function of so-called composite agents,
+i.e. agents that are composed from two or more (atomic) agents.
 The organization model relies on a basic system
-description -- provided as ontology in OWL -- to infer system combinations from it.
+description of each atomic agent, which is provided as ontology in the Web Ontology Language (OWL).
 
-These system combinations (coalition / composite actors) have quantifiable
-requirements. These requirements are defined by the combination of
+System combinations (aka coalition or composite agent) have quantifiable
+requirements and properties. The requirements and properties are defined by the combination of
 restrictions which apply to the model of atomic actors.
 
-The organization model allows to augment an organization model for a given
-set of atomic actors.
-
 ## Examples
-In general usage example can be found as part of the unit test in the subfolder
-test/, e.g., in test/test_OrganizationModelAsk.cpp
+A general usage example can be found as part of the unit test in the subfolder
+test/, e.g., in [test/test_OrganizationModelAsk.cpp](test/test_OrganizationModelAsk)
 
 A typical usage is illustrated in the following example.
 Execution of the example requires a previous installation of the organisation
@@ -51,7 +49,7 @@ bool isAMobileCompositeAgent = robot.isMobile();
 
 ### Organisation Model Reader
 The utility *moreorg-reader* allows you to visualise and render the
-information in an ontology.
+information contained in an ontology.
 For example, to create a latex table to describe the properties of the agent
 type SherpaTT:
 ```
@@ -151,12 +149,12 @@ To see the documentation of this project please do the following after checkout 
     make doc
 ```
 
-Open the doxygen documentation with a browser: build/doc/index.html The doxygen documentation contains all information on how to start using the library along with the general API documentation.
+Open the doxygen documentation with a browser: build/doc/index.html The doxygen documentation contains all information on how to start using the library (as described here) along with the general API documentation.
 
 
 # Testing
 
-Running test in Rock is control via the Flag ROCK_TEST_ENABLED. So activate the tests let autoproj set this cmake build flag:
+Running test in Rock is controlled via the Flag ROCK_TEST_ENABLED. To activate the tests let autoproj set this cmake build flag:
 ```
 $> autoproj test enable knowledge_reasoning/moreorg
 $> amake knowledge_reasoning/moreorg
