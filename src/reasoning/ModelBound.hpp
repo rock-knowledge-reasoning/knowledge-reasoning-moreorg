@@ -5,7 +5,7 @@
 #include <map>
 #include <owlapi/model/IRI.hpp>
 
-namespace organization_model {
+namespace moreorg {
 namespace reasoning {
 
 /**
@@ -59,5 +59,5 @@ struct ModelBound
 };
 
 } // end namespace reasoning
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_REASONING_MODEL_BOUND_HPP

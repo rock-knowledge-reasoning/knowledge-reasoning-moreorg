@@ -3,7 +3,7 @@
 #include "exporter/PDDLExporter.hpp"
 #include "pddl_planner/Planning.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 Heuristics::Heuristics(const OrganizationModelAsk& ask)
     : mAsk(ask)
@@ -100,7 +100,7 @@ double Heuristics::getEnergyReductionAbsolute(const StatusSample* sample,
         return consumption*share* (toTime - fromTime)/sample->getAvailableTime();
     } catch(const std::out_of_range& e)
     {
-        throw std::runtime_error("organization_model::Heuristics::getEnergyReductionAbsolute: "
+        throw std::runtime_error("moreorg::Heuristics::getEnergyReductionAbsolute: "
                 " please call update function on 'agent' to prepare information about energy provider shares");
     }
 }
@@ -115,7 +115,7 @@ double Heuristics::getReconfigurationCost(const Agent::Set& _from,
     AtomicAgent::Set atomicToAgents = Agent::allAtomicAgents(_to);
     if( atomicFromAgents != atomicToAgents)
     {
-        throw std::invalid_argument("organization_model::Heuristics::getReconfigurationCost: "
+        throw std::invalid_argument("moreorg::Heuristics::getReconfigurationCost: "
                 " from set and to set contain not the same atomic agents:\n"
                 " from set: " + AtomicAgent::toString(atomicFromAgents,4) + "\n"
                 " to set: " + AtomicAgent::toString(atomicToAgents,4)
@@ -179,4 +179,4 @@ double Heuristics::getReconfigurationCost(const Agent& target,
     return cost;
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

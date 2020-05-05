@@ -3,7 +3,7 @@
 
 #include <base/Pose.hpp>
 
-namespace organization_model {
+namespace moreorg {
 
 class Sample
 {

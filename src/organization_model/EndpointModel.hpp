@@ -3,8 +3,8 @@
 
 #include <owlapi/model/IRI.hpp>
 
-namespace organization_model {
-namespace organization_model {
+namespace moreorg {
+namespace moreorg {
 
 /**
  * An EndpointModel describe the actor and the interface role
@@ -25,7 +25,7 @@ public:
     std::string toString() const;
 };
 
-} // end namespace organization_model
-} // end namespace organization_model
+} // end namespace moreorg
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
 

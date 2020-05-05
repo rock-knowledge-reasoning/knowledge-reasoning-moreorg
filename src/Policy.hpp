@@ -3,7 +3,7 @@
 
 #include "OrganizationModelAsk.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 class Policy
 {
@@ -25,5 +25,5 @@ protected:
 
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_POLICY_HPP

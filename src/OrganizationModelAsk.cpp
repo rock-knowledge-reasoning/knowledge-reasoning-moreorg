@@ -17,7 +17,7 @@
 using namespace owlapi::model;
 using namespace owlapi::vocabulary;
 
-namespace organization_model {
+namespace moreorg {
 
 std::vector<OrganizationModelAsk> OrganizationModelAsk::msOrganizationModelAsk;
 
@@ -151,7 +151,7 @@ FunctionalityMapping OrganizationModelAsk::computeFunctionalityMapping(const Mod
 {
     if(modelPool.empty())
     {
-        LOG_WARN_S << "organization_model::OrganizationModelAsk::computeFunctionalityMapping"
+        LOG_WARN_S << "moreorg::OrganizationModelAsk::computeFunctionalityMapping"
                 " cannot compute functionality map for empty model pool";
         return FunctionalityMapping();
     }
@@ -159,7 +159,7 @@ FunctionalityMapping OrganizationModelAsk::computeFunctionalityMapping(const Mod
     IRIList functionalityModels = getFunctionalities();
     if(functionalityModels.empty())
     {
-        throw std::runtime_error("organization_model::OrganizationModelAsk::computeFunctionalityMapping: available functionalities empty");
+        throw std::runtime_error("moreorg::OrganizationModelAsk::computeFunctionalityMapping: available functionalities empty");
     }
 
     if(applyFunctionalSaturationBound)
@@ -196,7 +196,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
 
     if(functionalSaturationBound.empty())
     {
-        std::string msg = "organization_model::OrganizationModelAsk::computeBoundedFunctionalityMapping: provided empty functionalSaturationBound";
+        std::string msg = "moreorg::OrganizationModelAsk::computeBoundedFunctionalityMapping: provided empty functionalSaturationBound";
         msg += modelPool.toString() + "\n";
         msg += owlapi::model::IRI::toString(functionalityModels) + "\n";
         msg += functionalSaturationBound.toString() + "\n";
@@ -586,7 +586,7 @@ ModelPool::Set OrganizationModelAsk::getResourceSupport(const Resource& resource
         // Check if the scaled variant lies within general resource bounds
         if(mModelPool.empty())
         {
-            LOG_WARN_S << "organization_model::OrganizationModelAsk::getResourceSupport: could not compute functionality constrained model pool, since model pool is missing for setting the upper bound";
+            LOG_WARN_S << "moreorg::OrganizationModelAsk::getResourceSupport: could not compute functionality constrained model pool, since model pool is missing for setting the upper bound";
             return supportPool;
         } else {
             return  ModelPool::applyUpperBound(supportPool, mModelPool);
@@ -749,7 +749,7 @@ ModelPool OrganizationModelAsk::getFunctionalSaturationBound(const Resource& res
 {
     if(mModelPool.empty())
     {
-        throw std::invalid_argument("organization_model::OrganizationModelAsk::getFunctionalSaturationBound:"
+        throw std::invalid_argument("moreorg::OrganizationModelAsk::getFunctionalSaturationBound:"
                 " model pool is empty. Call OrganizationModelAsk::prepare with model pool");
     }
 
@@ -845,7 +845,7 @@ ModelPool::Set OrganizationModelAsk::getIntersection(const Resource::Set& functi
                 << "current functionality mappping: " << std::endl
                 << mFunctionalityMapping.toString(4);
 
-            throw std::runtime_error("organization_model::OrganizationModelAsk::isSupporting"
+            throw std::runtime_error("moreorg::OrganizationModelAsk::isSupporting"
                     " could not find functionality '" +
                     functionality.getModel().toString() + "' -- " + e.what());
         }
@@ -979,7 +979,7 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const std:
 {
     if(modelBounds.size() == 0)
     {
-        throw std::invalid_argument("organization_model::OrganizationModelAsk::getSupportVector: no model bounds given");
+        throw std::invalid_argument("moreorg::OrganizationModelAsk::getSupportVector: no model bounds given");
     }
 
     using namespace owlapi::model;
@@ -1155,7 +1155,7 @@ double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool,
             }
         } catch(const std::exception& e)
         {
-            throw std::invalid_argument("organization_model::getScalingFactor: functional requirement cannot be fulfilled by this model pool: " + modelPool.toString(12) + " - " + e.what());
+            throw std::invalid_argument("moreorg::getScalingFactor: functional requirement cannot be fulfilled by this model pool: " + modelPool.toString(12) + " - " + e.what());
         }
     }
     return minScalingFactor;
@@ -1335,4 +1335,4 @@ std::map< owlapi::model::IRI, std::map<owlapi::model::IRI, double> > Organizatio
     }
     return propertyValues;
 }
-} // end namespace organization_model
+} // end namespace moreorg

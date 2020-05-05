@@ -3,7 +3,7 @@
 
 #include "ModelPool.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 class ModelPoolIterator
 {
@@ -31,6 +31,6 @@ private:
     bool mInitialized;
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_MODEL_POOL_ITERATOR_HPP
 

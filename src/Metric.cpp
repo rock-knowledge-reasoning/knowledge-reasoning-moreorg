@@ -4,7 +4,7 @@
 #include "vocabularies/OM.hpp"
 #include "metrics/Redundancy.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 std::map<metrics::Type,Metric::Ptr> Metric::msMetrics;
 
@@ -154,7 +154,7 @@ Metric::Ptr Metric::getInstance(metrics::Type type, const OrganizationModelAsk& 
         default:
             break;
     }
-    throw std::invalid_argument("organization_model::Metric::getInstance: failed to retrieve a type");
+    throw std::invalid_argument("moreorg::Metric::getInstance: failed to retrieve a type");
 }
 
 std::string Metric::toString(const MetricMap& map, uint32_t indent)
@@ -174,5 +174,5 @@ std::string Metric::toString(const MetricMap& map, uint32_t indent)
     return ss.str();
 }
 
-} // end namespace organization_model
+} // end namespace moreorg
 

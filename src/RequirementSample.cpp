@@ -1,6 +1,6 @@
 #include "RequirementSample.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 RequirementSample::RequirementSample(const Resource::Set& resources,
        const ModelPool& agentPool,

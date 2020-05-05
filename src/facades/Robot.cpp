@@ -1,12 +1,12 @@
 #include "Robot.hpp"
-#include <organization_model/vocabularies/OM.hpp>
-#include <organization_model/vocabularies/Robot.hpp>
+#include <moreorg/vocabularies/OM.hpp>
+#include <moreorg/vocabularies/Robot.hpp>
 #include <base-logging/Logging.hpp>
 
 using namespace owlapi::model;
 
 
-namespace organization_model {
+namespace moreorg {
 namespace facades {
 
 std::map<ModelPool, Robot> Robot::msRobots;
@@ -176,7 +176,7 @@ uint32_t Robot::getTransportCapacity(const owlapi::model::IRI& model) const
                 case OWLCardinalityRestriction::MIN:
                 case OWLCardinalityRestriction::EXACT:
                 case OWLCardinalityRestriction::UNKNOWN:
-                    throw std::runtime_error("organization_model::facades::Robot::getTransportCapacity: expected max cardinality restriction, but got '" + OWLCardinalityRestriction::CardinalityRestrictionTypeTxt[r->getCardinalityRestrictionType()] + "'");
+                    throw std::runtime_error("moreorg::facades::Robot::getTransportCapacity: expected max cardinality restriction, but got '" + OWLCardinalityRestriction::CardinalityRestrictionTypeTxt[r->getCardinalityRestrictionType()] + "'");
             }
         }
     } else {
@@ -212,7 +212,7 @@ double Robot::getTransportVolume() const
     if(mTransportVolume < 0)
     {
         throw
-            std::runtime_error("organization_model::facades::Robot::getTransportVolume:"
+            std::runtime_error("moreorg::facades::Robot::getTransportVolume:"
                     " not implemented");
     }
     return mTransportVolume;
@@ -370,7 +370,7 @@ bool Robot::canTrail() const
     {
         supporting = organizationAsk().isSupporting(mModelPool, trail);
     } else {
-        throw std::runtime_error("organization_model::facades::Robot::canTrail:"
+        throw std::runtime_error("moreorg::facades::Robot::canTrail:"
                 " not implemented for composite agents");
     }
     return supporting;
@@ -438,7 +438,7 @@ double Robot::getPropertyValue(const owlapi::model::IRI& property) const
             return restriction->getCardinality();
         }
     }
-    throw std::invalid_argument("organization_model::OrganizationModelAsk::getPropertyValue: failed to identify value for '"
+    throw std::invalid_argument("moreorg::OrganizationModelAsk::getPropertyValue: failed to identify value for '"
             + property.toString() + "' for model pool: " + mModelPool.toString(8));
 
 }
@@ -465,4 +465,4 @@ double Robot::getLoadAreaSize(const owlapi::model::IRI& agent) const
 }
 
 } // end namespace facades
-} // end namespace organization_model
+} // end namespace moreorg

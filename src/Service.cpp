@@ -1,10 +1,10 @@
 #include "Service.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 bool Service::operator<(const Service& other) const
 {
     return this->getModel() < other.getModel();
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

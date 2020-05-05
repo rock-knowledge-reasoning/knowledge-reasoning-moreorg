@@ -3,7 +3,7 @@
 
 #include "../Policy.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace policies {
 
 /**
@@ -27,5 +27,5 @@ private:
 };
 
 } // end namespace policies
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_POLICIES_ENERGY_PROVIDER_POLICY_HPP

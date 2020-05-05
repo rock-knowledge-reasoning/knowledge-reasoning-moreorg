@@ -7,7 +7,7 @@
 #include "OrganizationModelAsk.hpp"
 #include "vocabularies/OM.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 // TODO: commment from ICRA Reviewer paper 2015
 // how can further merit functions like information gain, failure rates
@@ -100,20 +100,20 @@ public:
     /**
      * Compute metric based on the given list of cardinality restrictions
      */
-    virtual double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const { throw std::runtime_error("organization_model::metrics::Metric::compute: not implemented"); }
+    virtual double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const { throw std::runtime_error("moreorg::metrics::Metric::compute: not implemented"); }
 
     /**
      * Compute the metric for a given list of single functions (services) that are
      * used sequentially and a model pool describing a composite actor that has
      * to provide this functions
      */
-    virtual double computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const { throw std::runtime_error("organization_model::metrics::Metric::computeSequential(IRIList,ModelPool) not implemented"); }
+    virtual double computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const { throw std::runtime_error("moreorg::metrics::Metric::computeSequential(IRIList,ModelPool) not implemented"); }
 
     /**
      * Compute the metric for a sequential application of distinct function sets
      * by a composite actor which is described by the modelPool
      */
-    virtual double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ModelPool& modelPool, bool sharedUse = true) const { throw std::runtime_error("organization_model::metrics::Metric::compute(functions,modelPool) not implemented"); }
+    virtual double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ModelPool& modelPool, bool sharedUse = true) const { throw std::runtime_error("moreorg::metrics::Metric::compute(functions,modelPool) not implemented"); }
 
     /**
      * Compute a particular metric for a required model pool and an available
@@ -127,7 +127,7 @@ public:
     /**
      * Compute the metrics for a given sequential chain of components
      */
-    virtual double sequentialUse(const std::vector<double>& values) const { throw std::runtime_error("organization_model::metrics::Metric::sequentialUse  not implemented"); }
+    virtual double sequentialUse(const std::vector<double>& values) const { throw std::runtime_error("moreorg::metrics::Metric::sequentialUse  not implemented"); }
 
 protected:
     OrganizationModelAsk mOrganizationModelAsk;
@@ -137,5 +137,5 @@ protected:
     static std::map<metrics::Type, Metric::Ptr> msMetrics;
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_METRIC_HPP

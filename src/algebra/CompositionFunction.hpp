@@ -6,7 +6,7 @@
 #include <owlapi/model/IRI.hpp>
 #include "../ModelPool.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace algebra {
 
 typedef std::map<owlapi::model::IRI, double> IRIValueMap;
@@ -28,5 +28,5 @@ public:
 };
 
 } // end namespace algebra
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ALGEBRA_COMPOSITION_FUNCTION_HPP

@@ -3,13 +3,13 @@
 #include <algorithm>
 #include <gecode/minimodel.hh>
 #include <gecode/gist.hh>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 
 #include "ResourceMatch.hpp"
 
 using namespace owlapi::model;
 
-namespace organization_model {
+namespace moreorg {
 namespace reasoning {
 
 std::string ResourceMatch::Solution::toString(uint32_t indent) const
@@ -40,7 +40,7 @@ ModelBound::List ResourceMatch::Solution::getAssignments(const owlapi::model::IR
         }
     }
 
-    throw std::invalid_argument("organization_model::reasoning::Resource::Solution::getAssignments: no assignments for model '"
+    throw std::invalid_argument("moreorg::reasoning::Resource::Solution::getAssignments: no assignments for model '"
             + model.toString() + "' in solution");
 }
 
@@ -67,7 +67,7 @@ ModelBound::List ResourceMatch::Solution::substractMinFrom(const ModelBound::Lis
 
             if(it == remainingResources.end())
             {
-                throw std::invalid_argument("organization_model::reasoning::ResourceMatch::Solution::substractMinFrom: could not find model '" + assignedModelBound.model.toString() + "'");
+                throw std::invalid_argument("moreorg::reasoning::ResourceMatch::Solution::substractMinFrom: could not find model '" + assignedModelBound.model.toString() + "'");
             }
 
             ModelBound delta = it->substractMin(assignedModelBound);
@@ -236,7 +236,7 @@ ResourceMatch::Solution ResourceMatch::getSolution() const
             Gecode::IntVar var = modelAssignment(mi, i);
             if(!var.assigned())
             {
-                throw std::runtime_error("organization_model::reasoning::ResourceMatch::getSolution: value has not been assigned");
+                throw std::runtime_error("moreorg::reasoning::ResourceMatch::getSolution: value has not been assigned");
             }
 
             Gecode::IntVarValues v( var );
@@ -282,7 +282,7 @@ ResourceMatch* ResourceMatch::solve()
 
     if(best == NULL)
     {
-        throw std::runtime_error("organization_model::reasoning::ResourceMatch: no solution found");
+        throw std::runtime_error("moreorg::reasoning::ResourceMatch: no solution found");
     }
 
     return best;
@@ -395,4 +395,4 @@ bool ResourceMatch::hasMinRequirements(const ModelBound::List& list)
 }
 
 } // end namespace reasoning
-} // end namespace organization_model
+} // end namespace moreorg

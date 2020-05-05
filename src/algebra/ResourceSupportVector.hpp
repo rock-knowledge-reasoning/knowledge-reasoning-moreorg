@@ -5,7 +5,7 @@
 #include <base/Eigen.hpp>
 #include <owlapi/model/IRI.hpp>
 
-namespace organization_model {
+namespace moreorg {
 
 class OrganizationModelAsk;
 
@@ -194,5 +194,5 @@ private:
 };
 
 } // end namespace algebra
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ALGEBRA_RESOURCE_SUPPORT_VECTOR_HPP

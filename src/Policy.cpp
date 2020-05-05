@@ -1,6 +1,6 @@
 #include "Policy.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 Policy::Policy()
     : mModelPool()
@@ -17,4 +17,4 @@ Policy::~Policy()
 {
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

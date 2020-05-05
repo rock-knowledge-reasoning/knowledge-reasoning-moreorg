@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
-#include <organization_model/Resource.hpp>
+#include <moreorg/Resource.hpp>
 
-using namespace organization_model;
+using namespace moreorg;
 using namespace owlapi::model;
 
 BOOST_AUTO_TEST_SUITE(resource)

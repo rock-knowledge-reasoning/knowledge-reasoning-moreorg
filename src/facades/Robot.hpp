@@ -7,7 +7,7 @@
 #include "../policies/EnergyProviderPolicy.hpp"
 #include "../policies/TransportProviderPolicy.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace facades {
 
 /**
@@ -245,5 +245,5 @@ private:
 };
 
 } // end namespace facades
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_FACADES_ROBOT_HPP

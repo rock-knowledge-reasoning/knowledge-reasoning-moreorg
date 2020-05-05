@@ -3,7 +3,7 @@
 
 #include <owlapi/Vocabulary.hpp>
 
-namespace organization_model {
+namespace moreorg {
 namespace vocabulary {
 
 class OM

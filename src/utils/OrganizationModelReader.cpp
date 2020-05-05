@@ -10,7 +10,7 @@
 #include <boost/program_options.hpp>
 
 using namespace owlapi::model;
-using namespace organization_model;
+using namespace moreorg;
 
 int main(int argc, char** argv)
 {
@@ -23,7 +23,7 @@ int main(int argc, char** argv)
         ("latex", "Activate latex export")
         ("compact", "Activate latex export in a single table for all agents")
         ("columns", po::value<size_t>(), "Number of columns of the latex table, when in compact mode")
-        ("output", po::value<size_t>(), "Path to the output file (default /tmp/organization_model-ccf-analysis.log")
+        ("output", po::value<size_t>(), "Path to the output file (default /tmp/moreorg-ccf-analysis.log")
         ;
 
     po::variables_map vm;
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    std::string outputFilename = "/tmp/organization_model-reader.txt";
+    std::string outputFilename = "/tmp/moreorg-reader.txt";
     if(vm.count("output"))
     {
         outputFilename = vm["output"].as<std::string>();

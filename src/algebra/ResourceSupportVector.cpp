@@ -2,9 +2,9 @@
 #include <math.h>
 #include <sstream>
 #include <base-logging/Logging.hpp>
-#include <organization_model/OrganizationModelAsk.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
 
-namespace organization_model {
+namespace moreorg {
 namespace algebra {
 
 std::map<SupportType, std::string> SupportTypeTxt = {
@@ -199,12 +199,12 @@ void ResourceSupportVector::checkDimensions(const ResourceSupportVector& a, cons
 {
     if(a.getNumberOfDimensions() != b.getNumberOfDimensions())
     {
-        LOG_WARN_S << "organization_model::algebra::ResourceSupportVector::intersection "
+        LOG_WARN_S << "moreorg::algebra::ResourceSupportVector::intersection "
                 << " cannot compute intersection since number of dimensions differ: "
                 << a.toString() << " vs. "
                 << b.toString();
 
-        throw std::invalid_argument("organization_model::algebra::ResourceSupportVector::intersection \
+        throw std::invalid_argument("moreorg::algebra::ResourceSupportVector::intersection \
                 cannot compute intersection since number of dimensions differ: " + a.toString() + " vs. "
                 + b.toString());
     }
@@ -225,4 +225,4 @@ bool ResourceSupportVector::isNonNegative(const ResourceSupportVector& a)
 
 
 } // end namespace algebra
-} // end namespace organization_model
+} // end namespace moreorg

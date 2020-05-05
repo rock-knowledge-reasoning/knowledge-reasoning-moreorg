@@ -2,8 +2,8 @@
 
 using namespace owlapi::model;
 
-namespace organization_model {
-namespace organization_model {
+namespace moreorg {
+namespace moreorg {
 
 Grounding::Grounding(const RequirementsGrounding& grounding)
     : mRequirementToResourceMap(grounding)
@@ -77,5 +77,5 @@ std::string Grounding::toString() const
     return ss.str();
 }
 
-} // end namespace organization_model
-} // end namespace organization_model
+} // end namespace moreorg
+} // end namespace moreorg

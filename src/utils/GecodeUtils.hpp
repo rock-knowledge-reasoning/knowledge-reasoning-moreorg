@@ -1,7 +1,7 @@
 #include "gecode/int.hh"
 #include <map>
 
-namespace organization_model {
+namespace moreorg {
 namespace utils {
 
 class GecodeUtils
@@ -19,4 +19,4 @@ public:
 };
 
 } // end namespace utils
-} // end namespace organization_model
+} // end namespace moreorg

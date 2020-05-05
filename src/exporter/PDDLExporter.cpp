@@ -10,7 +10,7 @@
 
 using namespace owlapi::model;
 
-namespace organization_model {
+namespace moreorg {
 
 std::map<PDDLExporter::Keyword, std::string> PDDLExporter::KeywordTxt =
 {
@@ -38,7 +38,7 @@ PDDLExporter::PDDLExporter(const OrganizationModelAsk& ask,
 pddl_planner::representation::Domain PDDLExporter::toDomain()
 {
     using namespace owlapi::vocabulary;
-    using namespace organization_model::vocabulary;
+    using namespace moreorg::vocabulary;
     using namespace pddl_planner;
 
     pddl_planner::representation::Domain domain("om");
@@ -234,7 +234,7 @@ pddl_planner::representation::Problem PDDLExporter::toProblem()
     mAgentType2Functionality.clear();
 
     using namespace owlapi::vocabulary;
-    using namespace organization_model::vocabulary;
+    using namespace moreorg::vocabulary;
 
     using namespace pddl_planner;
     using namespace pddl_planner::representation;

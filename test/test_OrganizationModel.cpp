@@ -1,17 +1,17 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
-#include <organization_model/OrganizationModel.hpp>
-#include <organization_model/OrganizationModelAsk.hpp>
-#include <organization_model/exporter/PDDLExporter.hpp>
+#include <moreorg/OrganizationModel.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
+#include <moreorg/exporter/PDDLExporter.hpp>
 #include <numeric/Combinatorics.hpp>
-#include <organization_model/metrics/Redundancy.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/metrics/Redundancy.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 
-using namespace organization_model;
-using namespace organization_model::vocabulary;
+using namespace moreorg;
+using namespace moreorg::vocabulary;
 
-BOOST_AUTO_TEST_SUITE(organization_model)
+BOOST_AUTO_TEST_SUITE(moreorg)
 
 BOOST_AUTO_TEST_CASE(load_file)
 {
@@ -449,7 +449,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //
 //BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_with_punning)
 //{
-//    using namespace organization_model::vocabulary;
+//    using namespace moreorg::vocabulary;
 //
 //    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
 //
@@ -472,7 +472,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //
 //BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
 //{
-//    using namespace organization_model::vocabulary;
+//    using namespace moreorg::vocabulary;
 //    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
 //
 //    {
@@ -506,7 +506,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //    distances.push_back("location_c0");
 //    distances.push_back("location_p0");
 //
-//    using namespace organization_model::vocabulary;
+//    using namespace moreorg::vocabulary;
 //    using namespace pddl_planner::representation;
 //
 //    std::string locationType = OM::Location().getFragment();
@@ -542,7 +542,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //
 //BOOST_AUTO_TEST_CASE(it_should_handle_actorlinkmodel)
 //{
-//    using namespace organization_model::organization_model;
+//    using namespace moreorg::organization_model;
 //
 //    EndpointModel model0("http://test#P", "http://test#p0");
 //    EndpointModel model1("http://test#P", "http://test#p0");

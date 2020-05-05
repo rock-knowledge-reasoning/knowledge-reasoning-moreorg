@@ -6,7 +6,7 @@
 #include <owlapi/model/IRI.hpp>
 #include <boost/functional/hash.hpp>
 
-namespace organization_model {
+namespace moreorg {
 
 typedef owlapi::model::IRIList ModelCombination;
 typedef std::set<ModelCombination> ModelCombinationSet;
@@ -277,16 +277,16 @@ public:
     static std::vector<owlapi::model::IRI> getModels(const ModelPool& modelPool);
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 
 // Enable usage of ModelPool as key in unordered maps
 namespace std {
 template<>
-struct hash<organization_model::ModelPool> {
-    size_t operator()(const organization_model::ModelPool& modelPool) const
+struct hash<moreorg::ModelPool> {
+    size_t operator()(const moreorg::ModelPool& modelPool) const
     {
         size_t seed = 0;
-        for(const organization_model::ModelPool::value_type& v : modelPool)
+        for(const moreorg::ModelPool::value_type& v : modelPool)
         {
             size_t hashValue = std::hash<owlapi::model::IRI>()(v.first);
             boost::hash_combine(seed, hashValue);

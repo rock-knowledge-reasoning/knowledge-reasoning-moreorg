@@ -3,7 +3,7 @@
 
 #include "OrganizationModel.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 class Algebra
 {
@@ -101,5 +101,5 @@ public:
     static bool isSuperset(const ModelPool& a, const ModelPool& b);
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ALGEBRA_HPP

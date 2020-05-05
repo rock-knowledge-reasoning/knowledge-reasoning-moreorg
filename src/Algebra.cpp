@@ -1,6 +1,6 @@
 #include "Algebra.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 ModelPoolDelta Algebra::substract(const ModelPoolDelta& a, const ModelPoolDelta& b)
 {
@@ -237,4 +237,4 @@ bool Algebra::isSuperset(const ModelPool& a, const ModelPool& b)
     return isSubset(b,a);
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

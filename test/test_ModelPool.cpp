@@ -1,11 +1,11 @@
 #include <boost/test/unit_test.hpp>
-#include <organization_model/ModelPool.hpp>
-#include <organization_model/ModelPoolIterator.hpp>
-#include <organization_model/Algebra.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/ModelPool.hpp>
+#include <moreorg/ModelPoolIterator.hpp>
+#include <moreorg/Algebra.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 
-using namespace organization_model;
-using namespace organization_model::vocabulary;
+using namespace moreorg;
+using namespace moreorg::vocabulary;
 
 BOOST_AUTO_TEST_SUITE(model_pool)
 

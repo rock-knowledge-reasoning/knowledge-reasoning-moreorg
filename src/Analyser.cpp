@@ -4,7 +4,7 @@
 
 using namespace std::placeholders;
 
-namespace organization_model {
+namespace moreorg {
 
 std::map<Analyser::AtomicAgentSampleType, std::string> Analyser::AtomicAgentSampleTypeTxt =
 {
@@ -135,7 +135,7 @@ StatusSample::ConstRawPtrList Analyser::statusSamplesFor(const AtomicAgent& atom
     {
         return cit->second;
     }
-    throw std::invalid_argument("organization_model::Analyser::statusSamplesFor: the given atomic agent is not unknown");
+    throw std::invalid_argument("moreorg::Analyser::statusSamplesFor: the given atomic agent is not unknown");
 }
 
 Agent::List Analyser::getCoalitionStructure(size_t time) const
@@ -370,7 +370,7 @@ std::vector<double> Analyser::getCoalitionStructureValue(size_t time, AgentSampl
     std::map<AgentSampleType, AgentSampleFunc>::const_iterator it = mAgentSampleFunctionMap.find(sampleType);
     if(it == mAgentSampleFunctionMap.end())
     {
-        throw std::invalid_argument("organization_model::Analyser::getCoalitionStructureValue: not function registered for sample"
+        throw std::invalid_argument("moreorg::Analyser::getCoalitionStructureValue: not function registered for sample"
                 " type: '" + AgentSampleTypeTxt[sampleType]  + "'");
     }
 
@@ -440,7 +440,7 @@ double Analyser::getMedian(std::vector<double> values)
 {
     if(values.empty())
     {
-        throw std::invalid_argument("organization_model::Analyser::getMedian: no values provided");
+        throw std::invalid_argument("moreorg::Analyser::getMedian: no values provided");
     }
 
     size_t valueCount = values.size();
@@ -466,7 +466,7 @@ numeric::Stats<double> Analyser::getStats(const std::vector<double>& values)
 {
     if(values.empty())
     {
-        throw std::invalid_argument("organization_model::Analyser::getStats: no values provided");
+        throw std::invalid_argument("moreorg::Analyser::getStats: no values provided");
     }
     numeric::Stats<double> stats;
     for(double v : values)
@@ -480,7 +480,7 @@ double Analyser::getMedianAbsoluteDeviation(const std::vector<double>& values)
 {
     if(values.empty())
     {
-        throw std::invalid_argument("organization_model::Analyser::getMedianAbsoluteDeviation: no values provided");
+        throw std::invalid_argument("moreorg::Analyser::getMedianAbsoluteDeviation: no values provided");
     }
 
     double median = Analyser::getMedian(values);
@@ -562,4 +562,4 @@ std::string Analyser::toString(const std::vector<double>& data)
     return row;
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

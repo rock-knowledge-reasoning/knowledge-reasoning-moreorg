@@ -3,7 +3,7 @@
 
 #include <owlapi/Vocabulary.hpp>
 
-namespace organization_model {
+namespace moreorg {
 namespace vocabulary {
 
 class VRP
@@ -17,5 +17,5 @@ public:
 };
 
 } // end namespace vocabulary
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_VOCABULARIES_VRP_HPP

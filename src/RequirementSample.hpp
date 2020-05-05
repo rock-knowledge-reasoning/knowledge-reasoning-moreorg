@@ -5,7 +5,7 @@
 #include "Resource.hpp"
 #include "ModelPool.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 /**
  * A requirement associate with location and time
@@ -46,5 +46,5 @@ protected:
 
 
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_REQUIREMENT_SAMPLE_HPP

@@ -1,10 +1,10 @@
 #ifndef ORGANIZATION_MODEL_FACADES_FACADE_HPP
 #define ORGANIZATION_MODEL_FACADES_FACADE_HPP
 
-#include <organization_model/OrganizationModelAsk.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
 
-namespace organization_model {
+namespace moreorg {
 namespace facades {
 
 class Facade
@@ -30,5 +30,5 @@ protected:
 };
 
 } // end namespace facades
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_FACADES_FACADE_HPP

@@ -1,7 +1,7 @@
 #include "Facade.hpp"
 #include <base-logging/Logging.hpp>
 
-namespace organization_model {
+namespace moreorg {
 namespace facades {
 
 Facade::Facade(const OrganizationModelAsk& organizationModelAsk)
@@ -32,5 +32,5 @@ double Facade::getDoubleValueOrDefault(const owlapi::model::IRI& agentModel, con
 
 
 } // end namespace facades
-} // end namespace organization_model
+} // end namespace moreorg
 

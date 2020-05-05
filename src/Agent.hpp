@@ -4,7 +4,7 @@
 #include "AtomicAgent.hpp"
 #include "OrganizationModelAsk.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 /**
  * \class Agent
@@ -113,5 +113,5 @@ private:
 /// A coalition structure is a list of (composite) agents
 typedef Agent::List CoalitionStructure;
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_AGENT_HPP

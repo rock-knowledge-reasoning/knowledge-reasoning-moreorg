@@ -5,7 +5,7 @@
 #include <gecode/int.hh>
 #include <algorithm>
 
-namespace organization_model {
+namespace moreorg {
 namespace reasoning {
 
 uint32_t ModelBound::MAX_THRESHOLD = 1E06;
@@ -149,4 +149,4 @@ bool ModelBound::operator<(const ModelBound& other) const
 }
 
 } // end namespace reasoning
-} // end namespace organization_model
+} // end namespace moreorg

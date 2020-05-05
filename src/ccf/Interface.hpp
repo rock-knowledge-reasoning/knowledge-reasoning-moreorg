@@ -1,7 +1,7 @@
 #ifndef MULTIAGENT_CCF_INTERFACE_HPP
 #define MULTIAGENT_CCF_INTERFACE_HPP
 
-#include <organization_model/ccf/InterfaceType.hpp>
+#include <moreorg/ccf/InterfaceType.hpp>
 
 namespace multiagent {
 namespace ccf {

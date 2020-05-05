@@ -2,13 +2,13 @@
 #define ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
 
 #include <stdint.h>
-#include <organization_model/SharedPtr.hpp>
+#include <moreorg/SharedPtr.hpp>
 #include <owlapi/model/OWLOntology.hpp>
 #include "FunctionalityMapping.hpp"
 #include "Service.hpp"
 #include "QueryCache.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 class OrganizationModelAsk;
 class OrganizationModelTell;
@@ -31,9 +31,9 @@ typedef std::vector<owlapi::model::IRIList> CandidatesList;
  * set of atomic actors.
  *
  * \verbatim
-#include <organization_model/OrganizationModel.hpp>
+#include <moreorg/OrganizationModel.hpp>
 
-using namespace organization_model;
+using namespace moreorg;
 
 OrganizationModel om;
 Ontology::Ptr ontology = om.ontology();
@@ -100,5 +100,5 @@ protected:
     QueryCache mQueryCache;
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP

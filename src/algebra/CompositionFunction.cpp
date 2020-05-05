@@ -1,7 +1,7 @@
 #include "CompositionFunction.hpp"
 #include <limits>
 
-namespace organization_model {
+namespace moreorg {
 namespace algebra {
 
 double CompositionFunction::weightedSum(const ModelPool& modelPool, const IRIValueMap& valueMap)
@@ -15,7 +15,7 @@ double CompositionFunction::weightedSum(const ModelPool& modelPool, const IRIVal
             value += p.second*cit->second;
         } else {
             throw
-                std::invalid_argument("organization_model::algebra::CompositionFunction::weightedSum"
+                std::invalid_argument("moreorg::algebra::CompositionFunction::weightedSum"
                         " no value found for '" + p.first.toString() + "'");
         }
     }
@@ -37,7 +37,7 @@ double CompositionFunction::min(const ModelPool& modelPool, const IRIValueMap& v
             }
         } else {
             throw
-                std::invalid_argument("organization_model::algebra::CompositionFunction::max"
+                std::invalid_argument("moreorg::algebra::CompositionFunction::max"
                         " no value found for '" + p.first.toString() + "'");
         }
     }
@@ -59,7 +59,7 @@ double CompositionFunction::max(const ModelPool& modelPool, const IRIValueMap& v
             }
         } else {
             throw
-                std::invalid_argument("organization_model::algebra::CompositionFunction::max"
+                std::invalid_argument("moreorg::algebra::CompositionFunction::max"
                         " no value found for '" + p.first.toString() + "'");
         }
     }
@@ -67,4 +67,4 @@ double CompositionFunction::max(const ModelPool& modelPool, const IRIValueMap& v
 }
 
 } // end namespace algebra
-} // end namespace organization_model
+} // end namespace moreorg

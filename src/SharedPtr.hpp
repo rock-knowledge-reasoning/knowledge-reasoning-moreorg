@@ -14,7 +14,7 @@
 #include <functional>
 #endif
 
-namespace organization_model
+namespace moreorg
 {
 #ifdef USE_BOOST_SHARED_PTR
     using ::boost::shared_ptr;

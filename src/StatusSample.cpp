@@ -1,6 +1,6 @@
 #include "StatusSample.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 StatusSample::~StatusSample()
 {}
@@ -20,4 +20,4 @@ StatusSample::StatusSample(const Agent& instance,
 {
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

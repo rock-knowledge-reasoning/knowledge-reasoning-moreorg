@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <assert.h>
 
-namespace organization_model {
-namespace organization_model {
+namespace moreorg {
+namespace moreorg {
 
 ActorModelLink::ActorModelLink() {}
 
@@ -71,5 +71,5 @@ std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<ActorM
     return os;
 }
 
-} // namespace organization_model
-} // namespace organization_model
+} // namespace moreorg
+} // namespace moreorg

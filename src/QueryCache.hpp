@@ -11,7 +11,7 @@
 
 namespace std {
 using namespace owlapi::model;
-using namespace organization_model;
+using namespace moreorg;
 template<>
 struct hash< tuple<ModelPool, IRI, OWLCardinalityRestriction::OperationType, bool> >
 {
@@ -51,7 +51,7 @@ struct hash< tuple<ModelPool, Resource::Set> >
 };
 } // end namespace std
 
-namespace organization_model {
+namespace moreorg {
 
 class QueryCache
 {
@@ -93,5 +93,5 @@ protected:
     CSQueryResults mCSQueryResults;
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_QUERY_CACHE_HPP

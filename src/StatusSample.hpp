@@ -10,7 +10,7 @@
 #include "OrganizationModelAsk.hpp"
 #include "Sample.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 /**
  * \class StatusSample
@@ -60,5 +60,5 @@ private:
     Resource::Set mResourceRequirements;
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_STATUS_SAMPLE_HPP

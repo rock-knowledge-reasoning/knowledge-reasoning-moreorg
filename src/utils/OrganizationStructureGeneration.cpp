@@ -4,7 +4,7 @@
 
 using namespace numeric;
 
-namespace organization_model {
+namespace moreorg {
 namespace utils {
 
 std::ostream& operator<<(std::ostream& os, const Coalition& list)
@@ -662,4 +662,4 @@ CoalitionStructureGeneration::Statistics CoalitionStructureGeneration::getStatis
 }
 
 } // end namespace utils
-} // end namespace organization_model
+} // end namespace moreorg

@@ -3,7 +3,7 @@
 
 using namespace owlapi::model;
 
-namespace organization_model {
+namespace moreorg {
 namespace policies {
 
 EnergyProviderPolicy::EnergyProviderPolicy()
@@ -53,4 +53,4 @@ void EnergyProviderPolicy::update(const ModelPool& modelPool, const Organization
 }
 
 } // end namespace policies
-} // end organization_model
+} // end moreorg

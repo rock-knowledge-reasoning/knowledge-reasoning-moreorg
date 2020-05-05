@@ -1,15 +1,15 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
-#include <organization_model/OrganizationModel.hpp>
-#include <organization_model/metrics/Redundancy.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/OrganizationModel.hpp>
+#include <moreorg/metrics/Redundancy.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <owlapi/model/OWLOntologyTell.hpp>
 #include <owlapi/model/OWLExactCardinalityRestriction.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 
-using namespace organization_model;
+using namespace moreorg;
 using namespace owlapi;
 using namespace owlapi::model;
 
@@ -131,10 +131,10 @@ BOOST_AUTO_TEST_CASE(redundancy_computation)
     OrganizationModelAsk omAsk(OrganizationModel::Ptr(new OrganizationModel(om)) );
     metrics::Redundancy redundancy(omAsk);
 
-    IRI sherpa = organization_model::vocabulary::OM::resolve("Sherpa");
-    IRI payloadCamera = organization_model::vocabulary::OM::resolve("PayloadCamera");
-    IRI payloadBattery = organization_model::vocabulary::OM::resolve("PayloadBattery");
-    IRI transportProvider = organization_model::vocabulary::OM::resolve("TransportProvider");
+    IRI sherpa = moreorg::vocabulary::OM::resolve("Sherpa");
+    IRI payloadCamera = moreorg::vocabulary::OM::resolve("PayloadCamera");
+    IRI payloadBattery = moreorg::vocabulary::OM::resolve("PayloadBattery");
+    IRI transportProvider = moreorg::vocabulary::OM::resolve("TransportProvider");
 
     //{
     //    ModelPool availableModelPool;
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(redundancy_computation)
     //    BOOST_TEST_MESSAGE("TEST: " << redundancy.computeSequential(functionalities, availableModelPool));
     //}
 
-    IRI stereoCameraProvider = organization_model::vocabulary::OM::resolve("StereoImageProvider");
+    IRI stereoCameraProvider = moreorg::vocabulary::OM::resolve("StereoImageProvider");
     {
         ModelPool availableModelPool;
         availableModelPool[sherpa] = 1;
@@ -171,8 +171,8 @@ BOOST_AUTO_TEST_CASE(redundancy_computation)
     //    availableModelPool[sherpa] = 2;
     //    double r =  redundancy.computeExclusiveUse(requiredModelPool, availableModelPool);
 
-    //    BOOST_TEST_MESSAGE("Test show required: " << OWLCardinalityRestriction::toString( omAsk.getCardinalityRestrictions(requiredModelPool, organization_model::vocabulary::OM::has(), OWLCardinalityRestriction::SUM_OP) ) );
-    //    BOOST_TEST_MESSAGE("Test show available: " << OWLCardinalityRestriction::toString( omAsk.getCardinalityRestrictions(availableModelPool, organization_model::vocabulary::OM::has(), OWLCardinalityRestriction::SUM_OP) ) );
+    //    BOOST_TEST_MESSAGE("Test show required: " << OWLCardinalityRestriction::toString( omAsk.getCardinalityRestrictions(requiredModelPool, moreorg::vocabulary::OM::has(), OWLCardinalityRestriction::SUM_OP) ) );
+    //    BOOST_TEST_MESSAGE("Test show available: " << OWLCardinalityRestriction::toString( omAsk.getCardinalityRestrictions(availableModelPool, moreorg::vocabulary::OM::has(), OWLCardinalityRestriction::SUM_OP) ) );
     //    BOOST_REQUIRE_MESSAGE(true, "Redundancy exclusive use is:" << r);
     //}
 
@@ -195,17 +195,17 @@ BOOST_AUTO_TEST_CASE(function_redundancy)
     std::string filename = getRootDir() + "/test/data/om-project-transterra.owl";
 
     ModelPool modelPool;
-    modelPool[organization_model::vocabulary::OM::resolve("Sherpa")] = 5;
-    modelPool[organization_model::vocabulary::OM::resolve("CREX")] = 3;
-    modelPool[organization_model::vocabulary::OM::resolve("BaseCamp")] = 3;
-    modelPool[organization_model::vocabulary::OM::resolve("Payload")] = 10;
+    modelPool[moreorg::vocabulary::OM::resolve("Sherpa")] = 5;
+    modelPool[moreorg::vocabulary::OM::resolve("CREX")] = 3;
+    modelPool[moreorg::vocabulary::OM::resolve("BaseCamp")] = 3;
+    modelPool[moreorg::vocabulary::OM::resolve("Payload")] = 10;
 
     OrganizationModel::Ptr om = make_shared<OrganizationModel>(filename);
     OrganizationModelAsk ask(om, modelPool, true);
 
     {
         IRISet functionSet;
-        functionSet.insert(organization_model::vocabulary::OM::resolve("Mapping"));
+        functionSet.insert(moreorg::vocabulary::OM::resolve("Mapping"));
         Metric::Ptr metrics = Metric::getInstance(metrics::REDUNDANCY, ask);
         double value = metrics->computeSharedUse(functionSet, modelPool);
         BOOST_REQUIRE_MESSAGE(value != 0, "Mapping has redundancy: " << value);
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE(function_redundancy)
 
     {
         IRISet functionSet;
-        functionSet.insert(organization_model::vocabulary::OM::resolve("TransportProvider"));
+        functionSet.insert(moreorg::vocabulary::OM::resolve("TransportProvider"));
         Metric::Ptr metrics = Metric::getInstance(metrics::REDUNDANCY, ask);
         double value = metrics->computeSharedUse(functionSet, modelPool);
 

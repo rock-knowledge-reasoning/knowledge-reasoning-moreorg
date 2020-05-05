@@ -3,7 +3,7 @@
 #include <base-logging/Logging.hpp>
 #include <sstream>
 
-namespace organization_model {
+namespace moreorg {
 
 Resource::Resource(const owlapi::model::IRI& model)
     : mModel(model)
@@ -135,7 +135,7 @@ Resource Resource::merge(const Resource& a, const Resource& b)
 {
     if(a.mModel != b.mModel)
     {
-        throw std::invalid_argument("organization_model::Resource::merge: cannot merge resources: "
+        throw std::invalid_argument("moreorg::Resource::merge: cannot merge resources: "
                 " models are different: '" + a.mModel.toString() + "' and '" + b.mModel.toString());
     }
 

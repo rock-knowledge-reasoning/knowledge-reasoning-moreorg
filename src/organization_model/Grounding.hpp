@@ -4,8 +4,8 @@
 #include <map>
 #include <owlapi/OWLApi.hpp>
 
-namespace organization_model {
-namespace organization_model {
+namespace moreorg {
+namespace moreorg {
 
 typedef std::map<owlapi::model::OWLRestriction::Ptr, std::vector<owlapi::model::IRI> > RequirementsGrounding;
 
@@ -53,7 +53,7 @@ public:
 
 };
 
-} // end namespace organization_model
-} // end namespace organization_model
+} // end namespace moreorg
+} // end namespace moreorg
 
 #endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_GROUNDING_HPP

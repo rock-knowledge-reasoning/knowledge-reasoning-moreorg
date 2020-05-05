@@ -1,15 +1,15 @@
 #include <boost/test/unit_test.hpp>
-#include <organization_model/OrganizationModel.hpp>
-#include <organization_model/OrganizationModelAsk.hpp>
-#include <organization_model/Algebra.hpp>
+#include <moreorg/OrganizationModel.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
+#include <moreorg/Algebra.hpp>
 #include "test_utils.hpp"
-#include <organization_model/vocabularies/OM.hpp>
-#include <organization_model/algebra/Connectivity.hpp>
+#include <moreorg/vocabularies/OM.hpp>
+#include <moreorg/algebra/Connectivity.hpp>
 #include <graph_analysis/BaseGraph.hpp>
 #include <graph_analysis/GraphIO.hpp>
 
-using namespace organization_model;
-using namespace organization_model::algebra;
+using namespace moreorg;
+using namespace moreorg::algebra;
 
 BOOST_AUTO_TEST_SUITE(algebra)
 
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(resource_support)
 {
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
-    using namespace organization_model::vocabulary;
+    using namespace moreorg::vocabulary;
 
     OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-schema-v0.7.owl"));
     OrganizationModelAsk ask(om);

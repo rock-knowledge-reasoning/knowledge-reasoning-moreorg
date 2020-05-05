@@ -5,7 +5,7 @@
 #include <vector>
 #include <owlapi/model/IRI.hpp>
 
-namespace organization_model {
+namespace moreorg {
 
 class Service
 {
@@ -35,5 +35,5 @@ private:
 typedef std::vector<Service> ServiceList;
 typedef std::set<Service> ServiceSet;
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_SERVICE_HPP

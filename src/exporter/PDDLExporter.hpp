@@ -1,11 +1,11 @@
 #ifndef ORGANIZATION_MODEL_EXPORTER_PDDL_EXPORTER_HPP
 #define ORGANIZATION_MODEL_EXPORTER_PDDL_EXPORTER_HPP
 
-#include <organization_model/OrganizationModelAsk.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
 #include <pddl_planner/representation/Domain.hpp>
 #include <pddl_planner/representation/Problem.hpp>
 
-namespace organization_model {
+namespace moreorg {
 
 /**
  * \brief The PDDLExporter allows to export an instance of the OrganizationModel
@@ -116,5 +116,5 @@ private:
 
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_EXPORTER_PDDL_EXPORTER_HPP

@@ -2,18 +2,18 @@
 #include "test_utils.hpp"
 
 #include <owlapi/Vocabulary.hpp>
-#include <organization_model/vocabularies/OM.hpp>
-#include <organization_model/reasoning/ResourceMatch.hpp>
-#include <organization_model/algebra/Connectivity.hpp>
-#include <organization_model/OrganizationModel.hpp>
-#include <organization_model/OrganizationModelAsk.hpp>
+#include <moreorg/vocabularies/OM.hpp>
+#include <moreorg/reasoning/ResourceMatch.hpp>
+#include <moreorg/algebra/Connectivity.hpp>
+#include <moreorg/OrganizationModel.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
 #include <graph_analysis/GraphAnalysis.hpp>
 #include <graph_analysis/GraphIO.hpp>
 
 using namespace owlapi;
 using namespace owlapi::model;
-using namespace organization_model;
-using namespace organization_model::reasoning;
+using namespace moreorg;
+using namespace moreorg::reasoning;
 using namespace graph_analysis;
 
 BOOST_AUTO_TEST_SUITE(lego)
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(list)
     for(size_t i = 0; i < epochs; ++i)
     {
         BaseGraph::Ptr baseGraph;
-        bool feasible = algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, 0, minFeasible, organization_model::vocabulary::OM::resolve("MechanicalInterface") );
+        bool feasible = algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, 0, minFeasible, moreorg::vocabulary::OM::resolve("MechanicalInterface") );
         BOOST_REQUIRE_MESSAGE(feasible, "Connectivity check should validate feasibility");
         if(baseGraph)
         {
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(icaps)
     for(size_t i = 0; i < epochs; ++i)
     {
         BaseGraph::Ptr baseGraph;
-        bool feasible = algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, 0, minFeasible, organization_model::vocabulary::OM::resolve("MechanicalInterface") );
+        bool feasible = algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, 0, minFeasible, moreorg::vocabulary::OM::resolve("MechanicalInterface") );
         BOOST_REQUIRE_MESSAGE(feasible, "Connectivity check should validate feasibility");
         if(baseGraph)
         {

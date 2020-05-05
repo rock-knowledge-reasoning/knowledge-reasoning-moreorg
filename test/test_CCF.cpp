@@ -1,11 +1,11 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
-#include <organization_model/ccf/CCF.hpp>
-#include <organization_model/OrganizationModel.hpp>
+#include <moreorg/ccf/CCF.hpp>
+#include <moreorg/OrganizationModel.hpp>
 #include <set>
 
-using namespace organization_model;
+using namespace moreorg;
 using namespace owlapi::model;
 
 BOOST_AUTO_TEST_SUITE(constraint_coalition_formation)

@@ -2,10 +2,10 @@
 #define ORGANIZATION_MODEL_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP
 
 #include <owlapi/model/IRI.hpp>
-#include <organization_model/organization_model/ActorModelLink.hpp>
+#include <moreorg/organization_model/ActorModelLink.hpp>
 
-namespace organization_model {
-namespace organization_model {
+namespace moreorg {
+namespace moreorg {
 
 struct InterfaceConnection
 {
@@ -46,6 +46,6 @@ std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection
 std::ostream& operator<<(std::ostream& os, const InterfaceConnectionList& list);
 std::ostream& operator<<(std::ostream& os, const InterfaceCombinationList& list);
 
-} // end namespace organization_model
-} // end namespace organization_model
+} // end namespace moreorg
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP

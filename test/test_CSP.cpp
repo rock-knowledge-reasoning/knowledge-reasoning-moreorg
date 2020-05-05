@@ -3,17 +3,17 @@
 #include <owlapi/io/OWLOntologyIO.hpp>
 #include <owlapi/model/OWLOntologyTell.hpp>
 #include <owlapi/OWLApi.hpp>
-#include <organization_model/reasoning/ResourceMatch.hpp>
-#include <organization_model/vocabularies/OM.hpp>
-#include <organization_model/OrganizationModelAsk.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/reasoning/ResourceMatch.hpp>
+#include <moreorg/vocabularies/OM.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 
 #include "test_utils.hpp"
 
 using namespace owlapi;
 using namespace owlapi::model;
-using namespace organization_model;
-using namespace organization_model::reasoning;
+using namespace moreorg;
+using namespace moreorg::reasoning;
 
 BOOST_AUTO_TEST_SUITE(csp)
 
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(match_resource_via_restrictions)
         resourcePool.push_back(restriction);
     }
 
-    using namespace organization_model::reasoning;
+    using namespace moreorg::reasoning;
     ModelBound::List required = ResourceMatch::toModelBoundList(query);
     ModelBound::List available = ResourceMatch::toModelBoundList(resourcePool);
 
@@ -106,26 +106,26 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     OWLOntologyAsk ask(ontology);
     tell.initializeDefaultClasses();
 
-    IRI sherpa = organization_model::vocabulary::OM::resolve("Sherpa");
-    IRI move_to = organization_model::vocabulary::OM::resolve("MoveTo");
-    IRI image_provider = organization_model::vocabulary::OM::resolve("ImageProvider");
-    IRI stereo_image_provider = organization_model::vocabulary::OM::resolve("StereoImageProvider");
-    IRI location_image_provider = organization_model::vocabulary::OM::resolve("LocationImageProvider");
+    IRI sherpa = moreorg::vocabulary::OM::resolve("Sherpa");
+    IRI move_to = moreorg::vocabulary::OM::resolve("MoveTo");
+    IRI image_provider = moreorg::vocabulary::OM::resolve("ImageProvider");
+    IRI stereo_image_provider = moreorg::vocabulary::OM::resolve("StereoImageProvider");
+    IRI location_image_provider = moreorg::vocabulary::OM::resolve("LocationImageProvider");
 
-    std::vector<OWLCardinalityRestriction::Ptr> r_sherpa = ask.getCardinalityRestrictions(sherpa, organization_model::vocabulary::OM::has());
-    std::vector<OWLCardinalityRestriction::Ptr> r_move_to = ask.getCardinalityRestrictions(move_to, organization_model::vocabulary::OM::has());
-    std::vector<OWLCardinalityRestriction::Ptr> r_image_provider = ask.getCardinalityRestrictions(image_provider, organization_model::vocabulary::OM::has());
-    std::vector<OWLCardinalityRestriction::Ptr> r_stereo_image_provider = ask.getCardinalityRestrictions(stereo_image_provider, organization_model::vocabulary::OM::has());
-    std::vector<OWLCardinalityRestriction::Ptr> r_location_image_provider = ask.getCardinalityRestrictions(location_image_provider, organization_model::vocabulary::OM::has());
+    std::vector<OWLCardinalityRestriction::Ptr> r_sherpa = ask.getCardinalityRestrictions(sherpa, moreorg::vocabulary::OM::has());
+    std::vector<OWLCardinalityRestriction::Ptr> r_move_to = ask.getCardinalityRestrictions(move_to, moreorg::vocabulary::OM::has());
+    std::vector<OWLCardinalityRestriction::Ptr> r_image_provider = ask.getCardinalityRestrictions(image_provider, moreorg::vocabulary::OM::has());
+    std::vector<OWLCardinalityRestriction::Ptr> r_stereo_image_provider = ask.getCardinalityRestrictions(stereo_image_provider, moreorg::vocabulary::OM::has());
+    std::vector<OWLCardinalityRestriction::Ptr> r_location_image_provider = ask.getCardinalityRestrictions(location_image_provider, moreorg::vocabulary::OM::has());
 
-    using namespace organization_model::reasoning;
+    using namespace moreorg::reasoning;
     ResourceMatch::Solution fulfillment = ResourceMatch::solve(r_move_to, r_sherpa, ontology);
     BOOST_TEST_MESSAGE("Sherpa provides MoveTo\nAssignment: " << fulfillment.toString());
     BOOST_TEST_MESSAGE("MoveTo requirements: " << OWLCardinalityRestriction::toString(r_move_to));
     BOOST_TEST_MESSAGE("Sherpa provides: " << OWLCardinalityRestriction::toString(r_sherpa));
     {
         std::string capabilityName = "Localization";
-        ModelBound::List modelBounds = fulfillment.getAssignments(organization_model::vocabulary::OM::resolve(capabilityName));
+        ModelBound::List modelBounds = fulfillment.getAssignments(moreorg::vocabulary::OM::resolve(capabilityName));
         BOOST_REQUIRE_MESSAGE(modelBounds.size() == 1, "Matching of 1 provided resource expected, but got '" << modelBounds.size());
 
         ModelBound modelBound = modelBounds.front();
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     }
     {
         std::string capabilityName = "Locomotion";
-        ModelBound::List modelBounds = fulfillment.getAssignments(organization_model::vocabulary::OM::resolve(capabilityName));
+        ModelBound::List modelBounds = fulfillment.getAssignments(moreorg::vocabulary::OM::resolve(capabilityName));
         BOOST_REQUIRE_MESSAGE(modelBounds.size() == 1, "Matching of 1 provided resource expected, but got '" << modelBounds.size());
 
         ModelBound modelBound = modelBounds.front();
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     }
     {
         std::string capabilityName = "Mapping";
-        ModelBound::List modelBounds = fulfillment.getAssignments(organization_model::vocabulary::OM::resolve(capabilityName));
+        ModelBound::List modelBounds = fulfillment.getAssignments(moreorg::vocabulary::OM::resolve(capabilityName));
         BOOST_REQUIRE_MESSAGE(modelBounds.size() == 1, "Matching of 1 provided resource expected, but got '" << modelBounds.size());
 
         ModelBound modelBound = modelBounds.front();
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     }
     {
         std::string capabilityName = "PowerSource";
-        ModelBound::List modelBounds = fulfillment.getAssignments(organization_model::vocabulary::OM::resolve(capabilityName));
+        ModelBound::List modelBounds = fulfillment.getAssignments(moreorg::vocabulary::OM::resolve(capabilityName));
         BOOST_REQUIRE_MESSAGE(modelBounds.size() == 1, "Matching of 1 provided resource expected, but got '" << modelBounds.size());
 
         ModelBound modelBound = modelBounds.front();
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     BOOST_TEST_MESSAGE("Sherpa provides ImageProvider\nAssignment: " << fulfillment.toString());
 
     {
-        OWLObjectProperty::Ptr hasProperty = ask.getOWLObjectProperty( organization_model::vocabulary::OM::resolve("has") );
+        OWLObjectProperty::Ptr hasProperty = ask.getOWLObjectProperty( moreorg::vocabulary::OM::resolve("has") );
         OWLCardinalityRestriction::Ptr restriction(new OWLObjectMinCardinality(hasProperty, 1, image_provider));
         tell.subClassOf(sherpa, restriction);
     }
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     BOOST_TEST_MESSAGE("Sherpa provides StereoImageProvider\nAssignment: " << fulfillment.toString());
 
     {
-        OWLObjectProperty::Ptr hasProperty = ask.getOWLObjectProperty( organization_model::vocabulary::OM::resolve("has") );
+        OWLObjectProperty::Ptr hasProperty = ask.getOWLObjectProperty( moreorg::vocabulary::OM::resolve("has") );
         OWLCardinalityRestriction::Ptr restriction(new OWLObjectMinCardinality(hasProperty, 1, move_to));
         tell.subClassOf(sherpa, restriction);
     }
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     //  --> location_image_provider
     //    --> 1 - move_to
     //    --> 1 - image_provider
-    std::vector<OWLCardinalityRestriction::Ptr> r_sherpa_with_service = ask.getCardinalityRestrictions(sherpa, organization_model::vocabulary::OM::has());
+    std::vector<OWLCardinalityRestriction::Ptr> r_sherpa_with_service = ask.getCardinalityRestrictions(sherpa, moreorg::vocabulary::OM::has());
     try {
         fulfillment = ResourceMatch::solve(r_location_image_provider, r_sherpa_with_service, ontology);
         BOOST_REQUIRE_MESSAGE(true, "Sherpa provides LocationImageProvider\nAssignment: " << fulfillment.toString());
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     serviceModels.push_back(location_image_provider);
     serviceModels.push_back(image_provider);
     serviceModels.push_back(move_to);
-    IRI emi_power_provider = organization_model::vocabulary::OM::resolve("EmiPowerProvider");
+    IRI emi_power_provider = moreorg::vocabulary::OM::resolve("EmiPowerProvider");
     serviceModels.push_back(emi_power_provider);
 
     {
@@ -255,12 +255,12 @@ BOOST_AUTO_TEST_CASE(performance_three_sherpa)
     OWLOntologyAsk ask(ontology);
     tell.initializeDefaultClasses();
 
-    IRI sherpa = organization_model::vocabulary::OM::resolve("Sherpa");
-    IRI move_to = organization_model::vocabulary::OM::resolve("MoveTo");
-    IRI image_provider = organization_model::vocabulary::OM::resolve("ImageProvider");
-    IRI stereo_image_provider = organization_model::vocabulary::OM::resolve("StereoImageProvider");
-    IRI location_image_provider = organization_model::vocabulary::OM::resolve("LocationImageProvider");
-    IRI emi_power_provider = organization_model::vocabulary::OM::resolve("EmiPowerProvider");
+    IRI sherpa = moreorg::vocabulary::OM::resolve("Sherpa");
+    IRI move_to = moreorg::vocabulary::OM::resolve("MoveTo");
+    IRI image_provider = moreorg::vocabulary::OM::resolve("ImageProvider");
+    IRI stereo_image_provider = moreorg::vocabulary::OM::resolve("StereoImageProvider");
+    IRI location_image_provider = moreorg::vocabulary::OM::resolve("LocationImageProvider");
+    IRI emi_power_provider = moreorg::vocabulary::OM::resolve("EmiPowerProvider");
 
     owlapi::model::IRIList serviceModels;
     // http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider,
@@ -297,11 +297,11 @@ BOOST_AUTO_TEST_CASE(performance_ten_sherpa)
     OWLOntologyAsk ask(ontology);
     tell.initializeDefaultClasses();
 
-    IRI sherpa = organization_model::vocabulary::OM::resolve("Sherpa");
-    IRI move_to = organization_model::vocabulary::OM::resolve("MoveTo");
-    IRI image_provider = organization_model::vocabulary::OM::resolve("ImageProvider");
-    IRI stereo_image_provider = organization_model::vocabulary::OM::resolve("StereoImageProvider");
-    IRI location_image_provider = organization_model::vocabulary::OM::resolve("LocationImageProvider");
+    IRI sherpa = moreorg::vocabulary::OM::resolve("Sherpa");
+    IRI move_to = moreorg::vocabulary::OM::resolve("MoveTo");
+    IRI image_provider = moreorg::vocabulary::OM::resolve("ImageProvider");
+    IRI stereo_image_provider = moreorg::vocabulary::OM::resolve("StereoImageProvider");
+    IRI location_image_provider = moreorg::vocabulary::OM::resolve("LocationImageProvider");
 
     owlapi::model::IRIList serviceModels;
     // http://www.rock-robotics.org/2014/01/om-schema#StereoImageProvider,
@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE(performance_ten_sherpa)
     //serviceModels.push_back(location_image_provider);
     //serviceModels.push_back(image_provider);
     //serviceModels.push_back(move_to);
-    IRI emi_power_provider = organization_model::vocabulary::OM::resolve("EmiPowerProvider");
+    IRI emi_power_provider = moreorg::vocabulary::OM::resolve("EmiPowerProvider");
     serviceModels.push_back(emi_power_provider);
 
 
@@ -435,7 +435,7 @@ BOOST_AUTO_TEST_CASE(function_mapping)
     OrganizationModel::Ptr om(new OrganizationModel(getRootDir() + "/test/data/om-project-transterra.owl"));
     OrganizationModelAsk ask(om);
 
-    IRI mapping = organization_model::vocabulary::OM::resolve("Mapping");
+    IRI mapping = moreorg::vocabulary::OM::resolve("Mapping");
     ModelBound required0(mapping,1,1);
     ModelBound available0(mapping,0,8);
 

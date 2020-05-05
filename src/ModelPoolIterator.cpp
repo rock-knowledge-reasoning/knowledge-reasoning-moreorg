@@ -1,7 +1,7 @@
 #include "ModelPoolIterator.hpp"
 #include "Algebra.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 ModelPoolIterator::ModelPoolIterator(const ModelPool& start, const ModelPool& end,
         const ModelPool& stepSize)

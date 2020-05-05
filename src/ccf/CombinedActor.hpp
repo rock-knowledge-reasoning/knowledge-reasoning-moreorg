@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 #include <map>
-#include <organization_model/ccf/Link.hpp>
+#include <moreorg/ccf/Link.hpp>
 
 namespace multiagent {
 namespace ccf {

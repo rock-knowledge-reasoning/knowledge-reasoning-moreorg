@@ -1,11 +1,11 @@
 #include <boost/test/unit_test.hpp>
-#include <organization_model/OrganizationModelAsk.hpp>
-#include <organization_model/facades/Robot.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
+#include <moreorg/facades/Robot.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 #include "test_utils.hpp"
-#include <organization_model/vocabularies/Robot.hpp>
+#include <moreorg/vocabularies/Robot.hpp>
 
-using namespace organization_model;
+using namespace moreorg;
 
 BOOST_AUTO_TEST_SUITE(facades)
 
@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(robot)
 {
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
-    using namespace organization_model::vocabulary;
+    using namespace moreorg::vocabulary;
 
     OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
     IRI sherpa = OM::resolve("Sherpa");
@@ -25,17 +25,17 @@ BOOST_AUTO_TEST_CASE(robot)
 
     OrganizationModelAsk ask(om, modelPool, true);
     {
-        organization_model::facades::Robot robot(sherpa, ask);
+        moreorg::facades::Robot robot(sherpa, ask);
         BOOST_REQUIRE_MESSAGE(robot.isMobile(), "Robot " << sherpa << " is mobile");
         BOOST_REQUIRE_MESSAGE(robot.getPropertyValue(vocabulary::OM::mass()) ==
                 robot.getMass(), "Mass via numeric value should be equal to the robot mass");
     }
     {
-        organization_model::facades::Robot robot(payload, ask);
+        moreorg::facades::Robot robot(payload, ask);
         BOOST_REQUIRE_MESSAGE(!robot.isMobile(), "Robot " << payload << " is not mobile");
     }
     {
-        organization_model::facades::Robot robot(payload, ask);
+        moreorg::facades::Robot robot(payload, ask);
         BOOST_REQUIRE_MESSAGE(!robot.isMobile(), "Robot " << payload << " is not mobile");
     }
     {
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(robot)
             BOOST_REQUIRE_MESSAGE(supporting, "Robot is supporting '" << f << "'");
         }
         {
-            organization_model::facades::Robot robot(modelPool, ask);
+            moreorg::facades::Robot robot(modelPool, ask);
             BOOST_REQUIRE_MESSAGE(robot.getPropertyValue(vocabulary::OM::mass()) ==
                     robot.getMass(), "Composite agent: Mass via numeric value should be equal to the robot mass");
         }
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
 {
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
-    using namespace organization_model::vocabulary;
+    using namespace moreorg::vocabulary;
 
     IRI organizationModelIRI = "http://www.rock-robotics.org/2015/12/projects/TransTerrA";
     OrganizationModel::Ptr om(new OrganizationModel(organizationModelIRI));
@@ -84,15 +84,15 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
 
     OrganizationModelAsk ask(om, modelPool, true);
     {
-        organization_model::facades::Robot robot(sherpa, ask);
+        moreorg::facades::Robot robot(sherpa, ask);
         BOOST_REQUIRE_MESSAGE(robot.isMobile(), "Robot " << sherpa << " is mobile");
     }
     {
-        organization_model::facades::Robot robot(payload, ask);
+        moreorg::facades::Robot robot(payload, ask);
         BOOST_REQUIRE_MESSAGE(!robot.isMobile(), "Robot " << payload << " is not mobile");
     }
     {
-        organization_model::facades::Robot robot(payload, ask);
+        moreorg::facades::Robot robot(payload, ask);
         BOOST_REQUIRE_MESSAGE(!robot.isMobile(), "Robot " << payload << " is not mobile");
     }
     {
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
     }
 
     {
-        organization_model::facades::Robot robot(sherpa, ask);
+        moreorg::facades::Robot robot(sherpa, ask);
         uint32_t transportDemand = robot.getTransportDemand();
         BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << sherpa << " has transport demand of: " << transportDemand);
 
@@ -149,13 +149,13 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
 
     }
     {
-        organization_model::facades::Robot robot(basecamp, ask);
+        moreorg::facades::Robot robot(basecamp, ask);
         uint32_t transportDemand = robot.getTransportDemand();
         BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << basecamp << " has transport demand of: " << transportDemand);
     }
 
     {
-        organization_model::facades::Robot robot(payload, ask);
+        moreorg::facades::Robot robot(payload, ask);
         uint32_t transportDemand = robot.getTransportDemand();
         BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << payload << " has transport demand of: " << transportDemand);
     }
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE(composite_robot_from_transterra)
 {
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
-    using namespace organization_model::vocabulary;
+    using namespace moreorg::vocabulary;
 
     IRI organizationModelIRI = "http://www.rock-robotics.org/2015/12/projects/TransTerrA";
     OrganizationModel::Ptr om(new OrganizationModel(organizationModelIRI));
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(composite_robot_from_transterra)
     OrganizationModelAsk ask(om, modelPool, true);
     BOOST_TEST_MESSAGE("Functionality mapping: " << ask.getFunctionalityMapping().toString(4));
     {
-        organization_model::facades::Robot robot(modelPool, ask);
+        moreorg::facades::Robot robot(modelPool, ask);
         BOOST_REQUIRE_MESSAGE(robot.isMobile(), "Robot " << modelPool.toString() << " is mobile");
 
 //        uint32_t transportDemand = robot.getTransportDemand();

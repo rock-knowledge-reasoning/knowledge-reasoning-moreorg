@@ -35,7 +35,7 @@ else()
 endif()
 
 find_package(Boost REQUIRED thread serialization program_options)
-rock_library(organization_model
+rock_library(moreorg
     SOURCES
         AtomicAgent.cpp
         Agent.cpp
@@ -158,24 +158,26 @@ rock_library(organization_model
         ${GECODE_LIBRARIES}
 )
 
-target_link_libraries(organization_model ${GECODE_LIBRARIES})
+rock_executable(moreorg-limited_combinations utils/LimitedCombination.cpp
+    DEPS moreorg
+)
 
-rock_executable(limited_combinations utils/LimitedCombination.cpp
-    DEPS organization_model)
+#rock_executable(moreorg_bin Main.cpp
+#    DEPS moreorg)
 
-#rock_executable(organization_model_bin Main.cpp
-#    DEPS organization_model)
+rock_executable(moreorg-multiagent_caf ccf/CAF.cpp
+    DEPS moreorg
+)
 
-rock_executable(multiagent_caf ccf/CAF.cpp
-    DEPS organization_model)
+rock_executable(moreorg-multiagent_scenario_analysis utils/ScenarioAnalysis.cpp
+    DEPS moreorg
+    LIBS ${Boost_LIBRARIES}
+)
 
-rock_executable(multiagent_scenario_analysis utils/ScenarioAnalysis.cpp
-    DEPS organization_model
-    LIBS ${Boost_LIBRARIES})
+rock_executable(moreorg-bm Benchmark.cpp
+    DEPS moreorg)
 
-rock_executable(organization_model-bm Benchmark.cpp
-    DEPS organization_model)
-
-rock_executable(organization_model-reader utils/OrganizationModelReader.cpp
-    DEPS organization_model
-    LIBS ${Boost_LIBRARIES})
+rock_executable(moreorg-reader utils/OrganizationModelReader.cpp
+    DEPS moreorg
+    LIBS ${Boost_LIBRARIES}
+)

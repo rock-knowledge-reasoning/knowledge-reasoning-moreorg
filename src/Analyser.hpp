@@ -8,7 +8,7 @@
 #include "Metric.hpp"
 #include <numeric/Stats.hpp>
 
-namespace organization_model {
+namespace moreorg {
 
 /**
  * \class Analyser
@@ -478,5 +478,5 @@ private:
 
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ANALYSER_HPP

@@ -14,7 +14,7 @@
 #include "../vocabularies/OM.hpp"
 #include <qxcfg/Configuration.hpp>
 
-namespace organization_model {
+namespace moreorg {
 namespace algebra {
 
 typedef std::tuple<ModelPool, owlapi::model::IRI, owlapi::model::IRI, double, size_t>
@@ -23,12 +23,12 @@ typedef std::tuple<ModelPool, owlapi::model::IRI, owlapi::model::IRI, double, si
 typedef std::unordered_map<FeasibilityQuery,
         std::pair<graph_analysis::BaseGraph::Ptr, bool> > QueryCache;
 } // end namespace algebra
-} // end namespace organization_model
+} // end namespace moreorg
 
 
 namespace std {
 using namespace owlapi::model;
-using namespace organization_model::algebra;
+using namespace moreorg::algebra;
 template<>
 struct hash< FeasibilityQuery >
 {
@@ -49,7 +49,7 @@ struct hash< FeasibilityQuery >
 };
 } // end namespace std
 
-namespace organization_model {
+namespace moreorg {
 namespace algebra {
 
 /**
@@ -257,5 +257,5 @@ protected:
 
 
 } // end namespace algebra
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ALGEBRA_CONNECTIVITY_HPP

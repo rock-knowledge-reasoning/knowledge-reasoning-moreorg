@@ -93,7 +93,7 @@ Scenario Scenario::fromFile(const std::string& filename)
             std::vector<std::string> columns(tokens.begin(), tokens.end());
             if(columns.size() != 3)
             {
-                std::invalid_argument("organization_model::ccf::Scenario: invalid column: '" + line + "' in spec");
+                std::invalid_argument("moreorg::ccf::Scenario: invalid column: '" + line + "' in spec");
             }
 
             size_t numberOfInstances = boost::lexical_cast<size_t>(columns.at(0));
@@ -119,7 +119,7 @@ Scenario Scenario::fromFile(const std::string& filename)
         }
         specFile.close();
     } else {
-        throw std::runtime_error("organization_model::ccf::Scenario: failed to load spec from: " + filename );
+        throw std::runtime_error("moreorg::ccf::Scenario: failed to load spec from: " + filename );
     }
 
     return spec;
@@ -214,7 +214,7 @@ void Scenario::createLinks()
         mActorLinkMap[link.getSecondActor()].insert(link);
     }
 
-    organization_model::ModelPool::Set agentSpaceModelPools;
+    moreorg::ModelPool::Set agentSpaceModelPools;
     std::set< std::set<Link> > linkSpaceModelPools;
 
     int count = 0;
@@ -256,14 +256,14 @@ void Scenario::createLinks()
     mNumberOfActorTypesLinkSpace = linkSpaceModelPools.size() + mActorTypes.size();
 
     std::cout << "Max: " << mMaxCoalitionSize << std::endl;
-    std::cout << "ModelPool: Agents " << agentSpaceModelPools.size() << std::endl << organization_model::ModelPool::toString(agentSpaceModelPools) << std::endl;
+    std::cout << "ModelPool: Agents " << agentSpaceModelPools.size() << std::endl << moreorg::ModelPool::toString(agentSpaceModelPools) << std::endl;
     //std::cout << "ModelPool: Link " << linkSpaceModelPools << std::endl;
 }
 
 void Scenario::collectCombinations(
         const std::vector<Actor>& allowedActors,
         std::vector<Actor> actors, std::set<Link> links,
-        organization_model::ModelPool::Set& agentSpaceModelPools,
+        moreorg::ModelPool::Set& agentSpaceModelPools,
         std::set< std::set<Link> >& linkSpaceSets
         )
 {
@@ -280,8 +280,8 @@ void Scenario::collectCombinations(
 
         if(actors.size() == links.size() + 1)
         {
-            organization_model::ModelPool agentSpaceAgentType;
-            organization_model::ModelPool linkSpaceAgentType;
+            moreorg::ModelPool agentSpaceAgentType;
+            moreorg::ModelPool linkSpaceAgentType;
             for(Actor actor : actors)
             {
                 std::string id;

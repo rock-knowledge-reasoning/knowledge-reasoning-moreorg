@@ -2,7 +2,7 @@
 
 #include "../Agent.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace policies {
 
 TransportProviderPolicy::TransportProviderPolicy()
@@ -10,7 +10,7 @@ TransportProviderPolicy::TransportProviderPolicy()
 {
 }
 
-TransportProviderPolicy::TransportProviderPolicy(const ModelPool& modelPool, const organization_model::OrganizationModelAsk& ask)
+TransportProviderPolicy::TransportProviderPolicy(const ModelPool& modelPool, const moreorg::OrganizationModelAsk& ask)
     : Policy(modelPool, ask)
 {
     update(modelPool, ask);
@@ -52,4 +52,4 @@ void TransportProviderPolicy::update(const ModelPool& modelPool, const Organizat
 }
 
 } // end namespace policies
-} // end namespace organization_model
+} // end namespace moreorg

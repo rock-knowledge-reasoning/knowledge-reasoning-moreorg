@@ -3,7 +3,7 @@
 
 #include "OrganizationModel.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 class OrganizationModelTell
 {
@@ -23,5 +23,5 @@ private:
     OrganizationModel::Ptr mpOrganizationModel;
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_TELL_HPP

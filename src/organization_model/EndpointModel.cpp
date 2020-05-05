@@ -1,10 +1,10 @@
-#include <organization_model/organization_model/EndpointModel.hpp>
+#include <moreorg/organization_model/EndpointModel.hpp>
 #include <sstream>
 
 using namespace owlapi::model;
 
-namespace organization_model {
-namespace organization_model {
+namespace moreorg {
+namespace moreorg {
 
 EndpointModel::EndpointModel()
 {}
@@ -52,5 +52,5 @@ std::string EndpointModel::toString() const
     return ss.str();
 }
 
-} // end namespace organization_model
-} // end namespace organization_model
+} // end namespace moreorg
+} // end namespace moreorg

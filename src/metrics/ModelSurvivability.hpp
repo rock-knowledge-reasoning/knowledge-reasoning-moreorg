@@ -3,7 +3,7 @@
 
 #include <owlapi/OWLApi.hpp>
 
-namespace organization_model {
+namespace moreorg {
 namespace metrics {
 
 /**
@@ -81,5 +81,5 @@ private:
 };
 
 } // end namespace metrics
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_METRICS_MODEL_SURVIVABILITY_HPP

@@ -1,6 +1,6 @@
 #include "ModelSurvivability.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace metrics {
 
 ModelSurvivability::ModelSurvivability(const owlapi::model::OWLCardinalityRestriction::Ptr& restriction, double modelProbability, double redundancy)
@@ -37,4 +37,4 @@ std::string ModelSurvivability::toString() const
 }
 
 } // end namespace metrics
-} // end namespace organization_model
+} // end namespace moreorg

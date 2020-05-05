@@ -1,12 +1,12 @@
 #include <boost/test/unit_test.hpp>
-#include <organization_model/OrganizationModel.hpp>
-#include <organization_model/OrganizationModelAsk.hpp>
-#include <organization_model/facades/Robot.hpp>
-#include <organization_model/PropertyConstraintSolver.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/OrganizationModel.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
+#include <moreorg/facades/Robot.hpp>
+#include <moreorg/PropertyConstraintSolver.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 #include "test_utils.hpp"
 
-using namespace organization_model;
+using namespace moreorg;
 using namespace owlapi::model;
 
 BOOST_AUTO_TEST_SUITE(property_constraint_solver)

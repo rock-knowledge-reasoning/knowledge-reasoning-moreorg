@@ -12,7 +12,7 @@
 
 using namespace owlapi::model;
 
-namespace organization_model {
+namespace moreorg {
 namespace algebra {
 
 QueryCache Connectivity::msQueryCache;
@@ -179,7 +179,7 @@ Connectivity::Connectivity(const ModelPool& modelPool,
             varBranch = new Gecode::IntVarBranch(varSelect, nullptr);
             break;
         default:
-            throw std::runtime_error("organization_model::algebra::Connectivity: selected value selection"
+            throw std::runtime_error("moreorg::algebra::Connectivity: selected value selection"
                 " strategy is not supported: '" + variableSelection + "'");
 
 
@@ -237,7 +237,7 @@ void Connectivity::identifyInterfaces()
 
         if(interfaces.empty())
         {
-            throw NoConnectionInterfaces("organization_model::algebra::Connecticity:"
+            throw NoConnectionInterfaces("moreorg::algebra::Connecticity:"
                     " cannot construct problem since model '" + model.toString() + "' does not have any associated interfaces of type '" + mInterfaceBaseClass.toString() );
         }
 
@@ -479,7 +479,7 @@ bool Connectivity::isComplete() const
                     Gecode::IntVar v = connectionMatrix(i0,i1);
                     if(!v.assigned())
                     {
-                        throw std::runtime_error("organization_model::algebra::Connectivity::checkGraphCompleteness: expected value to be assiged");
+                        throw std::runtime_error("moreorg::algebra::Connectivity::checkGraphCompleteness: expected value to be assiged");
                     }
 
                     if(v.val() == 1)
@@ -547,7 +547,7 @@ bool Connectivity::isFeasible(const ModelPool& modelPool,
     size_t numberOfInstances = modelPool.numberOfInstances();
     if(numberOfInstances == 0)
     {
-        throw std::invalid_argument("organization_model::algebra::Connectivity::isFeasible: "
+        throw std::invalid_argument("moreorg::algebra::Connectivity::isFeasible: "
                 " the given model pool has a model count of 0");
     } else if(modelPool.numberOfInstances() == 1)
     {
@@ -749,4 +749,4 @@ double Connectivity::computeMerit(Gecode::IntVar x, int idx) const
 }
 
 } // end namespace algebra
-} // end namespace organization_model
+} // end namespace moreorg

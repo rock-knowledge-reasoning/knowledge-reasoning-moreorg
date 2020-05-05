@@ -2,7 +2,7 @@
 #include <sstream>
 #include <limits>
 
-namespace organization_model {
+namespace moreorg {
 
 ValueBound::ValueBound()
     : mMin(std::numeric_limits<double>::min())
@@ -21,4 +21,4 @@ std::string ValueBound::toString() const
     return ss.str();
 }
 
-} // end organization_model
+} // end moreorg

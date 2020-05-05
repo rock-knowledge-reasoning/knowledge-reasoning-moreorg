@@ -1,8 +1,8 @@
 #include "Statistics.hpp"
 #include <sstream>
 
-namespace organization_model {
-namespace organization_model {
+namespace moreorg {
+namespace moreorg {
 
 Statistics::Statistics()
     : upperCombinationBound(0)
@@ -56,7 +56,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Statistics>& statis
     return os;
 }
 
-} // end namespace organization_model
-} // end namespace organization_model
+} // end namespace moreorg
+} // end namespace moreorg
 
 

@@ -6,7 +6,7 @@
 #include <map>
 #include <owlapi/model/IRI.hpp>
 
-namespace organization_model {
+namespace moreorg {
 namespace facades {
     class Robot;
 }
@@ -141,5 +141,5 @@ private:
     owlapi::model::IRI mRValProperty;
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_PROPERTY_CONSTRAINTS_HPP

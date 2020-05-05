@@ -4,8 +4,8 @@
 #include <map>
 #include <set>
 #include <vector>
-#include <organization_model/ccf/Link.hpp>
-#include <organization_model/ModelPool.hpp>
+#include <moreorg/ccf/Link.hpp>
+#include <moreorg/ModelPool.hpp>
 
 namespace multiagent {
 namespace ccf {
@@ -78,7 +78,7 @@ public:
     void collectCombinations(
             const std::vector<Actor>& allowedActors,
             std::vector<Actor> actors, std::set<Link> links,
-            organization_model::ModelPool::Set& agentSpaceModelPools,
+            moreorg::ModelPool::Set& agentSpaceModelPools,
             std::set< std::set<Link> >& linkSpaceSets);
 
     size_t getNumberOfActors() const { return mActors.size(); }

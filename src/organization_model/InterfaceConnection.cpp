@@ -6,8 +6,8 @@
 
 using namespace owlapi::model;
 
-namespace organization_model {
-namespace organization_model {
+namespace moreorg {
+namespace moreorg {
 
 InterfaceConnection::InterfaceConnection() {}
 InterfaceConnection::InterfaceConnection(const IRI& interface0, const IRI& interface1)
@@ -100,5 +100,5 @@ std::ostream& operator<<(std::ostream& os, const InterfaceCombinationList& list)
     return os;
 }
 
-} // end namespace organization_model
-} // end namespace organization_model
+} // end namespace moreorg
+} // end namespace moreorg

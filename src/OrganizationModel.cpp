@@ -5,7 +5,7 @@
 
 using namespace owlapi::model;
 
-namespace organization_model {
+namespace moreorg {
 
 OrganizationModel::OrganizationModel(const owlapi::model::IRI& iri)
 {
@@ -115,4 +115,4 @@ OrganizationModel::Ptr OrganizationModel::getInstance(const owlapi::model::IRI& 
     return make_shared<OrganizationModel>(iri);
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

@@ -1,6 +1,6 @@
 #include "../facades/Robot.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace io {
 
 /**
@@ -25,4 +25,4 @@ public:
 };
 
 } // end namespace io
-} // end namespace organization_model
+} // end namespace moreorg

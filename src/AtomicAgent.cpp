@@ -1,7 +1,7 @@
 #include "AtomicAgent.hpp"
 #include <sstream>
 
-namespace organization_model {
+namespace moreorg {
 
 AtomicAgent::AtomicAgent()
     : mModel()
@@ -70,9 +70,9 @@ std::string AtomicAgent::toString(const AtomicAgent::Set& agents, size_t indent)
     return ss.str();
 }
 
-organization_model::ModelPool AtomicAgent::getModelPool(const AtomicAgent::List& agents)
+moreorg::ModelPool AtomicAgent::getModelPool(const AtomicAgent::List& agents)
 {
-    organization_model::ModelPool modelPool;
+    moreorg::ModelPool modelPool;
     for(const AtomicAgent& agent : agents)
     {
         owlapi::model::IRI model = agent.getModel();
@@ -81,9 +81,9 @@ organization_model::ModelPool AtomicAgent::getModelPool(const AtomicAgent::List&
     return modelPool;
 }
 
-organization_model::ModelPool AtomicAgent::getModelPool(const AtomicAgent::Set& agents)
+moreorg::ModelPool AtomicAgent::getModelPool(const AtomicAgent::Set& agents)
 {
-    organization_model::ModelPool modelPool;
+    moreorg::ModelPool modelPool;
     for(const AtomicAgent& agent : agents)
     {
         owlapi::model::IRI model = agent.getModel();
@@ -125,10 +125,10 @@ bool AtomicAgent::operator<(const AtomicAgent& other) const
     return mModel < other.mModel;
 }
 
-AtomicAgent::List AtomicAgent::toList(const organization_model::ModelPool& modelPool)
+AtomicAgent::List AtomicAgent::toList(const moreorg::ModelPool& modelPool)
 {
     List agents;
-    organization_model::ModelPool::const_iterator cit = modelPool.cbegin();
+    moreorg::ModelPool::const_iterator cit = modelPool.cbegin();
     for(;cit != modelPool.cend(); ++cit)
     {
         const owlapi::model::IRI& model = cit->first;
@@ -185,4 +185,4 @@ std::string AtomicAgent::toString(const TypeMap& typeMap, size_t indent)
     return ss.str();
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

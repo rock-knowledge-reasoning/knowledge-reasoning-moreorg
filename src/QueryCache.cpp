@@ -1,6 +1,6 @@
 #include "QueryCache.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 std::pair<owlapi::model::OWLCardinalityRestriction::PtrList, bool> QueryCache::getCachedResult(const ModelPool& modelPool,
         const owlapi::model::IRI& objectProperty,
@@ -61,6 +61,6 @@ void QueryCache::clear()
     mCSQueryResults.clear();
 }
 
-} // end namespace organization_model
+} // end namespace moreorg
 
 

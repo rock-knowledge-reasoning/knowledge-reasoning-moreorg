@@ -1,6 +1,6 @@
 #include "Types.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace activity {
 
 std::map<Type, std::string> TypeTxt = {
@@ -12,4 +12,4 @@ std::map<Type, std::string> TypeTxt = {
 };
 
 } // end namespace activity
-} // end namespace organization_model
+} // end namespace moreorg

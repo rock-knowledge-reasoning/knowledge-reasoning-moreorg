@@ -4,7 +4,7 @@
 #include "../Policy.hpp"
 #include "../OrganizationModelAsk.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace policies {
 
 class TransportProviderPolicy : public Policy
@@ -13,7 +13,7 @@ public:
 
     TransportProviderPolicy();
 
-    TransportProviderPolicy(const ModelPool& modelPool, const organization_model::OrganizationModelAsk& ask);
+    TransportProviderPolicy(const ModelPool& modelPool, const moreorg::OrganizationModelAsk& ask);
 
     virtual ~TransportProviderPolicy();
 
@@ -33,5 +33,5 @@ private:
 };
 
 } // end namespace policies
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_POLICIES_TRANSPORT_PROVIDER_HPP

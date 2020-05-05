@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace organization_model {
+namespace moreorg {
 
 /**
  * Allow a constrained value
@@ -27,5 +27,5 @@ private:
     double mMax;
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_VALUE_BOUND_HPP

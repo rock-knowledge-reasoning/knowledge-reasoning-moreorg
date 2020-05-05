@@ -4,10 +4,10 @@
 #include <vector>
 #include <set>
 
-#include <organization_model/ccf/Actor.hpp>
-#include <organization_model/ccf/Interface.hpp>
-#include <organization_model/ccf/LinkGroup.hpp>
-#include <organization_model/ccf/LinkType.hpp>
+#include <moreorg/ccf/Actor.hpp>
+#include <moreorg/ccf/Interface.hpp>
+#include <moreorg/ccf/LinkGroup.hpp>
+#include <moreorg/ccf/LinkType.hpp>
 
 namespace multiagent {
 namespace ccf {

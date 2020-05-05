@@ -25,11 +25,11 @@ Execution of the example requires a previous installation of the organisation
 model, so that the ontologies are properly installed (see CMakeLists.txt).
 
 ```
-#include <organization_model/OrganizationModel.hpp>
-#include <organization_model/OrganizationModelAsk.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/OrganizationModel.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 
-using namespace organization_model;
+using namespace moreorg;
 
 OrganizationModel::Ptr om =
 make_shared<OrganizationModel>(owlapi::model::IRI("http://www.rock-robotics.org/2015/12/projects/TransTerrA"));
@@ -50,12 +50,12 @@ bool isAMobileCompositeAgent = robot.isMobile();
 ## Commandline Tools
 
 ### Organisation Model Reader
-The utility *organization_model-reader* allows you to visualise and render the
+The utility *moreorg-reader* allows you to visualise and render the
 information in an ontology.
 For example, to create a latex table to describe the properties of the agent
 type SherpaTT:
 ```
-./build/src/organization_model-reader --om http://www.rock-robotics.org/2015/12/robots/SherpaTT --latex --compact --columns 3
+./build/src/moreorg-reader --om http://www.rock-robotics.org/2015/12/robots/SherpaTT --latex --compact --columns 3
 ```
 
 ### Multiagent Scenario Analysis (deprecated)
@@ -66,11 +66,11 @@ approach to evaluate the to-be-expected feasible agent types:
 ```
 
 ### Benchmark
-The utility *organization_model-bm* allows to test the connectivity
+The utility *moreorg-bm* allows to test the connectivity
 for a given scenario file.
 
 ```
-./build/src/organization_model-bm -s test/data/benchmark/bm-spec1 -e 1 -t connectivity
+./build/src/moreorg-bm -s test/data/benchmark/bm-spec1 -e 1 -t connectivity
 ```
 
 The benchmark requires a scenario file, consisting of the description of an
@@ -164,7 +164,7 @@ $> amake knowledge_reasoning/moreorg
 
 Then you can run the tests, which are implemented with Boost Testing Framework with:
 ```
-$> ./build/test/organization_model-test --log_level=all
+$> ./build/test/moreorg-test --log_level=all
 ```
 
 # Merge Requests and Issue Tracking

@@ -3,7 +3,7 @@
 
 #include <ostream>
 #include <stdint.h>
-#include <organization_model/ccf/Actor.hpp>
+#include <moreorg/ccf/Actor.hpp>
 
 namespace multiagent {
 namespace ccf {

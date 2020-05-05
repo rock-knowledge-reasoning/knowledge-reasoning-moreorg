@@ -4,7 +4,7 @@
 #include <set>
 #include "ModelPool.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 /// Maps a 'combined system' to the functionality it can 'theoretically'
 /// provide when looking at its resources
@@ -124,5 +124,5 @@ public:
     owlapi::model::IRISet getSupportedFunctionalities() const { return mSupportedFunctionalities; }
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_FUNCTIONALITY_MAPPING_HPP

@@ -1,6 +1,6 @@
 #include "Sample.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 Sample::Sample(const base::Position& fromLocation,
            const base::Position& toLocation,
@@ -17,4 +17,4 @@ Sample::Sample(const base::Position& fromLocation,
 Sample::~Sample()
 {}
 
-} // end namespace organization_model
+} // end namespace moreorg

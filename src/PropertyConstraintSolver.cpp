@@ -3,7 +3,7 @@
 #include <base-logging/Logging.hpp>
 #include "facades/Robot.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 PropertyConstraintSolver::PropertyConstraintSolver()
     : Gecode::Space()
@@ -69,7 +69,7 @@ ValueBound PropertyConstraintSolver::merge(const PropertyConstraint::Set& constr
     propertyConstraintSolver.status();
     if(propertyConstraintSolver.failed())
     {
-        throw std::invalid_argument("organization_model::PropertyConstraintSolver: constraints cannot be fulfilled");
+        throw std::invalid_argument("moreorg::PropertyConstraintSolver: constraints cannot be fulfilled");
     } else {
         double minValue = 0;
         double maxValue = Gecode::Float::Limits::max;
@@ -88,7 +88,7 @@ ValueBound PropertyConstraintSolver::merge(const PropertyConstraint::Set& constr
         if(minValue > maxValue)
         {
             throw
-                std::invalid_argument("organization_model::PropertyConstraintSolver:"
+                std::invalid_argument("moreorg::PropertyConstraintSolver:"
                         " constraints cannot be fulfilled - required min >"
                         " required max");
         }

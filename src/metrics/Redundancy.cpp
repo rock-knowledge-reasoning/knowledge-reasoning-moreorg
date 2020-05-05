@@ -2,14 +2,14 @@
 #include <math.h>
 #include <vector>
 #include <base-logging/Logging.hpp>
-#include <organization_model/reasoning/ResourceMatch.hpp>
-#include <organization_model/metrics/ModelSurvivability.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/reasoning/ResourceMatch.hpp>
+#include <moreorg/metrics/ModelSurvivability.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 
 using namespace owlapi::model;
 using namespace owlapi::vocabulary;
 
-namespace organization_model {
+namespace moreorg {
 namespace metrics {
 
 Redundancy::Redundancy(const OrganizationModelAsk& organization,
@@ -65,7 +65,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
 {
     if(required.empty())
     {
-        throw std::invalid_argument("organization_model::metrics::Redundancy: set of cardinality restriction to define requirements is empty");
+        throw std::invalid_argument("moreorg::metrics::Redundancy: set of cardinality restriction to define requirements is empty");
     }
     using namespace owlapi::model;
 
@@ -88,14 +88,14 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
     // Firstly -- we need to find a proper match of required resources to
     // available resources, thus defining here a small Constraint Satisfaction
     // Problem already
-    using namespace organization_model::reasoning;
+    using namespace moreorg::reasoning;
 
     ModelBound::List modelBoundRemaining = ResourceMatch::toModelBoundList(available);
     ModelBound::List modelBoundRequired = ResourceMatch::toModelBoundList(required);
 
     if(!ResourceMatch::hasMinRequirements( modelBoundRequired ) )
     {
-        throw std::invalid_argument("organization_model::metrics::Redundancy: model bound requires minimum requirements"
+        throw std::invalid_argument("moreorg::metrics::Redundancy: model bound requires minimum requirements"
                 "to complete redundancy computation, but none are provided");
     }
 
@@ -248,6 +248,6 @@ double Redundancy::serial(const std::vector<double>& probabilities)
 }
 
 } // end namespace metrics
-} // end namespace organization_model
+} // end namespace moreorg
 
 

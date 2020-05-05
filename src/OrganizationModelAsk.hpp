@@ -10,7 +10,7 @@
 #include "Resource.hpp"
 #include "vocabularies/OM.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 /**
  * \class OrganizationModelAsk
@@ -539,5 +539,5 @@ private:
     static std::vector<OrganizationModelAsk> msOrganizationModelAsk;
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ASK_HPP

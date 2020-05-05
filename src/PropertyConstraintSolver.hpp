@@ -6,7 +6,7 @@
 #include "PropertyConstraint.hpp"
 #include "ValueBound.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace facades {
     class Robot;
 }

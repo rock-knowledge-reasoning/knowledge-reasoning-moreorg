@@ -1,6 +1,6 @@
 #include "Agent.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 std::map<Agent::OperationalStatus, std::string> Agent::OperationalStatusTxt =
 {

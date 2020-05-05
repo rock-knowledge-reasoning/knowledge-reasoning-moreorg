@@ -3,13 +3,13 @@
 
 #include <stdint.h>
 #include <base/Time.hpp>
-#include <organization_model/organization_model/InterfaceConnection.hpp>
-#include <organization_model/organization_model/ActorModelLink.hpp>
+#include <moreorg/organization_model/InterfaceConnection.hpp>
+#include <moreorg/organization_model/ActorModelLink.hpp>
 
 namespace owl = owlapi::model;
 
-namespace organization_model {
-namespace organization_model {
+namespace moreorg {
+namespace moreorg {
 
 /**
  * Statistic of the organization model engine
@@ -50,6 +50,6 @@ struct Statistics
 std::ostream& operator<<(std::ostream& os, const Statistics& statistics);
 std::ostream& operator<<(std::ostream& os, const std::vector<Statistics>& statisticsList);
 
-} // end namespace organization_model
-} // end namespace organization_model
+} // end namespace moreorg
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_STATISTICS_HPP

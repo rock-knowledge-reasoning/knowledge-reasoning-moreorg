@@ -9,7 +9,7 @@
 #include <base-logging/Logging.hpp>
 #include "../Agent.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace utils {
 
 typedef AtomicAgent::List Coalition;
@@ -186,5 +186,5 @@ public:
 };
 
 } // end namespace utils
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_COALITION_STRUCTURE_GENERATION_HPP

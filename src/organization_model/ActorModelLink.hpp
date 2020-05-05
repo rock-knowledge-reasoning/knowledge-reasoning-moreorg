@@ -1,10 +1,10 @@
 #ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP
 #define ORGANIZATION_MODEL_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP
 
-#include <organization_model/organization_model/EndpointModel.hpp>
+#include <moreorg/organization_model/EndpointModel.hpp>
 
-namespace organization_model {
-namespace organization_model {
+namespace moreorg {
+namespace moreorg {
 
 /**
  * An ActorModelLink describes the combination of two actors via 
@@ -33,7 +33,7 @@ public:
 
 std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<ActorModelLink> > modelSet);
 
-} // namespace organization_model
-} // namespace organization_model
+} // namespace moreorg
+} // namespace moreorg
 
 #endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_ACTOR_MODEL_LINK_HPP

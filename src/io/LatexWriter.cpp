@@ -4,7 +4,7 @@
 #include <iostream>
 #include <functional>
 
-namespace organization_model {
+namespace moreorg {
 namespace io {
 
 std::string LatexWriter::toString(const facades::Robot& robot)
@@ -166,4 +166,4 @@ std::string LatexWriter::toString(const std::vector<facades::Robot>& facades)
 }
 
 } // end namespace io
-} // end namespace organization_model
+} // end namespace moreorg

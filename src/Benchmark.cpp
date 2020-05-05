@@ -1,4 +1,4 @@
-#include <organization_model/algebra/Connectivity.hpp>
+#include <moreorg/algebra/Connectivity.hpp>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -9,7 +9,7 @@
 #include "ModelPoolIterator.hpp"
 
 using namespace owlapi::model;
-using namespace organization_model;
+using namespace moreorg;
 using namespace graph_analysis;
 
 struct Spec
@@ -56,7 +56,7 @@ Spec loadSpec(const std::string& filename)
                 std::vector<std::string> columns(tokens.begin(), tokens.end());
                 if(columns.size() < 2)
                 {
-                    std::invalid_argument("organization_model::Benchmark: invalid column: '" + line + "' in spec");
+                    std::invalid_argument("moreorg::Benchmark: invalid column: '" + line + "' in spec");
                 }
 
                 // Column: iri <from> <to> <stepsize>
@@ -77,7 +77,7 @@ Spec loadSpec(const std::string& filename)
         }
         specFile.close();
     } else {
-        throw std::runtime_error("organization_model::Benchmark: failed to load spec from: " + filename );
+        throw std::runtime_error("moreorg::Benchmark: failed to load spec from: " + filename );
     }
     return spec;
 }
@@ -111,7 +111,7 @@ std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const Organizat
 
         if(!feasible)
         {
-            LOG_WARN_S << "organization_model::Benchmark: graph is not feasible in epoch #" << i;
+            LOG_WARN_S << "moreorg::Benchmark: graph is not feasible in epoch #" << i;
         }
     }
 

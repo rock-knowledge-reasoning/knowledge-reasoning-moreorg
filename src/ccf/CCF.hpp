@@ -13,7 +13,7 @@
  * as suggested by Rahwan et. al "Constrained Coalition Formation",2011
  */
 
-namespace organization_model
+namespace moreorg
 {
 
 template<typename T>
@@ -753,5 +753,5 @@ public:
 
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_CCF_CCF_HPP

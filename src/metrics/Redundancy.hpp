@@ -1,11 +1,11 @@
 #ifndef ORGANIZATION_MODEL_METRICS_REDUNDANCY_HPP
 #define ORGANIZATION_MODEL_METRICS_REDUNDANCY_HPP
 
-#include <organization_model/OrganizationModel.hpp>
-#include <organization_model/Metric.hpp>
+#include <moreorg/OrganizationModel.hpp>
+#include <moreorg/Metric.hpp>
 #include "../vocabularies/OM.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace metrics {
 
 
@@ -77,5 +77,5 @@ private:
 };
 
 } // end namespace metrics
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_METRICS_REDUNDANCY_HPP

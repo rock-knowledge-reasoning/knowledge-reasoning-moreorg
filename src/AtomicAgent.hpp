@@ -2,14 +2,14 @@
 #define ORGANIZATION_MODEL_AGENT_INSTANCE_HPP
 
 #include <owlapi/model/IRI.hpp>
-#include <organization_model/ModelPool.hpp>
+#include <moreorg/ModelPool.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/set.hpp>
 #include "OrganizationModelAsk.hpp"
 #include "facades/Robot.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 /**
  * \class AtomicAgent
@@ -51,8 +51,8 @@ public:
 
     static std::string toString(const List& agents, size_t indent = 0);
     static std::string toString(const Set& agents, size_t indent = 0);
-    static organization_model::ModelPool getModelPool(const List& agents);
-    static organization_model::ModelPool getModelPool(const Set& agents);
+    static moreorg::ModelPool getModelPool(const List& agents);
+    static moreorg::ModelPool getModelPool(const Set& agents);
 
     /**
      * Get a list of atomic agents from a model pool
@@ -116,5 +116,5 @@ public:
     static std::string toString(const TypeMap& typeMap, size_t indent = 0);
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_AGENT_INSTANCE_HPP

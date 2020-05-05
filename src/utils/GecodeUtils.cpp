@@ -1,6 +1,6 @@
 #include "GecodeUtils.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace utils {
 
 std::map<Gecode::IntValBranch::Select, std::string> GecodeUtils::IntValSelect2Txt =
@@ -62,7 +62,7 @@ Gecode::IntValBranch::Select GecodeUtils::getIntValSelect(const std::string& txt
             return p.first;
         }
     }
-    throw std::invalid_argument("organization_model::utils::GecodeUtils::getIntValSelect: could not find value for '" + txt + "'");
+    throw std::invalid_argument("moreorg::utils::GecodeUtils::getIntValSelect: could not find value for '" + txt + "'");
 }
 
 Gecode::IntVarBranch::Select GecodeUtils::getIntVarSelect(const std::string& txt)
@@ -74,8 +74,8 @@ Gecode::IntVarBranch::Select GecodeUtils::getIntVarSelect(const std::string& txt
             return p.first;
         }
     }
-    throw std::invalid_argument("organization_model::utils::GecodeUtils::getIntVarSelect: could not find value for '" + txt + "'");
+    throw std::invalid_argument("moreorg::utils::GecodeUtils::getIntVarSelect: could not find value for '" + txt + "'");
 }
 
 } // end namespace utils
-} // end namespace organization_model
+} // end namespace moreorg

@@ -3,7 +3,7 @@
 #include <tuple>
 #include "facades/Robot.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 std::map<PropertyConstraint::ConstraintType, std::string> PropertyConstraint::TypeTxt = {
     {PropertyConstraint::UNKNOWN, "UNKNOWN"},
@@ -123,4 +123,4 @@ double PropertyConstraint::getReferenceValue(const facades::Robot& robot) const
     return mValue;
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

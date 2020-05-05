@@ -5,7 +5,7 @@
 #include "OrganizationModelAsk.hpp"
 #include "StatusSample.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 /**
  * \class Heuristics
@@ -129,5 +129,5 @@ private:
     mutable StatusSample::RawPtr2Double mTravelTime;
 };
 
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_HEURISTICS_HPP

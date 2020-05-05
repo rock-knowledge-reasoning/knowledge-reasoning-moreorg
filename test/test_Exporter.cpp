@@ -1,10 +1,10 @@
 #include <boost/test/unit_test.hpp>
-#include <organization_model/exporter/PDDLExporter.hpp>
-#include <organization_model/OrganizationModelAsk.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/exporter/PDDLExporter.hpp>
+#include <moreorg/OrganizationModelAsk.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 #include "test_utils.hpp"
 
-using namespace organization_model;
+using namespace moreorg;
 
 BOOST_AUTO_TEST_SUITE(exporter)
 
@@ -20,8 +20,8 @@ BOOST_AUTO_TEST_CASE(pddl)
 
     OrganizationModelAsk ask(om, modelPool, false);
     PDDLExporter exporter(ask);
-    exporter.saveDomain("/tmp/organization_model-test-domain.pddl");
-    exporter.saveProblem("/tmp/organization_model-test-problem.pddl");
+    exporter.saveDomain("/tmp/moreorg-test-domain.pddl");
+    exporter.saveProblem("/tmp/moreorg-test-problem.pddl");
 
 }
 BOOST_AUTO_TEST_SUITE_END()

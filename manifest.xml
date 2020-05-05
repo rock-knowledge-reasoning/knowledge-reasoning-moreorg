@@ -1,6 +1,6 @@
 <package>
   <name>moreorg</name>
-  <description brief="Organization modelling library">
+  <description brief="Model for Reconfigurable Multi-Robot Organizations">
       This library allows to create an organization model of a system and
       reason and plan with it.
   </description>

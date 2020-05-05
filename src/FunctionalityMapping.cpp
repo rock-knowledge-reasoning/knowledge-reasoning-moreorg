@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "Algebra.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 FunctionalityMapping::FunctionalityMapping()
 {}
@@ -30,7 +30,7 @@ const ModelPool::Set& FunctionalityMapping::getModelPools(const owlapi::model::I
     {
         return cit->second;
     } else {
-        throw std::invalid_argument("organization_model::FunctionalityMapping::getModelPools: could not find"
+        throw std::invalid_argument("moreorg::FunctionalityMapping::getModelPools: could not find"
                 " model pools with function: " + iri.toString());
     }
 }
@@ -105,4 +105,4 @@ std::string FunctionalityMapping::toString(uint32_t indent) const
     return ss.str();
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

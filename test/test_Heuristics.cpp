@@ -1,11 +1,11 @@
 #include <boost/test/unit_test.hpp>
-#include <organization_model/Heuristics.hpp>
-#include <organization_model/vocabularies/OM.hpp>
+#include <moreorg/Heuristics.hpp>
+#include <moreorg/vocabularies/OM.hpp>
 #include "test_utils.hpp"
 
-using namespace organization_model;
+using namespace moreorg;
 using namespace owlapi::model;
-using namespace organization_model::vocabulary;
+using namespace moreorg::vocabulary;
 
 struct HeuristicsFixture
 {

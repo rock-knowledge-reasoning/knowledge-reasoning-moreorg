@@ -13,8 +13,8 @@ std::string getRootDir()
     char buffer[1024];
     BOOST_REQUIRE_MESSAGE( readlink("/proc/self/exe", buffer, 1024) != -1, "Retrieving current execution path");
     std::string str(buffer);
-    std::string executionDir = str.substr(0, str.rfind("organization_model/"));
-    std::string configurationPath = executionDir + "organization_model/";
+    std::string executionDir = str.substr(0, str.rfind("moreorg/"));
+    std::string configurationPath = executionDir + "moreorg/";
     return configurationPath;
 }
 

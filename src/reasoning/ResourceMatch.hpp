@@ -15,7 +15,7 @@
 #include "../vocabularies/OM.hpp"
 #include "ModelBound.hpp"
 
-namespace organization_model {
+namespace moreorg {
 namespace reasoning {
 
 typedef std::map<owlapi::model::IRI, std::vector<int> > TypeInstanceMap;
@@ -224,5 +224,5 @@ public:
 };
 
 } // end namespace reasoning
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_CSP_RESOURCE_MATCH_HPP

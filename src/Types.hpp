@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-namespace organization_model {
+namespace moreorg {
 namespace activity {
     enum Type { UNKNOWN = 0x00,
         /// The system is idle
@@ -34,5 +34,5 @@ namespace activity {
     extern std::map<Type, std::string> TypeTxt;
 
 } // end namespace activity
-} // end namespace organization_model
+} // end namespace moreorg
 #endif // ORGANIZATION_MODEL_TYPES_HPP

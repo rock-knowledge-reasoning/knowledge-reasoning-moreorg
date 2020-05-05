@@ -1,4 +1,4 @@
-#include "organization_model/ccf/Scenario.hpp"
+#include "moreorg/ccf/Scenario.hpp"
 
 #include <set>
 #include <iostream>
@@ -18,7 +18,7 @@ int main(int argc, char** argv)
         ("help","describe arguments")
         ("configuration", po::value<std::string>(), "Path to the scenario configuration file")
         ("coalition_size", po::value<size_t>(), "Maximum size of coalition (default: 2)")
-        ("output", po::value<size_t>(), "Path to the output file (default /tmp/organization_model-ccf-analysis.log")
+        ("output", po::value<size_t>(), "Path to the output file (default /tmp/moreorg-ccf-analysis.log")
         ;
 
     po::variables_map vm;
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
         maxCoalitionSize = vm["coalition_size"].as<size_t>();
     }
 
-    std::string outputFilename = "/tmp/organization_model-ccf-analysis.log";
+    std::string outputFilename = "/tmp/moreorg-ccf-analysis.log";
     if(vm.count("output"))
     {
         outputFilename = vm["output"].as<std::string>();

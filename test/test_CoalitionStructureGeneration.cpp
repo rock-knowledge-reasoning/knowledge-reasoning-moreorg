@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
-#include <organization_model/utils/CoalitionStructureGeneration.hpp>
+#include <moreorg/utils/CoalitionStructureGeneration.hpp>
 
 using namespace multiagent::utils;
 

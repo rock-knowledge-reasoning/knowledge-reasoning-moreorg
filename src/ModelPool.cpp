@@ -4,7 +4,7 @@
 #include "OrganizationModel.hpp"
 #include "Algebra.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 ModelPool::ModelPool()
     : std::map<owlapi::model::IRI, size_t>()
@@ -253,7 +253,7 @@ const owlapi::model::IRI& ModelPool::getAtomic() const
     {
         return begin()->first;
     } else {
-        throw std::runtime_error("organization_model::ModelPool::getAtomic: this model pool does"
+        throw std::runtime_error("moreorg::ModelPool::getAtomic: this model pool does"
                 " not describe an atomic model");
     }
 }
@@ -327,7 +327,7 @@ ModelPool ModelPoolDelta::toModelPool() const
     {
         if(cit->second < 0)
         {
-            throw std::runtime_error("organization_model::ModelPoolDelta contains negative values -- cannot convert to ModelPool");
+            throw std::runtime_error("moreorg::ModelPoolDelta contains negative values -- cannot convert to ModelPool");
         } else if(cit->second > 0)
         {
             modelPool[cit->first] = cit->second;
@@ -411,10 +411,10 @@ size_t ModelPool::getValue(const owlapi::model::IRI& resource, size_t defaultVal
 std::pair<owlapi::model::IRI, size_t> ModelPool::getMaxResource() const
 {
     size_t maxValue = std::numeric_limits<size_t>::min();
-    //organization_model::ModelPool::value_type currentMax;
+    //moreorg::ModelPool::value_type currentMax;
     std::pair<owlapi::model::IRI, size_t> currentMax;
 
-    organization_model::ModelPool::const_iterator cit = this->begin();
+    moreorg::ModelPool::const_iterator cit = this->begin();
     for(; cit != this->end(); ++cit)
     {
         if(maxValue < cit->second)
@@ -432,7 +432,7 @@ std::pair<owlapi::model::IRI, size_t> ModelPool::getMinResource() const
     size_t minValue = std::numeric_limits<size_t>::max();
     std::pair<owlapi::model::IRI, size_t> currentMin;
 
-    organization_model::ModelPool::const_iterator cit = this->begin();
+    moreorg::ModelPool::const_iterator cit = this->begin();
     for(; cit != this->end(); ++cit)
     {
         if(cit->second < minValue )
@@ -464,4 +464,4 @@ owlapi::model::IRIList ModelPool::getModels() const
     return models;
 }
 
-} // end namespace organization_model
+} // end namespace moreorg

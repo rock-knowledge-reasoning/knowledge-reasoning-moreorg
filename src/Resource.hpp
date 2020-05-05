@@ -5,7 +5,7 @@
 #include <set>
 #include "PropertyConstraint.hpp"
 
-namespace organization_model {
+namespace moreorg {
 
 /**
  * TODO: consider FunctionalitySet -> PropertyConstraint as Edge and HyperEdge
@@ -71,5 +71,5 @@ private:
 
 typedef Resource Functionality;
 
-} // namespace organization_model
+} // namespace moreorg
 #endif // ORGANIZATION_MODEL_RESOURCE_HPP
