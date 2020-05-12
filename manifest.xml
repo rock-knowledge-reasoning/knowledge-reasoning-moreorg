@@ -26,6 +26,7 @@
   <stage>1</stage>
   <use>single project</use>
   <activity>active</activity>
+  <classifiers>
       <classifier>c++</classifier>
       <classifier>rock</classifier>
   </classifiers>
