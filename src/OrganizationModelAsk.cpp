@@ -923,7 +923,6 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owla
     using namespace owlapi::model;
     std::vector<OWLCardinalityRestriction::Ptr> restrictions = mOntologyAsk.getCardinalityRestrictions(models, vocabulary::OM::has(), OWLCardinalityRestriction::MAX_OP);
 
-    std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = restrictions.begin();
     if(restrictions.empty())
     {
         owlapi::model::IRIList labels;
