@@ -13,8 +13,22 @@ std::string getRootDir()
     char buffer[1024];
     BOOST_REQUIRE_MESSAGE( readlink("/proc/self/exe", buffer, 1024) != -1, "Retrieving current execution path");
     std::string str(buffer);
-    std::string executionDir = str.substr(0, str.rfind("organization_model/"));
-    std::string configurationPath = executionDir + "organization_model/";
+    std::vector<std::string> foldernames = { "organization_model", "moreorg" };
+    std::string mainfolder;
+    size_t textPos;
+    for(const std::string& foldername : foldernames )
+    {
+        size_t pos = str.rfind(foldername + "/");
+        if(pos != std::string::npos)
+        {
+            textPos = pos;
+            mainfolder = foldername;
+            break;
+        }
+    }
+
+    std::string executionDir = str.substr(0, textPos);
+    std::string configurationPath = executionDir + mainfolder + "/";
     return configurationPath;
 }
 
