@@ -2,13 +2,16 @@
 # executed from 'project/build' with 'cmake ../'.
 cmake_minimum_required(VERSION 3.1)
 find_package(Rock)
+project(moreorg
+    VERSION 0.2
+    DESCRIPTION "Model for Reconfigurable Multi-Robot Organizations"
+)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-rock_init(moreorg 0.2)
-set(PROJECT_DESCRIPTION "Model for Reconfigurable Multi-Robot Organizations")
+rock_init()
 rock_standard_layout()
 
 find_package(owlapi)
