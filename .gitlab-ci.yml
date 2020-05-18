@@ -8,3 +8,13 @@ software_catalogue_entry:
   - sh generate.sh $CI_PROJECT_NAMESPACE $CI_PROJECT_NAME $CI_PROJECT_URL
   only:
   - master
+
+build_moreorg_18.04:
+  image: d-reg.hb.dfki.de:5000/gitlab-ci/ric-backbone_ubuntu:18.04
+  stage: build
+  script:
+  - aup --config
+  - aup
+  - sed -i "s#\(rock_init.*\)#set(ROCK_TEST_ENABLED ON)\n\1#" CMakeLists.txt
+  - amake
+  - ./build/test/moreorg-test --log_level=all
