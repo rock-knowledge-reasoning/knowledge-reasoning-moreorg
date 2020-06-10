@@ -86,34 +86,6 @@ http://www.rock-robotics.org/2014/01/om-schema#Payload 4
 
 # Installation
 
-## Gitlab (internal)
-Create a new Rock-based installation in a development folder, here called dev:
-```
-    mkdir dev
-    cd dev
-    wget http://www.rock-robotics.org/master/autoproj_bootstrap
-    ruby autoproj_bootstrap
-```
-
-In autoproj/manifest add the respective manifest and add the package to the layout section:
-```
-    package_set:
-        - dfkigit: rock-dfki/rock-package_set
-
-    layout:
-        - multiagent/organization_model
-```
-
-Then use the following commands to update your workspace:
-```
-$>source env.sh
-$>autoproj update
-$>autoproj osdeps
-$>amake multiagent/organization_model
-```
-
-## Github
-
 Create a new Rock-based installation in a development folder, here called dev:
 ```
     mkdir dev
