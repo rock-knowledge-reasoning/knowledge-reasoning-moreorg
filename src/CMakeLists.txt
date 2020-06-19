@@ -18,19 +18,34 @@ if(NOT GECODE_FOUND)
             NAMES gecode${GECODE_COMPONENT}
             HINTS ${CMAKE_INSTALL_TARGET}/lib
                 /opt/rock/$ENV{ROCK_DEB_RELEASE_NAME}/lib
+                /opt/rock/$ENV{ROCK_DEB_RELEASE_NAME}/rock-$ENV{ROCK_DEB_RELEASE_NAME}-tools-gecode/lib
             REQUIRED
         )
         get_filename_component(GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY
             ${GECODE_${GECODE_COMPONENT}_LIBRARY_PATH} DIRECTORY)
+        if(NOT GECODE_LIBDIR)
+            set(GECODE_LIBDIR ${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY})
+            set(GECODE_PC_LIBS "-L${GECODE_LIBDIR}")
+            string(REPLACE "/lib" "/include" GECODE_INCLUDE_DIR "${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY}")
+            set(GECODE_PC_CFLAGS "-I${GECODE_INCLUDE_DIR}")
+            include_directories(${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY}/../include)
+        endif()
         get_filename_component(GECODE_${GECODE_COMPONENT}_LIBRARY
             ${GECODE_${GECODE_COMPONENT}_LIBRARY_PATH} NAME)
+        get_filename_component(GECODE_${GECODE_COMPONENT}_LIBRARY_NOEXT
+            ${GECODE_${GECODE_COMPONENT}_LIBRARY_PATH} NAME_WE)
         list(APPEND GECODE_LIBRARIES ${GECODE_${GECODE_COMPONENT}_LIBRARY})
+
+        string(REPLACE "lib" "" OUT_VAR ${GECODE_${GECODE_COMPONENT}_LIBRARY_NOEXT})
+        set(GECODE_PC_LIBS "${GECODE_PC_LIBS} -l${OUT_VAR}")
+
         link_directories(${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY})
         message(STATUS "Found gecode library: ${GECODE_${GECODE_COMPONENT}_LIBRARY} \
              in ${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY}")
     endforeach()
 else()
     message(STATUS "Found gecode libraries in ${GECODE_LIBRARY_DIRS}")
+    include_directories(${GECODE_INCLUDE_DIRS})
     link_directories(${GECODE_LIBRARIES_DIRS})
 endif()
 
