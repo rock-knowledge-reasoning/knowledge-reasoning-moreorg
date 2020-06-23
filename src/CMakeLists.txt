@@ -34,7 +34,7 @@ if(NOT GECODE_FOUND)
             ${GECODE_${GECODE_COMPONENT}_LIBRARY_PATH} NAME)
         get_filename_component(GECODE_${GECODE_COMPONENT}_LIBRARY_NOEXT
             ${GECODE_${GECODE_COMPONENT}_LIBRARY_PATH} NAME_WE)
-        list(APPEND GECODE_LIBRARIES ${GECODE_${GECODE_COMPONENT}_LIBRARY})
+        list(APPEND GECODE_LINK_LIBRARIES ${GECODE_${GECODE_COMPONENT}_LIBRARY})
 
         string(REPLACE "lib" "" OUT_VAR ${GECODE_${GECODE_COMPONENT}_LIBRARY_NOEXT})
         set(GECODE_PC_LIBS "${GECODE_PC_LIBS} -l${OUT_VAR}")
@@ -44,9 +44,8 @@ if(NOT GECODE_FOUND)
              in ${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY}")
     endforeach()
 else()
-    message(STATUS "Found gecode libraries in ${GECODE_LIBRARY_DIRS}")
-    include_directories(${GECODE_INCLUDE_DIRS})
-    link_directories(${GECODE_LIBRARIES_DIRS})
+    message(STATUS "Found gecode libraries via pkg-config in ${GECODE_LIBRARY_DIRS}")
+    set(GECODE_PKGCONFIG gecode)
 endif()
 
 find_package(Boost REQUIRED thread serialization program_options)
@@ -166,11 +165,12 @@ rock_library(moreorg
     DEPS_PKGCONFIG
         owlapi
         numeric
+        ${GECODE_PKGCONFIG}
         pddl_planner
         graph_analysis
         qxcfg
     LIBS ${Boost_THREAD_LIBRARY}
-        ${GECODE_LIBRARIES}
+        ${GECODE_LINK_LIBRARIES}
 )
 
 rock_executable(moreorg-limited_combinations utils/LimitedCombination.cpp
