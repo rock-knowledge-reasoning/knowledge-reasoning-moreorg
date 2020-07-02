@@ -162,64 +162,68 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         }
 
         ModelSurvivability survivability(*cit, probabilityOfSurvival, fullModelRedundancy);
+        LOG_DEBUG_S << "Prepare model survivability: " <<
+            survivability.toString();
         models.push_back(survivability);
     }
 
-    // Best model fit: redundancy
-    bool updated = false;
-    do
-    {
-        updated = false;
-        // Sort based on probability of survival -- try to maximize redundancy
-        std::sort(models.begin(), models.end(), [](const ModelSurvivability& a, const ModelSurvivability& b)
-                {
-                    return a.getProbabilityOfSurvival() < b.getProbabilityOfSurvival();
-                });
+    //// Best model fit: redundancy
+    //bool updated = false;
+    //do
+    //{
+    //    updated = false;
+    //    // Sort based on probability of survival -- try to maximize redundancy
+    //    std::sort(models.begin(), models.end(), [](const ModelSurvivability& a, const ModelSurvivability& b)
+    //            {
+    //                return a.getProbabilityOfSurvival() < b.getProbabilityOfSurvival();
+    //            });
 
-        ModelBound::List::iterator rit = modelBoundRemaining.begin();
-        for(; rit != modelBoundRemaining.end();++rit)
-        {
-            ModelBound& remaining = *rit;
-            bool hasPossibleMatch = false;
+    //    LOG_DEBUG_S << "Try best model fit" << modelBoundRemaining.size();
+    //    ModelBound::List::iterator rit = modelBoundRemaining.begin();
+    //    for(; rit != modelBoundRemaining.end();++rit)
+    //    {
+    //        ModelBound& remaining = *rit;
+    //        bool hasPossibleMatch = false;
 
-            // Try to fit remaining resources
-            std::vector<ModelSurvivability>::iterator mit = models.begin();
-            for(; mit != models.end(); ++mit)
-            {
-                // Check if model can be used to strengthen the survivability
-                if( mit->getQualification() == remaining.model || mOrganizationModelAsk.ontology().isSubClassOf(remaining.model, mit->getQualification()) )
-                {
-                    hasPossibleMatch = true;
-                    try {
-                        remaining.decrement();
-                        mit->increment();
-                        updated = true;
-                    } catch(...)
-                    {
-                        modelBoundRemaining.erase(rit);
-                        --rit;
-                        break;
-                    }
-                }
-            }
-            if(!hasPossibleMatch)
-            {
-                modelBoundRemaining.erase(rit);
-                --rit;
-            }
-        }
-    } while(updated);
+    //        // Try to fit remaining resources
+    //        std::vector<ModelSurvivability>::iterator mit = models.begin();
+    //        for(; mit != models.end(); ++mit)
+    //        {
+    //            // Check if model can be used to strengthen the survivability
+    //            if( mit->getQualification() == remaining.model || mOrganizationModelAsk.ontology().isSubClassOf(remaining.model, mit->getQualification()) )
+    //            {
+    //                LOG_DEBUG_S << remaining.model << " bound: " <<
+    //                    remaining.min << "-- " << remaining.max << " quali " << mit->getQualification();
+    //                hasPossibleMatch = true;
+    //                try {
+    //                    remaining.decrement();
+    //                    mit->increment();
+    //                    updated = true;
+    //                } catch(...)
+    //                {
+    //                    modelBoundRemaining.erase(rit);
+    //                    --rit;
+    //                    break;
+    //                }
+    //            }
+    //        }
+    //        if(!hasPossibleMatch)
+    //        {
+    //            modelBoundRemaining.erase(rit);
+    //            --rit;
+    //        }
+    //    }
+    //} while(updated);
 
-    // Serial model of all subcomponents --> the full system
+    //// Serial model of all subcomponents --> the full system
     double fullModelSurvival = 1;
 
-    std::vector<ModelSurvivability>::iterator mit = models.begin();
-    for(; mit != models.end(); ++mit)
-    {
-        LOG_INFO_S << "Probability of survival: " << mit->toString();
-        fullModelSurvival *= mit->getProbabilityOfSurvival();
-    }
-
+    //std::vector<ModelSurvivability>::iterator mit = models.begin();
+    //for(; mit != models.end(); ++mit)
+    //{
+    //    LOG_INFO_S << "Probability of survival: " << mit->toString();
+    //    fullModelSurvival *= mit->getProbabilityOfSurvival();
+    //}
     return fullModelSurvival;
 }
 
