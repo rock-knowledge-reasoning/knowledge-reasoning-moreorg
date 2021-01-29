@@ -220,10 +220,16 @@ void Connectivity::identifyInterfaces()
         std::vector<OWLCardinalityRestriction::Ptr> restrictions = mAsk.getCardinalityRestrictions(model, mProperty, mInterfaceBaseClass);
 
         owlapi::model::IRIList interfaces;
-        std::vector<OWLCardinalityRestriction::Ptr>::const_iterator rit = restrictions.begin();
-        for(; rit != restrictions.end(); ++rit)
+        for(const OWLCardinalityRestriction::Ptr& r : restrictions)
         {
-            const OWLCardinalityRestriction::Ptr& restriction = *rit;
+            const OWLObjectCardinalityRestriction::Ptr& restriction = dynamic_pointer_cast<OWLObjectCardinalityRestriction>(r);
+            if(!restriction)
+            {
+                throw
+                    std::runtime_error("moreorg::algebra::Connectivity::identifyInterfaces:"
+                        " expected OWLObjectCardinalityRestriction");
+            }
+
             if( restriction->getCardinalityRestrictionType() == OWLCardinalityRestriction::MAX)
             {
                 for(size_t i = 0; i < restriction->getCardinality(); ++i)

@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_SUITE(csp)
 
 BOOST_AUTO_TEST_CASE(match_resource_via_restrictions)
 {
-    OWLOntology::Ptr ontology(new OWLOntology());
+    OWLOntology::Ptr ontology = make_shared<OWLOntology>();
     OWLOntologyTell tell(ontology);
     OWLOntologyAsk ask(ontology);
     tell.initializeDefaultClasses();
@@ -72,20 +72,23 @@ BOOST_AUTO_TEST_CASE(match_resource_via_restrictions)
 
     std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction = make_shared<OWLObjectExactCardinality>(property, 2, a);
         query.push_back(restriction);
     }
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, c->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction =
+            make_shared<OWLObjectExactCardinality>(property, 2, c);
         query.push_back(restriction);
     }
 
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 3, b->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction =
+            make_shared<OWLObjectExactCardinality>(property, 3, b);
         resourcePool.push_back(restriction);
     }
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 3, c->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction =
+            make_shared<OWLObjectExactCardinality>(property, 3, c);
         resourcePool.push_back(restriction);
     }
 
@@ -124,7 +127,7 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
     BOOST_TEST_MESSAGE("MoveTo requirements: " << OWLCardinalityRestriction::toString(r_move_to));
     BOOST_TEST_MESSAGE("Sherpa provides: " << OWLCardinalityRestriction::toString(r_sherpa));
     {
-        std::string capabilityName = "Localization";
+        std::string capabilityName = "SelfLocalization";
         ModelBound::List modelBounds = fulfillment.getAssignments(moreorg::vocabulary::OM::resolve(capabilityName));
         BOOST_REQUIRE_MESSAGE(modelBounds.size() == 1, "Matching of 1 provided resource expected, but got '" << modelBounds.size());
 
@@ -162,7 +165,9 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
 
     {
         OWLObjectProperty::Ptr hasProperty = ask.getOWLObjectProperty( moreorg::vocabulary::OM::resolve("has") );
-        OWLCardinalityRestriction::Ptr restriction(new OWLObjectMinCardinality(hasProperty, 1, image_provider));
+        OWLClass::Ptr c_image_provider = ask.getOWLClass(image_provider);
+        OWLCardinalityRestriction::Ptr restriction =
+            make_shared<OWLObjectMinCardinality>(hasProperty, 1, c_image_provider);
         tell.subClassOf(sherpa, restriction);
     }
 
@@ -171,7 +176,9 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
 
     {
         OWLObjectProperty::Ptr hasProperty = ask.getOWLObjectProperty( moreorg::vocabulary::OM::resolve("has") );
-        OWLCardinalityRestriction::Ptr restriction(new OWLObjectMinCardinality(hasProperty, 1, move_to));
+        OWLClass::Ptr c_move_to = ask.getOWLClass(move_to);
+        OWLCardinalityRestriction::Ptr restriction =
+            make_shared<OWLObjectMinCardinality>(hasProperty, 1, c_move_to);
         tell.subClassOf(sherpa, restriction);
     }
 

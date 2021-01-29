@@ -36,7 +36,11 @@ public:
      * information about the overall redundancy, e.g., if 4 cameras are
      * available, we assume a redundancy of 2
      */
-    ModelSurvivability(const owlapi::model::OWLCardinalityRestriction::Ptr& restriction, double resourceProbabilityOfSurvival, double redundancy);
+    ModelSurvivability(
+            const owlapi::model::OWLObjectCardinalityRestriction::Ptr& restriction,
+            double resourceProbabilityOfSurvival,
+            double redundancy
+    );
 
     /**
      * Get the probability of survival for this model
@@ -72,7 +76,7 @@ public:
     std::string toString() const;
 
 private:
-    owlapi::model::OWLCardinalityRestriction::Ptr mRestriction;
+    owlapi::model::OWLObjectCardinalityRestriction::Ptr mObjectRestriction;
 
     /// Probability of survival of this model
     double mModelProbabilityOfSurvival;

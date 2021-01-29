@@ -298,7 +298,7 @@ std::string ResourceMatch::toString() const
 ModelBound::List ResourceMatch::toModelBoundList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& restrictions)
 {
     using namespace owlapi::model;
-    std::map<owlapi::model::IRI, OWLCardinalityRestriction::MinMax> bounds = OWLCardinalityRestriction::getBounds(restrictions);
+    std::map<owlapi::model::IRI, OWLCardinalityRestriction::MinMax> bounds = OWLObjectCardinalityRestriction::getBounds(restrictions);
 
     ModelBound::List modelBounds;
     std::map<owlapi::model::IRI, OWLCardinalityRestriction::MinMax>::const_iterator cit = bounds.begin();
@@ -358,10 +358,14 @@ owlapi::model::IRIList ResourceMatch::filterSupportedModels(const owlapi::model:
         std::vector<OWLCardinalityRestriction::Ptr> resourceRestrictions = ask.getCardinalityRestrictions(resourceModel, objectProperty);
         if(resourceRestrictions.empty())
         {
+            OWLClassExpression::Ptr resourceModelExpression =
+                ask.getOWLClassExpression(resourceModel);
             // This definition has no children, i.e. is not defined by
             // subconstraints, thus adding the resourceModel itself as min
             // constraint
-            OWLCardinalityRestriction::Ptr restriction(new OWLCardinalityRestriction(ask.getOWLObjectProperty(objectProperty), 1, resourceModel, OWLCardinalityRestriction::MIN));
+            OWLCardinalityRestriction::Ptr restriction =
+                OWLCardinalityRestriction::getInstance(ask.getOWLObjectProperty(objectProperty),
+                        1, resourceModelExpression , OWLCardinalityRestriction::MIN);
             resourceRestrictions.push_back(restriction);
         }
 

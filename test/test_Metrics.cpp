@@ -6,7 +6,7 @@
 #include <moreorg/vocabularies/OM.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <owlapi/model/OWLOntologyTell.hpp>
-#include <owlapi/model/OWLExactCardinalityRestriction.hpp>
+#include <owlapi/model/OWLObjectExactCardinality.hpp>
 #include <moreorg/vocabularies/OM.hpp>
 
 using namespace moreorg;
@@ -50,21 +50,25 @@ BOOST_FIXTURE_TEST_CASE(redundancy, RedundancyFixture )
     // query =2.has.A and =2.has.C
     std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, a->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction =
+            make_shared<OWLObjectExactCardinality>(property, 2, a);
         query.push_back(restriction);
     }
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, c->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction =
+            make_shared<OWLObjectExactCardinality>(property, 2, c);
         query.push_back(restriction);
     }
 
     // available =2.has.B and 2.has.C
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, b->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction =
+            make_shared<OWLObjectExactCardinality>(property, 2, b);
         resourcePool.push_back(restriction);
     }
     {
-        OWLCardinalityRestriction::Ptr restriction(new OWLExactCardinalityRestriction(property, 2, c->getIRI()));
+        OWLCardinalityRestriction::Ptr restriction =
+            make_shared<OWLObjectExactCardinality>(property, 2, c);
         resourcePool.push_back(restriction);
     }
 
@@ -85,7 +89,7 @@ BOOST_FIXTURE_TEST_CASE(redundancy_same_parallel_in_series, RedundancyFixture)
     std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
     {
         OWLCardinalityRestriction::Ptr restriction =
-            make_shared<OWLExactCardinalityRestriction>(property, 2, a->getIRI());
+            make_shared<OWLObjectExactCardinality>(property, 2, a);
         query.push_back(restriction);
     }
 
@@ -93,12 +97,12 @@ BOOST_FIXTURE_TEST_CASE(redundancy_same_parallel_in_series, RedundancyFixture)
     {
         {
             OWLCardinalityRestriction::Ptr restriction =
-                make_shared<OWLExactCardinalityRestriction>(property, 2, a->getIRI());
+                make_shared<OWLObjectExactCardinality>(property, 2, a);
             resourcePool.push_back(restriction);
         }
         {
             OWLCardinalityRestriction::Ptr restriction =
-                make_shared<OWLExactCardinalityRestriction>(property, 2, a->getIRI());
+                make_shared<OWLObjectExactCardinality>(property, 2, a);
             resourcePool.push_back(restriction);
         }
 
@@ -112,7 +116,7 @@ BOOST_FIXTURE_TEST_CASE(redundancy_same_parallel_in_series, RedundancyFixture)
     {
         {
             OWLCardinalityRestriction::Ptr restriction =
-                make_shared<OWLExactCardinalityRestriction>(property, 4, a->getIRI());
+                make_shared<OWLObjectExactCardinality>(property, 4, a);
             resourcePool.push_back(restriction);
         }
 

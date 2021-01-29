@@ -3,8 +3,10 @@
 namespace moreorg {
 namespace metrics {
 
-ModelSurvivability::ModelSurvivability(const owlapi::model::OWLCardinalityRestriction::Ptr& restriction, double modelProbability, double redundancy)
-    : mRestriction(restriction)
+ModelSurvivability::ModelSurvivability(const owlapi::model::OWLObjectCardinalityRestriction::Ptr& restriction,
+        double modelProbability,
+        double redundancy)
+    : mObjectRestriction(restriction)
     , mModelProbabilityOfSurvival(modelProbability)
     , mRedundancy(redundancy)
 {}
@@ -17,12 +19,12 @@ double ModelSurvivability::getProbabilityOfSurvival() const
 
 owlapi::model::IRI ModelSurvivability::getQualification() const
 {
-    return mRestriction->getQualification();
+    return mObjectRestriction->getQualification();
 }
 
 uint32_t ModelSurvivability::getCardinality() const
 {
-    return mRestriction->getCardinality();
+    return mObjectRestriction->getCardinality();
 }
 
 std::string ModelSurvivability::toString() const
@@ -32,7 +34,7 @@ std::string ModelSurvivability::toString() const
     ss << "    modelProbability:      " << mModelProbabilityOfSurvival << std::endl;
     ss << "    redundancy:            " << mRedundancy << std::endl;
     ss << "    probabilityOfSurvival: " << getProbabilityOfSurvival() << std::endl;
-    ss << "  > " << mRestriction->toString();
+    ss << "  > " << mObjectRestriction->toString();
     return ss.str();
 }
 

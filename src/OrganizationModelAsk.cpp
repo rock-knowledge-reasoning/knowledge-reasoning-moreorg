@@ -490,29 +490,44 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
         // defined through the model pool
         if(availableResources.empty())
         {
+            OWLClassExpression::Ptr klass =
+                mOntologyAsk.getOWLClassExpression(mit->first);
+
             OWLCardinalityRestriction::Ptr highlevelModelMaxConstraint = OWLCardinalityRestriction::getInstance(property,
                     modelCount,
-                    mit->first,
+                    klass,
                     OWLCardinalityRestriction::MAX);
             availableResources.push_back(highlevelModelMaxConstraint);
 
             OWLCardinalityRestriction::Ptr highlevelModelMinConstraint = OWLCardinalityRestriction::getInstance(property,
                     modelCount,
-                    mit->first,
+                    klass,
                     OWLCardinalityRestriction::MIN);
             availableResources.push_back(highlevelModelMinConstraint);
         }
 
         std::vector<OWLCardinalityRestriction::Ptr> available;
-        for(const OWLCardinalityRestriction::Ptr& restriction : availableResources)
+        for(const OWLCardinalityRestriction::Ptr& r : availableResources)
         {
+            OWLObjectCardinalityRestriction::Ptr restriction =
+                dynamic_pointer_cast<OWLObjectCardinalityRestriction>(r);
+            if(!restriction)
+            {
+                throw
+                    std::runtime_error("moreorg::OrganizationModelAsk::getCardinalityRestrictions:"
+                        " expected OWLObjectCardinalityRestriction");
+            }
+
             // Update the cardinality with the actual model count
             uint32_t cardinality = modelCount*restriction->getCardinality();
             if(max2Min && restriction->getCardinalityRestrictionType() == OWLCardinalityRestriction::MAX)
             {
+                OWLClassExpression::Ptr klass =
+                    mOntologyAsk.getOWLClassExpression(restriction->getQualification());
+
                 OWLCardinalityRestriction::Ptr converted = OWLCardinalityRestriction::getInstance(restriction->getProperty(),
                         cardinality,
-                        restriction->getQualification(),
+                        klass,
                         OWLCardinalityRestriction::MIN);
                 available.push_back(converted);
             } else {
@@ -954,7 +969,7 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(const owla
         return supportVector;
 
     } else {
-        std::map<IRI, OWLCardinalityRestriction::MinMax> modelCount = OWLCardinalityRestriction::getBounds(restrictions);
+        std::map<IRI, OWLCardinalityRestriction::MinMax> modelCount = OWLObjectCardinalityRestriction::getBounds(restrictions);
         algebra::ResourceSupportVector supportVector = getSupportVector(modelCount, filterLabels, useMaxCardinality);
         LOG_DEBUG_S << "ModelCount: "<< modelCount.size() << ", restrictions: " << OWLCardinalityRestriction::toString(restrictions) << std::endl
             << supportVector.toString(4);
