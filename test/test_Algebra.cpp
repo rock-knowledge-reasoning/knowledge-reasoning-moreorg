@@ -264,9 +264,14 @@ BOOST_AUTO_TEST_CASE(composition)
 
 BOOST_AUTO_TEST_CASE(connectivity)
 {
-    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()) );
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(getOMSchema());
     OrganizationModelAsk ask(om);
 
+    owlapi::model::IRI ifModel0 = vocabulary::OM::resolve("EmiActive");
+    owlapi::model::IRI ifModel1 = vocabulary::OM::resolve("EmiPassive");
+
+    BOOST_REQUIRE_MESSAGE( ask.ontology().isRelatedTo(ifModel0,
+                vocabulary::OM::compatibleWith(), ifModel1), "Interfaces are compatible");
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Payload")] = 2;
