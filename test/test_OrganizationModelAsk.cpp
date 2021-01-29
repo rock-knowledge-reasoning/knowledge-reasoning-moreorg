@@ -22,19 +22,25 @@ BOOST_AUTO_TEST_SUITE(moreorg_ask)
 
 BOOST_AUTO_TEST_CASE(supported_functionalities)
 {
-    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
-    IRI sherpa = OM::resolve("Sherpa");
-    ModelPool modelPool;
-    modelPool[sherpa] = 1;
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(getOMSchema());
+    std::vector<std::string> robotNames = { "Sherpa", "SherpaTT", "CoyoteIII", "CREX"  };
 
-    OrganizationModelAsk ask(om, modelPool, true);
-    BOOST_TEST_MESSAGE("Supported functionalities by " << sherpa << ": " <<  ask.getSupportedFunctionalities().toString() );
+    for(const std::string& robotName : robotNames )
+    {
+        IRI robot = vocabulary::OM::resolve(robotName);
 
-    Resource::Set resources;
-    resources.insert( { Resource(vocabulary::OM::resolve("MoveTo")) });
+        ModelPool modelPool;
+        modelPool[robot] = 1;
 
-    BOOST_REQUIRE_MESSAGE(ask.isSupporting(modelPool, resources),
-            "Sherpa supports 'MoveTo'");
+        OrganizationModelAsk ask(om, modelPool, true);
+        BOOST_TEST_MESSAGE("Supported functionalities by " << robot << ": " <<  ask.getSupportedFunctionalities().toString() );
+
+        Resource::Set resources;
+        resources.insert( { Resource(vocabulary::OM::resolve("MoveTo")) });
+
+        BOOST_REQUIRE_MESSAGE(ask.isSupporting(modelPool, resources),
+                "Robot '" << robot << "' supports 'MoveTo'");
+    }
 }
 
 BOOST_AUTO_TEST_CASE(recursive_resolution)
@@ -688,6 +694,8 @@ BOOST_AUTO_TEST_CASE(robotpool)
         OrganizationModelAsk ask(om, modelPool, true);
         facades::Robot robot(modelPool, ask);
 
+        BOOST_TEST_MESSAGE("All TransportProvider instances: " << ask.ontology().allInstancesOf(vocabulary::OM::resolve("TransportProvider")));
+        BOOST_TEST_MESSAGE("All types of WalkingBot instance: " << ask.ontology().allTypesOf(vehicle)); // returns class information
         BOOST_REQUIRE_MESSAGE( robot.isMobile(), "WalkingBot is mobile");
     }
 }
