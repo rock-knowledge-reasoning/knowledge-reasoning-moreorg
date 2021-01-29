@@ -9,6 +9,9 @@
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2014/01/om-schema">
         <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base"/>
         <rdfs:comment>Changelog:
+* 0.20
+  * add MotionPlanning
+  * add AutonomousNavigation equivalentTo MoveTo
 * 0.19
   * change to using om-base
 * 0.18
@@ -46,6 +49,23 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#ActionPlanning -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ActionPlanning">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Planning"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#AutonomousNavigation -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AutonomousNavigation">
+        <owl:equivalentClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MoveTo"/>
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Capability"/>
+    </owl:Class>
     
 
 
@@ -249,17 +269,18 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Planning"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#MoveTo -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#MoveTo">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Capability"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
@@ -278,7 +299,21 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
                 <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
                 <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelfLocalization"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -307,10 +342,26 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#Planning -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Planning">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Capability"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#PowerSource -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PhysicalEntity"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#SelfLocalization -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#SelfLocalization">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization"/>
     </owl:Class>
     
 
@@ -388,6 +439,14 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#TaskPlanning -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#TaskPlanning">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Planning"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Trail -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Trail">
@@ -456,5 +515,5 @@
 
 
 
-<!-- Generated by the OWL API (version 4.5.7.2018-12-02T02:23:35Z) https://github.com/owlcs/owlapi -->
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
 

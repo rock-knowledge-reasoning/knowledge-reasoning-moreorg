@@ -40,13 +40,6 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
                 <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
-                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -68,7 +61,21 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
                 <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
                 <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelfLocalization"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -104,7 +111,17 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot"/>
-        <om-schema:powerSourceCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">10.0</om-schema:powerSourceCapacity>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulation"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelfLocalization"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_Camera_0"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiActive_0"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiActive_1"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiPassive_0"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiPassive_1"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_PowerSource"/>
         <om-schema:mass rdf:datatype="http://www.w3.org/2001/XMLSchema#double">100.0</om-schema:mass>
         <om-schema:maxAcceleration rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-schema:maxAcceleration>
         <om-schema:maxVelocity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">5.0</om-schema:maxVelocity>
@@ -113,13 +130,62 @@
         <om-schema:nominalAcceleration rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.0</om-schema:nominalAcceleration>
         <om-schema:nominalPowerConsumption rdf:datatype="http://www.w3.org/2001/XMLSchema#double">10.0</om-schema:nominalPowerConsumption>
         <om-schema:nominalVelocity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.3</om-schema:nominalVelocity>
+        <om-schema:powerSourceCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">10.0</om-schema:powerSourceCapacity>
         <om-schema:supplyVoltage rdf:datatype="http://www.w3.org/2001/XMLSchema#double">48.0</om-schema:supplyVoltage>
-        <om-schema:transportCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</om-schema:transportCapacity>
-        <om-schema:transportDemand rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</om-schema:transportDemand>
+        <om-schema:transportCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">4.0</om-schema:transportCapacity>
+        <om-schema:transportDemand rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-schema:transportDemand>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_Camera_0 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_Camera_0">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiActive_0 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiActive_0">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiActive_1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiActive_1">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiPassive_0 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiPassive_0">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiPassive_1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_EmiPassive_1">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_PowerSource -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2018/10/robots/extrabots#WalkingBot_PowerSource">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 
 
 
-<!-- Generated by the OWL API (version 4.5.6.2018-09-06T00:27:41Z) https://github.com/owlcs/owlapi -->
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
 

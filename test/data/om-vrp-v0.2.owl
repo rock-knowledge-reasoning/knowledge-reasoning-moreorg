@@ -77,7 +77,14 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
                 <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization"/>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelfLocalization"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#has"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
