@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
 
+#include <owlapi/io/OWLOntologyIO.hpp>
 #include <moreorg/OrganizationModel.hpp>
 #include <moreorg/OrganizationModelAsk.hpp>
 #include <moreorg/exporter/PDDLExporter.hpp>
@@ -209,7 +210,7 @@ BOOST_AUTO_TEST_CASE(resource_support_crex)
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(getOMSchema());
 
     {
         ModelPool items;
@@ -229,6 +230,17 @@ BOOST_AUTO_TEST_CASE(resource_support_crex)
         BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider expected 0 was " << combinations.size());
     }
 }
+
+BOOST_AUTO_TEST_CASE(load_qudt)
+{
+    using namespace owlapi::model;
+    using namespace owlapi::io;
+
+    OWLOntology::Ptr qudt_ontology =
+        OWLOntologyIO::load(IRI("http://qudt.org/2.1/schema/qudt"));
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
 
 //BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
