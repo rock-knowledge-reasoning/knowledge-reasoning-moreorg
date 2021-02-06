@@ -17,9 +17,9 @@ rock_standard_layout()
 find_package(owlapi)
 
 owlapi_install_ontology("http://www.rock-robotics.org/2014/01/om-base"
-    "test/data/om-base-v0.3.owl")
+    "test/data/om-base-v0.4.owl")
 owlapi_install_ontology("http://www.rock-robotics.org/2014/01/om-schema"
-    "test/data/om-schema-v0.20.owl")
+    "test/data/om-schema-v0.21.owl")
 owlapi_install_ontology("http://www.rock-robotics.org/2015/12/robots/BaseCamp"
     "test/data/om-robot-basecamp.owl")
 owlapi_install_ontology("http://www.rock-robotics.org/2015/12/robots/CoyoteIII"
@@ -45,3 +45,7 @@ owlapi_install_ontology("http://www.rock-robotics.org/2018/10/robots/extrabots"
     "test/data/om-extrabots.owl")
 owlapi_install_ontology("http://www.rock-robotics.org/2018/10/robots/robotpool"
     "test/data/om-robotpool.owl")
+owlapi_install_ontology("http://qudt.org/2.1/schema/qudt"
+    "test/data/qudt/qudt.ttl")
+owlapi_install_ontology("http://qudt.org/2.1/schema/extensions/functions"
+    "test/data/qudt/http___qudt_org_2_1_schema_extensions_functions.ttl")
