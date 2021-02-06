@@ -1,4 +1,5 @@
 # MoreOrg - Model for Reconfigurable Multi-Robot Organizations
+![Build Status](https://github.com/rock-knowledge-reasoning/knowledge-reasoning-moreorg/workflows/test/badge.svg)
 
 This library implements MoreOrg which is described in the PhD Thesis
 "Autonomous Operation of a Reconfigurable Multi-Robot System for Planetary Space
@@ -139,7 +140,7 @@ $> ./build/test/moreorg-test --log_level=all
 
 # Merge Requests and Issue Tracking
 
-Github will be used for pull requests and issue tracking: https://github.com/rock-knowledge-reasoning/knowledge-reasoning-moreorg
+GitHub will be used for pull requests and issue tracking: https://github.com/rock-knowledge-reasoning/knowledge-reasoning-moreorg
 
 # License
 
@@ -147,4 +148,4 @@ This software is distributed under the New/3-clause BSD license.
 
 # Copyright
 
-Copyright (c) 2013-2020 Thomas M. Roehr, DFKI GmbH Robotics Innovation Center
+Copyright (c) 2013-2021 Thomas M. Roehr, DFKI GmbH Robotics Innovation Center
