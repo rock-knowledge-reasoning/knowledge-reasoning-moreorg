@@ -3041,9 +3041,8 @@ qudt:valueUnion
   dcterms:description "A datatype that is the union of numeric xsd data types. \"numericUnion\" is equivalent to the xsd specification that uses an xsd:union of memberTypes=\"xsd:decimal xsd:double xsd:float xsd:integer\"." ;
   rdfs:isDefinedBy <http://qudt.org/2.1/schema/qudt> ;
   rdfs:label "value union" ;
-  rdfs:subClassOf rdfs:Resource ;
   owl:equivalentClass [
-      a owl:Class ;
+      a rdfs::Datatype ;
       owl:unionOf (
           xsd:anySimpleType
           dtype:EnumeratedValue
