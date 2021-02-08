@@ -24,12 +24,9 @@ double Redundancy::computeSequential(const owlapi::model::IRIList& functions, co
 {
     using namespace owlapi::model;
     std::vector<double> metrics;
-    IRIList::const_iterator cit = functions.begin();
-    for(; cit != functions.end(); ++cit)
+    for(const IRI& function : functions)
     {
-        const IRI& function = *cit;
-        double metric;
-        metric = Metric::compute(function, modelPool);
+        double metric = Metric::compute(function, modelPool);
         LOG_DEBUG_S << "Function: '" << function.toString() << "' --> metric: " << metric;
         metrics.push_back(metric);
     }
@@ -42,10 +39,8 @@ double Redundancy::computeSequential(const std::vector<owlapi::model::IRISet>& f
 {
     using namespace owlapi::model;
     std::vector<double> metrics;
-    std::vector<IRISet>::const_iterator cit = functionalRequirement.begin();
-    for(; cit != functionalRequirement.end(); ++cit)
+    for(const IRISet& functions : functionalRequirement)
     {
-        const IRISet& functions = *cit;
         double metric;
         if(sharedUse)
         {
@@ -99,8 +94,10 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
                 "to complete redundancy computation, but none are provided");
     }
 
-    LOG_DEBUG_S << "Available: " << ModelBound::toString(modelBoundRemaining);
-    LOG_DEBUG_S << "Required: " << ModelBound::toString(modelBoundRequired);
+    LOG_DEBUG_S
+        << "Available: " << ModelBound::toString(modelBoundRemaining)
+        << std::endl
+        << "Required: " << ModelBound::toString(modelBoundRequired);
 
     ResourceMatch::Solution solution;
     uint32_t fullModelRedundancy = 0;
@@ -115,8 +112,10 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
             // repeat solving
             // throws invalid_argument when model bounds are exceeded
             modelBoundRemaining = solution.substractMinFrom(modelBoundRemaining);
-            LOG_DEBUG_S << "Solution: " << solution.toString();
-            LOG_DEBUG_S << "Remaining: " << ModelBound::toString(modelBoundRemaining);
+            LOG_DEBUG_S
+                << "Solution: " << solution.toString()
+                << std::endl
+                << "Remaining: " << ModelBound::toString(modelBoundRemaining);
         }
     } catch(const std::exception& e)
     {
@@ -140,10 +139,17 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
 
     std::vector<ModelSurvivability> models;
 
-    std::vector<OWLCardinalityRestriction::Ptr>::const_iterator cit = required.begin();
-    for(; cit != required.end(); ++cit)
+    for(const OWLCardinalityRestriction::Ptr& cRestriction : required)
     {
-        IRI qualification = (*cit)->getQualification();
+        OWLObjectCardinalityRestriction::Ptr restriction =
+            dynamic_pointer_cast<OWLObjectCardinalityRestriction>(cRestriction);
+        if(!restriction)
+        {
+            throw
+                std::runtime_error("moreorg::metrics::Redundancy::computeSequential:"
+                        " expected OWLObjectCardinalityRestriction");
+        }
+        IRI qualification = restriction->getQualification();
 
         // Mean probability of failure
         // Probability of component failure
@@ -161,7 +167,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
             probabilityOfSurvival = mDefaultProbabilityOfSurvival;
         }
 
-        ModelSurvivability survivability(*cit, probabilityOfSurvival, fullModelRedundancy);
+        ModelSurvivability survivability(restriction, probabilityOfSurvival, fullModelRedundancy);
         models.push_back(survivability);
     }
 
@@ -213,11 +219,10 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
     // Serial model of all subcomponents --> the full system
     double fullModelSurvival = 1;
 
-    std::vector<ModelSurvivability>::iterator mit = models.begin();
-    for(; mit != models.end(); ++mit)
+    for(const ModelSurvivability& survivability : models)
     {
-        LOG_INFO_S << "Probability of survival: " << mit->toString();
-        fullModelSurvival *= mit->getProbabilityOfSurvival();
+        LOG_INFO_S << "Probability of survival: " << survivability.toString();
+        fullModelSurvival *= survivability.getProbabilityOfSurvival();
     }
 
     return fullModelSurvival;
@@ -226,10 +231,9 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
 double Redundancy::parallel(const std::vector<double>& probabilities)
 {
     double probability = 1.0;
-    std::vector<double>::const_iterator cit = probabilities.begin();
-    for(; cit != probabilities.end(); ++cit)
+    for(const double& p : probabilities)
     {
-        probability *= (1 - *cit);
+        probability *= (1 - p);
     }
 
     return 1 - probability;
@@ -239,10 +243,9 @@ double Redundancy::parallel(const std::vector<double>& probabilities)
 double Redundancy::serial(const std::vector<double>& probabilities)
 {
     double probability = 1.0;
-    std::vector<double>::const_iterator cit = probabilities.begin();
-    for(; cit != probabilities.end(); ++cit)
+    for(const double& p : probabilities)
     {
-        probability *= *cit;
+        probability *= p;
     }
     return probability;
 }
