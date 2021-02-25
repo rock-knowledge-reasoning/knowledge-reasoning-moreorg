@@ -31,6 +31,7 @@ typedef std::map< std::pair<ServiceIRI, ActorIRI>, double> MetricMap;
 class Metric
 {
 public:
+    typedef shared_ptr<Metric> Ptr;
 
     /**
      * Metric for an organization model
@@ -39,9 +40,7 @@ public:
             const OrganizationModelAsk& organization,
             const owlapi::model::IRI& property = vocabulary::OM::has());
 
-    virtual ~Metric() {}
-
-    typedef shared_ptr<Metric> Ptr;
+    virtual ~Metric() = default;
 
     /**
      * Compute all metrics for all combinations of services and atomic actors

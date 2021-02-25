@@ -458,6 +458,32 @@ double OrganizationModelAsk::getPropertyValue(const ModelPool& modelPool,
     return robot.getPropertyValue(property);
 }
 
+std::vector<OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getRequiredCardinalities(
+        const ModelPool& modelPool,
+        const owlapi::model::IRI& objectProperty) const
+{
+    std::vector<OWLCardinalityRestriction::Ptr> required = getCardinalityRestrictions(modelPool, objectProperty, OWLCardinalityRestriction::SUM_OP);
+    required.erase( std::remove_if(required.begin(), required.end(), [](const OWLCardinalityRestriction::Ptr& elem)
+            {
+                return elem->getCardinalityRestrictionType() == OWLObjectCardinalityRestriction::MAX;
+            }), required.end()
+    );
+    return required;
+}
+
+std::vector<OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getAvailableCardinalities(
+        const ModelPool& modelPool,
+        const owlapi::model::IRI& objectProperty) const
+{
+    std::vector<OWLCardinalityRestriction::Ptr> available = getCardinalityRestrictions(modelPool, objectProperty, OWLCardinalityRestriction::SUM_OP);
+    available.erase( std::remove_if(available.begin(), available.end(), [](const OWLCardinalityRestriction::Ptr& elem)
+            {
+                return elem->getCardinalityRestrictionType() == OWLObjectCardinalityRestriction::MIN;
+            }), available.end()
+    );
+    return available;
+}
+
 std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getCardinalityRestrictions(const ModelPool& modelPool,
     const owlapi::model::IRI& objectProperty,
     owlapi::model::OWLCardinalityRestriction::OperationType operationType,
@@ -483,7 +509,9 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
         const IRI& model = mit->first;
         uint32_t modelCount = mit->second;
 
-        OWLCardinalityRestriction::PtrList availableResources = mOntologyAsk.getCardinalityRestrictions(model, objectProperty);
+        OWLCardinalityRestriction::PtrList availableResources =
+            mOntologyAsk.getCardinalityRestrictions(model, objectProperty,
+                    true /*includeAncestors*/);
 
         // This is not a meta constraint, but a direct representation of an
         // atomic resource, so add the exact availability of the given high level resource, which is
@@ -537,7 +565,7 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
             }
         }
 
-        allAvailableResources = owlapi::model::OWLCardinalityRestriction::join(allAvailableResources, available, operationType );
+        allAvailableResources = OWLCardinalityRestrictionOps::join(allAvailableResources, available, operationType );
     }
 
     mpOrganizationModel->mQueryCache.cacheResult(modelPool, objectProperty,

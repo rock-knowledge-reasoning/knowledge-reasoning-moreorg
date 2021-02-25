@@ -2,9 +2,9 @@
 #include <math.h>
 #include <vector>
 #include <base-logging/Logging.hpp>
-#include <moreorg/reasoning/ResourceMatch.hpp>
-#include <moreorg/metrics/ModelSurvivability.hpp>
-#include <moreorg/vocabularies/OM.hpp>
+#include "../reasoning/ResourceMatch.hpp"
+#include "ModelSurvivability.hpp"
+#include "../vocabularies/OM.hpp"
 
 using namespace owlapi::model;
 using namespace owlapi::vocabulary;
@@ -22,7 +22,6 @@ Redundancy::Redundancy(const OrganizationModelAsk& organization,
 
 double Redundancy::computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const
 {
-    using namespace owlapi::model;
     std::vector<double> metrics;
     for(const IRI& function : functions)
     {
@@ -37,7 +36,6 @@ double Redundancy::computeSequential(const owlapi::model::IRIList& functions, co
 
 double Redundancy::computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ModelPool& modelPool, bool sharedUse) const
 {
-    using namespace owlapi::model;
     std::vector<double> metrics;
     for(const IRISet& functions : functionalRequirement)
     {
@@ -62,7 +60,6 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
     {
         throw std::invalid_argument("moreorg::metrics::Redundancy: set of cardinality restriction to define requirements is empty");
     }
-    using namespace owlapi::model;
 
     // Strategies to compute redundancy:
     // 1. account for relevant functionality only
@@ -119,7 +116,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         }
     } catch(const std::exception& e)
     {
-        LOG_DEBUG_S << e.what();
+        LOG_DEBUG_S << "ResourceMatch failed: " << e.what();
     }
 
     LOG_INFO_S << "Full model redundancy count is at: " << fullModelRedundancy << std::endl
@@ -189,16 +186,16 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
             bool hasPossibleMatch = false;
 
             // Try to fit remaining resources
-            std::vector<ModelSurvivability>::iterator mit = models.begin();
-            for(; mit != models.end(); ++mit)
+            for(ModelSurvivability& survivability : models)
             {
                 // Check if model can be used to strengthen the survivability
-                if( mit->getQualification() == remaining.model || mOrganizationModelAsk.ontology().isSubClassOf(remaining.model, mit->getQualification()) )
+                if( survivability.getQualification() == remaining.model ||
+                        mOrganizationModelAsk.ontology().isSubClassOf(remaining.model, survivability.getQualification()) )
                 {
                     hasPossibleMatch = true;
                     try {
                         remaining.decrement();
-                        mit->increment();
+                        survivability.increment();
                         updated = true;
                     } catch(...)
                     {

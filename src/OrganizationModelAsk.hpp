@@ -365,6 +365,14 @@ public:
     double getPropertyValue(const ModelPool& modelPool,
             const owlapi::model::IRI& property) const;
 
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> getRequiredCardinalities(
+            const ModelPool& modelPool,
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has()) const;
+
+    std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> getAvailableCardinalities(
+            const ModelPool& modelPool,
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has()) const;
+
     /**
      * Get all (joined) restriction that hold for a given model pool
      * \param modelPool
@@ -376,7 +384,8 @@ public:
      */
     std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> getCardinalityRestrictions(const ModelPool& modelPool,
             const owlapi::model::IRI& objectProperty = vocabulary::OM::has(),
-            owlapi::model::OWLCardinalityRestriction::OperationType type = owlapi::model::OWLCardinalityRestriction::SUM_OP, bool max2Min = false) const;
+            owlapi::model::OWLCardinalityRestriction::OperationType type = owlapi::model::OWLCardinalityRestriction::SUM_OP,
+            bool max2Min = false) const;
 
 
     /**
