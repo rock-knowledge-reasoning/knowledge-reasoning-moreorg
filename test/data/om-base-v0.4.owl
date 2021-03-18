@@ -45,6 +45,12 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-base#hasUnit -->
+
+    <owl:ObjectProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#hasUnit"/>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#compatibleWith -->
 
     <owl:ObjectProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#compatibleWith">
@@ -121,6 +127,14 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#factorValue -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#factorValue">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    </owl:DatatypeProperty>
     
 
 
@@ -530,6 +544,214 @@ Can be inferred from other properties describing the corresponding dimensions</r
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-base#A -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#A">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ElectricalUnit"/>
+        <rdfs:comment>Ampere</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#ElectricalUnit -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#ElectricalUnit">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Unit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Factor -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Factor">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Hz -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Hz">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#TimeUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#N -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#N">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#SIUnit"/>
+        <rdfs:comment>Newton</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Nm -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Nm">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#SIUnit"/>
+        <rdfs:comment>Newton meter</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#SIUnit -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#SIUnit">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Unit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#TimeUnit -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#TimeUnit">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Unit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Unit -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Unit">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#V -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#V">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ElectricalUnit"/>
+        <rdfs:comment>Volt</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#W -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#W">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#SIUnit"/>
+        <rdfs:comment>Watt</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Wh -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Wh">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#SIUnit"/>
+        <rdfs:comment>Watthour</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#centi -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#centi">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#deci -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#deci">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#giga -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#giga">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#gram -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#gram">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#SIUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#h -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#h">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#TimeUnit"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#kg -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#kg">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#SIUnit"/>
+        <rdfs:comment>kilogram</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#kilo -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#kilo">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#m -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#m">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#SIUnit"/>
+        <rdfs:comment>meter</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#mega -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#mega">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#micro -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#micro">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#milli -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#milli">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#nano -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#nano">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Factor"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#s -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#s">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#TimeUnit"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#Actor -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Actor">
@@ -628,6 +850,78 @@ Can be inferred from other properties describing the corresponding dimensions</r
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#centi -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#centi">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#centi"/>
+        <om-base:factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">100.0</om-base:factorValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#deci -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#deci">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#deci"/>
+        <om-base:factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">10.0</om-base:factorValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#giga -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#giga">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#giga"/>
+        <om-base:factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">1000000000.0</om-base:factorValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#kilo -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#kilo">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#kilo"/>
+        <om-base:factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">1000.0</om-base:factorValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#mega -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#mega">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#mega"/>
+        <om-base:factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">1000000.0</om-base:factorValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#micro -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#micro">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#micro"/>
+        <om-base:factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">0.000001</om-base:factorValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#milli -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#milli">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#milli"/>
+        <om-base:factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">0.001</om-base:factorValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#nano -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#nano">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#nano"/>
+        <om-base:factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">0.000000001</om-base:factorValue>
+    </owl:NamedIndividual>
     
 
 
