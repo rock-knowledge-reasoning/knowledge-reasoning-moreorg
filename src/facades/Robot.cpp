@@ -1,7 +1,13 @@
 #include "Robot.hpp"
-#include <moreorg/vocabularies/OM.hpp>
-#include <moreorg/vocabularies/Robot.hpp>
+
 #include <base-logging/Logging.hpp>
+#include <regex>
+#include <sstream>
+
+#include <muParser.h>
+
+#include "../vocabularies/OM.hpp"
+#include "../vocabularies/Robot.hpp"
 
 using namespace owlapi::model;
 
@@ -148,7 +154,9 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
         mTransportCapacity += modelCount*getDoubleValueOrDefault(actorModel, vocabulary::Robot::transportCapacity(),0.0);
     }
 
+    // derived property
     mEnergyCapacity = mPowerSourceCapacity*mSupplyVoltage*3600;
+
     // Assume there is only a single system transporting
     mTransportCapacity = mTransportCapacity - mModelPool.numberOfInstances() + 1;
 
@@ -463,6 +471,98 @@ double Robot::getLoadAreaSize(const owlapi::model::IRI& agent) const
     }
     return loadAreaSurface;
 }
+
+std::string Robot::getInferFromAnnotation(const owlapi::model::IRI& property) const
+{
+    using namespace owlapi::model;
+    OWLAnnotationValue::Ptr value =
+        organizationAsk().ontology().getAnnotationValue(property,
+                vocabulary::OM::inferFrom());
+    if(value)
+    {
+        switch(value->getObjectType())
+        {
+            case OWLObject::IRIType:
+                return dynamic_pointer_cast<IRI>(value)->toString();
+            case OWLObject::Literal:
+                return dynamic_pointer_cast<OWLLiteral>(value)->toString();
+            default:
+                break;
+        }
+    }
+    throw std::invalid_argument("owlapi::facades::Robot::getDerivedByAnnotation: cannot identify value for '" + property.toString() + "'");
+}
+
+bool Robot::isDerivedProperty(const owlapi::model::IRI& property) const
+{
+    try {
+        std::string formula = getInferFromAnnotation(property);
+        return true;
+    } catch(const std::invalid_argument& e)
+    {
+        LOG_DEBUG_S << "Property: '" << property << "' is not derivedBy formula";
+        return false;
+    }
+}
+
+double Robot::getDerivedPropertyValue(const owlapi::model::IRI& property) const
+{
+    mu::Parser muParser;
+    std::string formula = getInferFromAnnotation(property);
+    // process formula and identify dependencies / bindings
+
+    std::string translatedFormula = formula;
+    std::string tmpFormula = formula;
+
+    std::map<std::string, std::string> bindings;
+    char a = 'a';
+
+    while(true)
+    {
+        size_t pos = tmpFormula.find_first_of("iri(");
+        if(pos == std::string::npos)
+        {
+            break;
+        }
+        // Find first iri(...) match
+        size_t closingBracketPos = tmpFormula.find_first_of(")", pos);
+        if(pos == std::string::npos)
+        {
+            throw
+                std::invalid_argument("moreorg::facades::Robot::getDerivedPropertyValue:"
+                        " formula for '" + property.toString() + "' misses a"
+                        " closing bracket: " + tmpFormula.substr(pos));
+        }
+
+        // Extract found iri
+        std::string iri = tmpFormula.substr(pos+4,closingBracketPos-pos-4);
+        // prepare for search of next iri(...)
+        tmpFormula = tmpFormula.substr(closingBracketPos);
+
+        // Extract the bindings for this formula
+        size_t matchPos = translatedFormula.find(iri);
+        size_t startPos = matchPos - 4;
+        size_t endPos = matchPos + iri.size() + 1;
+        std::stringstream ss;
+        ss << "__" << a++ << "__";
+        std::string binding = ss.str();
+
+        translatedFormula = translatedFormula.replace(startPos,endPos-startPos,
+                binding);
+        bindings[binding] = iri;
+    }
+
+    std::map<std::string, double> valueBindings;
+    for(const auto& p : bindings)
+    {
+        valueBindings[p.first] = getPropertyValue(p.second);
+        muParser.DefineVar(p.first, &valueBindings[p.first]);
+    }
+
+    muParser.SetExpr(translatedFormula);
+    return muParser.Eval();
+}
+
 
 } // end namespace facades
 } // end namespace moreorg

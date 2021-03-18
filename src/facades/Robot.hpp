@@ -16,7 +16,6 @@ namespace facades {
  */
 class Robot : public Facade
 {
-
 public:
 
     static const Robot& getInstance(const owlapi::model::IRI& actorModel,
@@ -197,7 +196,34 @@ public:
             algebra::CompositionFunc cf =
             bind(&algebra::CompositionFunction::weightedSum,placeholder::_1,placeholder::_2)) const;
 
+    /**
+     * Get the property value which is either,
+     * (1) cached for the predefined values
+     * (2) extracted as weighted sum for custom data properties
+     * (3) extracted via summed cardinalities, when cardinality restrictions
+     *     apply to this property
+     */
     double getPropertyValue(const owlapi::model::IRI& property) const;
+
+    bool isDerivedProperty(const owlapi::model::IRI& property) const;
+
+    /**
+     * The ontology can use properties, that have a relation to other
+     * properties: the expression has to be set via the
+     * inferFrom field and relies on parsing via muparser
+     *
+     \verbatim
+        <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#energyCapacity">
+            <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#energyProperty"/>
+            <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+            <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+            <inferFrom>iri(http://www.rock-robotics.org/2014/01/om-schema#powerSourceCapacity)*iri(http://www.rock-robotics.org/2014/01/om-schema#supplyVoltage)</inferFrom>
+            <rdfs:comment>in [Wh]</rdfs:comment>
+        </owl:DatatypeProperty>
+     \endverbatim
+     * \return get derived property value
+     */
+    double getDerivedPropertyValue(const owlapi::model::IRI& property) const;
 
 private:
 
@@ -242,6 +268,11 @@ private:
     void updateManipulationProperties();
 
     void updateProperty(const owlapi::model::IRI& iri, double value, bool useMin);
+
+    /**
+     * Extract the drivedBy AnnotationProperty, if set
+     */
+    std::string getDerivedByAnnotation(const owlapi::model::IRI& property) const;
 };
 
 } // end namespace facades

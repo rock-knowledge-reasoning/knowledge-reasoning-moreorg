@@ -193,5 +193,28 @@ BOOST_AUTO_TEST_CASE(composite_robot_from_transterra)
     }
 }
 
+BOOST_AUTO_TEST_CASE(derived_property)
+{
+    using namespace owlapi::vocabulary;
+    using namespace owlapi::model;
+    using namespace moreorg::vocabulary;
+
+    IRI organizationModelIRI = "http://www.rock-robotics.org/2015/12/projects/TransTerrA";
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(organizationModelIRI);
+
+    IRI sherpa = OM::resolve("Sherpa");
+    ModelPool modelPool;
+    modelPool[sherpa] = 1;
+
+    OrganizationModelAsk ask(om, modelPool, true);
+    {
+        moreorg::facades::Robot robot(modelPool, ask);
+        double energyCapacity = robot.getDerivedPropertyValue(vocabulary::OM::energyCapacity());
+
+        BOOST_REQUIRE_MESSAGE(energyCapacity > 0, "Energy Capacity has been derived from other properties: " << energyCapacity);
+    }
+
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

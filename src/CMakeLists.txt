@@ -169,6 +169,7 @@ rock_library(moreorg
         pddl_planner
         graph_analysis
         qxcfg
+        muparser
     LIBS ${Boost_THREAD_LIBRARY}
         ${GECODE_LINK_LIBRARIES}
 )

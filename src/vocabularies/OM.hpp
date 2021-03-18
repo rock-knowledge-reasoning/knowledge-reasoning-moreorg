@@ -52,6 +52,9 @@ public:
     VOCABULARY_ADD_WORD(transportMass);
     VOCABULARY_ADD_WORD(transportVolume);
 
+    VOCABULARY_ADD_WORD(energyCapacity);
+
+
     VOCABULARY_ADD_WORD(nominalLength);
     VOCABULARY_ADD_WORD(nominalWidth);
     VOCABULARY_ADD_WORD(nominalHeight);
@@ -59,6 +62,8 @@ public:
     VOCABULARY_ADD_WORD(mass);
 
     VOCABULARY_ADD_WORD(probabilityOfFailure);
+
+    VOCABULARY_ADD_WORD(inferFrom);
 };
 
 } // end namespace vocabulary

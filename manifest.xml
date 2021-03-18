@@ -17,6 +17,7 @@
   <depend package="tools/graph_analysis" />
   <depend package="tools/gecode" />
   <depend package="tools/qxcfg" />
+  <depend package="muparser" />
   <keywords>
       <keyword>reasoning</keyword>
       <keyword>representation</keyword>
