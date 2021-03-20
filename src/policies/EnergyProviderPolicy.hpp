@@ -1,7 +1,7 @@
 #ifndef ORGANIZATION_MODEL_POLICIES_ENERGY_PROVIDER_POLICY_HPP
 #define ORGANIZATION_MODEL_POLICIES_ENERGY_PROVIDER_POLICY_HPP
 
-#include "../Policy.hpp"
+#include "DistributionPolicy.hpp"
 
 namespace moreorg {
 namespace policies {
@@ -9,7 +9,7 @@ namespace policies {
 /**
  *
  */
-class EnergyProviderPolicy : public Policy
+class EnergyProviderPolicy : public DistributionPolicy
 {
 public:
     EnergyProviderPolicy();
@@ -18,12 +18,10 @@ public:
 
     virtual ~EnergyProviderPolicy();
 
-    const std::map<owlapi::model::IRI, double>& getSharesByType() const { return mEnergyProviderSharesByType; }
-
     void update(const ModelPool& pool, const OrganizationModelAsk& ask);
 
 private:
-    std::map<owlapi::model::IRI, double> mEnergyProviderSharesByType;
+    static PolicyRegistration<EnergyProviderPolicy> __attribute__((used)) msRegistration;
 };
 
 } // end namespace policies

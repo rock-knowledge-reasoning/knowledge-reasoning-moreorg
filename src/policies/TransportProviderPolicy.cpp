@@ -1,17 +1,21 @@
 #include "TransportProviderPolicy.hpp"
 
 #include "../Agent.hpp"
+#include "../vocabularies/OM.hpp"
+#include "../facades/Robot.hpp"
 
 namespace moreorg {
 namespace policies {
 
+PolicyRegistration<TransportProviderPolicy> TransportProviderPolicy::msRegistration;
+
 TransportProviderPolicy::TransportProviderPolicy()
-    : Policy()
+    : SelectionPolicy(vocabulary::OM::resolve("TransportProviderPolicy"))
 {
 }
 
 TransportProviderPolicy::TransportProviderPolicy(const ModelPool& modelPool, const moreorg::OrganizationModelAsk& ask)
-    : Policy(modelPool, ask)
+    : SelectionPolicy(modelPool, ask, vocabulary::OM::resolve("TransportProviderPolicy"))
 {
     update(modelPool, ask);
 }
@@ -31,7 +35,11 @@ void TransportProviderPolicy::update(const ModelPool& modelPool, const Organizat
                     " invalid argument: model pool cannot be empty");
     } else if(modelPool.numberOfInstances() == 1)
     {
-        mActiveTransportProviders = modelPool;
+        facades::Robot robot = facades::Robot::getInstance(modelPool, ask);
+        if(robot.isMobile() && robot.getTransportCapacity() > 0)
+        {
+            mSelection.agent = modelPool;
+        }
     } else {
         // Assume there can be only one active transport provider
         double maxCapacity = std::numeric_limits<double>::min();
@@ -47,7 +55,7 @@ void TransportProviderPolicy::update(const ModelPool& modelPool, const Organizat
                 activeAgent = agentType;
             }
         }
-        mActiveTransportProviders[activeAgent] = 1;
+        mSelection.agent[activeAgent] = 1;
     }
 }
 

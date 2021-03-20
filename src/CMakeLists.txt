@@ -90,6 +90,8 @@ rock_library(moreorg
         organization_model/Grounding.cpp
         organization_model/InterfaceConnection.cpp
         organization_model/Statistics.cpp
+        policies/SelectionPolicy.cpp
+        policies/DistributionPolicy.cpp
         policies/EnergyProviderPolicy.cpp
         policies/TransportProviderPolicy.cpp
         reasoning/ModelBound.cpp
@@ -143,6 +145,8 @@ rock_library(moreorg
         organization_model/Grounding.hpp
         organization_model/InterfaceConnection.hpp
         organization_model/Statistics.hpp
+        policies/DistributionPolicy.hpp
+        policies/SelectionPolicy.hpp
         policies/EnergyProviderPolicy.hpp
         policies/TransportProviderPolicy.hpp
         QueryCache.hpp

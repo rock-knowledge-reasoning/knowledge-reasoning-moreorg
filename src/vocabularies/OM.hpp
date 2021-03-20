@@ -64,6 +64,9 @@ public:
     VOCABULARY_ADD_WORD(probabilityOfFailure);
 
     VOCABULARY_ADD_WORD(inferFrom);
+
+    VOCABULARY_ADD_WORD(EnergyProviderPolicy);
+    VOCABULARY_ADD_WORD(TransportProviderPolicy);
 };
 
 } // end namespace vocabulary

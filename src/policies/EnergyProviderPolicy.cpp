@@ -1,17 +1,21 @@
 #include "EnergyProviderPolicy.hpp"
 #include "../facades/Robot.hpp"
+#include "../vocabularies/OM.hpp"
 
 using namespace owlapi::model;
 
 namespace moreorg {
 namespace policies {
 
+PolicyRegistration<EnergyProviderPolicy> EnergyProviderPolicy::msRegistration;
+
 EnergyProviderPolicy::EnergyProviderPolicy()
-    : Policy()
-{}
+    : DistributionPolicy(vocabulary::OM::resolve("EnergyProviderPolicy"))
+{
+}
 
 EnergyProviderPolicy::EnergyProviderPolicy(const ModelPool& pool, const OrganizationModelAsk& ask)
-    : Policy(pool, ask)
+    : DistributionPolicy(pool, ask, vocabulary::OM::resolve("EnergyProviderPolicy"))
 {
     update(pool, ask);
 }
@@ -28,7 +32,7 @@ void EnergyProviderPolicy::update(const ModelPool& modelPool, const Organization
                     " invalid argument: model pool cannot be empty");
     } else if(modelPool.numberOfInstances() == 1)
     {
-        mEnergyProviderSharesByType[ modelPool.begin()->first ] = 1.0;
+        mDistribution.shares[ modelPool.begin()->first ] = 1.0;
     } else {
         // set energy consumption policy
         double fullCapacity = 0;
@@ -47,7 +51,7 @@ void EnergyProviderPolicy::update(const ModelPool& modelPool, const Organization
 
         for(const std::pair<IRI,double>& p : energyCapacity)
         {
-            mEnergyProviderSharesByType[p.first] = p.second / fullCapacity;
+            mDistribution.shares[p.first] = p.second / fullCapacity;
         }
     }
 }

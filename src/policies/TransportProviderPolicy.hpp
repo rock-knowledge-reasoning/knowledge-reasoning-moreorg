@@ -1,16 +1,21 @@
 #ifndef ORGANIZATION_MODEL_POLICIES_TRANSPORT_PROVIDER_HPP
 #define ORGANIZATION_MODEL_POLICIES_TRANSPORT_PROVIDER_HPP
 
-#include "../Policy.hpp"
-#include "../OrganizationModelAsk.hpp"
+#include "SelectionPolicy.hpp"
 
 namespace moreorg {
 namespace policies {
 
-class TransportProviderPolicy : public Policy
+/**
+ * Identify the transport provider that is active to
+ * provide the mobility / transport service for the agent
+ *
+ * This policy assumes is that only one transport system can be active at a
+ * time
+ */
+class TransportProviderPolicy : public SelectionPolicy
 {
 public:
-
     TransportProviderPolicy();
 
     TransportProviderPolicy(const ModelPool& modelPool, const moreorg::OrganizationModelAsk& ask);
@@ -19,17 +24,8 @@ public:
 
     void update(const ModelPool& pool, const OrganizationModelAsk& ask);
 
-    /**
-     * Identify the transport providers that are active to
-     * provide the mobility / transport service for the agent
-     *
-     * This policy assumes is that only one transport system can be active at a
-     * time
-     */
-    const ModelPool& getActiveTransportProviders() const { return mActiveTransportProviders; }
-
 private:
-    ModelPool mActiveTransportProviders;
+    static PolicyRegistration<TransportProviderPolicy> __attribute__((used)) msRegistration;
 };
 
 } // end namespace policies

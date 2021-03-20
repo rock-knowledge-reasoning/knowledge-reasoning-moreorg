@@ -33,6 +33,8 @@ BOOST_AUTO_TEST_CASE(robot)
     {
         moreorg::facades::Robot robot(payload, ask);
         BOOST_REQUIRE_MESSAGE(!robot.isMobile(), "Robot " << payload << " is not mobile");
+        BOOST_REQUIRE_MESSAGE(robot.getTransportDemand() != 0, "Robot " <<
+                payload << " has transport demand > 0");
     }
     {
         moreorg::facades::Robot robot(payload, ask);
@@ -123,6 +125,15 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
         uint32_t transportCapacity = robot.getTransportCapacity();
         BOOST_REQUIRE_MESSAGE( transportCapacity == 10, "Robot " << sherpa << " has transport capacity of: " << transportCapacity);
 
+        policies::Selection selection = robot.getSelection(vocabulary::OM::TransportProviderPolicy());
+        BOOST_REQUIRE_MESSAGE(selection.agent[sherpa] == 1, "Robot " <<
+                sherpa << " is transport provider, selection is: " <<
+                selection.agent.toString(0));
+
+        policies::Distribution distribution = robot.getDistribution(vocabulary::OM::EnergyProviderPolicy());
+        BOOST_REQUIRE_MESSAGE(distribution.shares[sherpa] == 1, "Robot " <<
+                sherpa << " is energy provider");
+
         {
             IRI model = vocabulary::OM::resolve("CREX");
             uint32_t transportCapacityForModel = robot.getTransportCapacity(model);
@@ -158,6 +169,9 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
         moreorg::facades::Robot robot(payload, ask);
         uint32_t transportDemand = robot.getTransportDemand();
         BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << payload << " has transport demand of: " << transportDemand);
+
+        policies::Selection selection = robot.getSelection(vocabulary::OM::TransportProviderPolicy());
+        BOOST_REQUIRE_MESSAGE(selection.agent.empty(), "Robot has no transport provider: " << selection.agent.toString(0));
     }
 }
 
@@ -168,7 +182,7 @@ BOOST_AUTO_TEST_CASE(composite_robot_from_transterra)
     using namespace moreorg::vocabulary;
 
     IRI organizationModelIRI = "http://www.rock-robotics.org/2015/12/projects/TransTerrA";
-    OrganizationModel::Ptr om(new OrganizationModel(organizationModelIRI));
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(organizationModelIRI);
 
     IRI sherpa = OM::resolve("Sherpa");
     IRI payload = OM::resolve("Payload");

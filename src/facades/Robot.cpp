@@ -71,14 +71,12 @@ Robot::Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& o
 {
 
     mModelPool[actorModel] = 1;
-    mEnergyProviderPolicy = policies::EnergyProviderPolicy(mModelPool, mOrganizationModelAsk);
-    mTransportProviderPolicy = policies::TransportProviderPolicy(mModelPool, mOrganizationModelAsk);
 
     mNominalPowerConsumption = getDoubleValueOrDefault(actorModel, vocabulary::Robot::nominalPowerConsumption(), 0.0);
     mMass = getDoubleValueOrDefault(actorModel, vocabulary::Robot::mass(), 0.0);
     mSupplyVoltage = getDoubleValueOrDefault(actorModel, vocabulary::Robot::supplyVoltage(), 0.0);
     mPowerSourceCapacity = getDoubleValueOrDefault(actorModel, vocabulary::Robot::powerSourceCapacity(), 0.0);
-        // convert from Ah (battery capacity to Ws)
+    // convert from Ah (battery capacity to Ws)
     mEnergyCapacity = mPowerSourceCapacity*mSupplyVoltage*3600;
 
     mMinAcceleration = getDoubleValueOrDefault(actorModel, vocabulary::Robot::minAcceleration(),0.0);
@@ -122,8 +120,6 @@ Robot::Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizatio
     , mTransportMass(-1)
     , mTransportVolume(-1)
     , mLoadArea(-1)
-    , mEnergyProviderPolicy(modelPool, organizationModelAsk)
-    , mTransportProviderPolicy(modelPool, organizationModelAsk)
 {
 
     for(const ModelPool::value_type& pair : mModelPool)
@@ -332,14 +328,21 @@ double Robot::estimatedRelativeEnergyCost(double distanceInM) const
 }
 
 
-const std::map<IRI, double>& Robot::getEnergyProviderShares() const
+const policies::Distribution& Robot::getDistribution(const IRI& policyName) const
 {
-    return mEnergyProviderPolicy.getSharesByType();
+    policies::DistributionPolicy::Ptr policy =
+        dynamic_pointer_cast<policies::DistributionPolicy>(Policy::getInstance(policyName, mModelPool,
+            mOrganizationModelAsk));
+    return policy->getDistribution();
+
 }
 
-const ModelPool& Robot::getTransportProvider() const
+const policies::Selection& Robot::getSelection(const IRI& policyName) const
 {
-    return mTransportProviderPolicy.getActiveTransportProviders();
+    policies::SelectionPolicy::Ptr policy =
+        dynamic_pointer_cast<policies::SelectionPolicy>(Policy::getInstance(policyName, mModelPool,
+            mOrganizationModelAsk));
+    return policy->getSelection();
 }
 
 

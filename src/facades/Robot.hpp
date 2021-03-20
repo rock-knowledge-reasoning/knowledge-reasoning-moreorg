@@ -148,15 +148,15 @@ public:
     double estimatedRelativeEnergyCost(double distanceInM) const;
 
     /**
-      * Get energy provider share by agent type (for a full capacity)
+      * Get share by agent type according to a given policy (by name)
       */
-    const std::map<owlapi::model::IRI, double>& getEnergyProviderShares() const;
+    const policies::Distribution& getDistribution(const owlapi::model::IRI& policyName) const;
 
     /**
-      * Identify the agents that are relevant for the transport systems
-      * \return modelpool of agents that are relevant for the transport system
+      * \return modelpool of agents that are relevant according to the given
+      * policyname
       */
-    const ModelPool& getTransportProvider() const;
+    const policies::Selection& getSelection(const owlapi::model::IRI& policyName) const;
 
     /**
      * Create a string object that list all system
@@ -272,7 +272,7 @@ private:
     /**
      * Extract the drivedBy AnnotationProperty, if set
      */
-    std::string getDerivedByAnnotation(const owlapi::model::IRI& property) const;
+    std::string getInferFromAnnotation(const owlapi::model::IRI& property) const;
 };
 
 } // end namespace facades
