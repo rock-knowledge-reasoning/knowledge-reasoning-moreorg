@@ -120,4 +120,14 @@ AtomicAgent::List Agent::getDifference(const Agent& other) const
     return AtomicAgent::getDifference(mAtomicAgents, other.mAtomicAgents);
 }
 
+
+std::ostream& operator<<(std::ostream& os, const Agent::Set& agents)
+{
+    for(const Agent& a : agents)
+    {
+        os << a.toString() << std::endl;
+    }
+    return os;
+}
+
 }

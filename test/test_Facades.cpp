@@ -4,6 +4,8 @@
 #include <moreorg/vocabularies/OM.hpp>
 #include "test_utils.hpp"
 #include <moreorg/vocabularies/Robot.hpp>
+#include <moreorg/policies/SelectionPolicy.hpp>
+#include <moreorg/policies/DistributionPolicy.hpp>
 
 using namespace moreorg;
 
@@ -126,9 +128,8 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
         BOOST_REQUIRE_MESSAGE( transportCapacity == 10, "Robot " << sherpa << " has transport capacity of: " << transportCapacity);
 
         policies::Selection selection = robot.getSelection(vocabulary::OM::TransportProviderPolicy());
-        BOOST_REQUIRE_MESSAGE(selection.agent[sherpa] == 1, "Robot " <<
-                sherpa << " is transport provider, selection is: " <<
-                selection.agent.toString(0));
+        BOOST_REQUIRE_MESSAGE(selection.size() == 1, "Robot " <<
+                sherpa << " is transport provider, selection is: " << selection);
 
         policies::Distribution distribution = robot.getDistribution(vocabulary::OM::EnergyProviderPolicy());
         BOOST_REQUIRE_MESSAGE(distribution.shares[sherpa] == 1, "Robot " <<
@@ -171,7 +172,7 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
         BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << payload << " has transport demand of: " << transportDemand);
 
         policies::Selection selection = robot.getSelection(vocabulary::OM::TransportProviderPolicy());
-        BOOST_REQUIRE_MESSAGE(selection.agent.empty(), "Robot has no transport provider: " << selection.agent.toString(0));
+        BOOST_REQUIRE_MESSAGE(selection.empty(), "Robot has no transport provider: " << selection);
     }
 }
 

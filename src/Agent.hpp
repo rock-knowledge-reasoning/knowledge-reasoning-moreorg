@@ -121,5 +121,9 @@ private:
 /// A coalition structure is a list of (composite) agents
 typedef Agent::List CoalitionStructure;
 
+std::ostream& operator<<(std::ostream& os, const Agent::Set& agents);
+
 } // end namespace moreorg
+
+
 #endif // ORGANIZATION_MODEL_AGENT_HPP
