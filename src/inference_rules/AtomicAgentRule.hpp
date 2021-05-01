@@ -1,0 +1,20 @@
+
+#ifndef MOREORG_INFERENCE_RULES_ATOMIC_AGENT_RULE_HPP
+#define MOREORG_INFERENCE_RULES_ATOMIC_AGENT_RULE_HPP
+
+#include "../InferenceRule.hpp"
+
+namespace moreorg {
+namespace inference_rules {
+
+class AtomicAgentRule : public InferenceRule
+{
+public:
+    typedef shared_ptr<AtomicAgentRule> Ptr;
+
+    double apply(const facades::Robot& robot) const override;
+};
+
+} // end namespace inference_rules
+} // end namespace moreorg
+#endif // MOREORG_INFERENCE_RULES_ATOMIC_AGENT_RULE_HPP

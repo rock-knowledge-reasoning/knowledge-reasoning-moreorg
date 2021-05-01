@@ -8,6 +8,7 @@
 
 #include "../vocabularies/OM.hpp"
 #include "../vocabularies/Robot.hpp"
+#include "../InferenceRule.hpp"
 
 #include "../policies/DistributionPolicy.hpp"
 #include "../policies/SelectionPolicy.hpp"
@@ -404,19 +405,62 @@ bool Robot::hasLoadArea() const
     return supporting;
 }
 
-double Robot::getDataPropertyValue(const owlapi::model::IRI& property,
+double Robot::getAtomicDataPropertyValue(const owlapi::model::IRI& property)
+    const
+{
+    size_t numberOfInstances = mModelPool.numberOfInstances();
+    if(numberOfInstances != 1)
+    {
+        throw std::runtime_error("facades::Robot::getAtomicDataPropertyValue:"
+                " expected atomic agent, but got one of size" +
+                std::to_string(numberOfInstances));
+    }
+
+    const owlapi::model::IRI& actorModel = mModelPool.begin()->first;
+    return organizationAsk().ontology().
+         getDataValue(actorModel, property)->getDouble();
+}
+
+double Robot::getCompositeDataPropertyValue(const owlapi::model::IRI& property,
         algebra::CompositionFunc cf) const
 {
     std::map<owlapi::model::IRI,double> values;
     for(const ModelPool::value_type& pair : mModelPool)
     {
         const owlapi::model::IRI& actorModel = pair.first;
-        double value = organizationAsk().ontology().
-            getDataValue(actorModel, property)->getDouble();
+        ModelPool m;
+        m[actorModel] = 1;
+        Robot r = Robot::getInstance(m, organizationAsk());
+        double value =
+            r.getDataPropertyValue(property);
         values[actorModel] = value;
     }
 
     return cf(mModelPool, values);
+}
+
+double Robot::getDataPropertyValue(const owlapi::model::IRI& property) const
+{
+    if(mModelPool.numberOfInstances() <= 1)
+    {
+        try {
+            InferenceRule::Ptr rule = InferenceRule::loadAtomicAgentRule(property, organizationAsk());
+            return rule->apply(*this);
+        } catch(const std::invalid_argument& e)
+        {}
+
+        return getAtomicDataPropertyValue(property);
+    } else {
+        try {
+            // Load inference rule
+            InferenceRule::Ptr rule = InferenceRule::loadCompositeAgentRule(property,
+                    organizationAsk());
+            return rule->apply(*this);
+        } catch(const std::invalid_argument& e)
+        {}
+
+        return getCompositeDataPropertyValue(property, bind(&algebra::CompositionFunction::weightedSum,placeholder::_1,placeholder::_2));
+    }
 }
 
 double Robot::getPropertyValue(const owlapi::model::IRI& property) const
@@ -431,8 +475,7 @@ double Robot::getPropertyValue(const owlapi::model::IRI& property) const
     }
 
     try {
-        double value = getDataPropertyValue(property,
-            bind(&algebra::CompositionFunction::weightedSum,placeholder::_1,placeholder::_2));
+        double value = getDataPropertyValue(property);
         mProperties[property] = value;
         return value;
     } catch(const std::runtime_error& e)

@@ -43,6 +43,7 @@ rock_testsuite(${PROJECT_NAME}-test suite.cpp
     test_Exporter.cpp
     test_CSP.cpp
     test_Heuristics.cpp
+    test_InferenceRule.cpp
     test_Lego.cpp
     test_ModelPool.cpp
     test_Facades.cpp

@@ -73,6 +73,9 @@ rock_library(moreorg
         facades/Robot.cpp
         FunctionalityMapping.cpp
         Heuristics.cpp
+        InferenceRule.cpp
+        inference_rules/AtomicAgentRule.cpp
+        inference_rules/CompositeAgentRule.cpp
         io/LatexWriter.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
@@ -131,6 +134,9 @@ rock_library(moreorg
         facades/Robot.hpp
         FunctionalityMapping.hpp
         Heuristics.hpp
+        InferenceRule.hpp
+        inference_rules/AtomicAgentRule.hpp
+        inference_rules/CompositeAgentRule.hpp
         io/LatexWriter.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
