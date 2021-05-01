@@ -53,6 +53,8 @@ rock_library(moreorg
     SOURCES
         AtomicAgent.cpp
         Agent.cpp
+        AgentLink.cpp
+        AgentInterface.cpp
         Algebra.cpp
         Analyser.cpp
         algebra/Connectivity.cpp
@@ -109,6 +111,8 @@ rock_library(moreorg
     HEADERS
         AtomicAgent.hpp
         Agent.hpp
+        AgentLink.hpp
+        AgentInterface.hpp
         Algebra.hpp
         Analyser.hpp
         algebra/CompositionFunction.hpp

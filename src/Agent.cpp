@@ -1,5 +1,7 @@
 #include "Agent.hpp"
 
+using namespace owlapi::model;
+
 namespace moreorg {
 
 std::map<Agent::OperationalStatus, std::string> Agent::OperationalStatusTxt =
@@ -25,6 +27,19 @@ Agent::Agent(const AtomicAgent::List& atomicAgents)
 Agent::Agent(const AtomicAgent::Set& atomicAgents)
     : mAtomicAgents(atomicAgents)
 {
+}
+
+Agent::Agent(const ModelPool& modelPool)
+    : mAtomicAgents()
+{
+    for(const std::pair<IRI,size_t>& p : modelPool)
+    {
+        for(size_t i= 0; i < p.second; ++i)
+        {
+            AtomicAgent a(i, p.first);
+            add(a);
+        }
+    }
 }
 
 facades::Robot Agent::getFacade(const OrganizationModelAsk& ask) const

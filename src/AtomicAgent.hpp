@@ -2,10 +2,10 @@
 #define ORGANIZATION_MODEL_AGENT_INSTANCE_HPP
 
 #include <owlapi/model/IRI.hpp>
-#include <moreorg/ModelPool.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/set.hpp>
+#include "ModelPool.hpp"
 #include "OrganizationModelAsk.hpp"
 #include "facades/Robot.hpp"
 
@@ -64,8 +64,7 @@ public:
      * Compute the cardinality of an agent model inside a given list of agents
      * \return cardinality
      */
-    static size_t getCardinality(const List& agents, const owlapi::model::IRI& agentModel) {
-    return getModelPool(agents)[agentModel]; }
+    static size_t getCardinality(const List& agents, const owlapi::model::IRI& agentModel) { return getModelPool(agents)[agentModel]; }
 
     /**
      * Get the intersection of two atomic agent sets

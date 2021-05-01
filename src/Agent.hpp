@@ -2,6 +2,7 @@
 #define ORGANIZATION_MODEL_AGENT_HPP
 
 #include "AtomicAgent.hpp"
+#include "AgentLink.hpp"
 #include "OrganizationModelAsk.hpp"
 
 namespace moreorg {
@@ -32,6 +33,7 @@ public:
     Agent(const AtomicAgent& atomicAgent);
     Agent(const AtomicAgent::List& atomicAgents);
     Agent(const AtomicAgent::Set& atomicAgents);
+    Agent(const ModelPool& modelPool);
 
     /**
      * Add an atomic agent to this agent object
@@ -69,6 +71,11 @@ public:
      * Get the set of atomic agents
      */
     const AtomicAgent::Set& getAtomicAgents() const { return mAtomicAgents; }
+
+    /**
+     * Get the links between the set of agents
+     */
+    const AgentLink::Set& getLinks() const  { return mLinks; }
 
     bool operator<(const Agent& other) const { return this->mAtomicAgents < other.mAtomicAgents; }
     bool operator==(const Agent& other) const { return this->mAtomicAgents == other.mAtomicAgents; }
@@ -108,6 +115,7 @@ public:
 
 private:
     AtomicAgent::Set mAtomicAgents;
+    AgentLink::Set mLinks;
 };
 
 /// A coalition structure is a list of (composite) agents
