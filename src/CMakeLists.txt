@@ -92,10 +92,10 @@ rock_library(moreorg
         organization_model/Grounding.cpp
         organization_model/InterfaceConnection.cpp
         organization_model/Statistics.cpp
-        policies/SelectionPolicy.cpp
         policies/DistributionPolicy.cpp
-        policies/EnergyProviderPolicy.cpp
-        policies/TransportProviderPolicy.cpp
+        policies/FunctionalityBasedSelection.cpp
+        policies/PropertyBasedSelection.cpp
+        policies/SelectionPolicy.cpp
         reasoning/ModelBound.cpp
         reasoning/ResourceMatch.cpp
         Resource.cpp
@@ -150,9 +150,9 @@ rock_library(moreorg
         organization_model/InterfaceConnection.hpp
         organization_model/Statistics.hpp
         policies/DistributionPolicy.hpp
+        policies/FunctionalityBasedSelection.hpp
+        policies/PropertyBasedSelection.hpp
         policies/SelectionPolicy.hpp
-        policies/EnergyProviderPolicy.hpp
-        policies/TransportProviderPolicy.hpp
         QueryCache.hpp
         Resource.hpp
         Service.hpp

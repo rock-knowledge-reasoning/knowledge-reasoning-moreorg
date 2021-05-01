@@ -1,4 +1,6 @@
 #include "SelectionPolicy.hpp"
+#include "../Agent.hpp"
+#include <base-logging/Logging.hpp>
 
 using namespace owlapi::model;
 
@@ -9,12 +11,17 @@ SelectionPolicy::SelectionPolicy(const IRI& iri)
     : Policy(iri)
 {}
 
-SelectionPolicy::SelectionPolicy(const ModelPool& pool,
-       const OrganizationModelAsk& ask,
-       const IRI& iri)
-    : Policy(pool, ask, iri)
-{}
-
+Selection SelectionPolicy::apply(const Selection& agentSelection,
+        const OrganizationModelAsk& ask) const
+{
+    Selection selection = agentSelection;
+    LOG_WARN_S << "PolicyChain " << mPolicyChain.size();
+    for(const SelectionPolicy::Ptr& sp : mPolicyChain)
+    {
+        selection = sp->apply(selection, ask);
+    }
+    return selection;
+}
 
 } // end namespace policies
 } // end namespace moreorg

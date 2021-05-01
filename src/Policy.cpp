@@ -1,27 +1,18 @@
 #include "Policy.hpp"
 #include "facades/Robot.hpp"
+#include "policies/SelectionPolicy.hpp"
+#include "policies/FunctionalityBasedSelection.hpp"
+#include "policies/PropertyBasedSelection.hpp"
 
 using namespace owlapi::model;
 
 namespace moreorg {
 
-std::map<owlapi::model::IRI, Policy::CreationFunc > Policy::msCreationFuncs;
-std::map<owlapi::model::IRI, std::map<ModelPool, Policy::Ptr> > Policy::msPolicies;
+std::map<owlapi::model::IRI, Policy::Ptr> Policy::msPolicies;
 
 Policy::Policy(const owlapi::model::IRI& iri)
-    : mModelPool()
-    , mAsk()
-    , mIRI(iri)
+    : mIRI(iri)
 {}
-
-Policy::Policy(const ModelPool& pool,
-        const OrganizationModelAsk& ask,
-        const owlapi::model::IRI& iri)
-    : mModelPool(pool)
-    , mAsk(ask)
-    , mIRI(iri)
-{
-}
 
 Policy::~Policy()
 {
@@ -65,27 +56,65 @@ std::map<owlapi::model::IRI, double> Policy::computeSharesByType(const
 }
 
 Policy::Ptr Policy::getInstance(const owlapi::model::IRI& policyName,
-            const ModelPool& pool,
             const OrganizationModelAsk& ask)
 {
-    Policy::Ptr policy = msPolicies[policyName][pool];
-    if(!policy)
+    Policy::Ptr policy = msPolicies[policyName];
+    if(policy)
     {
-        std::map<IRI, CreationFunc>::const_iterator fit = msCreationFuncs.find(policyName);
-        if(fit != msCreationFuncs.end())
-        {
-            const CreationFunc& cFunc = fit->second;
-            policy = cFunc(pool, ask);
-            msPolicies[policyName][pool] = policy;
-        }
+        return policy;
     }
-    return policy;
-}
 
-void Policy::registerCreationFuncs(const owlapi::model::IRI& policyName,
-        CreationFunc func)
-{
-    Policy::msCreationFuncs[policyName] = func;
+    if(ask.ontology().isInstanceOf(policyName,
+                vocabulary::OM::resolve("SelectionPolicy")))
+    {
+        policies::SelectionPolicy::Ptr selectionPolicy = make_shared<policies::SelectionPolicy>(policyName);
+        for(size_t i = 0; i < MAX_POLICY_ELEMENTS; ++i)
+        {
+            std::stringstream ss;
+            ss << "_" << i;
+            IRI indexPlaceholder = vocabulary::OM::resolve(ss.str());
+            IRIList instances = ask.ontology().allRelatedInstances(policyName, indexPlaceholder);
+            if(instances.size() == 0)
+            {
+                break;
+            } else if(instances.size() > 1)
+            {
+                throw std::runtime_error("moreorg::Policy::getInstance: index placeholder '"
+                        + indexPlaceholder.toString() + "' used multiple times");
+            }
+
+            IRI policyElement = instances[0];
+            std::string policyShortName = policyElement.getFragment();
+
+            OWLAnnotationValue::Ptr selectByValue =
+                ask.ontology().getAnnotationValue(policyElement,
+                        vocabulary::OM::resolve("selectBy"));
+
+            if(ask.ontology().isInstanceOf(policyElement, vocabulary::OM::resolve("FunctionalityBasedSelection")))
+            {
+                IRI functionality = selectByValue->asIRI();
+
+                policies::SelectionPolicy::Ptr fbs = make_shared<policies::FunctionalityBasedSelection>(functionality);
+                selectionPolicy->add(fbs);
+            } else if(ask.ontology().isInstanceOf(policyElement, vocabulary::OM::resolve("PropertyBasedSelection")))
+            {
+                IRI property = selectByValue->asIRI();
+                IRIList operators = ask.ontology().allRelatedInstances(policyElement,
+                        vocabulary::OM::resolve("hasOperator"));
+
+                IRI operatorName = operators[0];
+
+                policies::SelectionPolicy::Ptr pbs = make_shared<policies::PropertyBasedSelection>(property, operatorName);
+                selectionPolicy->add(pbs);
+            }
+        }
+
+        msPolicies[policyName] = selectionPolicy;
+        return selectionPolicy;
+    }
+
+    throw std::runtime_error("moreorg::Policy::getInstance: could not identify"
+            " policy for '" + policyName.toString() + "'");
 }
 
 } // end namespace moreorg

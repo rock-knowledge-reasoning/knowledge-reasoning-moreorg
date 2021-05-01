@@ -22,16 +22,10 @@ public:
 
     DistributionPolicy(const owlapi::model::IRI& iri = owlapi::model::IRI());
 
-    DistributionPolicy(const ModelPool& pool,
-           const OrganizationModelAsk& ask,
-           const owlapi::model::IRI& iri);
-
     virtual ~DistributionPolicy() = default;
 
-    const Distribution& getDistribution() const { return mDistribution; }
-
-protected:
-    Distribution mDistribution;
+    virtual Distribution apply(const ModelPool& modelPool,
+            const OrganizationModelAsk& ask) const = 0;
 };
 
 } // policies

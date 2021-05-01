@@ -2,17 +2,12 @@
 #define ORGANIZATION_MODEL_POLICIES_SELECTION_POLICY_HPP
 
 #include "../Policy.hpp"
+#include "../Agent.hpp"
 
 namespace moreorg {
 namespace policies {
 
-struct Selection
-{
-    // The selection
-    ModelPool agent;
-    // Value characterising this modelPool
-    double value;
-};
+typedef Agent::Set Selection;
 
 class SelectionPolicy : public Policy
 {
@@ -21,16 +16,19 @@ public:
 
     SelectionPolicy(const owlapi::model::IRI& iri = owlapi::model::IRI());
 
-    SelectionPolicy(const ModelPool& pool,
-           const OrganizationModelAsk& ask,
-           const owlapi::model::IRI& iri);
-
     virtual ~SelectionPolicy() = default;
 
-    virtual const Selection& getSelection() const { return mSelection; }
+    /**
+     * Selection policies can be chained, so that apply returns an
+     * updated selection
+     */
+    virtual Selection apply(const Selection& agentSelection,
+            const OrganizationModelAsk& ask) const;
+
+    void add(const SelectionPolicy::Ptr& policy) { mPolicyChain.push_back(policy); }
 
 protected:
-    Selection mSelection;
+    std::vector<SelectionPolicy::Ptr> mPolicyChain;
 };
 
 } // policies

@@ -88,8 +88,8 @@ public:
             size_t toTime) const;
 
     /**
-     * Compute the reconfiguration cost from a set of agent to another set of
-     * agents, based on teach target agent and involved source agents
+     * Compute the reconfiguration cost from a set of agents to another set of
+     * agents, based on each target agent and involved source agents
      *
      * One could consider using the pddl planner, but since the split
      * disassembles the complete system, this does not give a correct estimate

@@ -3,9 +3,14 @@
 
 #include "Facade.hpp"
 #include "../algebra/CompositionFunction.hpp"
+#include "../Policy.hpp"
 
-#include "../policies/EnergyProviderPolicy.hpp"
-#include "../policies/TransportProviderPolicy.hpp"
+namespace moreorg {
+    class Agent;
+namespace policies {
+    class Distribution;
+}
+}
 
 namespace moreorg {
 namespace facades {
@@ -150,13 +155,13 @@ public:
     /**
       * Get share by agent type according to a given policy (by name)
       */
-    const policies::Distribution& getDistribution(const owlapi::model::IRI& policyName) const;
+    policies::Distribution getDistribution(const owlapi::model::IRI& policyName) const;
 
     /**
       * \return modelpool of agents that are relevant according to the given
       * policyname
       */
-    const policies::Selection& getSelection(const owlapi::model::IRI& policyName) const;
+    std::set<Agent> getSelection(const owlapi::model::IRI& policyName) const;
 
     /**
      * Create a string object that list all system
@@ -258,9 +263,6 @@ private:
     // Robot cache
     static std::map<ModelPool, Robot> msRobots;
 
-    // Active policies
-    policies::EnergyProviderPolicy mEnergyProviderPolicy;
-    policies::TransportProviderPolicy mTransportProviderPolicy;
 
     double getLoadAreaSize(const owlapi::model::IRI& agent) const;
 

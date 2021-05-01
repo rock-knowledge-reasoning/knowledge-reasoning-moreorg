@@ -2,6 +2,7 @@
 #include "facades/Robot.hpp"
 #include "exporter/PDDLExporter.hpp"
 #include "pddl_planner/Planning.hpp"
+#include "policies/DistributionPolicy.hpp"
 
 namespace moreorg {
 

@@ -49,6 +49,7 @@ rock_testsuite(${PROJECT_NAME}-test suite.cpp
     test_Metrics.cpp
     test_OrganizationModel.cpp
     test_OrganizationModelAsk.cpp
+    test_Policy.cpp
     test_Resource.cpp
     test_PropertyConstraintSolver.cpp
     #test_RandomModelGenerator.cpp

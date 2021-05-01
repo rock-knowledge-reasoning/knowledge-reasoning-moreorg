@@ -9,6 +9,9 @@
 #include "../vocabularies/OM.hpp"
 #include "../vocabularies/Robot.hpp"
 
+#include "../policies/DistributionPolicy.hpp"
+#include "../policies/SelectionPolicy.hpp"
+
 using namespace owlapi::model;
 
 
@@ -328,21 +331,22 @@ double Robot::estimatedRelativeEnergyCost(double distanceInM) const
 }
 
 
-const policies::Distribution& Robot::getDistribution(const IRI& policyName) const
+policies::Distribution Robot::getDistribution(const IRI& policyName) const
 {
     policies::DistributionPolicy::Ptr policy =
-        dynamic_pointer_cast<policies::DistributionPolicy>(Policy::getInstance(policyName, mModelPool,
-            mOrganizationModelAsk));
-    return policy->getDistribution();
+        dynamic_pointer_cast<policies::DistributionPolicy>(Policy::getInstance(policyName,
+                    mOrganizationModelAsk));
+    return policy->apply(mModelPool, mOrganizationModelAsk);
 
 }
 
-const policies::Selection& Robot::getSelection(const IRI& policyName) const
+policies::Selection Robot::getSelection(const IRI& policyName) const
 {
     policies::SelectionPolicy::Ptr policy =
-        dynamic_pointer_cast<policies::SelectionPolicy>(Policy::getInstance(policyName, mModelPool,
-            mOrganizationModelAsk));
-    return policy->getSelection();
+        dynamic_pointer_cast<policies::SelectionPolicy>(Policy::getInstance(policyName,
+                    mOrganizationModelAsk));
+
+    return policy->apply({ Agent(mModelPool) }, mOrganizationModelAsk);
 }
 
 
