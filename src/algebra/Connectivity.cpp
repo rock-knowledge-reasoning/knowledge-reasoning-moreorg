@@ -237,7 +237,9 @@ void Connectivity::identifyInterfaces()
                     interfaces.push_back(restriction->getQualification());
                 }
             } else {
-                LOG_WARN_S << "Found a minimum cardinality restrictions for a resource -- was expecting a max cardinality constraint";
+                LOG_WARN_S << "Found a minimum cardinality restriction "
+                    << restriction->getQualification() << " on model " << model
+                    << " -- was expecting a max cardinality constraint";
             }
         }
 
