@@ -5,7 +5,8 @@
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:om-base="http://www.rock-robotics.org/2014/01/om-base#">
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2014/01/om-schema">
         <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-base"/>
         <rdfs:comment>Changelog:
@@ -38,6 +39,25 @@
  * added data properties such as mass etc. for Sherpa, CREX, Payload
  * add PayloadBattery</rdfs:comment>
     </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#inferFrom -->
+
+    <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-schema#inferFrom">
+        <inferFrom rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_transportCapacity"/>
+    </rdf:Description>
     
 
 
@@ -544,10 +564,60 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#FunctionalityBasedSelection_AutonomousNavigation -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#FunctionalityBasedSelection_AutonomousNavigation">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#FunctionalityBasedSelection"/>
+        <selectBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AutonomousNavigation"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#FunctionalityBasedSelection_TransportProvider -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#FunctionalityBasedSelection_TransportProvider">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#FunctionalityBasedSelection"/>
+        <selectBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#TransportProvider"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#ImageProvider -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ImageProvider">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ImageProvider"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_default -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_default">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule"/>
+        <_a rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AllSelection"/>
+        <inferFrom>OP_SUM(_a,_self)</inferFrom>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_locomotionProperty -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_locomotionProperty">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#CompositeAgentRule"/>
+        <_a rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#TransportProviderSelection"/>
+        <inferFrom>OP_SUM(_a, _self)</inferFrom>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_transportCapacity -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_transportCapacity">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#CompositeAgentRule"/>
+        <_a rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#TransportProviderSelection"/>
+        <_b rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#transportCapacity"/>
+        <_c rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#transportDemand"/>
+        <inferFrom>OP_SUM(_a,_b) - OP_SUM(NOT(_a),_c)</inferFrom>
     </owl:NamedIndividual>
     
 
@@ -640,6 +710,15 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#MobileAgentSelection -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#MobileAgentSelection">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelectionPolicy"/>
+        <_0 rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#FunctionalityBasedSelection_AutonomousNavigation"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning">
@@ -668,6 +747,16 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PropertyBasedSelection_max_transportCapacity -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PropertyBasedSelection_max_transportCapacity">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PropertyBasedSelection"/>
+        <hasOperator rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#OP_MAX"/>
+        <selectBy rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#transportCapacity"/>
     </owl:NamedIndividual>
     
 
@@ -728,6 +817,26 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#TransportProviderSelection -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#TransportProviderSelection">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelectionPolicy"/>
+        <_0 rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#FunctionalityBasedSelection_TransportProvider"/>
+        <_1 rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PropertyBasedSelection_max_transportCapacity"/>
+        <rdfs:comment>A TransportProvider in a composite system, is the atomic agent that offers locomotion capabilities and provides a maximum of transport capacities.
+
+This is a simplication, since multiple systems might also be able to form one TransportProvider.
+This will not be analysed via ontological reasoning, but requires a 3D physical vstructure anaylsis/verification, to identify how exactly two systems are connected.
+
+Hence, for now the model remains limited.
+
+Examples of possible reasoning mechanisms:
+- one atomic agent provides a locomotion platform, with transport capacity 1
+- another atomic agent (not mobile, thus has no TransportCapacity) provides the load area / additional interfaces extending the final load capacity to 8</rdfs:comment>
+    </owl:NamedIndividual>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -738,6 +847,12 @@
 
     <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Trail">
         <rdfs:comment>The capability to trail permits for instance trailers to follow trucks after being towed</rdfs:comment>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-schema#locomotionProperty">
+        <hasCompositeAgentRule rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_locomotionProperty"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-schema#transportCapacity">
+        <hasCompositeAgentRule rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_transportCapacity"/>
     </rdf:Description>
 </rdf:RDF>
 
