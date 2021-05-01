@@ -213,26 +213,6 @@ public:
      */
     double getPropertyValue(const owlapi::model::IRI& property) const;
 
-    bool isDerivedProperty(const owlapi::model::IRI& property) const;
-
-    /**
-     * The ontology can use properties, that have a relation to other
-     * properties: the expression has to be set via the
-     * inferFrom field and relies on parsing via muparser
-     *
-     \verbatim
-        <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#energyCapacity">
-            <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#energyProperty"/>
-            <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-            <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-            <inferFrom>iri(http://www.rock-robotics.org/2014/01/om-schema#powerSourceCapacity)*iri(http://www.rock-robotics.org/2014/01/om-schema#supplyVoltage)</inferFrom>
-            <rdfs:comment>in [Wh]</rdfs:comment>
-        </owl:DatatypeProperty>
-     \endverbatim
-     * \return get derived property value
-     */
-    double getDerivedPropertyValue(const owlapi::model::IRI& property) const;
-
 private:
 
     ModelPool mModelPool;

@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(derived_property)
     OrganizationModelAsk ask(om, modelPool, true);
     {
         moreorg::facades::Robot robot(modelPool, ask);
-        double energyCapacity = robot.getDerivedPropertyValue(vocabulary::OM::energyCapacity());
+        double energyCapacity = robot.getDataPropertyValue(vocabulary::OM::energyCapacity());
 
         BOOST_REQUIRE_MESSAGE(energyCapacity > 0, "Energy Capacity has been derived from other properties: " << energyCapacity);
     }
