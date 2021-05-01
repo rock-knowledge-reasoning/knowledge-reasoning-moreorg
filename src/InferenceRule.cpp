@@ -149,8 +149,6 @@ void InferenceRule::load(const IRI& dataproperty, const IRI& roleRelation, const
         {
             break;
         }
-        LOG_WARN_S << "pick: " << ancestors.front() << " FOR " <<
-            pickFromProperty;
         pickFromProperty = ancestors.front();
     }
 
@@ -197,8 +195,6 @@ void InferenceRule::load(const IRI& dataproperty, const IRI& roleRelation, const
         {
             addBinding(placeholder, placeholderValue->asIRI());
         } else {
-            LOG_WARN_S << "No binding for rule '" << ruleName
-                << "' and placeholder '" << placeholder << "'";
             break;
         }
     }
@@ -227,8 +223,6 @@ void InferenceRule::prepare()
 
         rule.replace(startNOT,endNOT-startNOT+1, "__NOT__" + expr);
     }
-
-    LOG_WARN_S << rule;
 
     while(true)
     {
@@ -263,23 +257,21 @@ void InferenceRule::prepare()
             if(pos == std::string::npos)
             {
                 std::string p = args.substr(startpos);
-                LOG_WARN_S << "PARSING " << p;
                 arguments.push_back(resolvePlaceholder(p));
                 break;
             } else {
                 std::string p = args.substr(startpos,pos);
-                LOG_WARN_S << "PARSING " << p;
                 arguments.push_back(resolvePlaceholder(p));
             }
             startpos = pos + 1;
         }
 
         OPCall oc(op_name, arguments);
-        LOG_WARN_S << "ADDING OPCALL FOR " << placeholder
+        LOG_DEBUG_S << "ADDING OPCALL FOR " << placeholder
             << " : " << oc.toString(4);
         mOPCalls[placeholder] = oc;
     }
-   LOG_WARN_S << "Prepared rule: " << rule << " with #" << mOPCalls.size() << " operation calls";
+    LOG_DEBUG_S << "Prepared rule: " << rule << " with #" << mOPCalls.size() << " operation calls";
     mPreparedRule = rule;
 }
 

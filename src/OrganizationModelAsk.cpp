@@ -229,7 +229,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
             IRIList combination = limitedCombination.current();
             ModelPool combinationModelPool = OrganizationModel::combination2ModelPool(combination);
 
-            LOG_WARN_S << "CHECK COMBINATION: " << count++ << std::endl
+            LOG_INFO_S << "CHECK COMBINATION: " << count++ << std::endl
                 << combinationModelPool.toString(4);
             base::Time start = base::Time::now();
             bool isFeasiblePool = isFeasible(combinationModelPool);
@@ -237,9 +237,9 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(co
             base::Time end = base::Time::now();
             if(isFeasiblePool)
             {
-                LOG_WARN_S << "Is feasible: " << (end-start).toSeconds();
+                LOG_INFO_S << "Is feasible: " << (end-start).toSeconds();
             } else {
-                LOG_WARN_S << "Is not feasible" << (end-start).toSeconds();
+                LOG_INFO_S << "Is not feasible" << (end-start).toSeconds();
             }
 
             // identify the potential additions

@@ -15,7 +15,6 @@ Selection SelectionPolicy::apply(const Selection& agentSelection,
         const OrganizationModelAsk& ask) const
 {
     Selection selection = agentSelection;
-    LOG_WARN_S << "PolicyChain " << mPolicyChain.size();
     for(const SelectionPolicy::Ptr& sp : mPolicyChain)
     {
         selection = sp->apply(selection, ask);
