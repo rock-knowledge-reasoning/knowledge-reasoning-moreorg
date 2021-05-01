@@ -202,6 +202,8 @@ void InferenceRule::load(const IRI& dataproperty, const IRI& roleRelation, const
             break;
         }
     }
+    // default binding for self
+    addBinding(vocabulary::OM::resolve("_self"), dataproperty);
 
     prepare();
 }
