@@ -127,13 +127,13 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
         uint32_t transportCapacity = robot.getTransportCapacity();
         BOOST_REQUIRE_MESSAGE( transportCapacity == 10, "Robot " << sherpa << " has transport capacity of: " << transportCapacity);
 
-        policies::Selection selection = robot.getSelection(vocabulary::OM::TransportProviderPolicy());
+        policies::Selection selection = robot.getSelection(vocabulary::OM::TransportProviderSelection());
         BOOST_REQUIRE_MESSAGE(selection.size() == 1, "Robot " <<
                 sherpa << " is transport provider, selection is: " << selection);
 
-        policies::Distribution distribution = robot.getDistribution(vocabulary::OM::EnergyProviderPolicy());
-        BOOST_REQUIRE_MESSAGE(distribution.shares[sherpa] == 1, "Robot " <<
-                sherpa << " is energy provider");
+        //policies::Distribution distribution = robot.getDistribution(vocabulary::OM::DistributionPolicy_EnergyProvider());
+        //BOOST_REQUIRE_MESSAGE(distribution.shares[sherpa] == 1, "Robot " <<
+        //        sherpa << " is energy provider");
 
         {
             IRI model = vocabulary::OM::resolve("CREX");
@@ -171,8 +171,9 @@ BOOST_AUTO_TEST_CASE(robot_from_transterra)
         uint32_t transportDemand = robot.getTransportDemand();
         BOOST_REQUIRE_MESSAGE( transportDemand == 1, "Robot " << payload << " has transport demand of: " << transportDemand);
 
-        policies::Selection selection = robot.getSelection(vocabulary::OM::TransportProviderPolicy());
-        BOOST_REQUIRE_MESSAGE(selection.empty(), "Robot has no transport provider: " << selection);
+        policies::Selection selection = robot.getSelection(vocabulary::OM::TransportProviderSelection());
+        BOOST_REQUIRE_MESSAGE(selection.empty(), "Robot has no transport"
+                " provider: '" << selection << "' " << selection.size());
     }
 }
 

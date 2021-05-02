@@ -95,6 +95,7 @@ rock_library(moreorg
         organization_model/Grounding.cpp
         organization_model/InterfaceConnection.cpp
         organization_model/Statistics.cpp
+        policies/AgentSizeBasedSelection.cpp
         policies/DistributionPolicy.cpp
         policies/FunctionalityBasedSelection.cpp
         policies/PropertyBasedSelection.cpp
@@ -155,6 +156,7 @@ rock_library(moreorg
         organization_model/Grounding.hpp
         organization_model/InterfaceConnection.hpp
         organization_model/Statistics.hpp
+        policies/AgentSizeBasedSelection.hpp
         policies/DistributionPolicy.hpp
         policies/FunctionalityBasedSelection.hpp
         policies/PropertyBasedSelection.hpp

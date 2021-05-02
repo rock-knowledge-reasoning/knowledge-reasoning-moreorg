@@ -1,6 +1,7 @@
 #include "PropertyBasedSelection.hpp"
 #include "../facades/Robot.hpp"
 #include "../vocabularies/OM.hpp"
+#include "../algebra/CompositionFunction.hpp"
 #include <base-logging/Logging.hpp>
 
 using namespace owlapi::model;
@@ -16,15 +17,27 @@ PropertyBasedSelection::PropertyBasedSelection(const IRI& property,
 {
 }
 
-policies::Selection PropertyBasedSelection::apply(const policies::Selection& selection,
+policies::Selection PropertyBasedSelection::apply(
+        const policies::Selection& selection,
         const OrganizationModelAsk& ask) const
 {
     std::map<Agent, double> values;
 
     for(const Agent& a : selection)
     {
-        facades::Robot robot(a.getType(), ask);
-        values[a] = robot.getPropertyValue(mProperty);
+        facades::Robot robot = facades::Robot::getInstance(a.getType(), ask);
+        // If this is a composite agent, then here, we have to decide
+        // how to combine a property, e.g., for two or more system contributing
+        // to the value
+        // TODO: allow to configure composition function
+        values[a] = robot.getCompositeDataPropertyValue(mProperty,
+                    bind(&algebra::CompositionFunction::weightedSum,placeholder::_1,placeholder::_2)
+                );
+    }
+
+    if(selection.empty())
+    {
+        return selection;
     }
 
     if(mOperator == vocabulary::OM::resolve("OP_MAX"))

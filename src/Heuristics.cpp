@@ -96,7 +96,7 @@ double Heuristics::getEnergyReductionAbsolute(const StatusSample* sample,
     try {
         double consumption = getEnergyConsumption(sample);
         double share =
-            sample->getAgent().getFacade(mAsk).getDistribution(vocabulary::OM::EnergyProviderPolicy()).shares.at(atomicAgent.getModel());
+            sample->getAgent().getFacade(mAsk).getDistribution(vocabulary::OM::DistributionPolicy_EnergyProvider()).shares.at(atomicAgent.getModel());
 
         // use linear model to estimate consumption
         return consumption*share* (toTime - fromTime)/sample->getAvailableTime();

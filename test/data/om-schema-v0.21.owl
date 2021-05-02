@@ -822,7 +822,8 @@
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#TransportProviderSelection">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelectionPolicy"/>
         <_0 rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#FunctionalityBasedSelection_TransportProvider"/>
-        <_1 rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PropertyBasedSelection_max_transportCapacity"/>
+        <_1 rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AgentSizeBasedSelection_equals_1"/>
+        <_2 rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PropertyBasedSelection_max_transportCapacity"/>
         <rdfs:comment>A TransportProvider in a composite system, is the atomic agent that offers locomotion capabilities and provides a maximum of transport capacities.
 
 This is a simplication, since multiple systems might also be able to form one TransportProvider.

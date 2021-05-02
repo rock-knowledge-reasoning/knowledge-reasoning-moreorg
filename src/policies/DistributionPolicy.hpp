@@ -25,7 +25,7 @@ public:
     virtual ~DistributionPolicy() = default;
 
     virtual Distribution apply(const ModelPool& modelPool,
-            const OrganizationModelAsk& ask) const = 0;
+            const OrganizationModelAsk& ask) const;
 };
 
 } // policies

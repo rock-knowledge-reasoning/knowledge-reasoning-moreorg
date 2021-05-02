@@ -283,6 +283,14 @@ composite systems</rdfs:comment>
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#comparesTo -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#comparesTo">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#degreeOfFreedoms -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#degreeOfFreedoms">
@@ -319,6 +327,14 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#equals -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#equals">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#comparesTo"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#factorValue -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#factorValue">
@@ -331,6 +347,38 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#geometricProperty">
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#greaterOrEqual -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#greaterOrEqual">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#comparesTo"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#greaterThan -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#greaterThan">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#comparesTo"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#lessOrEqual -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#lessOrEqual">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#comparesTo"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#lessThan -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#lessThan">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#comparesTo"/>
     </owl:DatatypeProperty>
     
 
@@ -719,6 +767,14 @@ Can be inferred from other properties describing the corresponding dimensions</r
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Agent">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#AgentSizeBasedSelection -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AgentSizeBasedSelection">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelectionPolicy"/>
     </owl:Class>
     
 
@@ -1126,6 +1182,24 @@ MIN(__all, base::energyCapacity) / MAX(__all, base::energyCapacity)</rdfs:commen
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#AgentSizeBasedSelection_equals_1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AgentSizeBasedSelection_equals_1">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AgentSizeBasedSelection"/>
+        <equals rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</equals>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#AgentSizeBasedSelection_greaterOrEqual_2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AgentSizeBasedSelection_greaterOrEqual_2">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AgentSizeBasedSelection"/>
+        <greaterOrEqual rdf:datatype="http://www.w3.org/2001/XMLSchema#double">2.0</greaterOrEqual>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#AnyFunctionality -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AnyFunctionality">
@@ -1140,13 +1214,16 @@ MIN(__all, base::energyCapacity) / MAX(__all, base::energyCapacity)</rdfs:commen
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#EnergyConsumptionPolicy -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#DistributionPolicy_EnergyProvider -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#EnergyConsumptionPolicy">
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#DistributionPolicy_EnergyProvider">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#DistributionPolicy"/>
-        <inferFrom>base := http://www.rock-robotics.org/2014/01/om-schema#
+        <_a rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#energyCapacity"/>
+        <_b rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AllSelection"/>
+        <inferFrom>OP_VALUE(_a) / OP_SUM(_b,_a)</inferFrom>
+        <rdfs:comment>This distribution policy allows to compute the current share of an agent with respect to the energy that the full system requires.
 
-VAL(__individual,base::energyCapacity) / SUM(__all, base::energyCapacity)</inferFrom>
+Note, that there might be agents involved that do not provide any energy.</rdfs:comment>
     </owl:NamedIndividual>
     
 

@@ -16,7 +16,7 @@ public:
 
     virtual ~PropertyBasedSelection() = default;
 
-    policies::Selection apply(const policies::Selection& selection,
+    Selection apply(const policies::Selection& selection,
             const OrganizationModelAsk& ask) const override;
 
 protected:

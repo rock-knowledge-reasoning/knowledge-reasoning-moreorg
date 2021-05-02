@@ -65,8 +65,8 @@ public:
 
     VOCABULARY_ADD_WORD(inferFrom);
 
-    VOCABULARY_ADD_WORD(EnergyProviderPolicy);
-    VOCABULARY_ADD_WORD(TransportProviderPolicy);
+    VOCABULARY_ADD_WORD(DistributionPolicy_EnergyProvider);
+    VOCABULARY_ADD_WORD(TransportProviderSelection);
 };
 
 } // end namespace vocabulary
