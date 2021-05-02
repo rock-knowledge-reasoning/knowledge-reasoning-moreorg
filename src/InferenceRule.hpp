@@ -103,6 +103,9 @@ protected:
     std::string mPreparedRule;
     std::map<std::string, OPCall> mOPCalls;
 
+    static std::map<owlapi::model::IRI, InferenceRule::Ptr> mCompositeAgentRules;
+    static std::map<owlapi::model::IRI, InferenceRule::Ptr> mAtomicAgentRules;
+
 };
 
 }
