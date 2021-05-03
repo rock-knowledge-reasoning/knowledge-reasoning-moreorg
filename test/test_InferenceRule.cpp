@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(infer_transportCapacity)
     modelPool[payload] = 1;
     OrganizationModelAsk ask(om, modelPool, true);
 
-    InferenceRule::Ptr r = InferenceRule::loadCompositeAgentRule(vocabulary::OM::resolve("transportCapacity"), ask);
+    InferenceRule::Ptr r = InferenceRule::loadPropertyCompositeAgentRule(vocabulary::OM::resolve("transportCapacity"), ask);
 
     BOOST_TEST_MESSAGE(r->toString());
 
@@ -46,17 +46,17 @@ BOOST_AUTO_TEST_CASE(infer_energyCapacity_atomic)
     modelPool[sherpa] = 1;
     OrganizationModelAsk ask(om, modelPool, true);
 
-    IRI property = vocabulary::OM::resolve("InferenceRule_energyCapacity");
+    IRI property = vocabulary::OM::resolve("AtomicAgentRule_energyCapacity");
     OWLAnnotationValue::Ptr ruleTxt =
         ask.ontology().getAnnotationValue(property, vocabulary::OM::resolve("inferFrom"));
 
     OWLLiteral::Ptr literal = ruleTxt->asLiteral();
     BOOST_REQUIRE_MESSAGE(literal, "Literal annotation for " <<
             property.toString() << " " << literal);
-    BOOST_TEST_MESSAGE("InferenceRule_energyCapacity: " << literal->getValue());
+    BOOST_TEST_MESSAGE("AtomicAgentRule_energyCapacity: " << literal->getValue());
 
     InferenceRule::Ptr r =
-        InferenceRule::loadAtomicAgentRule(vocabulary::OM::resolve("energyCapacity"), ask);
+        InferenceRule::loadPropertyAtomicAgentRule(vocabulary::OM::resolve("energyCapacity"), ask);
 
     BOOST_TEST_MESSAGE(r->toString());
 
@@ -64,6 +64,32 @@ BOOST_AUTO_TEST_CASE(infer_energyCapacity_atomic)
     double value = r->apply(robot);
     BOOST_REQUIRE_MESSAGE(value == 480, "Sherpa has energyCapacity of " << value <<
             " expected 480");
+}
+
+BOOST_AUTO_TEST_CASE(infer_energyCapacity_composite)
+{
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(getOMSchema());
+    IRI sherpa = vocabulary::OM::resolve("Sherpa");
+    IRI payload = vocabulary::OM::resolve("Payload");
+    IRI crex = vocabulary::OM::resolve("CREX");
+
+
+    ModelPool modelPool;
+    modelPool[sherpa] = 1;
+    modelPool[payload] = 1;
+    modelPool[crex] = 1;
+    OrganizationModelAsk ask(om, modelPool, true);
+
+    IRI property = vocabulary::OM::resolve("CompositeAgentRule_energyCapacity");
+    InferenceRule::Ptr r =
+        InferenceRule::loadCompositeAgentRule(property, ask);
+
+    BOOST_TEST_MESSAGE(r->toString());
+
+    facades::Robot robot = facades::Robot::getInstance(modelPool, ask);
+    double value = r->apply(robot);
+    BOOST_REQUIRE_MESSAGE(value > 480, "Sherpa+Payload+CREX have energyCapacity of " << value <<
+            " expected >480");
 }
 
 BOOST_AUTO_TEST_CASE(infer_energyCapacity)

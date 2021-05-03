@@ -6,7 +6,8 @@
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-     xmlns:om-base="http://www.rock-robotics.org/2014/01/om-base#">
+     xmlns:om-base="http://www.rock-robotics.org/2014/01/om-base#"
+     xmlns:om-schemae="http://www.rock-robotics.org/2014/01/om-schemae#">
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2014/01/om-base">
         <rdfs:comment>Changelog:
 * 0.2
@@ -100,6 +101,14 @@ composite systems</rdfs:comment>
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#hasDenominator -->
+
+    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#hasDenominator">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#inferFrom"/>
+    </owl:AnnotationProperty>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#hasInferenceRule -->
 
     <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#hasInferenceRule">
@@ -127,6 +136,14 @@ composite systems</rdfs:comment>
     <!-- http://www.rock-robotics.org/2014/01/om-schema#usePolicy -->
 
     <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#usePolicy"/>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schemae#hasCounter -->
+
+    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schemae#hasCounter">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#inferFrom"/>
+    </owl:AnnotationProperty>
     
 
 
@@ -213,7 +230,6 @@ composite systems</rdfs:comment>
 
     <owl:ObjectProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#hasOperator">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:range rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Operator"/>
     </owl:ObjectProperty>
     
 
@@ -308,7 +324,7 @@ composite systems</rdfs:comment>
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#energyProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
-        <hasAtomicAgentRule rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_energyCapacity"/>
+        <hasAtomicAgentRule rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AtomicAgentRule_energyCapacity"/>
         <rdfs:comment>in [Wh]</rdfs:comment>
     </owl:DatatypeProperty>
     
@@ -783,7 +799,6 @@ Can be inferred from other properties describing the corresponding dimensions</r
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AllSelection">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelectionPolicy"/>
-        <rdfs:comment>Select all atomic agents that are part of an agent</rdfs:comment>
     </owl:Class>
     
 
@@ -1200,10 +1215,38 @@ MIN(__all, base::energyCapacity) / MAX(__all, base::energyCapacity)</rdfs:commen
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#AllAtomicAgents -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AllAtomicAgents">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelectionPolicy"/>
+        <_0 rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AllSelection"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#AllSelection -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AllSelection">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AllSelection"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#AnyFunctionality -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AnyFunctionality">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Functionality"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#AtomicAgentRule_energyCapacity -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AtomicAgentRule_energyCapacity">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AtomicAgentRule"/>
+        <_a rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#powerSourceCapacity"/>
+        <_b rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#supplyVoltage"/>
+        <inferFrom>OP_VALUE(_a)*OP_VALUE(_b)</inferFrom>
     </owl:NamedIndividual>
     
 
@@ -1214,13 +1257,23 @@ MIN(__all, base::energyCapacity) / MAX(__all, base::energyCapacity)</rdfs:commen
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#CompositeAgentRule_energyCapacity -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#CompositeAgentRule_energyCapacity">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#CompositeAgentRule"/>
+        <_a rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AllAtomicAgents"/>
+        <_b rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#energyCapacity"/>
+        <inferFrom>OP_SUM(_a,_b)</inferFrom>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#DistributionPolicy_EnergyProvider -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#DistributionPolicy_EnergyProvider">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#DistributionPolicy"/>
-        <_a rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#energyCapacity"/>
-        <_b rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AllSelection"/>
-        <inferFrom>OP_VALUE(_a) / OP_SUM(_b,_a)</inferFrom>
+        <hasAtomicAgentRule rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AtomicAgentRule_energyCapacity"/>
+        <hasCompositeAgentRule rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#CompositeAgentRule_energyCapacity"/>
         <rdfs:comment>This distribution policy allows to compute the current share of an agent with respect to the energy that the full system requires.
 
 Note, that there might be agents involved that do not provide any energy.</rdfs:comment>
@@ -1240,17 +1293,6 @@ Note, that there might be agents involved that do not provide any energy.</rdfs:
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#FunctionalityBasedSelection">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelectionPolicy"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_energyCapacity -->
-
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_energyCapacity">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AtomicAgentRule"/>
-        <_a rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#powerSourceCapacity"/>
-        <_b rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#supplyVoltage"/>
-        <inferFrom>OP_VALUE(_a)*OP_VALUE(_b)</inferFrom>
     </owl:NamedIndividual>
     
 

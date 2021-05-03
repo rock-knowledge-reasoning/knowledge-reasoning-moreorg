@@ -444,7 +444,7 @@ double Robot::getDataPropertyValue(const owlapi::model::IRI& property) const
     if(mModelPool.numberOfInstances() <= 1)
     {
         try {
-            InferenceRule::Ptr rule = InferenceRule::loadAtomicAgentRule(property, organizationAsk());
+            InferenceRule::Ptr rule = InferenceRule::loadPropertyAtomicAgentRule(property, organizationAsk());
             return rule->apply(*this);
         } catch(const std::invalid_argument& e)
         {}
@@ -453,7 +453,7 @@ double Robot::getDataPropertyValue(const owlapi::model::IRI& property) const
     } else {
         try {
             // Load inference rule
-            InferenceRule::Ptr rule = InferenceRule::loadCompositeAgentRule(property,
+            InferenceRule::Ptr rule = InferenceRule::loadPropertyCompositeAgentRule(property,
                     organizationAsk());
             return rule->apply(*this);
         } catch(const std::invalid_argument& e)

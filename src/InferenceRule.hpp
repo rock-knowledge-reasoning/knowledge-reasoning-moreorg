@@ -57,13 +57,17 @@ public:
 
     void load(const owlapi::model::IRI& dataproperty, const owlapi::model::IRI& ruleRelation, const OrganizationModelAsk& ask);
 
+    void loadByName(const owlapi::model::IRI& ruleName, const OrganizationModelAsk& ask);
+
     /**
      * Load a composition rule that is related to a data property
      * via 'hasCompositionInferenceRule' relation
      *
      * A composition is only accounted for when agents are combined
      */
-    static InferenceRule::Ptr loadCompositeAgentRule(const owlapi::model::IRI& dataproperty, const OrganizationModelAsk& ask);
+    static InferenceRule::Ptr loadPropertyCompositeAgentRule(const owlapi::model::IRI& dataproperty, const OrganizationModelAsk& ask);
+
+    static InferenceRule::Ptr loadCompositeAgentRule(const owlapi::model::IRI& ruleName, const OrganizationModelAsk& ask);
 
     /**
      * Load a plain inference rule, for instance a formula for a property that
@@ -73,7 +77,9 @@ public:
      * A plain rule is always applied, independently of dealing with atomic or composite
      * agents
      */
-    static InferenceRule::Ptr loadAtomicAgentRule(const owlapi::model::IRI& dataproperty, const OrganizationModelAsk& ask);
+    static InferenceRule::Ptr loadPropertyAtomicAgentRule(const owlapi::model::IRI& dataproperty, const OrganizationModelAsk& ask);
+
+    static InferenceRule::Ptr loadAtomicAgentRule(const owlapi::model::IRI& ruleName, const OrganizationModelAsk& ask);
 
     /**
      * Preparing the rule, means to instantiate the function by substituting placeholder
@@ -102,6 +108,9 @@ protected:
 
     std::string mPreparedRule;
     std::map<std::string, OPCall> mOPCalls;
+
+    static std::map<owlapi::model::IRI, InferenceRule::Ptr> mPropertyCompositeAgentRules;
+    static std::map<owlapi::model::IRI, InferenceRule::Ptr> mPropertyAtomicAgentRules;
 
     static std::map<owlapi::model::IRI, InferenceRule::Ptr> mCompositeAgentRules;
     static std::map<owlapi::model::IRI, InferenceRule::Ptr> mAtomicAgentRules;

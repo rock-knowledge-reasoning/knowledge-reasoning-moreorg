@@ -2,6 +2,7 @@
 #include "facades/Robot.hpp"
 #include "policies/DistributionPolicy.hpp"
 #include "policies/SelectionPolicy.hpp"
+#include "policies/AllSelection.hpp"
 #include "policies/AgentSizeBasedSelection.hpp"
 #include "policies/FunctionalityBasedSelection.hpp"
 #include "policies/PropertyBasedSelection.hpp"
@@ -87,10 +88,11 @@ Policy::Ptr Policy::getInstance(const owlapi::model::IRI& policyName,
 
             IRI policyElement = instances[0];
 
-            if(policyElement == vocabulary::OM::resolve("AllSelection"))
+            if(ask.ontology().isInstanceOf(policyElement, vocabulary::OM::resolve("AllSelection")))
             {
-                // as neutral element we can ignore it here, since the selection
-                // is not changed
+                policies::SelectionPolicy::Ptr allSel =
+                    make_shared<policies::AllSelection>();
+                selectionPolicy->add(allSel);
             } else if(ask.ontology().isInstanceOf(policyElement, vocabulary::OM::resolve("FunctionalityBasedSelection")))
             {
                 OWLAnnotationValue::Ptr selectByValue =
@@ -145,28 +147,9 @@ Policy::Ptr Policy::getInstance(const owlapi::model::IRI& policyName,
     {
 
         policies::DistributionPolicy::Ptr distributionPolicy =
-            make_shared<policies::DistributionPolicy>(policyName);
-
-        for(size_t i = 0; i < MAX_POLICY_ELEMENTS; ++i)
-        {
-            std::stringstream ss;
-            ss << "_" << i;
-            IRI indexPlaceholder = vocabulary::OM::resolve(ss.str());
-            IRIList instances = ask.ontology().allRelatedInstances(policyName, indexPlaceholder);
-            if(instances.size() == 0)
-            {
-                break;
-            } else if(instances.size() > 1)
-            {
-                throw std::runtime_error("moreorg::Policy::getInstance: index placeholder '"
-                        + indexPlaceholder.toString() + "' used multiple times");
-            }
-            IRI policyElement = instances[0];
-
-            // TODO
-
-        }
-
+            make_shared<policies::DistributionPolicy>(policyName, ask);
+        msPolicies[policyName] = distributionPolicy;
+        return distributionPolicy;
     }
 
     throw std::runtime_error("moreorg::Policy::getInstance: could not identify"

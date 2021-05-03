@@ -116,36 +116,71 @@ std::string OPCall::toString(size_t indent) const
 }
 
 
+std::map<IRI, InferenceRule::Ptr> InferenceRule::mPropertyCompositeAgentRules;
+std::map<IRI, InferenceRule::Ptr> InferenceRule::mPropertyAtomicAgentRules;
+
 std::map<IRI, InferenceRule::Ptr> InferenceRule::mCompositeAgentRules;
 std::map<IRI, InferenceRule::Ptr> InferenceRule::mAtomicAgentRules;
 
-InferenceRule::Ptr InferenceRule::loadCompositeAgentRule(const IRI& dataproperty,
+InferenceRule::Ptr InferenceRule::loadPropertyCompositeAgentRule(const IRI& dataproperty,
         const OrganizationModelAsk& ask)
 {
-    std::map<IRI, InferenceRule::Ptr>::const_iterator cit = mCompositeAgentRules.find(dataproperty);
-    if(cit != mCompositeAgentRules.end())
+    std::map<IRI, InferenceRule::Ptr>::const_iterator cit = mPropertyCompositeAgentRules.find(dataproperty);
+    if(cit != mPropertyCompositeAgentRules.end())
     {
         return cit->second;
     }
 
     inference_rules::CompositeAgentRule::Ptr rule = make_shared<inference_rules::CompositeAgentRule>();
     rule->load(dataproperty, vocabulary::OM::resolve("hasCompositeAgentRule"), ask);
-    mCompositeAgentRules[dataproperty] = rule;
+    mPropertyCompositeAgentRules[dataproperty] = rule;
     return rule;
 }
 
-InferenceRule::Ptr InferenceRule::loadAtomicAgentRule(const IRI& dataproperty,
+InferenceRule::Ptr InferenceRule::loadCompositeAgentRule(const IRI& ruleName,
         const OrganizationModelAsk& ask)
 {
-    std::map<IRI, InferenceRule::Ptr>::const_iterator cit = mAtomicAgentRules.find(dataproperty);
-    if(cit != mAtomicAgentRules.end())
+    std::map<IRI, InferenceRule::Ptr>::const_iterator cit =
+        mCompositeAgentRules.find(ruleName);
+    if(cit != mCompositeAgentRules.end())
+    {
+        return cit->second;
+    }
+
+    inference_rules::CompositeAgentRule::Ptr rule = make_shared<inference_rules::CompositeAgentRule>();
+    rule->loadByName(ruleName, ask);
+    mCompositeAgentRules[ruleName] = rule;
+    return rule;
+}
+
+InferenceRule::Ptr InferenceRule::loadPropertyAtomicAgentRule(const IRI& dataproperty,
+        const OrganizationModelAsk& ask)
+{
+    std::map<IRI, InferenceRule::Ptr>::const_iterator cit = mPropertyAtomicAgentRules.find(dataproperty);
+    if(cit != mPropertyAtomicAgentRules.end())
     {
         return cit->second;
     }
 
     inference_rules::AtomicAgentRule::Ptr rule = make_shared<inference_rules::AtomicAgentRule>();
     rule->load(dataproperty, vocabulary::OM::resolve("hasAtomicAgentRule"), ask);
-    mAtomicAgentRules[dataproperty] = rule;
+    mPropertyAtomicAgentRules[dataproperty] = rule;
+    return rule;
+}
+
+InferenceRule::Ptr InferenceRule::loadAtomicAgentRule(const IRI& ruleName,
+        const OrganizationModelAsk& ask)
+{
+    std::map<IRI, InferenceRule::Ptr>::const_iterator cit =
+        mAtomicAgentRules.find(ruleName);
+    if(cit != mAtomicAgentRules.end())
+    {
+        return cit->second;
+    }
+
+    inference_rules::AtomicAgentRule::Ptr rule = make_shared<inference_rules::AtomicAgentRule>();
+    rule->loadByName(ruleName, ask);
+    mAtomicAgentRules[ruleName] = rule;
     return rule;
 }
 
@@ -180,6 +215,15 @@ void InferenceRule::load(const IRI& dataproperty, const IRI& roleRelation, const
 
     owlapi::model::IRI ruleName = annotationValue->asIRI();
 
+    // default binding for self
+    addBinding(vocabulary::OM::resolve("_self"), dataproperty);
+
+    loadByName(ruleName, ask);
+}
+
+
+void InferenceRule::loadByName(const IRI& ruleName, const OrganizationModelAsk& ask)
+{
     OWLAnnotationValue::Ptr ruleTxt = ask.ontology().getAnnotationValue(ruleName, vocabulary::OM::resolve("inferFrom"));
     OWLLiteral::Ptr literal = ruleTxt->asLiteral();
 
@@ -216,8 +260,6 @@ void InferenceRule::load(const IRI& dataproperty, const IRI& roleRelation, const
             break;
         }
     }
-    // default binding for self
-    addBinding(vocabulary::OM::resolve("_self"), dataproperty);
 
     prepare();
 }
