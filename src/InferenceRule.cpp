@@ -27,7 +27,13 @@ std::string OPArgument::toString() const
 OPCall::OPCall(const std::string& op_name, const std::vector<OPArgument>& arguments)
     : mOPName(op_name)
     , mArguments(arguments)
-{}
+    , mRandomNumberGenerator(std::random_device()())
+
+{
+    base::Time time = base::Time::now();
+    mRandomNumberGenerator.seed(time.microseconds);
+
+}
 
 double OPCall::evalComposite(const Agent& agent, const OrganizationModelAsk& ask) const
 {
@@ -54,7 +60,17 @@ double OPCall::evalComposite(const Agent& agent, const OrganizationModelAsk& ask
     policies::SelectionPolicy::Ptr selectionPolicy = dynamic_pointer_cast<policies::SelectionPolicy>(policy);
 
     policies::Selection selection = selectionPolicy->apply(agents, ask);
-    Agent selectedAgent = *selection.begin();
+    if(selection.empty())
+    {
+        // default value
+        return 0;
+    }
+
+    //Requires only one agent as argument so pick one randomly if there
+    //are multiple
+    Agent::List selectedAgents(selection.begin(), selection.end());
+    std::uniform_int_distribution<size_t> dist(0, selectedAgents.size() - 1);
+    Agent selectedAgent = selectedAgents[dist(mRandomNumberGenerator)];
 
     if(mArguments[0].inverse)
     {
@@ -65,6 +81,9 @@ double OPCall::evalComposite(const Agent& agent, const OrganizationModelAsk& ask
     if(mOPName == "SUM")
     {
         return sum(selectedAgent, dataPropertyName, ask);
+    } else if (mOPName == "MEAN")
+    {
+        return mean(selectedAgent, dataPropertyName, ask);
     }
 
     throw std::runtime_error("moreorg::OPCall::eval: operation '" + mOPName + "' is not supported");
@@ -101,6 +120,12 @@ double OPCall::sum(const Agent& agent, const IRI& dataproperty, const Organizati
         sum += pair.second*robot.getDataPropertyValue(dataproperty);
     }
     return sum;
+}
+
+double OPCall::mean(const Agent& agent, const IRI& dataproperty, const OrganizationModelAsk& ask)
+{
+    double sum = sum(agent,dataproperty, ask);
+    return sum / (1.0*agent.size());
 }
 
 std::string OPCall::toString(size_t indent) const

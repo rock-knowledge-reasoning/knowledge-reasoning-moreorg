@@ -4,6 +4,7 @@
 #include <owlapi/model/IRI.hpp>
 #include "SharedPtr.hpp"
 #include "OrganizationModelAsk.hpp"
+#include <random>
 
 namespace moreorg {
 namespace facades {
@@ -37,6 +38,7 @@ public:
     const std::vector<OPArgument>& getArguments() const { return mArguments; }
 
     static double sum(const Agent& agent, const owlapi::model::IRI& dataproperty, const OrganizationModelAsk& ask);
+    static double mean(const Agent& agent, const owlapi::model::IRI& dataproperty, const OrganizationModelAsk& ask);
 
     double evalComposite(const Agent& agent, const OrganizationModelAsk& ask) const;
     double evalAtomic(const Agent& agent, const OrganizationModelAsk& ask) const;
@@ -46,6 +48,8 @@ public:
 protected:
     std::string mOPName;
     std::vector<OPArgument> mArguments;
+
+    mutable std::mt19937 mRandomNumberGenerator;
 };
 
 class InferenceRule
