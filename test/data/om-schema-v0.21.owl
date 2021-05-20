@@ -593,7 +593,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_default -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_default">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#CompositeAgentRule"/>
         <_a rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AllSelection"/>
         <inferFrom>OP_SUM(_a,_self)</inferFrom>
     </owl:NamedIndividual>
@@ -851,6 +851,9 @@ Examples of possible reasoning mechanisms:
     </rdf:Description>
     <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-schema#locomotionProperty">
         <hasCompositeAgentRule rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_locomotionProperty"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-schema#physicalProperty">
+        <hasCompositeAgentRule rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_default"/>
     </rdf:Description>
     <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-schema#transportCapacity">
         <hasCompositeAgentRule rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#InferenceRule_transportCapacity"/>

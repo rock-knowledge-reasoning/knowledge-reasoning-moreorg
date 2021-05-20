@@ -3,6 +3,7 @@
 #include "facades/Robot.hpp"
 #include "vocabularies/OM.hpp"
 #include <base-logging/Logging.hpp>
+#include <base/Time.hpp>
 #include "policies/SelectionPolicy.hpp"
 #include "inference_rules/CompositeAgentRule.hpp"
 #include "inference_rules/AtomicAgentRule.hpp"
@@ -124,8 +125,8 @@ double OPCall::sum(const Agent& agent, const IRI& dataproperty, const Organizati
 
 double OPCall::mean(const Agent& agent, const IRI& dataproperty, const OrganizationModelAsk& ask)
 {
-    double sum = sum(agent,dataproperty, ask);
-    return sum / (1.0*agent.size());
+    double total = sum(agent,dataproperty, ask);
+    return total / (1.0*agent.size());
 }
 
 std::string OPCall::toString(size_t indent) const
