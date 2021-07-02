@@ -299,6 +299,24 @@ composite systems</rdfs:comment>
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-base#resilience -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#resilience">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#safetyProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#taskDifficulty -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#taskDifficulty">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#safetyProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#comparesTo -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#comparesTo">
@@ -676,9 +694,9 @@ timeOfOperation[h] = energyCapacity[Wh]/nominalPowerConsumption[W]</rdfs:comment
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#probabilityOfFailure -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#reliability -->
 
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#probabilityOfFailure">
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#reliability">
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#safetyProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>

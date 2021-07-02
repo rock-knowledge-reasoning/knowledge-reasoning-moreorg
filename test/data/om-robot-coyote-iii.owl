@@ -7,7 +7,8 @@
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:om-base="http://www.rock-robotics.org/2014/01/om-base#"
-     xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#">
+     xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#"
+     xmlns:om-schemae="http://www.rock-robotics.org/2014/01/om-schemae#">
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2015/12/robots/CoyoteIII">
         <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema"/>
         <rdfs:comment>v0.2
@@ -137,7 +138,7 @@
         <om-schema:nominalVelocity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.2</om-schema:nominalVelocity>
         <om-schema:nominalWidth rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</om-schema:nominalWidth>
         <om-schema:powerSourceCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">7.0</om-schema:powerSourceCapacity>
-        <om-schema:probabilityOfFailure rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</om-schema:probabilityOfFailure>
+        <om-schema:reliability rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</om-schema:reliability>
         <om-schema:supplyVoltage rdf:datatype="http://www.w3.org/2001/XMLSchema#double">48.0</om-schema:supplyVoltage>
         <om-schema:transportCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#double">4.0</om-schema:transportCapacity>
         <om-schema:transportDemand rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-schema:transportDemand>
