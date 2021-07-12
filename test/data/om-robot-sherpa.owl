@@ -20,6 +20,33 @@
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#resilience -->
+
+    <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-base#resilience">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#taskDifficulty -->
+
+    <rdf:Description rdf:about="http://www.rock-robotics.org/2014/01/om-base#taskDifficulty">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+    </rdf:Description>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
     // Classes
     //
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +162,6 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Sherpa">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Sherpa"/>
-        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulation"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning"/>
@@ -148,6 +174,7 @@
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_EmiPassive_South"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_EmiPassive_West"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_LaserScanner_Front"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Locomotion"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Manipulator"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_PowerSource"/>
         <om-schema:mass rdf:datatype="http://www.w3.org/2001/XMLSchema#double">160.0</om-schema:mass>
@@ -236,6 +263,15 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_LaserScanner_Front">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#LaserScanner"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Locomotion -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Locomotion">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion"/>
+        <om-schema:reliability rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.96</om-schema:reliability>
     </owl:NamedIndividual>
     
 

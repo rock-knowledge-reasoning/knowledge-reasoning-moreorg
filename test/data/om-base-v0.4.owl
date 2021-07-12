@@ -299,10 +299,42 @@ composite systems</rdfs:comment>
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-base#failureRate -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#failureRate">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#metricProperty"/>
+        <rdfs:comment>determines rate of failure in faults/hr</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#metricProperty -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#metricProperty">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#probabilityOfFailure -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#probabilityOfFailure">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#safetyProperty"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#probabilityValue -->
+
+    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#probabilityValue"/>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-base#resilience -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#resilience">
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#safetyProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
     </owl:DatatypeProperty>
     
@@ -311,7 +343,8 @@ composite systems</rdfs:comment>
     <!-- http://www.rock-robotics.org/2014/01/om-base#taskDifficulty -->
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#taskDifficulty">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#safetyProperty"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#metricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
     </owl:DatatypeProperty>
     
@@ -779,6 +812,44 @@ Can be inferred from other properties describing the corresponding dimensions</r
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-base#CatastrophicFault -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#CatastrophicFault">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Fault"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Fault -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Fault"/>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#HazardousFault -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#HazardousFault">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Fault"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#MajorFault -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#MajorFault">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Fault"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#MinorFault -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#MinorFault">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Fault"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#A -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-schema#A">
@@ -1206,6 +1277,46 @@ MIN(__all, base::energyCapacity) / MAX(__all, base::energyCapacity)</rdfs:commen
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Fault_Catastrophic -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#Fault_Catastrophic">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#CatastrophicFault"/>
+        <om-base:probabilityValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.01</om-base:probabilityValue>
+        <factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0E-5</factorValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Fault_Hazardous -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#Fault_Hazardous">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#HazardousFault"/>
+        <om-base:probabilityValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.09</om-base:probabilityValue>
+        <factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</factorValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Fault_Major -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#Fault_Major">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#MajorFault"/>
+        <om-base:probabilityValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.15</om-base:probabilityValue>
+        <factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</factorValue>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Fault_Minor -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#Fault_Minor">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#MinorFault"/>
+        <om-base:probabilityValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.75</om-base:probabilityValue>
+        <factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.5</factorValue>
+    </owl:NamedIndividual>
     
 
 
