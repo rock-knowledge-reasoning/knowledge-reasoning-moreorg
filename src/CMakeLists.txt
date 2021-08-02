@@ -79,6 +79,7 @@ rock_library(moreorg
         io/LatexWriter.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
+        metrics/ProbabilityOfFailure.cpp
         Metric.cpp
         ModelPool.cpp
         ModelPoolIterator.cpp
@@ -142,6 +143,8 @@ rock_library(moreorg
         io/LatexWriter.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
+        metrics/ProbabilityOfFailure.hpp
+        metrics/DistributionFunctions.hpp
         Metric.hpp
         ModelPool.hpp
         ModelPoolIterator.hpp

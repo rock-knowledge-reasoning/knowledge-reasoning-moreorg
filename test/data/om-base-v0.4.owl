@@ -29,6 +29,44 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-base#alpha -->
+
+    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#alpha">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#hasParameter"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#beta -->
+
+    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#beta">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#hasParameter"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#hasParameter -->
+
+    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#hasParameter"/>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#lambda -->
+
+    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#lambda">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#hasParameter"/>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#p -->
+
+    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#p">
+        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#hasParameter"/>
+    </owl:AnnotationProperty>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#_a -->
 
     <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-schema#_a">
@@ -312,14 +350,6 @@ composite systems</rdfs:comment>
 
     <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#metricProperty">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-base#probabilityOfFailure -->
-
-    <owl:DatatypeProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#probabilityOfFailure">
-        <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#safetyProperty"/>
     </owl:DatatypeProperty>
     
 
@@ -820,17 +850,25 @@ Can be inferred from other properties describing the corresponding dimensions</r
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-base#Fault -->
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Constant -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Fault"/>
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Constant">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDensityFunction"/>
+    </owl:Class>
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-base#HazardousFault -->
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Exponential -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#HazardousFault">
-        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Fault"/>
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Exponential">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDensityFunction"/>
     </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Fault -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Fault"/>
     
 
 
@@ -846,6 +884,20 @@ Can be inferred from other properties describing the corresponding dimensions</r
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#MinorFault">
         <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Fault"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#ProbabilityDensityFunction -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDensityFunction"/>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-base#Weibull -->
+
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#Weibull">
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDensityFunction"/>
     </owl:Class>
     
 
@@ -1286,16 +1338,6 @@ MIN(__all, base::energyCapacity) / MAX(__all, base::energyCapacity)</rdfs:commen
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#CatastrophicFault"/>
         <om-base:probabilityValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.01</om-base:probabilityValue>
         <factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0E-5</factorValue>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.rock-robotics.org/2014/01/om-base#Fault_Hazardous -->
-
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-base#Fault_Hazardous">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#HazardousFault"/>
-        <om-base:probabilityValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.09</om-base:probabilityValue>
-        <factorValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</factorValue>
     </owl:NamedIndividual>
     
 

@@ -164,6 +164,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
             probabilityOfSurvival = mDefaultProbabilityOfSurvival;
         }
 
+        // TODO replace logic above to read distribution function + parameters from OM -> then init Distribution function and create PoF object
         ModelSurvivability survivability(restriction, probabilityOfSurvival, fullModelRedundancy);
         models.push_back(survivability);
     }

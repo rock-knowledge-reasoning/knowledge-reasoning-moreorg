@@ -3,6 +3,7 @@
 
 #include <moreorg/OrganizationModel.hpp>
 #include <moreorg/metrics/Redundancy.hpp>
+#include <moreorg/metrics/ProbabilityOfFailure.hpp>
 #include <moreorg/vocabularies/OM.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <owlapi/model/OWLOntologyTell.hpp>
