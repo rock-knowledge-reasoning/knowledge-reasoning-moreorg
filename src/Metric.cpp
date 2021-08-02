@@ -75,7 +75,7 @@ double Metric::compute(const owlapi::model::IRI& function, const ModelPool& mode
     return computeExclusiveUse(functionSet, modelPool);
 }
 
-double Metric::computeSharedUse(const ModelPool& required, const ModelPool& available) const
+double Metric::computeSharedUse(const ModelPool& required, const ModelPool& available, double t0, double t1) const
 {
     using namespace owlapi::model;
 
@@ -86,7 +86,7 @@ double Metric::computeSharedUse(const ModelPool& required, const ModelPool& avai
     std::vector<OWLCardinalityRestriction::Ptr> r_required =
         mOrganizationModelAsk.getRequiredCardinalities(required, mProperty);
 
-    return computeMetric(r_required, r_available);
+    return computeMetric(r_required, r_available, t0, t1);
 
 }
 

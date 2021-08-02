@@ -4,6 +4,7 @@
 #include <moreorg/OrganizationModel.hpp>
 #include <moreorg/Metric.hpp>
 #include "../vocabularies/OM.hpp"
+#include "DistributionFunctions.hpp"
 
 namespace moreorg {
 namespace metrics {
@@ -32,12 +33,12 @@ public:
      * Default probability of survival
      */
     Redundancy(const OrganizationModelAsk& organization,
-            double defaultPoS = 0.95,
-            const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
+        const ProbabilityDensityFunction::Ptr& defaultPDF = make_shared<WeibullPDF>(1, 1),
+        const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
 
 
     double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
-            const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const;
+            const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available, double t0 = 0, double t1 = 0) const;
 
     double computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const;
     double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ModelPool& modelPool, bool sharedUse = true) const;
@@ -64,16 +65,16 @@ public:
      * Set the default probability survial that shall be used for computed the
      * redundancy
      */
-    void setDefaultProbabilityOfSurvival(double p) { mDefaultProbabilityOfSurvival = p; }
+    void setDefaultProbabilityDensityFunction(const ProbabilityDensityFunction::Ptr& pdf_ptr) { mDefaultProbabilityDensityFunction = pdf_ptr; }
 
     /**
      * Get the default probability survial that shall be used for computed the
      * redundancy
      */
-    double getDefaultProbabilityOfSurvival() { return mDefaultProbabilityOfSurvival; }
+    ProbabilityDensityFunction::Ptr getDefaultProbabilityDensityFunction() { return mDefaultProbabilityDensityFunction; }
 
 private:
-    double mDefaultProbabilityOfSurvival;
+    ProbabilityDensityFunction::Ptr mDefaultProbabilityDensityFunction;
 };
 
 } // end namespace metrics

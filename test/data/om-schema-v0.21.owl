@@ -757,8 +757,8 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Constant -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Constant">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Constant"/>
-        <om-base:p rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-base:p>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ConstantPDF"/>
+        <om-base:p rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.05</om-base:p>
     </owl:NamedIndividual>
     
 
@@ -766,7 +766,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Exponential -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Exponential">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Exponential"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ExponentialPDF"/>
         <om-base:lambda rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-base:lambda>
     </owl:NamedIndividual>
     
@@ -775,7 +775,7 @@
     <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull">
-        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#Weibull"/>
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#WeibullPDF"/>
         <om-base:alpha rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-base:alpha>
         <om-base:beta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-base:beta>
     </owl:NamedIndividual>

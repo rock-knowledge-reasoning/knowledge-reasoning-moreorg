@@ -4,7 +4,7 @@
 #include <owlapi/OWLApi.hpp>
 #include <random>
 #include <cmath>
-#include <moreorg/metrics/DistributionFunctions.hpp>
+#include "DistributionFunctions.hpp"
 
 namespace moreorg {
 namespace metrics {
@@ -19,7 +19,6 @@ namespace metrics {
  
  *
  */
-template<class T>
 class ProbabilityOfFailure
 {
 public:
@@ -37,7 +36,7 @@ public:
     
     ProbabilityOfFailure(
             const owlapi::model::OWLObjectCardinalityRestriction::Ptr& restriction,
-            T& resourcePoFDistribution,
+            const ProbabilityDensityFunction::Ptr& resourcePoFDistribution,
             double redundancy
     );
 
@@ -47,8 +46,9 @@ public:
      * \return probability of failure
      */
     double getProbabilityOfFailure(double time = 0) const;
-
-    double getProbabilityOfFailureDensity(double time_start, double time_end) const;
+    double getProbabilityOfSurvival(double time = 0) const;
+    double getProbabilityOfFailureConditional(double time_start, double time_end) const;
+    double getProbabilityOfSurvivalConditional(double time_start, double time_end) const;
 
     /**
      * Get the qualification, i.e. the model name
@@ -80,7 +80,7 @@ private:
     owlapi::model::OWLObjectCardinalityRestriction::Ptr mObjectRestriction;
 
     /// Probability of Failure of this model
-    T mModelProbabilityOfFailureDistribution;
+    ProbabilityDensityFunction::Ptr mModelProbabilityOfFailureDistribution;
     /// Redundancy of this model
     double mRedundancy;
 };

@@ -8,7 +8,7 @@
 #include <owlapi/model/OWLOntologyAsk.hpp>
 #include <owlapi/model/OWLOntologyTell.hpp>
 #include <owlapi/model/OWLObjectExactCardinality.hpp>
-#include <moreorg/vocabularies/OM.hpp>
+#include <moreorg/vocabularies/OMBase.hpp>
 
 using namespace moreorg;
 using namespace owlapi;
@@ -48,6 +48,7 @@ BOOST_AUTO_TEST_SUITE(model_metrics)
 
 BOOST_FIXTURE_TEST_CASE(redundancy, RedundancyFixture )
 {
+    using namespace metrics;
     // query =2.has.A and =2.has.C
     std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
     {
@@ -74,7 +75,7 @@ BOOST_FIXTURE_TEST_CASE(redundancy, RedundancyFixture )
     }
 
     OrganizationModelAsk ask(om);
-    metrics::Redundancy redundancy(ask, 0.5, has);
+    Redundancy redundancy(ask, make_shared<ConstantPDF>(0.5), has);
     // Serial connection of two parallel a 0.5
     // [ [ 0.5 ] --- [ 0.5 ] ]  --- [ [ 0.5 ] --- [ 0.5 ] ]
     //
@@ -87,6 +88,7 @@ BOOST_FIXTURE_TEST_CASE(redundancy, RedundancyFixture )
 
 BOOST_FIXTURE_TEST_CASE(redundancy_same_parallel_in_series, RedundancyFixture)
 {
+    using namespace metrics;
     std::vector<OWLCardinalityRestriction::Ptr> query, resourcePool;
     {
         OWLCardinalityRestriction::Ptr restriction =
@@ -108,7 +110,7 @@ BOOST_FIXTURE_TEST_CASE(redundancy_same_parallel_in_series, RedundancyFixture)
         }
 
         OrganizationModelAsk ask(om);
-        metrics::Redundancy redundancy(ask, 0.5, has);
+        Redundancy redundancy(ask, make_shared<ConstantPDF>(0.5), has);
         // when the structure be considered then: (1 -pow( 1-pow(0.5,2),2))*pow(0.5,2);
         double expected = 0.25;
         double redundancyVal = redundancy.computeMetric(query, resourcePool);
@@ -122,7 +124,7 @@ BOOST_FIXTURE_TEST_CASE(redundancy_same_parallel_in_series, RedundancyFixture)
         }
 
         OrganizationModelAsk ask(om);
-        metrics::Redundancy redundancy(ask, 0.5, has);
+        Redundancy redundancy(ask, make_shared<ConstantPDF>(0.5), has);
         // --> (1 - (1-0.25)^2)
         double expected = 0.4375;
         double redundancyVal = redundancy.computeMetric(query, resourcePool);
@@ -224,6 +226,45 @@ BOOST_AUTO_TEST_CASE(function_redundancy)
 
         BOOST_REQUIRE_MESSAGE(value != 0, "TransportProvider has redundancy: " << value);
     }
+}
+
+BOOST_AUTO_TEST_CASE(probability_density_function)
+{
+  using namespace metrics;
+  std::string filename = getRootDir() + "/test/data/om-project-transterra.owl";
+
+  ModelPool modelPool;
+  modelPool[moreorg::vocabulary::OM::resolve("Sherpa")] = 1;
+
+  OrganizationModel::Ptr om = make_shared<OrganizationModel>(filename);
+  OrganizationModelAsk ask(om, modelPool, true);
+
+  ProbabilityDensityFunction::Ptr pdf_ptr = ProbabilityDensityFunction::getInstance(ask, IRI("http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Camera_Front"));
+  BOOST_REQUIRE_MESSAGE(pdf_ptr, "Probability Density Function has been created");
+
+  BOOST_TEST_MESSAGE("Probability Density Value at t = 0: " << pdf_ptr->getValue());
+}
+
+BOOST_FIXTURE_TEST_CASE(probability_of_failure, RedundancyFixture)
+{
+    using namespace metrics;
+
+    std::string filename = getRootDir() + "/test/data/om-project-transterra.owl";
+
+    ModelPool modelPool;
+    modelPool[moreorg::vocabulary::OM::resolve("Sherpa")] = 1;
+
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(filename);
+    OrganizationModelAsk ask(om, modelPool, true);
+
+    ProbabilityDensityFunction::Ptr pdf_ptr = make_shared<WeibullPDF>(1, 1);
+    
+    OWLObjectCardinalityRestriction::Ptr restriction = make_shared<OWLObjectExactCardinality>(property, 2, a);   
+
+    
+    ProbabilityOfFailure PoF(restriction, pdf_ptr, 1.);
+    BOOST_TEST_MESSAGE("Probability of Failure Conditional Value at t0 = 0, t1 = 0: " << PoF.getProbabilityOfFailureConditional(0., 0.));
+
 }
 
 BOOST_AUTO_TEST_CASE(metric_map_computation)

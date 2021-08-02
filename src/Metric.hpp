@@ -84,7 +84,7 @@ public:
      * \param required Required resources
      * \param available Available resources
      */
-    double computeSharedUse(const ModelPool& required, const ModelPool& available) const;
+    double computeSharedUse(const ModelPool& required, const ModelPool& available, double t0 = 0, double t1 = 0) const;
 
     /**
      * Compute the metric for a given set of functions (services)
@@ -99,7 +99,8 @@ public:
     /**
      * Compute metric based on the given list of cardinality restrictions
      */
-    virtual double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available) const { throw std::runtime_error("moreorg::metrics::Metric::compute: not implemented"); }
+    virtual double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
+                                 double t0 = 0, double t1 = 0) const { throw std::runtime_error("moreorg::metrics::Metric::compute: not implemented"); }
 
     /**
      * Compute the metric for a given list of single functions (services) that are

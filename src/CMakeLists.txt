@@ -80,6 +80,7 @@ rock_library(moreorg
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
         metrics/ProbabilityOfFailure.cpp
+        metrics/DistributionFunctions.cpp
         Metric.cpp
         ModelPool.cpp
         ModelPoolIterator.cpp
@@ -180,6 +181,7 @@ rock_library(moreorg
         utils/OrganizationStructureGeneration.hpp
         utils/GecodeUtils.hpp
         vocabularies/OM.hpp
+        vocabularies/OMBase.hpp
         vocabularies/Robot.hpp
         vocabularies/VRP.hpp
         ValueBound.hpp

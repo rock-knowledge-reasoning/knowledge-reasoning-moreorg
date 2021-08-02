@@ -4,7 +4,10 @@
 #include <base-logging/Logging.hpp>
 #include "../reasoning/ResourceMatch.hpp"
 #include "ModelSurvivability.hpp"
+#include "DistributionFunctions.hpp"
+#include "ProbabilityOfFailure.hpp"
 #include "../vocabularies/OM.hpp"
+#include "../vocabularies/OMBase.hpp"
 
 using namespace owlapi::model;
 using namespace owlapi::vocabulary;
@@ -13,11 +16,11 @@ namespace moreorg {
 namespace metrics {
 
 Redundancy::Redundancy(const OrganizationModelAsk& organization,
-        double defaultPoS,
+        const ProbabilityDensityFunction::Ptr& defaultPDF,
         const owlapi::model::IRI& objectProperty)
 
     : Metric(REDUNDANCY, organization, objectProperty)
-    , mDefaultProbabilityOfSurvival(defaultPoS)
+    , mDefaultProbabilityDensityFunction(defaultPDF)
 {}
 
 double Redundancy::computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const
@@ -54,7 +57,7 @@ double Redundancy::computeSequential(const std::vector<owlapi::model::IRISet>& f
     return serial(metrics);
 }
 
-double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Ptr>& required, const std::vector<OWLCardinalityRestriction::Ptr>& available) const
+double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Ptr>& required, const std::vector<OWLCardinalityRestriction::Ptr>& available, double t0, double t1) const
 {
     if(required.empty())
     {
@@ -134,7 +137,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
     //  Put all resources in that match
     //  iterate until no resources are left
 
-    std::vector<ModelSurvivability> models;
+    std::vector<ProbabilityOfFailure> models;
 
     for(const OWLCardinalityRestriction::Ptr& cRestriction : required)
     {
@@ -151,21 +154,20 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         // Mean probability of failure
         // Probability of component failure
         // default is p=0.5
-        double probabilityOfSurvival = 0;
+        ProbabilityDensityFunction::Ptr probabilityDensityFunction;
         try {
             // Model should have an associated probability of failure if not
             // failure of parent component which be used (see punning strategy // in owlapi)
-            OWLLiteral::Ptr value = mOrganizationModelAsk.ontology().getDataValue(qualification, vocabulary::OM::probabilityOfFailure());
-            LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
-            probabilityOfSurvival = 1 - value->getDouble();
+            probabilityDensityFunction = ProbabilityDensityFunction::getInstance(mOrganizationModelAsk, qualification);
+            
         } catch(...)
         {
-            LOG_DEBUG_S << "Using probability of failure for '" << qualification << ": 0.95";
-            probabilityOfSurvival = mDefaultProbabilityOfSurvival;
+            //LOG_DEBUG_S << "Using probability of failure for '" << qualification << ": 0.95";
+            probabilityDensityFunction = mDefaultProbabilityDensityFunction;
         }
 
         // TODO replace logic above to read distribution function + parameters from OM -> then init Distribution function and create PoF object
-        ModelSurvivability survivability(restriction, probabilityOfSurvival, fullModelRedundancy);
+        ProbabilityOfFailure survivability (restriction, probabilityDensityFunction, fullModelRedundancy);
         models.push_back(survivability);
     }
 
@@ -175,9 +177,9 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
     {
         updated = false;
         // Sort based on probability of survival -- try to maximize redundancy
-        std::sort(models.begin(), models.end(), [](const ModelSurvivability& a, const ModelSurvivability& b)
+        std::sort(models.begin(), models.end(), [&t0, &t1](const ProbabilityOfFailure& a, const ProbabilityOfFailure& b)
                 {
-                    return a.getProbabilityOfSurvival() < b.getProbabilityOfSurvival();
+                    return a.getProbabilityOfSurvivalConditional(t0, t1) < b.getProbabilityOfSurvivalConditional(t0, t1);
                 });
 
         ModelBound::List::iterator rit = modelBoundRemaining.begin();
@@ -187,7 +189,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
             bool hasPossibleMatch = false;
 
             // Try to fit remaining resources
-            for(ModelSurvivability& survivability : models)
+            for(ProbabilityOfFailure& survivability : models)
             {
                 // Check if model can be used to strengthen the survivability
                 if( survivability.getQualification() == remaining.model ||
@@ -217,10 +219,10 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
     // Serial model of all subcomponents --> the full system
     double fullModelSurvival = 1;
 
-    for(const ModelSurvivability& survivability : models)
+    for(const ProbabilityOfFailure& survivability : models)
     {
         LOG_INFO_S << "Probability of survival: " << survivability.toString();
-        fullModelSurvival *= survivability.getProbabilityOfSurvival();
+        fullModelSurvival *= survivability.getProbabilityOfSurvivalConditional(t0, t1);
     }
 
     return fullModelSurvival;

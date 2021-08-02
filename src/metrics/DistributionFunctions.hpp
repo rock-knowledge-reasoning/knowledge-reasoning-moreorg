@@ -3,17 +3,31 @@
 
 #include <math.h>
 #include <stdexcept>
+#include "../SharedPtr.hpp"
+#include "../OrganizationModelAsk.hpp"
 
 namespace moreorg {
 namespace metrics {
 
-class Weibull {
+class ProbabilityDensityFunction 
+{
+  public:
+    typedef shared_ptr<ProbabilityDensityFunction> Ptr;
+    virtual ~ProbabilityDensityFunction() = default;
+    virtual double getValue (double t = 0) const = 0;  
+    virtual double getConditional (double t0 = 0, double t1 = 0) const = 0;
+    static Ptr getInstance(const OrganizationModelAsk& organizationModelAsk, const owlapi::model::IRI& qualification);
+
+};
+
+class WeibullPDF : public ProbabilityDensityFunction
+{
   private:
     double a_;
     double b_;
 
     public:
-      Weibull(double a, double b)
+      WeibullPDF(double a, double b)
         {
           if (a >= 0 || b >= 0)
           {
@@ -24,64 +38,66 @@ class Weibull {
           
         } 
 
-      double getValue (double t = 0) const
+      double getValue (double t = 0) const override
       {
         if (t < 0) return 0;
         double value = 1 - exp(-1 * a_ * pow(t, b_));
         return value;
       }
 
-      double getDensity (double t0, double t1) const
+      double getConditional (double t0 = 0, double t1 = 0) const override
       {
         if (t1 >= t0 && t0 >= 0)
         {
-          double density = (1 - getValue(t1)) / (1 - getValue(t0)); // I'm not to sure if this is correct tbh
-          return density;
+          double conditional = (1 - getValue(t1)) / (1 - getValue(t0)); // I'm not to sure if this is correct tbh
+          return conditional;
         } else
         return 0.;
       }
 };
 
-class Exponential {
+class ExponentialPDF : public ProbabilityDensityFunction
+{
   private:
     double mFailureRate;
   public:
-    Exponential(double failureRate):
+    ExponentialPDF(double failureRate):
     mFailureRate(failureRate)
     {}
 
-    double getValue(double t) const
+    double getValue(double t = 0) const override
     {
       if (t < 0) return 0;
       double value = 1 - exp((-1. * mFailureRate * t));
       return value;
     }
 
-    double getDensity(double t0, double t1) const
+    double getConditional(double t0 = 0, double t1 = 0) const override
     {
       // not sure if this is the value im looking for
       if (t1 >= t0 && t0 >= 0)
       {
-        double density = (1 - getValue(t1)) / (1 - getValue(t0));
-        return density;
+        double conditional = (1 - getValue(t1)) / (1 - getValue(t0));
+        return conditional;
       } else return 0;
 
     }
 };
 
-class Const {
+class ConstantPDF : public ProbabilityDensityFunction
+{
   private:
     double mProbabilityOfFailure;
   public:
-  Const(double probabilityOfFailure):
+  ConstantPDF(double probabilityOfFailure):
   mProbabilityOfFailure(probabilityOfFailure)
   {}
-  double getValue(double t) const
+  double getValue(double t = 0) const override
   {
     if (t < 0) return 0;
     return mProbabilityOfFailure;
   }
-  double getDensity (double t0, double t1) const
+  double getConditional (double t0 = 0, double t1 = 0) const override
   {
     if (t1 >= t0 && t0 >= 0)
       {
