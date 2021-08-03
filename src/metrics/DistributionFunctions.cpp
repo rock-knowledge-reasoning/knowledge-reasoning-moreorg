@@ -34,6 +34,8 @@ namespace metrics {
         return make_shared<ExponentialPDF>(value->getDouble());
       }
     }
+
+    throw std::invalid_argument("moreorg::metrics::ProbabilityDensityFunction::getInstance no related probability density function instance was found!");
     
   }
 

@@ -243,6 +243,10 @@ BOOST_AUTO_TEST_CASE(probability_density_function)
   BOOST_REQUIRE_MESSAGE(pdf_ptr, "Probability Density Function has been created");
 
   BOOST_TEST_MESSAGE("Probability Density Value at t = 0: " << pdf_ptr->getValue());
+
+  ProbabilityDensityFunction::Ptr weibull_pdf_ptr = make_shared<WeibullPDF>(1.,1.);
+  BOOST_TEST_MESSAGE("Weibull Probability Density Value at t = 0: " << weibull_pdf_ptr->getValue());
+  BOOST_TEST_MESSAGE("Weibull Conditional Probability Value at t0 = 0, t1 = 0: " << weibull_pdf_ptr->getConditional());
 }
 
 BOOST_FIXTURE_TEST_CASE(probability_of_failure, RedundancyFixture)
@@ -257,7 +261,7 @@ BOOST_FIXTURE_TEST_CASE(probability_of_failure, RedundancyFixture)
     OrganizationModel::Ptr om = make_shared<OrganizationModel>(filename);
     OrganizationModelAsk ask(om, modelPool, true);
 
-    ProbabilityDensityFunction::Ptr pdf_ptr = make_shared<WeibullPDF>(1, 1);
+    ProbabilityDensityFunction::Ptr pdf_ptr = make_shared<WeibullPDF>(1., 1.);
     
     OWLObjectCardinalityRestriction::Ptr restriction = make_shared<OWLObjectExactCardinality>(property, 2, a);   
 

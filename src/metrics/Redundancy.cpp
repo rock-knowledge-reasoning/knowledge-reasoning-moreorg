@@ -159,10 +159,14 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
             // Model should have an associated probability of failure if not
             // failure of parent component which be used (see punning strategy // in owlapi)
             probabilityDensityFunction = ProbabilityDensityFunction::getInstance(mOrganizationModelAsk, qualification);
+            // if(!probabilityDensityFunction)
+            // {
+            //     throw std::invalid_argument("moreorg::metrics::Redundancy::computeMetrics probability density function was not set!");
+            // }
             
         } catch(...)
         {
-            //LOG_DEBUG_S << "Using probability of failure for '" << qualification << ": 0.95";
+            
             probabilityDensityFunction = mDefaultProbabilityDensityFunction;
         }
 

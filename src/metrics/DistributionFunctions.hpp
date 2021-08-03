@@ -40,7 +40,10 @@ class WeibullPDF : public ProbabilityDensityFunction
 
       double getValue (double t = 0) const override
       {
-        if (t < 0) return 0;
+        if (t < 0)
+        {
+            return 1.;
+        } 
         double value = 1 - exp(-1 * a_ * pow(t, b_));
         return value;
       }
@@ -49,10 +52,10 @@ class WeibullPDF : public ProbabilityDensityFunction
       {
         if (t1 >= t0 && t0 >= 0)
         {
-          double conditional = (1 - getValue(t1)) / (1 - getValue(t0)); // I'm not to sure if this is correct tbh
+          double conditional = 1 - ((1 - getValue(t1)) / (1 - getValue(t0))); // I'm not to sure if this is correct tbh
           return conditional;
         } else
-        return 0.;
+        return 1.;
       }
 };
 
