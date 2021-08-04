@@ -512,6 +512,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ActionPlanning">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ActionPlanning"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</om-base:resilience>
     </owl:NamedIndividual>
@@ -522,6 +523,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#AutonomousNavigation">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#AutonomousNavigation"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0"/>
     </owl:NamedIndividual>
     
 
@@ -530,6 +532,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Camera">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.01</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.8</om-base:resilience>
     </owl:NamedIndividual>
@@ -541,6 +544,7 @@
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#EmiActive">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive"/>
         <compatibleWith rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-base:resilience>
     </owl:NamedIndividual>
@@ -551,6 +555,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.2</om-base:resilience>
     </owl:NamedIndividual>
@@ -569,6 +574,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#ForceTorqueSensor">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#ForceTorqueSensor"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.01</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.8</om-base:resilience>
     </owl:NamedIndividual>
@@ -637,6 +643,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#LaserScanner">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#LaserScanner"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.01</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.8</om-base:resilience>
     </owl:NamedIndividual>
@@ -647,6 +654,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#LoadArea">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#LoadArea"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Constant_Hardware_unfailable"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.001</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.0</om-base:resilience>
     </owl:NamedIndividual>
@@ -665,6 +673,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Localization">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Localization"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">5.0</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.4</om-base:resilience>
     </owl:NamedIndividual>
@@ -683,6 +692,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Locomotion">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Locomotion"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</om-base:resilience>
     </owl:NamedIndividual>
@@ -701,6 +711,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Manipulation">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulation"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</om-base:resilience>
     </owl:NamedIndividual>
@@ -719,6 +730,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Manipulator">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulator"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.05</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.3</om-base:resilience>
     </owl:NamedIndividual>
@@ -729,6 +741,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Mapping">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Mapping"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.05</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</om-base:resilience>
     </owl:NamedIndividual>
@@ -748,6 +761,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.8</om-base:resilience>
     </owl:NamedIndividual>
@@ -763,6 +777,15 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Constant_Hardware_unfailable -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Constant_Hardware_unfailable">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ConstantPDF"/>
+        <om-base:p rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0E-4</om-base:p>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Exponential -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Exponential">
@@ -772,12 +795,22 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull -->
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0 -->
 
-    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull">
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#WeibullPDF"/>
-        <om-base:alpha rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-base:alpha>
         <om-base:beta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-base:beta>
+        <om-base:eta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">720000.0</om-base:eta>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#WeibullPDF"/>
+        <om-base:beta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-base:beta>
+        <om-base:eta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">18000.0</om-base:eta>
     </owl:NamedIndividual>
     
 
@@ -794,6 +827,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Planning">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Planning"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">1.0</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.9</om-base:resilience>
     </owl:NamedIndividual>
@@ -804,6 +838,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PowerSource">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Constant_Hardware_unfailable"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.001</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.01</om-base:resilience>
     </owl:NamedIndividual>
@@ -824,6 +859,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#SelfLocalization">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelfLocalization"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</om-base:resilience>
     </owl:NamedIndividual>
@@ -834,6 +870,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#SoilSampler">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SoilSampler"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</om-base:resilience>
     </owl:NamedIndividual>
@@ -860,6 +897,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#TaskPlanning">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#TaskPlanning"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Software_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.9</om-base:resilience>
     </owl:NamedIndividual>
@@ -870,6 +908,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#Trail">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Trail"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
         <om-base:failureRate rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.01</om-base:failureRate>
         <om-base:resilience rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.1</om-base:resilience>
     </owl:NamedIndividual>

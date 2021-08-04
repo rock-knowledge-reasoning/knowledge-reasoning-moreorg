@@ -180,6 +180,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT#SherpaTT_Camera_EndEffector">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -188,6 +189,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT#SherpaTT_Camera_Front">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -196,6 +198,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT#SherpaTT_EmiActive_Bottom">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -204,6 +207,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT#SherpaTT_EmiActive_Manipulator">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -212,6 +216,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT#SherpaTT_EmiPassive_East">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -220,6 +225,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT#SherpaTT_EmiPassive_North">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -228,6 +234,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT#SherpaTT_EmiPassive_South">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -236,6 +243,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT#SherpaTT_EmiPassive_West">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -244,6 +252,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT#SherpaTT_Manipulator">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Manipulator"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -252,6 +261,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/SherpaTT#SherpaTT_PowerSource">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 

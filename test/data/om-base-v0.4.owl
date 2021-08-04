@@ -29,17 +29,17 @@
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-base#alpha -->
+    <!-- http://www.rock-robotics.org/2014/01/om-base#beta -->
 
-    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#alpha">
+    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#beta">
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#hasParameter"/>
     </owl:AnnotationProperty>
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-base#beta -->
+    <!-- http://www.rock-robotics.org/2014/01/om-base#eta -->
 
-    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#beta">
+    <owl:AnnotationProperty rdf:about="http://www.rock-robotics.org/2014/01/om-base#eta">
         <rdfs:subPropertyOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#hasParameter"/>
     </owl:AnnotationProperty>
     

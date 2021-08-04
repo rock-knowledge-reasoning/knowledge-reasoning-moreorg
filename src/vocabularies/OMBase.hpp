@@ -17,7 +17,7 @@ public:
     VOCABULARY_ADD_WORD(WeibullPDF);
     VOCABULARY_ADD_WORD(ExponentialPDF);
     VOCABULARY_ADD_WORD(p);
-    VOCABULARY_ADD_WORD(alpha);
+    VOCABULARY_ADD_WORD(eta);
     VOCABULARY_ADD_WORD(beta);
     VOCABULARY_ADD_WORD(lambda);
 };

@@ -33,7 +33,7 @@ public:
      * Default probability of survival
      */
     Redundancy(const OrganizationModelAsk& organization,
-        const ProbabilityDensityFunction::Ptr& defaultPDF = make_shared<WeibullPDF>(1., 1.),
+        const ProbabilityDensityFunction::Ptr& defaultPDF = make_shared<WeibullPDF>(36000., 1.), // 36000s = 10h
         const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
 
 

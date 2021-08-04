@@ -8,7 +8,8 @@
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:robots="http://www.rock-robotics.org/2015/12/robots#"
      xmlns:om-base="http://www.rock-robotics.org/2014/01/om-base#"
-     xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#">
+     xmlns:om-schema="http://www.rock-robotics.org/2014/01/om-schema#"
+     xmlns:om-schemae="http://www.rock-robotics.org/2014/01/om-schemae#">
     <owl:Ontology rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload">
         <owl:imports rdf:resource="http://www.rock-robotics.org/2014/01/om-schema"/>
         <rdfs:comment>* 0.2
@@ -195,6 +196,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadBattery_PowerSource">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Constant_Hardware_unfailable"/>
     </owl:NamedIndividual>
     
 
@@ -203,6 +205,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadCamera_Camera">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -211,6 +214,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#PayloadSoilSampler_SoilSampler">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SoilSampler"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -219,6 +223,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#Payload_EmiActive">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiActive"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -227,6 +232,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Payload#Payload_EmiPassive">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 

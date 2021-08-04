@@ -19,12 +19,12 @@ namespace metrics {
       }
       if (organizationModelAsk.ontology().isInstanceOf(iri, vocabulary::OMBase::WeibullPDF()))
       {
-        OWLAnnotationValue::Ptr annotationValue_alpha = organizationModelAsk.ontology().getAnnotationValue(iriList.front(), vocabulary::OMBase::alpha());
+        OWLAnnotationValue::Ptr annotationValue_eta = organizationModelAsk.ontology().getAnnotationValue(iriList.front(), vocabulary::OMBase::eta());
         OWLAnnotationValue::Ptr annotationValue_beta = organizationModelAsk.ontology().getAnnotationValue(iriList.front(), vocabulary::OMBase::beta());
-        OWLLiteral::Ptr value_alpha = annotationValue_alpha->asLiteral();
+        OWLLiteral::Ptr value_eta = annotationValue_eta->asLiteral();
         OWLLiteral::Ptr value_beta = annotationValue_beta->asLiteral();
         // LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
-        return make_shared<WeibullPDF>(value_alpha->getDouble(), value_beta->getDouble());
+        return make_shared<WeibullPDF>(value_eta->getDouble(), value_beta->getDouble());
       }
       if (organizationModelAsk.ontology().isInstanceOf(iri, vocabulary::OMBase::ExponentialPDF()))
       {
