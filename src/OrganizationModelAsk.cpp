@@ -12,6 +12,8 @@
 #include "algebra/Connectivity.hpp"
 #include "PropertyConstraintSolver.hpp"
 #include "utils/OrganizationStructureGeneration.hpp"
+#include <unordered_map>
+#include <fstream>
 
 
 using namespace owlapi::model;
@@ -162,12 +164,36 @@ FunctionalityMapping OrganizationModelAsk::computeFunctionalityMapping(const Mod
         throw std::runtime_error("moreorg::OrganizationModelAsk::computeFunctionalityMapping: available functionalities empty");
     }
 
+    FunctionalityMapping functionalityMapping;
+
+    size_t hashPool = std::hash<std::string>{}(modelPool.toString(0));
+    std::stringstream ss;
+    ss << "/tmp/moreorg-om-cache-" << hashPool;
     if(applyFunctionalSaturationBound)
     {
-        return computeBoundedFunctionalityMapping(modelPool, functionalityModels);
-    } else {
-        return computeUnboundedFunctionalityMapping(modelPool, functionalityModels);
+        ss << "-with-sat-bound";
     }
+    std::string cacheFilename = ss.str();
+
+    std::ifstream cacheFile(cacheFilename);
+    if(cacheFile.is_open())
+    {
+        cacheFile.close();
+
+        functionalityMapping = FunctionalityMapping::fromFile(cacheFilename);
+        return functionalityMapping;
+    }
+
+    if(applyFunctionalSaturationBound)
+    {
+        functionalityMapping = computeBoundedFunctionalityMapping(modelPool, functionalityModels);
+    } else {
+        functionalityMapping = computeUnboundedFunctionalityMapping(modelPool, functionalityModels);
+    }
+
+    functionalityMapping.save(cacheFilename);
+
+    return functionalityMapping;
 }
 
 FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(const ModelPool& modelPool, const IRIList& functionalityModels) const

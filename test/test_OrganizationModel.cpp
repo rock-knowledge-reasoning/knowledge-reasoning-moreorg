@@ -59,6 +59,13 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
 
     FunctionalityMapping fm = ask.computeFunctionalityMapping(items, true);
     BOOST_TEST_MESSAGE("FunctionalityMapping " << fm.toString());
+
+    fm.save("/tmp/test-moreorg-functionality-mapping");
+    FunctionalityMapping fmLoaded = FunctionalityMapping::fromFile("/tmp/test-moreorg-functionality-mapping");
+
+    BOOST_REQUIRE_MESSAGE(fmLoaded.getModelPool() == items, "Loaded model has all resources" << fmLoaded.toString());
+    BOOST_REQUIRE_MESSAGE(fmLoaded.getFunctionalSaturationBound().at(OM::resolve("BaseCamp"))
+            == 1, "Saturation bound loaded" << fmLoaded.toString());
 }
 
 BOOST_AUTO_TEST_CASE(resource_support)
