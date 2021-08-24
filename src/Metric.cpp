@@ -86,7 +86,16 @@ double Metric::computeSharedUse(const ModelPool& required, const ModelPool& avai
     std::vector<OWLCardinalityRestriction::Ptr> r_required =
         mOrganizationModelAsk.getRequiredCardinalities(required, mProperty);
 
-    return computeMetric(r_required, r_available, t0, t1);
+    try
+    {
+        double value = computeMetric(r_required, r_available, t0, t1);
+        return value;
+    }
+    catch(const std::exception& e)
+    {
+        throw std::invalid_argument("moreorg::Metric::computeSharedUse: could not compute metric. Maybe no requirements were found?");
+    }
+    
 
 }
 
