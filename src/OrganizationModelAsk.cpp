@@ -12,6 +12,8 @@
 #include "algebra/Connectivity.hpp"
 #include "PropertyConstraintSolver.hpp"
 #include "utils/OrganizationStructureGeneration.hpp"
+#include <unordered_map>
+#include <fstream>
 
 
 using namespace owlapi::model;
@@ -162,12 +164,36 @@ FunctionalityMapping OrganizationModelAsk::computeFunctionalityMapping(const Mod
         throw std::runtime_error("moreorg::OrganizationModelAsk::computeFunctionalityMapping: available functionalities empty");
     }
 
+    FunctionalityMapping functionalityMapping;
+
+    size_t hashPool = std::hash<std::string>{}(modelPool.toString(0));
+    std::stringstream ss;
+    ss << "/tmp/moreorg-om-cache-" << hashPool;
     if(applyFunctionalSaturationBound)
     {
-        return computeBoundedFunctionalityMapping(modelPool, functionalityModels);
-    } else {
-        return computeUnboundedFunctionalityMapping(modelPool, functionalityModels);
+        ss << "-with-sat-bound";
     }
+    std::string cacheFilename = ss.str();
+
+    std::ifstream cacheFile(cacheFilename);
+    if(cacheFile.is_open())
+    {
+        cacheFile.close();
+
+        functionalityMapping = FunctionalityMapping::fromFile(cacheFilename);
+        return functionalityMapping;
+    }
+
+    if(applyFunctionalSaturationBound)
+    {
+        functionalityMapping = computeBoundedFunctionalityMapping(modelPool, functionalityModels);
+    } else {
+        functionalityMapping = computeUnboundedFunctionalityMapping(modelPool, functionalityModels);
+    }
+
+    functionalityMapping.save(cacheFilename);
+
+    return functionalityMapping;
 }
 
 FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(const ModelPool& modelPool, const IRIList& functionalityModels) const
@@ -462,7 +488,24 @@ std::vector<OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getRequiredCar
         const ModelPool& modelPool,
         const owlapi::model::IRI& objectProperty) const
 {
-    std::vector<OWLCardinalityRestriction::Ptr> required = getCardinalityRestrictions(modelPool, objectProperty, OWLCardinalityRestriction::SUM_OP);
+    ModelPool agents;
+    ModelPool functionalities;
+    for(const ModelPool::value_type& m : modelPool)
+    {
+        if(ontology().isSubClassOf(m.first, vocabulary::OM::Agent()))
+        {
+            agents[m.first] = m.second;
+        } else if(ontology().isSubClassOf(m.first, vocabulary::OM::Functionality()))
+        {
+            agents[m.first] = m.second;
+        }
+    }
+
+    std::vector<OWLCardinalityRestriction::Ptr> f_required = getCardinalityRestrictions(functionalities, objectProperty, OWLCardinalityRestriction::SUM_OP);
+    std::vector<OWLCardinalityRestriction::Ptr> r_required = getCardinalityRestrictions(agents, objectProperty, OWLCardinalityRestriction::SUM_OP, true);
+
+    std::vector<OWLCardinalityRestriction::Ptr> required = OWLCardinalityRestrictionOps::join(f_required, r_required, OWLCardinalityRestriction::MIN_OP);
+
     required.erase( std::remove_if(required.begin(), required.end(), [](const OWLCardinalityRestriction::Ptr& elem)
             {
                 return elem->getCardinalityRestrictionType() == OWLObjectCardinalityRestriction::MAX;
@@ -475,7 +518,12 @@ std::vector<OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getAvailableCa
         const ModelPool& modelPool,
         const owlapi::model::IRI& objectProperty) const
 {
-    std::vector<OWLCardinalityRestriction::Ptr> available = getCardinalityRestrictions(modelPool, objectProperty, OWLCardinalityRestriction::SUM_OP);
+    // available cardinalities can only be computed for agents
+    ModelPool availableAgents = allowSubclasses(modelPool, vocabulary::OM::Actor());
+
+    std::vector<OWLCardinalityRestriction::Ptr> available =
+        getCardinalityRestrictions(availableAgents, objectProperty,
+                OWLCardinalityRestriction::SUM_OP);
     available.erase( std::remove_if(available.begin(), available.end(), [](const OWLCardinalityRestriction::Ptr& elem)
             {
                 return elem->getCardinalityRestrictionType() == OWLObjectCardinalityRestriction::MIN;

@@ -700,5 +700,22 @@ BOOST_AUTO_TEST_CASE(robotpool)
     }
 }
 
+BOOST_AUTO_TEST_CASE(cardinality_restrictions)
+{
+    owlapi::model::IRI iri("http://www.rock-robotics.org/2015/12/projects/TransTerrA");
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(iri);
+
+    ModelPool pool;
+    pool[OM::resolve("Payload")] = 1;
+    OrganizationModelAsk ask(om, pool, true);
+
+    std::vector<OWLCardinalityRestriction::Ptr> r_required =
+        ask.getRequiredCardinalities(pool, OM::resolve("has"));
+
+    BOOST_REQUIRE_MESSAGE(!r_required.empty(), "Payload has restrictions" <<
+            OWLCardinalityRestriction::toString(r_required));
+
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

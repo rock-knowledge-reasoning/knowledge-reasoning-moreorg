@@ -115,13 +115,22 @@ public:
      */
     std::string toString(uint32_t indent = 0) const;
 
-
     /**
      * Compute the list of supported functionalities, i.e.
      * when at least some combination of models supports this functionality
      * \return list of supported functionalities
      */
     owlapi::model::IRISet getSupportedFunctionalities() const { return mSupportedFunctionalities; }
+
+    /**
+     * Save the current functionality mapping to a file with given name
+     */
+    void save(const std::string& filename) const;
+
+    /**
+     * Load the functionality mapping from a file with given name
+     */
+    static FunctionalityMapping fromFile(const std::string& filename);
 };
 
 } // end namespace moreorg
