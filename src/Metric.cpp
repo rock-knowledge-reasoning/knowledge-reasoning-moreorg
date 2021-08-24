@@ -79,10 +79,8 @@ double Metric::computeSharedUse(const ModelPool& required, const ModelPool& avai
 {
     using namespace owlapi::model;
 
-    ModelPool availableAgents = mOrganizationModelAsk.allowSubclasses(available, vocabulary::OM::Actor());
-
     std::vector<OWLCardinalityRestriction::Ptr> r_available =
-        mOrganizationModelAsk.getAvailableCardinalities(availableAgents, mProperty);
+        mOrganizationModelAsk.getAvailableCardinalities(available, mProperty);
     std::vector<OWLCardinalityRestriction::Ptr> r_required =
         mOrganizationModelAsk.getRequiredCardinalities(required, mProperty);
 

@@ -488,7 +488,24 @@ std::vector<OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getRequiredCar
         const ModelPool& modelPool,
         const owlapi::model::IRI& objectProperty) const
 {
-    std::vector<OWLCardinalityRestriction::Ptr> required = getCardinalityRestrictions(modelPool, objectProperty, OWLCardinalityRestriction::SUM_OP);
+    ModelPool agents;
+    ModelPool functionalities;
+    for(const ModelPool::value_type& m : modelPool)
+    {
+        if(ontology().isSubClassOf(m.first, vocabulary::OM::Agent()))
+        {
+            agents[m.first] = m.second;
+        } else if(ontology().isSubClassOf(m.first, vocabulary::OM::Functionality()))
+        {
+            agents[m.first] = m.second;
+        }
+    }
+
+    std::vector<OWLCardinalityRestriction::Ptr> f_required = getCardinalityRestrictions(functionalities, objectProperty, OWLCardinalityRestriction::SUM_OP);
+    std::vector<OWLCardinalityRestriction::Ptr> r_required = getCardinalityRestrictions(agents, objectProperty, OWLCardinalityRestriction::SUM_OP, true);
+
+    std::vector<OWLCardinalityRestriction::Ptr> required = OWLCardinalityRestrictionOps::join(f_required, r_required, OWLCardinalityRestriction::MIN_OP);
+
     required.erase( std::remove_if(required.begin(), required.end(), [](const OWLCardinalityRestriction::Ptr& elem)
             {
                 return elem->getCardinalityRestrictionType() == OWLObjectCardinalityRestriction::MAX;
@@ -501,7 +518,12 @@ std::vector<OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getAvailableCa
         const ModelPool& modelPool,
         const owlapi::model::IRI& objectProperty) const
 {
-    std::vector<OWLCardinalityRestriction::Ptr> available = getCardinalityRestrictions(modelPool, objectProperty, OWLCardinalityRestriction::SUM_OP);
+    // available cardinalities can only be computed for agents
+    ModelPool availableAgents = allowSubclasses(modelPool, vocabulary::OM::Actor());
+
+    std::vector<OWLCardinalityRestriction::Ptr> available =
+        getCardinalityRestrictions(availableAgents, objectProperty,
+                OWLCardinalityRestriction::SUM_OP);
     available.erase( std::remove_if(available.begin(), available.end(), [](const OWLCardinalityRestriction::Ptr& elem)
             {
                 return elem->getCardinalityRestrictionType() == OWLObjectCardinalityRestriction::MIN;
