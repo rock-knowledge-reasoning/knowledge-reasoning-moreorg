@@ -22,7 +22,7 @@ double ProbabilityOfFailure::getProbabilityOfFailure(double time) const
 {
     double pos = 1 - mModelProbabilityOfFailureDistribution->getValue(time);
     double pSerialSystem = pow(pos, getCardinality());
-    return pow(1-pSerialSystem, mRedundancy);
+    return 1 - pSerialSystem;
 }
 
 
@@ -35,12 +35,42 @@ double ProbabilityOfFailure::getProbabilityOfFailureConditional(double time_star
 {
     double pos = 1 - mModelProbabilityOfFailureDistribution->getConditional(time_start, time_end);
     double pSerialSystem = pow(pos, getCardinality());
-    return pow(1-pSerialSystem, mRedundancy);
+    return 1 - pSerialSystem;
 }
 
 double ProbabilityOfFailure::getProbabilityOfSurvivalConditional(double time_start, double time_end) const
 {
     return 1 - getProbabilityOfFailureConditional(time_start, time_end);
+}
+
+double ProbabilityOfFailure::getProbabilityOfFailureWithRedundancy(double time) const
+{
+    double pos = 1 - mModelProbabilityOfFailureDistribution->getValue(time);
+    double pSerialSystem = pow(pos, getCardinality());
+    return pow(1-pSerialSystem, mRedundancy);
+}
+
+
+double ProbabilityOfFailure::getProbabilityOfSurvivalWithRedundancy(double time) const
+{
+    return 1 - getProbabilityOfFailureWithRedundancy(time);
+}
+
+double ProbabilityOfFailure::getProbabilityOfFailureConditionalWithRedundancy(double time_start, double time_end) const
+{
+    double pos = 1 - mModelProbabilityOfFailureDistribution->getConditional(time_start, time_end);
+    double pSerialSystem = pow(pos, getCardinality());
+    return pow(1-pSerialSystem, mRedundancy);
+}
+
+double ProbabilityOfFailure::getProbabilityOfSurvivalConditionalWithRedundancy(double time_start, double time_end) const
+{
+    return 1 - getProbabilityOfFailureConditionalWithRedundancy(time_start, time_end);
+}
+
+ProbabilityDensityFunction::Ptr ProbabilityOfFailure::getProbabilityDensityFunction() const
+{
+    return mModelProbabilityOfFailureDistribution;
 }
 
 owlapi::model::IRI ProbabilityOfFailure::getQualification() const
@@ -59,7 +89,7 @@ std::string ProbabilityOfFailure::toString() const
     ss << " ProbabilityOfFailure: " << std::endl;
     ss << "    modelProbability:      " << mModelProbabilityOfFailureDistribution->getValue() << std::endl;
     ss << "    redundancy:            " << mRedundancy << std::endl;
-    ss << "    probabilityOfFailure: " << getProbabilityOfFailure() << std::endl;
+    ss << "    probabilityOfFailure: " << getProbabilityOfFailureWithRedundancy(() << std::endl;
     ss << "  > " << mObjectRestriction->toString();
     return ss.str();
 }

@@ -6,6 +6,7 @@
 #include "ModelPool.hpp"
 #include "OrganizationModelAsk.hpp"
 #include "vocabularies/OM.hpp"
+#include <random>
 
 namespace moreorg {
 
@@ -103,6 +104,13 @@ public:
                                  double t0 = 0, double t1 = 0) const { throw std::runtime_error("moreorg::metrics::Metric::compute: not implemented"); }
 
     /**
+     * Get list of Metrics to be able to check whether the corresponding component(s) survive or not or handle metric value calculations elsewhere
+     */
+
+    virtual std::vector<ProbabilityDensityFunction> getSharedUseMetricModelsList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
+                                 double t0 = 0, double t1 = 0) { throw std::runtime_error("moreorg::metrics::Metric::compute: not implemented"); } const 
+
+    /**
      * Compute the metric for a given list of single functions (services) that are
      * used sequentially and a model pool describing a composite actor that has
      * to provide this functions
@@ -133,7 +141,6 @@ protected:
     OrganizationModelAsk mOrganizationModelAsk;
     metrics::Type mType;
     owlapi::model::IRI mProperty;
-
     static std::map<metrics::Type, Metric::Ptr> msMetrics;
 };
 

@@ -21,7 +21,8 @@ Redundancy::Redundancy(const OrganizationModelAsk& organization,
 
     : Metric(REDUNDANCY, organization, objectProperty)
     , mDefaultProbabilityDensityFunction(defaultPDF)
-{}
+{
+}
 
 double Redundancy::computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const
 {
@@ -183,7 +184,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
         // Sort based on probability of survival -- try to maximize redundancy
         std::sort(models.begin(), models.end(), [&t0, &t1](const ProbabilityOfFailure& a, const ProbabilityOfFailure& b)
                 {
-                    return a.getProbabilityOfSurvivalConditional(t0, t1) < b.getProbabilityOfSurvivalConditional(t0, t1);
+                    return a.getProbabilityOfSurvivalConditionalWithRedundancy(t0, t1) < b.getProbabilityOfSurvivalConditionalWithRedundancy(t0, t1);
                 });
 
         ModelBound::List::iterator rit = modelBoundRemaining.begin();
@@ -226,10 +227,158 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
     for(const ProbabilityOfFailure& survivability : models)
     {
         LOG_INFO_S << "Probability of survival: " << survivability.toString();
-        fullModelSurvival *= survivability.getProbabilityOfSurvivalConditional(t0, t1);
+        fullModelSurvival *= survivability.getProbabilityOfSurvivalConditionalWithRedundancy(t0, t1);
     }
 
     return fullModelSurvival;
+}
+
+std::vector<ProbabilityDensityFunction> Redundancy::getSharedUseMetricModelsList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
+                                 double t0 = 0, double t1 = 0) const
+{
+    if(required.empty())
+    {
+        throw std::invalid_argument("moreorg::metrics::Redundancy: set of cardinality restriction to define requirements is empty");
+    }
+
+    using namespace moreorg::reasoning;
+
+    ModelBound::List modelBoundRemaining = ResourceMatch::toModelBoundList(available);
+    ModelBound::List modelBoundRequired = ResourceMatch::toModelBoundList(required);
+
+    if(!ResourceMatch::hasMinRequirements( modelBoundRequired ) )
+    {
+        throw std::invalid_argument("moreorg::metrics::Redundancy: model bound requires minimum requirements"
+                "to complete redundancy computation, but none are provided");
+    }
+
+    LOG_DEBUG_S
+        << "Available: " << ModelBound::toString(modelBoundRemaining)
+        << std::endl
+        << "Required: " << ModelBound::toString(modelBoundRequired);
+
+    ResourceMatch::Solution solution;
+    uint32_t fullModelRedundancy = 0;
+    try {
+
+        // Check how often a full redundancy of the top level model is given
+        while(true)
+        {
+            solution = ResourceMatch::solve(modelBoundRequired, modelBoundRemaining, mOrganizationModelAsk);
+            ++fullModelRedundancy;
+            // Remove the consumed models from the list of available and try to
+            // repeat solving
+            // throws invalid_argument when model bounds are exceeded
+            modelBoundRemaining = solution.substractMinFrom(modelBoundRemaining);
+            LOG_DEBUG_S
+                << "Solution: " << solution.toString()
+                << std::endl
+                << "Remaining: " << ModelBound::toString(modelBoundRemaining);
+        }
+    } catch(const std::exception& e)
+    {
+        LOG_DEBUG_S << "ResourceMatch failed: " << e.what();
+    }
+
+    LOG_INFO_S << "Full model redundancy count is at: " << fullModelRedundancy << std::endl
+        << "   remaining: " << ModelBound::toString(modelBoundRemaining, 8);
+
+    if(fullModelRedundancy == 0)
+    {
+        LOG_WARN_S << "Redundancy: the minimal resource requirements have not been fulfilled. Redundancy cannot be computed"
+            << "available: " << ModelBound::toString(modelBoundRemaining,4)
+            << "required: " << ModelBound::toString(modelBoundRequired, 4);
+        throw std::runtime_error("owlapi::metrics::Redundancy: minimal resource requirement have not been fulfilled");
+    }
+
+    //  Find weakest spot in the model
+    //  Put all resources in that match
+    //  iterate until no resources are left
+
+    std::vector<ProbabilityOfFailure> models;
+
+    for(const OWLCardinalityRestriction::Ptr& cRestriction : required)
+    {
+        OWLObjectCardinalityRestriction::Ptr restriction =
+            dynamic_pointer_cast<OWLObjectCardinalityRestriction>(cRestriction);
+        if(!restriction)
+        {
+            throw
+                std::runtime_error("moreorg::metrics::Redundancy::computeSequential:"
+                        " expected OWLObjectCardinalityRestriction");
+        }
+        IRI qualification = restriction->getQualification();
+
+        // Mean probability of failure
+        // Probability of component failure
+        // default is p=0.5
+        ProbabilityDensityFunction::Ptr probabilityDensityFunction;
+        try {
+            // Model should have an associated probability of failure if not
+            // failure of parent component which be used (see punning strategy // in owlapi)
+            probabilityDensityFunction = ProbabilityDensityFunction::getInstance(mOrganizationModelAsk, qualification);
+            // if(!probabilityDensityFunction)
+            // {
+            //     throw std::invalid_argument("moreorg::metrics::Redundancy::computeMetrics probability density function was not set!");
+            // }
+            
+        } catch(...)
+        {            
+            probabilityDensityFunction = mDefaultProbabilityDensityFunction;
+        }
+
+        // TODO replace logic above to read distribution function + parameters from OM -> then init Distribution function and create PoF object
+        ProbabilityOfFailure survivability (restriction, probabilityDensityFunction, fullModelRedundancy);
+        models.push_back(survivability);
+    }
+
+    // Best model fit: redundancy
+    bool updated = false;
+    do
+    {
+        updated = false;
+        // Sort based on probability of survival -- try to maximize redundancy
+        std::sort(models.begin(), models.end(), [&t0, &t1](const ProbabilityOfFailure& a, const ProbabilityOfFailure& b)
+                {
+                    return a.getProbabilityOfSurvivalConditionalWithRedundancy(t0, t1) < b.getProbabilityOfSurvivalConditionalWithRedundancy(t0, t1);
+                });
+
+        ModelBound::List::iterator rit = modelBoundRemaining.begin();
+        for(; rit != modelBoundRemaining.end();++rit)
+        {
+            ModelBound& remaining = *rit;
+            bool hasPossibleMatch = false;
+
+            // Try to fit remaining resources
+            for(ProbabilityOfFailure& survivability : models)
+            {
+                // Check if model can be used to strengthen the survivability
+                if( survivability.getQualification() == remaining.model ||
+                        mOrganizationModelAsk.ontology().isSubClassOf(remaining.model, survivability.getQualification()) )
+                {
+                    hasPossibleMatch = true;
+                    try {
+                        remaining.decrement();
+                        survivability.increment();
+                        updated = true;
+                    } catch(...)
+                    {
+                        modelBoundRemaining.erase(rit);
+                        --rit;
+                        break;
+                    }
+                }
+            }
+            if(!hasPossibleMatch)
+            {
+                modelBoundRemaining.erase(rit);
+                --rit;
+            }
+        }
+    } while(updated);
+
+    return models;
+
 }
 
 double Redundancy::parallel(const std::vector<double>& probabilities)

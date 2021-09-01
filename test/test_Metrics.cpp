@@ -267,7 +267,7 @@ BOOST_FIXTURE_TEST_CASE(probability_of_failure, RedundancyFixture)
 
     
     ProbabilityOfFailure PoF(restriction, pdf_ptr, 1.);
-    BOOST_TEST_MESSAGE("Probability of Failure Conditional Value at t0 = 0, t1 = 0: " << PoF.getProbabilityOfFailureConditional(0., 0.));
+    BOOST_TEST_MESSAGE("Probability of Failure Conditional Value at t0 = 0, t1 = 0: " << PoF.getProbabilityOfFailureConditionalWithRedundancy(0., 0.));
 
 }
 

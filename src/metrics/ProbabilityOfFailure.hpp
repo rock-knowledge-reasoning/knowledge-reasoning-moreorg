@@ -49,6 +49,10 @@ public:
     double getProbabilityOfSurvival(double time = 0) const;
     double getProbabilityOfFailureConditional(double time_start, double time_end) const;
     double getProbabilityOfSurvivalConditional(double time_start, double time_end) const;
+    double getProbabilityOfFailureWithRedundancy((double time = 0) const;
+    double getProbabilityOfSurvivalWithRedundancy(double time = 0) const;
+    double getProbabilityOfFailureConditionalWithRedundancy(double time_start, double time_end) const;
+    double getProbabilityOfSurvivalConditionalWithRedundancy(double time_start, double time_end) const;
 
     /**
      * Get the qualification, i.e. the model name
@@ -62,6 +66,8 @@ public:
      * \return cardinality of the restriction
      */
     uint32_t getCardinality() const;
+
+    ProbabilityDensityFunction::Ptr getProbabilityDensityFunction() const;
 
     /**
      * Increment the redundancy based on addition a single resource of the same
