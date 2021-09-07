@@ -12,6 +12,9 @@
 #include "algebra/Connectivity.hpp"
 #include "PropertyConstraintSolver.hpp"
 #include "utils/OrganizationStructureGeneration.hpp"
+#include "Agent.hpp"
+#include "Resource.hpp"
+#include "ResourceInstance.hpp"
 #include <unordered_map>
 #include <fstream>
 
@@ -622,6 +625,61 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
             allAvailableResources);
 
     return allAvailableResources;
+}
+
+ResourceInstance::List OrganizationModelAsk::getRelated(const Agent& agent,
+        const owlapi::model::IRI& qualification,
+        const owlapi::model::IRI& objectProperty) const
+{
+    ResourceInstance::List allRelatedInstances;
+    for(const AtomicAgent& aa : agent.getAtomicAgents())
+    {
+        const IRI& modelName = aa.getModel();
+
+        ResourceInstance::PtrList agentRelatedResources = getRelated(modelName, qualification, objectProperty);
+        for(const ResourceInstance::Ptr resourceInstance : agentRelatedResources)
+        {
+            ResourceInstance r(*resourceInstance.get());
+            r.setAtomicAgent(aa);
+            allRelatedInstances.push_back(r);
+        }
+    }
+    return allRelatedInstances;
+}
+
+ResourceInstance::PtrList OrganizationModelAsk::getRelated(const owlapi::model::IRI& model,
+        const owlapi::model::IRI& qualification,
+        const owlapi::model::IRI& objectProperty) const
+{
+    std::map<IRI, ResourceInstance::PtrList>::const_iterator cit = mRelatedResourceCache.find(model);
+    if(mRelatedResourceCache.end() != cit)
+    {
+        return cit->second;
+    }
+
+    ResourceInstance::PtrList resourceInstances;
+    IRIList relatedInstances = mOntologyAsk.allRelatedInstances(model, objectProperty, qualification);
+    for(const IRI& relatedInstance : relatedInstances)
+    {
+        bool direct = true;
+        IRIList relatedInstanceModels = mOntologyAsk.allTypesOf(relatedInstance, direct);
+        ResourceInstance::Ptr r = make_shared<ResourceInstance>(relatedInstance,
+                relatedInstanceModels.front());
+        resourceInstances.push_back(r);
+    }
+
+    IRIList types = mOntologyAsk.allTypesOf(model);
+    for(const IRI& type : types)
+    {
+        if(mOntologyAsk.isSubClassOf(type, vocabulary::OM::Functionality()))
+        {
+            ResourceInstance::Ptr r = make_shared<ResourceInstance>(type, type);
+            resourceInstances.push_back(r);
+        }
+    }
+
+    mRelatedResourceCache[model] = resourceInstances;
+    return resourceInstances;
 }
 
 ModelPool::Set OrganizationModelAsk::filterNonMinimal(const ModelPool::Set& modelPoolSet, const Resource::Set& functionalities) const
@@ -1425,4 +1483,6 @@ std::map< owlapi::model::IRI, std::map<owlapi::model::IRI, double> > Organizatio
     }
     return propertyValues;
 }
+
+
 } // end namespace moreorg
