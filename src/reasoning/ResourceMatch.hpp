@@ -121,6 +121,10 @@ public:
          * the given model
          */
         void setAssignments(const ModelBound& model, const ModelBound::List& assignments) { mAssignments[model] = assignments; }
+        /**
+         * get complete AssignmentsMap
+         */
+        std::map<ModelBound, ModelBound::List> getAssignmentsMap() const {return mAssignments;}
 
         /**
          * Add the assignment to existing assignements of resources to fulfill the requirement

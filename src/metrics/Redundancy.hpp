@@ -5,6 +5,8 @@
 #include <moreorg/Metric.hpp>
 #include "../vocabularies/OM.hpp"
 #include "DistributionFunctions.hpp"
+#include "ProbabilityOfFailure.hpp"
+#include <map>
 
 namespace moreorg {
 namespace metrics {
@@ -42,6 +44,9 @@ public:
 
     double computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const;
     double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ModelPool& modelPool, bool sharedUse = true) const;
+
+    ProbabilityOfFailure::List getSharedUseMetricModelsList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
+                                 double t0 = 0, double t1 = 0) const;
 
     /**
      * Compute survivability a parallel system

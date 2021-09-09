@@ -2,9 +2,11 @@
 #define ORGANIZATION_MODEL_METRICS_PROBABILITY_OF_FAILURE_HPP
 
 #include <owlapi/OWLApi.hpp>
+#include <owlapi/model/IRI.hpp>
 #include <random>
 #include <cmath>
 #include "DistributionFunctions.hpp"
+#include "../reasoning/ModelBound.hpp"
 
 namespace moreorg {
 namespace metrics {
@@ -22,6 +24,7 @@ namespace metrics {
 class ProbabilityOfFailure
 {
 public:
+    typedef std::vector<ProbabilityOfFailure> List; 
     /**
      * Constructor for the ProbabilityOfFailure of a single resource type
      * \param restriction Defines the requirement for a single resource type
@@ -33,11 +36,16 @@ public:
      * information about the overall redundancy, e.g., if 4 cameras are
      * available, we assume a redundancy of 2
      */
-    
     ProbabilityOfFailure(
             const owlapi::model::OWLObjectCardinalityRestriction::Ptr& restriction,
             const ProbabilityDensityFunction::Ptr& resourcePoFDistribution,
             double redundancy
+    );
+    ProbabilityOfFailure(
+            const owlapi::model::OWLObjectCardinalityRestriction::Ptr& restriction,
+            const ProbabilityDensityFunction::Ptr& resourcePoFDistribution,
+            double redundancy,
+            owlapi::model::IRIList assignments
     );
 
     /**
@@ -49,7 +57,7 @@ public:
     double getProbabilityOfSurvival(double time = 0) const;
     double getProbabilityOfFailureConditional(double time_start, double time_end) const;
     double getProbabilityOfSurvivalConditional(double time_start, double time_end) const;
-    double getProbabilityOfFailureWithRedundancy((double time = 0) const;
+    double getProbabilityOfFailureWithRedundancy(double time = 0) const;
     double getProbabilityOfSurvivalWithRedundancy(double time = 0) const;
     double getProbabilityOfFailureConditionalWithRedundancy(double time_start, double time_end) const;
     double getProbabilityOfSurvivalConditionalWithRedundancy(double time_start, double time_end) const;
@@ -74,7 +82,21 @@ public:
      * type
      *
      */
+
+    void addAssignment (owlapi::model::IRI &assignment) {mAssignments.push_back(assignment);}
+
+    void removeModelBoundAssignment (owlapi::model::IRI &assignment);
+
+    reasoning::ModelBound::List getModelBoundAssignments() {return mModelBoundAssignments;}
+
     void increment() { mRedundancy += 1.0/(1.0*getCardinality()); }
+
+    /**
+     * Increment the redundancy based on addition a single resource of the same
+     * type
+     *
+     */
+    void decrement() { mRedundancy -= 1.0/(1.0*getCardinality()); }
 
     /**
      * Stringify object
@@ -85,6 +107,7 @@ public:
 private:
     owlapi::model::OWLObjectCardinalityRestriction::Ptr mObjectRestriction;
 
+    owlapi::model::IRIList mAssignments;
     /// Probability of Failure of this model
     ProbabilityDensityFunction::Ptr mModelProbabilityOfFailureDistribution;
     /// Redundancy of this model

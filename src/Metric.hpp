@@ -6,6 +6,7 @@
 #include "ModelPool.hpp"
 #include "OrganizationModelAsk.hpp"
 #include "vocabularies/OM.hpp"
+#include "reasoning/ModelBound.hpp"
 #include <random>
 
 namespace moreorg {
@@ -33,6 +34,7 @@ class Metric
 {
 public:
     typedef shared_ptr<Metric> Ptr;
+    typedef std::vector<Metric> List;
 
     /**
      * Metric for an organization model
@@ -107,8 +109,8 @@ public:
      * Get list of Metrics to be able to check whether the corresponding component(s) survive or not or handle metric value calculations elsewhere
      */
 
-    virtual std::vector<ProbabilityDensityFunction> getSharedUseMetricModelsList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
-                                 double t0 = 0, double t1 = 0) { throw std::runtime_error("moreorg::metrics::Metric::compute: not implemented"); } const 
+    virtual Metric::List getSharedUseMetricModelsList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
+                                 double t0 = 0, double t1 = 0) const { throw std::runtime_error("moreorg::metrics::Metric::compute: not implemented"); }
 
     /**
      * Compute the metric for a given list of single functions (services) that are

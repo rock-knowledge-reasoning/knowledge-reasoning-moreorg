@@ -18,6 +18,21 @@ ProbabilityOfFailure::ProbabilityOfFailure(const owlapi::model::OWLObjectCardina
     }
 }
 
+ProbabilityOfFailure::ProbabilityOfFailure(const owlapi::model::OWLObjectCardinalityRestriction::Ptr& restriction,
+            const ProbabilityDensityFunction::Ptr& resourcePoFDistribution,
+            double redundancy,
+            reasoning::ModelBound::List modelBoundAssignments)
+    : mObjectRestriction(restriction)
+    , mModelProbabilityOfFailureDistribution(resourcePoFDistribution)
+    , mRedundancy(redundancy)
+{
+    if (!mModelProbabilityOfFailureDistribution)
+    {
+        throw std::invalid_argument("moreorg::metrics::ProbabilityOfFailure no model provided!");
+    }
+    mModelBoundAssignments = modelBoundAssignments;
+}
+
 double ProbabilityOfFailure::getProbabilityOfFailure(double time) const
 {
     double pos = 1 - mModelProbabilityOfFailureDistribution->getValue(time);
@@ -89,7 +104,7 @@ std::string ProbabilityOfFailure::toString() const
     ss << " ProbabilityOfFailure: " << std::endl;
     ss << "    modelProbability:      " << mModelProbabilityOfFailureDistribution->getValue() << std::endl;
     ss << "    redundancy:            " << mRedundancy << std::endl;
-    ss << "    probabilityOfFailure: " << getProbabilityOfFailureWithRedundancy(() << std::endl;
+    ss << "    probabilityOfFailure: " << getProbabilityOfFailureWithRedundancy() << std::endl;
     ss << "  > " << mObjectRestriction->toString();
     return ss.str();
 }
