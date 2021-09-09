@@ -7,6 +7,9 @@
 #include <moreorg/vocabularies/OM.hpp>
 #include <moreorg/OrganizationModelAsk.hpp>
 #include <moreorg/vocabularies/OM.hpp>
+#include <moreorg/ResourceInstance.hpp>
+#include <moreorg/reasoning/ResourceInstanceMatch.hpp>
+#include <moreorg/Agent.hpp>
 
 #include "test_utils.hpp"
 
@@ -251,6 +254,40 @@ BOOST_AUTO_TEST_CASE(provider_via_restrictions)
         BOOST_REQUIRE_MESSAGE(supportedModels.size() == 4, "Services supported by sherpa: computing time: " << (stopTime - startTime).toSeconds());
     }
 
+}
+
+BOOST_AUTO_TEST_CASE(resource_instance_matching)
+{
+    using namespace moreorg::reasoning;
+
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(getRootDir() + "/test/data/om-project-transterra.owl");
+    OrganizationModelAsk ask(om);
+
+    IRI sherpa = moreorg::vocabulary::OM::resolve("Sherpa");
+    IRI move_to = moreorg::vocabulary::OM::resolve("MoveTo");
+
+    Agent agent;
+    AtomicAgent sherpa_0(0,sherpa);
+    AtomicAgent sherpa_1(1,sherpa);
+    agent.add(sherpa_0);
+    agent.add(sherpa_1);
+
+
+    std::vector<OWLCardinalityRestriction::Ptr> required =
+        ask.ontology().getCardinalityRestrictions(move_to);
+    ModelBound::List requiredModelBound = ResourceInstanceMatch::toModelBoundList(required);
+
+    ResourceInstance::List available = ask.getRelated(agent);
+
+    try {
+    ResourceInstanceMatch::Solution solution =
+        ResourceInstanceMatch::solve(requiredModelBound, available, ask);
+        BOOST_TEST_MESSAGE("Solution found: " << solution.toString());
+    } catch(const std::exception& e)
+    {
+        BOOST_REQUIRE_MESSAGE(false, "ResourceInstance matching failed "
+                << e.what());
+    }
 }
 
 BOOST_AUTO_TEST_CASE(performance_three_sherpa)

@@ -105,7 +105,9 @@ rock_library(moreorg
         policies/SelectionPolicy.cpp
         reasoning/ModelBound.cpp
         reasoning/ResourceMatch.cpp
+        reasoning/ResourceInstanceMatch.cpp
         Resource.cpp
+        ResourceInstance.cpp
         Service.cpp
         Sample.cpp
         RequirementSample.cpp
@@ -169,6 +171,7 @@ rock_library(moreorg
         policies/SelectionPolicy.hpp
         QueryCache.hpp
         Resource.hpp
+        ResourceInstance.hpp
         Service.hpp
         SharedPtr.hpp
         Sample.hpp
@@ -177,6 +180,7 @@ rock_library(moreorg
         Types.hpp
         reasoning/ModelBound.hpp
         reasoning/ResourceMatch.hpp
+        reasoning/ResourceInstanceMatch.hpp
         utils/CoalitionStructureGeneration.hpp
         utils/OrganizationStructureGeneration.hpp
         utils/GecodeUtils.hpp

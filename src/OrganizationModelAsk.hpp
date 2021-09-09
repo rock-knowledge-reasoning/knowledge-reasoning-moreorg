@@ -3,14 +3,17 @@
 
 #include <owlapi/model/OWLCardinalityRestriction.hpp>
 #include <owlapi/model/OWLOntologyAsk.hpp>
+
 #include "SharedPtr.hpp"
 #include "OrganizationModel.hpp"
 #include "algebra/ResourceSupportVector.hpp"
 #include "Algebra.hpp"
-#include "Resource.hpp"
 #include "vocabularies/OM.hpp"
 
 namespace moreorg {
+
+class Agent;
+class ResourceInstance;
 
 /**
  * \class OrganizationModelAsk
@@ -387,6 +390,19 @@ public:
             owlapi::model::OWLCardinalityRestriction::OperationType type = owlapi::model::OWLCardinalityRestriction::SUM_OP,
             bool max2Min = false) const;
 
+    /**
+     * Compute the related instances for a given agent
+     */
+    std::vector<ResourceInstance> getRelated(const Agent& agent,
+            const owlapi::model::IRI& qualification = vocabulary::OM::Resource(),
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has()) const;
+
+    /**
+     * Compute the instance list for a given model
+     */
+    std::vector< shared_ptr<ResourceInstance> > getRelated(const owlapi::model::IRI& model,
+            const owlapi::model::IRI& qualification = vocabulary::OM::Resource(),
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has()) const;
 
     /**
      * Allow only subclasses of a particular type in a model pool
@@ -546,6 +562,8 @@ private:
     size_t mStructuralNeighbourhood;
     owlapi::model::IRI mInterfaceBaseClass;
     static std::vector<OrganizationModelAsk> msOrganizationModelAsk;
+
+    mutable std::map<owlapi::model::IRI, std::vector< shared_ptr<ResourceInstance> > > mRelatedResourceCache;
 };
 
 } // end namespace moreorg

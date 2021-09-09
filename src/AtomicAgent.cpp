@@ -1,5 +1,7 @@
 #include "AtomicAgent.hpp"
+
 #include <sstream>
+#include "OrganizationModelAsk.hpp"
 
 namespace moreorg {
 

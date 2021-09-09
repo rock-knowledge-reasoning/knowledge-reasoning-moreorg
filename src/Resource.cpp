@@ -174,4 +174,4 @@ Resource::Set Resource::merge(const Resource::Set& resourcesA, const Resource::S
     return Resource::merge(resources);
 }
 
-}
+} // end namespace moreorg

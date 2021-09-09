@@ -6,10 +6,11 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/set.hpp>
 #include "ModelPool.hpp"
-#include "OrganizationModelAsk.hpp"
 #include "facades/Robot.hpp"
 
 namespace moreorg {
+
+class OrganizationModelAsk;
 
 /**
  * \class AtomicAgent

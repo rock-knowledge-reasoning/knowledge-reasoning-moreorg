@@ -8,7 +8,9 @@
 #include <gecode/search.hh>
 #include "test_utils.hpp"
 
+#include <moreorg/ResourceInstance.hpp>
 #include <moreorg/facades/Robot.hpp>
+#include <moreorg/Agent.hpp>
 
 using namespace moreorg;
 using namespace moreorg::reasoning;
@@ -714,8 +716,35 @@ BOOST_AUTO_TEST_CASE(cardinality_restrictions)
 
     BOOST_REQUIRE_MESSAGE(!r_required.empty(), "Payload has restrictions" <<
             OWLCardinalityRestriction::toString(r_required));
-
 }
+
+BOOST_AUTO_TEST_CASE(related_resources)
+{
+    OrganizationModel::Ptr om = make_shared<OrganizationModel>(getRootDir() +
+            "/test/data/om-project-transterra.owl");
+    OrganizationModelAsk ask(om);
+
+    IRI sherpa = moreorg::vocabulary::OM::resolve("Sherpa");
+
+    ResourceInstance::PtrList related = ask.getRelated(sherpa);
+    size_t numberOfRelatedResources = related.size();
+    BOOST_REQUIRE_MESSAGE(numberOfRelatedResources > 0, "Sherpa has associated resources");
+    for(const ResourceInstance::Ptr ri : related)
+    {
+        BOOST_TEST_MESSAGE("Related resource: " << ri->toString());
+    }
+
+    Agent agent;
+    AtomicAgent aa0(0, sherpa);
+    AtomicAgent aa1(1, sherpa);
+    agent.add(aa0);
+    agent.add(aa1);
+
+    ResourceInstance::List relatedResourceInstances = ask.getRelated(agent);
+    BOOST_REQUIRE_MESSAGE(relatedResourceInstances.size() == numberOfRelatedResources*2, "Agent has 2x resources of Sherpa as associated instances");
+    BOOST_TEST_MESSAGE("RELATED: to " << agent.toString() << " " << ResourceInstance::toString(relatedResourceInstances,4));
+}
+
 
 
 BOOST_AUTO_TEST_SUITE_END()
