@@ -40,13 +40,13 @@ public:
 
 
     double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
-            const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available, double t0 = 0, double t1 = 0) const;
+            const ResourceInstance::List &availableAgents, double t0 = 0, double t1 = 0) const;
 
-    double computeSequential(const owlapi::model::IRIList& functions, const ModelPool& modelPool) const;
-    double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ModelPool& modelPool, bool sharedUse = true) const;
+    double computeSequential(const owlapi::model::IRIList& functions, const ResourceInstance::List& modelPool) const;
+    double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ResourceInstance::List& modelPool, bool sharedUse = true) const;
 
-    ProbabilityOfFailure::List getSharedUseMetricModelsList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
-                                 double t0 = 0, double t1 = 0) const;
+    // ProbabilityOfFailure::List getSharedUseMetricModelsList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
+    //                              double t0 = 0, double t1 = 0) const;
 
     /**
      * Compute survivability a parallel system

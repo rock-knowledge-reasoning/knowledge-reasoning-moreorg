@@ -252,6 +252,25 @@ ModelBound::List ResourceInstanceMatch::toModelBoundList(const std::vector<owlap
     return modelBounds;
 }
 
+ResourceInstance::List ResourceInstanceMatch::Solution::removeAssignmentsFromList(ResourceInstance::List &availableList)
+        {
+            ResourceInstance::List available(availableList);
+            for (const auto pair : mAssignments)
+            {
+                for (auto ri : pair.second)
+                {
+                    auto listIterator = std::find_if(available.begin(), available.end(), [&ri](const ResourceInstance &availableAgent)
+                    {
+                        return ri.getName() == availableAgent.getName();
+                    });
+
+                    available.erase(listIterator);
+                }
+            }
+            
+            return available;
+        }
+
 bool ResourceInstanceMatch::isSupporting(const Agent& agent,
         const owlapi::model::IRI& serviceModel,
         const OrganizationModelAsk& ask,

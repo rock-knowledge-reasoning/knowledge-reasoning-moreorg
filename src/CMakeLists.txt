@@ -79,6 +79,7 @@ rock_library(moreorg
         io/LatexWriter.cpp
         metrics/Redundancy.cpp
         metrics/ModelSurvivability.cpp
+        metrics/Probability.cpp
         metrics/ProbabilityOfFailure.cpp
         metrics/DistributionFunctions.cpp
         Metric.cpp
@@ -146,6 +147,7 @@ rock_library(moreorg
         io/LatexWriter.hpp
         metrics/Redundancy.hpp
         metrics/ModelSurvivability.hpp
+        metrics/Probability.hpp
         metrics/ProbabilityOfFailure.hpp
         metrics/DistributionFunctions.hpp
         Metric.hpp

@@ -133,6 +133,13 @@ public:
          * \param assignment model bound of available resources that are assigned to fulfill the requirement
          */
         void addAssignment(const ModelBound& model, const ResourceInstance& assignment) { mAssignments[model].push_back(assignment); }
+        /**
+         * @brief Remove list of assignments from available Resource List
+         * 
+         * @param availableList 
+         * @return ResourceInstance::List 
+         */
+        ResourceInstance::List removeAssignmentsFromList(ResourceInstance::List &assignmentsToRemove);
 
     private:
         // Assignments for this model type

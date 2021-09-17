@@ -4,6 +4,7 @@
 #include <base-logging/Logging.hpp>
 #include "vocabularies/OM.hpp"
 #include "metrics/Redundancy.hpp"
+#include "Agent.hpp"
 
 namespace moreorg {
 
@@ -30,12 +31,16 @@ MetricMap Metric::getMetricMap() const
 
     for(const IRI& actorModel : actorModels)
     {
+        AtomicAgent agent0(0, actorModel);
+        Agent agent;
+        agent.add(agent0);
+        ResourceInstance::List available = mOrganizationModelAsk.getRelated(agent);
         for(const IRI& service : services)
         {
             try {
                 LOG_DEBUG_S << "Compute metric for: " << actorModel << " and " << service;
 
-                double metric = compute(service, actorModel);
+                double metric = compute(service, available);
                 std::pair<ServiceIRI, ActorIRI> key(service, actorModel);
                 metricMap[key] = metric;
 
@@ -58,15 +63,14 @@ MetricMap Metric::getMetricMap() const
     return metricMap;
 }
 
-double Metric::compute(const owlapi::model::IRI& function, const owlapi::model::IRI& model) const
+double Metric::compute(const owlapi::model::IRI& function, const ResourceInstance& model) const
 {
-    ModelPool modelPool;
-    modelPool[model] = 1;
-
-    return compute(function, modelPool);
+    ResourceInstance::List available;
+    available.push_back(model);
+    return compute(function, available);
 }
 
-double Metric::compute(const owlapi::model::IRI& function, const ModelPool& modelPool) const
+double Metric::compute(const owlapi::model::IRI& function, const ResourceInstance::List& modelPool) const
 {
     using namespace owlapi::model;
     IRISet functionSet;
@@ -75,15 +79,12 @@ double Metric::compute(const owlapi::model::IRI& function, const ModelPool& mode
     return computeExclusiveUse(functionSet, modelPool);
 }
 
-double Metric::computeSharedUse(const ModelPool& required, const ModelPool& available, double t0, double t1) const
+double Metric::computeSharedUse(const ModelPool& required, const ResourceInstance::List& available, double t0, double t1) const
 {
     using namespace owlapi::model;
-
-    std::vector<OWLCardinalityRestriction::Ptr> r_available =
-        mOrganizationModelAsk.getAvailableCardinalities(available, mProperty);
     std::vector<OWLCardinalityRestriction::Ptr> r_required =
         mOrganizationModelAsk.getRequiredCardinalities(required, mProperty);
-
+    ResourceInstance::List r_available(available);
     try
     {
         double value = computeMetric(r_required, r_available, t0, t1);
@@ -97,7 +98,7 @@ double Metric::computeSharedUse(const ModelPool& required, const ModelPool& avai
 
 }
 
-double Metric::computeSharedUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const
+double Metric::computeSharedUse(const owlapi::model::IRISet& functions, const ResourceInstance::List& modelPool) const
 {
     using namespace owlapi::model;
 
@@ -112,13 +113,12 @@ double Metric::computeSharedUse(const owlapi::model::IRISet& functions, const Mo
     return sequentialUse(values);
 }
 
-double Metric::computeExclusiveUse(const ModelPool& required, const ModelPool& available) const
+double Metric::computeExclusiveUse(const ModelPool& required, const ResourceInstance::List& available) const
 {
     using namespace owlapi::model;
 
     // Sum all collected cardinality restrictions
-    std::vector<OWLCardinalityRestriction::Ptr> r_available =
-        mOrganizationModelAsk.getAvailableCardinalities(available, mProperty);
+    ResourceInstance::List r_available(available);
     std::vector<OWLCardinalityRestriction::Ptr> r_required =
         mOrganizationModelAsk.getRequiredCardinalities(required, mProperty);
 
@@ -126,7 +126,7 @@ double Metric::computeExclusiveUse(const ModelPool& required, const ModelPool& a
 
 }
 
-double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const
+double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const ResourceInstance::List& modelPool) const
 {
     using namespace owlapi::model;
 
@@ -143,7 +143,7 @@ double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const
 
     // Get model restrictions, i.e. in effect what has to be available for the
     // given models
-    std::vector<OWLCardinalityRestriction::Ptr> availableResources = mOrganizationModelAsk.getAvailableCardinalities(modelPool, mProperty);
+    ResourceInstance::List availableResources(modelPool);
 
     return computeMetric(requirements, availableResources);
 }

@@ -1,113 +1,111 @@
 #include "ProbabilityOfFailure.hpp"
 #include <stdexcept>
 
-namespace moreorg {
-namespace metrics {
-
-
-ProbabilityOfFailure::ProbabilityOfFailure(const owlapi::model::OWLObjectCardinalityRestriction::Ptr& restriction,
-            const ProbabilityDensityFunction::Ptr& resourcePoFDistribution,
-            double redundancy)
-    : mObjectRestriction(restriction)
-    , mModelProbabilityOfFailureDistribution(resourcePoFDistribution)
-    , mRedundancy(redundancy)
+namespace moreorg
 {
-    if (!mModelProbabilityOfFailureDistribution)
+    namespace metrics
     {
-        throw std::invalid_argument("moreorg::metrics::ProbabilityOfFailure no model provided!");
-    }
-}
 
-ProbabilityOfFailure::ProbabilityOfFailure(const owlapi::model::OWLObjectCardinalityRestriction::Ptr& restriction,
-            const ProbabilityDensityFunction::Ptr& resourcePoFDistribution,
-            double redundancy,
-            reasoning::ModelBound::List modelBoundAssignments)
-    : mObjectRestriction(restriction)
-    , mModelProbabilityOfFailureDistribution(resourcePoFDistribution)
-    , mRedundancy(redundancy)
-{
-    if (!mModelProbabilityOfFailureDistribution)
-    {
-        throw std::invalid_argument("moreorg::metrics::ProbabilityOfFailure no model provided!");
-    }
-    mModelBoundAssignments = modelBoundAssignments;
-}
+        ProbabilityOfFailure::ProbabilityOfFailure(const reasoning::ModelBound &requirement,
+                                                   const ResourceInstance::List &assignments,
+                                                   const ProbabilityDensityFunction::Ptr &resourcePoFDistribution)
+            : Probability(requirement, assignments), mModelProbabilityOfFailureDistribution(resourcePoFDistribution)
+        {
+            if (!mModelProbabilityOfFailureDistribution)
+            {
+                throw std::invalid_argument("moreorg::metrics::ProbabilityOfFailure no model provided!");
+            }
+            mRedundancy = mAssignments.size() / getCardinality();
+        }
 
-double ProbabilityOfFailure::getProbabilityOfFailure(double time) const
-{
-    double pos = 1 - mModelProbabilityOfFailureDistribution->getValue(time);
-    double pSerialSystem = pow(pos, getCardinality());
-    return 1 - pSerialSystem;
-}
+        double ProbabilityOfFailure::getProbabilityOfFailure(double time) const
+        {
+            double pos = 1 - mModelProbabilityOfFailureDistribution->getValue(time);
+            double pSerialSystem = pow(pos, getCardinality());
+            return 1 - pSerialSystem;
+        }
 
+        double ProbabilityOfFailure::getProbabilityOfSurvival(double time) const
+        {
+            return 1 - getProbabilityOfFailure(time);
+        }
 
-double ProbabilityOfFailure::getProbabilityOfSurvival(double time) const
-{
-    return 1 - getProbabilityOfFailure(time);
-}
+        double ProbabilityOfFailure::getProbabilityOfFailureConditional(double time_start, double time_end) const
+        {
+            double pos = 1 - mModelProbabilityOfFailureDistribution->getConditional(time_start, time_end);
+            double pSerialSystem = pow(pos, getCardinality());
+            return 1 - pSerialSystem;
+        }
 
-double ProbabilityOfFailure::getProbabilityOfFailureConditional(double time_start, double time_end) const
-{
-    double pos = 1 - mModelProbabilityOfFailureDistribution->getConditional(time_start, time_end);
-    double pSerialSystem = pow(pos, getCardinality());
-    return 1 - pSerialSystem;
-}
+        double ProbabilityOfFailure::getProbabilityOfSurvivalConditional(double time_start, double time_end) const
+        {
+            return 1 - getProbabilityOfFailureConditional(time_start, time_end);
+        }
 
-double ProbabilityOfFailure::getProbabilityOfSurvivalConditional(double time_start, double time_end) const
-{
-    return 1 - getProbabilityOfFailureConditional(time_start, time_end);
-}
+        double ProbabilityOfFailure::getProbabilityOfFailureWithRedundancy(double time) const
+        {
+            double pos = 1 - mModelProbabilityOfFailureDistribution->getValue(time);
+            double pSerialSystem = pow(pos, getCardinality());
+            return pow(1 - pSerialSystem, mRedundancy);
+        }
 
-double ProbabilityOfFailure::getProbabilityOfFailureWithRedundancy(double time) const
-{
-    double pos = 1 - mModelProbabilityOfFailureDistribution->getValue(time);
-    double pSerialSystem = pow(pos, getCardinality());
-    return pow(1-pSerialSystem, mRedundancy);
-}
+        double ProbabilityOfFailure::getProbabilityOfSurvivalWithRedundancy(double time) const
+        {
+            return 1 - getProbabilityOfFailureWithRedundancy(time);
+        }
 
+        double ProbabilityOfFailure::getProbabilityOfFailureConditionalWithRedundancy(double time_start, double time_end) const
+        {
+            double pos = 1 - mModelProbabilityOfFailureDistribution->getConditional(time_start, time_end);
+            double pSerialSystem = pow(pos, getCardinality());
+            return pow(1 - pSerialSystem, mRedundancy);
+        }
 
-double ProbabilityOfFailure::getProbabilityOfSurvivalWithRedundancy(double time) const
-{
-    return 1 - getProbabilityOfFailureWithRedundancy(time);
-}
+        double ProbabilityOfFailure::getProbabilityOfSurvivalConditionalWithRedundancy(double time_start, double time_end) const
+        {
+            return 1 - getProbabilityOfFailureConditionalWithRedundancy(time_start, time_end);
+        }
 
-double ProbabilityOfFailure::getProbabilityOfFailureConditionalWithRedundancy(double time_start, double time_end) const
-{
-    double pos = 1 - mModelProbabilityOfFailureDistribution->getConditional(time_start, time_end);
-    double pSerialSystem = pow(pos, getCardinality());
-    return pow(1-pSerialSystem, mRedundancy);
-}
+        ProbabilityDensityFunction::Ptr ProbabilityOfFailure::getProbabilityDensityFunction() const
+        {
+            return mModelProbabilityOfFailureDistribution;
+        }
 
-double ProbabilityOfFailure::getProbabilityOfSurvivalConditionalWithRedundancy(double time_start, double time_end) const
-{
-    return 1 - getProbabilityOfFailureConditionalWithRedundancy(time_start, time_end);
-}
+        void ProbabilityOfFailure::addAssignment(ResourceInstance &assignment)
+        {
+            mAssignments.push_back(assignment);
+            increment();
+        }
 
-ProbabilityDensityFunction::Ptr ProbabilityOfFailure::getProbabilityDensityFunction() const
-{
-    return mModelProbabilityOfFailureDistribution;
-}
+        void ProbabilityOfFailure::removeAssignment(ResourceInstance &assignmentToRemove)
+        {
+            auto it = std::find_if(mAssignments.begin(), mAssignments.end(),
+                                   [&assignmentToRemove](
+                                       const ResourceInstance assignment)
+                                   {
+                                       return assignment.getName() == assignmentToRemove.getName();
+                                   });
+            if (it == mAssignments.end())
+            {
+                throw std::runtime_error("moreorg::metrics::ProbabilityOfFailure::removeAssignment could not find assignment and remove it.");
+            }
+            else
+            {
+                mAssignments.erase(it);
+                decrement();
+            }
+        }
 
-owlapi::model::IRI ProbabilityOfFailure::getQualification() const
-{
-    return mObjectRestriction->getQualification();
-}
+        std::string ProbabilityOfFailure::toString() const
+        {
+            std::stringstream ss;
+            ss << " ProbabilityOfFailure: " << std::endl;
+            ss << "    modelProbability:      " << mModelProbabilityOfFailureDistribution->getValue() << std::endl;
+            ss << "    redundancy:            " << mRedundancy << std::endl;
+            ss << "    probabilityOfFailure: " << getProbabilityOfFailureWithRedundancy() << std::endl;
+            ss << "  > " << mRequirement.toString();
+            return ss.str();
+        }
 
-uint32_t ProbabilityOfFailure::getCardinality() const
-{
-    return mObjectRestriction->getCardinality();
-}
-
-std::string ProbabilityOfFailure::toString() const
-{
-    std::stringstream ss;
-    ss << " ProbabilityOfFailure: " << std::endl;
-    ss << "    modelProbability:      " << mModelProbabilityOfFailureDistribution->getValue() << std::endl;
-    ss << "    redundancy:            " << mRedundancy << std::endl;
-    ss << "    probabilityOfFailure: " << getProbabilityOfFailureWithRedundancy() << std::endl;
-    ss << "  > " << mObjectRestriction->toString();
-    return ss.str();
-}
-
-} // end namespace metrics
+    } // end namespace metrics
 } // end namespace moreorg

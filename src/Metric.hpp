@@ -7,6 +7,7 @@
 #include "OrganizationModelAsk.hpp"
 #include "vocabularies/OM.hpp"
 #include "reasoning/ModelBound.hpp"
+#include "ResourceInstance.hpp"
 #include <random>
 
 namespace moreorg {
@@ -55,13 +56,13 @@ public:
      * Compute the metric for a given function (service) and a single agent model
      * \return computed metric
      */
-    double compute(const owlapi::model::IRI& function, const owlapi::model::IRI& model) const;
+    double compute(const owlapi::model::IRI& function, const ResourceInstance& model) const;
 
     /**
      * Compute the metric for a given function (service) and a agent defined by
      * a model pool, based on the exclusive resource usage
      */
-    double compute(const owlapi::model::IRI& function, const ModelPool& modelPool) const;
+    double compute(const owlapi::model::IRI& function, const ResourceInstance::List& modelPool) const;
 
     /**
      * Compute the exclusive use metric for two model pools
@@ -69,7 +70,7 @@ public:
      * \param available Set of available resources
      * \see computeExclusiveUse
      */
-    double computeExclusiveUse(const ModelPool& required, const ModelPool& available) const;
+    double computeExclusiveUse(const ModelPool& required, const ResourceInstance::List& available) const;
 
     /**
      * Compute the metric for a given set of functions (services)
@@ -79,7 +80,7 @@ public:
      * \param modelPool The available set of resources
      * \return metric
      */
-    double computeExclusiveUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const;
+    double computeExclusiveUse(const owlapi::model::IRISet& functions, const ResourceInstance::List& modelPool) const;
 
     /**
      * Compute the shared use metric to compute a metric for required vs.
@@ -87,7 +88,7 @@ public:
      * \param required Required resources
      * \param available Available resources
      */
-    double computeSharedUse(const ModelPool& required, const ModelPool& available, double t0 = 0, double t1 = 0) const;
+    double computeSharedUse(const ModelPool& required, const ResourceInstance::List& available, double t0 = 0, double t1 = 0) const;
 
     /**
      * Compute the metric for a given set of functions (services)
@@ -97,12 +98,12 @@ public:
      * \param modelPool describing a composite actor
      * \return metric
      */
-    double computeSharedUse(const owlapi::model::IRISet& functions, const ModelPool& modelPool) const;
+    double computeSharedUse(const owlapi::model::IRISet& functions, const ResourceInstance::List& modelPool) const;
 
     /**
      * Compute metric based on the given list of cardinality restrictions
      */
-    virtual double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
+    virtual double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, const ResourceInstance::List& available,
                                  double t0 = 0, double t1 = 0) const { throw std::runtime_error("moreorg::metrics::Metric::compute: not implemented"); }
 
     /**
@@ -144,6 +145,7 @@ protected:
     metrics::Type mType;
     owlapi::model::IRI mProperty;
     static std::map<metrics::Type, Metric::Ptr> msMetrics;
+    ResourceInstance::PtrList mResourceInstanceAssignments;
 };
 
 } // end namespace moreorg
