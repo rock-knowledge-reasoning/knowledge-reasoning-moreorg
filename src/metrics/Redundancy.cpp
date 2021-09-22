@@ -204,6 +204,7 @@ namespace moreorg
             bool updated = false;
             do
             {
+                std::cout << "Start do-while" << std::endl;
                 updated = false;
                 // Sort based on probability of survival -- try to maximize redundancy
                 std::sort(
@@ -214,6 +215,7 @@ namespace moreorg
                         return a.getProbabilityOfSurvivalConditionalWithRedundancy(t0, t1) <
                                b.getProbabilityOfSurvivalConditionalWithRedundancy(t0, t1);
                     });
+                std::cout << "test1" << std::endl;
 
                 ResourceInstance::List::iterator rit = available.begin();
                 for (; rit != available.end(); ++rit)
@@ -234,7 +236,9 @@ namespace moreorg
                             {
                                 survivability.addAssignment(remaining);
                                 available.erase(rit);
+                                --rit;
                                 updated = true;
+                                break;
                             }
                             catch (...)
                             {
@@ -254,7 +258,6 @@ namespace moreorg
 
             // Serial model of all subcomponents --> the full system
             double fullModelSurvival = 1;
-
             for (const ProbabilityOfFailure &survivability : models)
             {
                 LOG_INFO_S << "Probability of survival: " << survivability.toString();
