@@ -9,18 +9,24 @@ namespace moreorg
         ProbabilityOfFailure::ProbabilityOfFailure(const reasoning::ModelBound &requirement,
                                                    const ResourceInstance::List &assignments,
                                                    const ProbabilityDensityFunction::Ptr &resourcePoFDistribution)
-            : Probability(requirement, assignments), mModelProbabilityOfFailureDistribution(resourcePoFDistribution)
+            : Probability(requirement, assignments, resourcePoFDistribution)
         {
-            if (!mModelProbabilityOfFailureDistribution)
+            if (!mModelProbabilityDistribution)
             {
                 throw std::invalid_argument("moreorg::metrics::ProbabilityOfFailure no model provided!");
             }
             mRedundancy = mAssignments.size() / getCardinality();
         }
 
+        ProbabilityOfFailure::ProbabilityOfFailure(const Probability &probability)
+        : Probability(probability)
+        {
+            mRedundancy = mAssignments.size() / getCardinality();
+        }
+
         double ProbabilityOfFailure::getProbabilityOfFailure(double time) const
         {
-            double pos = 1 - mModelProbabilityOfFailureDistribution->getValue(time);
+            double pos = 1 - mModelProbabilityDistribution->getValue(time);
             double pSerialSystem = pow(pos, getCardinality());
             return 1 - pSerialSystem;
         }
@@ -32,7 +38,7 @@ namespace moreorg
 
         double ProbabilityOfFailure::getProbabilityOfFailureConditional(double time_start, double time_end) const
         {
-            double pos = 1 - mModelProbabilityOfFailureDistribution->getConditional(time_start, time_end);
+            double pos = 1 - mModelProbabilityDistribution->getConditional(time_start, time_end);
             double pSerialSystem = pow(pos, getCardinality());
             return 1 - pSerialSystem;
         }
@@ -44,7 +50,7 @@ namespace moreorg
 
         double ProbabilityOfFailure::getProbabilityOfFailureWithRedundancy(double time) const
         {
-            double pos = 1 - mModelProbabilityOfFailureDistribution->getValue(time);
+            double pos = 1 - mModelProbabilityDistribution->getValue(time);
             double pSerialSystem = pow(pos, getCardinality());
             return pow(1 - pSerialSystem, mRedundancy);
         }
@@ -56,7 +62,7 @@ namespace moreorg
 
         double ProbabilityOfFailure::getProbabilityOfFailureConditionalWithRedundancy(double time_start, double time_end) const
         {
-            double pos = 1 - mModelProbabilityOfFailureDistribution->getConditional(time_start, time_end);
+            double pos = 1 - mModelProbabilityDistribution->getConditional(time_start, time_end);
             double pSerialSystem = pow(pos, getCardinality());
             return pow(1 - pSerialSystem, mRedundancy);
         }
@@ -66,10 +72,6 @@ namespace moreorg
             return 1 - getProbabilityOfFailureConditionalWithRedundancy(time_start, time_end);
         }
 
-        ProbabilityDensityFunction::Ptr ProbabilityOfFailure::getProbabilityDensityFunction() const
-        {
-            return mModelProbabilityOfFailureDistribution;
-        }
 
         void ProbabilityOfFailure::addAssignment(ResourceInstance &assignment)
         {
@@ -100,7 +102,7 @@ namespace moreorg
         {
             std::stringstream ss;
             ss << " ProbabilityOfFailure: " << std::endl;
-            ss << "    modelProbability:      " << mModelProbabilityOfFailureDistribution->getValue() << std::endl;
+            ss << "    modelProbability:      " << mModelProbabilityDistribution->getValue() << std::endl;
             ss << "    redundancy:            " << mRedundancy << std::endl;
             ss << "    probabilityOfFailure: " << getProbabilityOfFailureWithRedundancy() << std::endl;
             ss << "  > " << mRequirement.toString();

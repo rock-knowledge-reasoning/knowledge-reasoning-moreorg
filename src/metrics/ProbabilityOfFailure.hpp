@@ -5,7 +5,6 @@
 #include <owlapi/model/IRI.hpp>
 #include <random>
 #include <cmath>
-#include "DistributionFunctions.hpp"
 #include "../ResourceInstance.hpp"
 #include "../reasoning/ModelBound.hpp"
 #include "Probability.hpp"
@@ -44,6 +43,8 @@ namespace moreorg
                 const ResourceInstance::List &assignments,
                 const ProbabilityDensityFunction::Ptr &resourcePoFDistribution);
 
+            ProbabilityOfFailure(const Probability &probability);
+
             /**
              * Get the probability of Failure for this model
              * account for the overall redundancy and cardinality
@@ -64,8 +65,6 @@ namespace moreorg
             * \return cardinality of the restriction
             */
             uint32_t getCardinality() const {return mRequirement.min;}
-
-            ProbabilityDensityFunction::Ptr getProbabilityDensityFunction() const;
 
             /**
              * Increment the redundancy based on addition a single resource of the same
@@ -92,8 +91,6 @@ namespace moreorg
             std::string toString() const;
 
         private:
-            /// Probability of Failure of this model
-            ProbabilityDensityFunction::Ptr mModelProbabilityOfFailureDistribution;
             /// Redundancy of this model
             double mRedundancy;
         };

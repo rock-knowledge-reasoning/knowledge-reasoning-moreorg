@@ -4,10 +4,17 @@
 namespace moreorg {
 namespace metrics {
 
-    Probability::Probability(const reasoning::ModelBound &requirement, const ResourceInstance::List &assignments)
-                            : mRequirement(requirement), mAssignments(assignments)
+    Probability::Probability(const reasoning::ModelBound &requirement, const ResourceInstance::List &assignments, const ProbabilityDensityFunction::Ptr &probabilityDensityFunction)
+                            : mRequirement(requirement), mAssignments(assignments), mModelProbabilityDistribution(probabilityDensityFunction)
     {
     }
+
+    Probability::Probability(const Probability &probability)
+        {
+             mModelProbabilityDistribution = probability.getProbabilityDensityFunction();
+             mAssignments = probability.getAssignments();
+             mRequirement = probability.getRequirement();
+        }
 
     void Probability::removeAssignment(ResourceInstance &assignmentToRemove)
         {
@@ -25,6 +32,11 @@ namespace metrics {
             {
                 mAssignments.erase(it);
             }
+        }
+
+    ProbabilityDensityFunction::Ptr Probability::getProbabilityDensityFunction() const
+        {
+            return mModelProbabilityDistribution;
         }
 
 }
