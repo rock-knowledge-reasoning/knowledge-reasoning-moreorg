@@ -124,7 +124,7 @@ double Redundancy::computeMetric(const std::vector<OWLCardinalityRestriction::Pt
 
     if(fullModelRedundancy == 0)
     {
-        LOG_WARN_S << "Redundancy: the minimal resource requirements have not been fulfilled. Redundancy cannot be computed"
+        LOG_WARN_S << "Redundancy: the minimal resource requirements have not been fulfilled. Redundancy cannot be computed" << std::endl
             << "available: " << ModelBound::toString(modelBoundRemaining,4)
             << "required: " << ModelBound::toString(modelBoundRequired, 4);
         throw std::runtime_error("owlapi::metrics::Redundancy: minimal resource requirement have not been fulfilled");
