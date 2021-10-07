@@ -195,6 +195,25 @@ ResourceMatch::Solution ResourceMatch::solve(const ModelBound::List& required,
         const ModelBound::List& _available,
         const OWLOntology::Ptr& ontology)
 {
+
+    owlapi::model::OWLOntologyAsk ask(ontology);
+
+    ModelBound::List available = _available;
+    for(size_t a = 0; a < available.size()-1; ++a)
+    {
+        ModelBound* available_a = &available[a];
+        for(size_t b = a; b < available.size(); ++b)
+        {
+            ModelBound* available_b = &available[b];
+
+            if(ask.isSubClassOf(available_b->model, available_a->model))
+            {
+                available_a->min += available_b->min;
+                available_a->max += available_b->max;
+            }
+        }
+    }
+
     LOG_INFO_S << "Solve:" << std::endl
         << "    required: " << std::endl
         << "    " << ModelBound::toString(required, 8) << std::endl
