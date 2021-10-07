@@ -183,7 +183,7 @@ Gecode::Space* ResourceMatch::copy()
 
 ResourceMatch::Solution ResourceMatch::solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& modelRequirements,
         const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& providerResources,
-        OWLOntology::Ptr ontology)
+        const OWLOntology::Ptr& ontology)
 {
     ModelBound::List required = toModelBoundList(modelRequirements);
     ModelBound::List available = toModelBoundList(providerResources);
@@ -191,7 +191,9 @@ ResourceMatch::Solution ResourceMatch::solve(const std::vector<owlapi::model::OW
     return solve(required, available, ontology);
 }
 
-ResourceMatch::Solution ResourceMatch::solve(const ModelBound::List& required, const ModelBound::List& available, OWLOntology::Ptr ontology)
+ResourceMatch::Solution ResourceMatch::solve(const ModelBound::List& required,
+        const ModelBound::List& _available,
+        const OWLOntology::Ptr& ontology)
 {
     LOG_INFO_S << "Solve:" << std::endl
         << "    required: " << std::endl
