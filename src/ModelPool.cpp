@@ -7,11 +7,9 @@
 namespace moreorg {
 
 ModelPool::ModelPool()
-    : std::map<owlapi::model::IRI, size_t>()
 {}
 
 ModelPool::ModelPool(const ModelCombination& modelCombination)
-    : std::map<owlapi::model::IRI, size_t>()
 {
     ModelCombination::const_iterator cit = modelCombination.begin();
     for(; cit != modelCombination.end(); ++cit)
