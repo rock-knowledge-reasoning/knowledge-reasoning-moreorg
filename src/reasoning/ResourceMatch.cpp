@@ -196,6 +196,11 @@ ResourceMatch::Solution ResourceMatch::solve(const ModelBound::List& required,
         const OWLOntology::Ptr& ontology)
 {
 
+    if(_available.empty())
+    {
+        throw std::runtime_error("moreorg::reasoning::ResourceMatch::solve: no available models");
+    }
+
     owlapi::model::OWLOntologyAsk ask(ontology);
 
     ModelBound::List available = _available;
