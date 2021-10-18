@@ -16,7 +16,7 @@ jobs:
         run: docker build -t rock/moreorg .  --build-arg PKG_NAME="knowledge_reasoning/moreorg" --build-arg PKG_BRANCH=${{ steps.current_branch.outputs.branch }}
 
       - name: Test
-        run: docker run rock/moreorg /bin/bash -c "source /home/docker/rock_test/env.sh; BOOST_TEST_CATCH_SYSTEM_ERRORS=\"no\" make -C knowledge_reasoning/moreorg/build test"
+        run: docker run rock/moreorg /bin/bash -c "source /home/docker/rock_test/env.sh; BOOST_TEST_CATCH_SYSTEM_ERRORS=\"no\" knowledge_reasoning/moreorg/build/test/moreorg-test --log_level=all"
 
 
 
