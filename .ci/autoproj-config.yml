@@ -15,3 +15,8 @@ osdeps_mode: all
 USE_OCL: false
 USE_PYTHON: true
 python_executable: "/usr/bin/python3"
+DEB_USE: true
+DEB_AUTOMATIC: true
+debian_release: master-20.10
+autoproj_test_utility:
+  knowledge_reasoning/moreorg: true

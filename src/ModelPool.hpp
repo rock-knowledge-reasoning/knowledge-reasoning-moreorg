@@ -78,22 +78,22 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          * combinations, i.e., remove ModelCombinations that operate below the lower
          * bound
          * \param combinations
-         * \param lowerBounds Bounding ModelPool
+         * \param lowerBound Bounding ModelPool
          * \return all combinations that operate within the bounds of the given
          * ModelPool
          */
-        static ModelCombinationSet applyLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBounds);
+        static ModelCombinationSet applyLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBound);
 
         /**
          * Apply a lower bound of resources to an existing set of model
          * combinations, i.e., remove ModelCombinations that operate below the lower
          * bound
          * \param combinations
-         * \param lowerBounds Bounding ModelPool
+         * \param lowerBound Bounding ModelPool
          * \return all combinations that operate within the bounds of the given
          * ModelPool
          */
-        static ModelPool::Set applyLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBounds);
+        static ModelPool::Set applyLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBound);
 
         /*
          * Enforces the minimum requirement by expanding missing models to
@@ -101,11 +101,11 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          * Apply a lower bound of resources to an existing set of model
          * combinations
          * \param combinations
-         * \param lowerBounds Bounding ModelPool
+         * \param lowerBound Bounding ModelPool
          * \return all combinations that operate now within the bounds of the given
          * ModelPool
          */
-        static ModelCombinationSet expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBounds);
+        static ModelCombinationSet expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBound);
 
         /*
          * Enforces the minimum requirement by expanding missing models to
@@ -113,11 +113,11 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          * Apply a lower bound of resources to an existing set of model
          * combinations
          * \param combinations
-         * \param lowerBounds Bounding ModelPool
+         * \param lowerBound Bounding ModelPool
          * \return all combinations that operate now within the bounds of the given
          * ModelPool
          */
-        static ModelPool::Set expandToLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBounds);
+        static ModelPool::Set expandToLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBound);
 
         /**
          * Check if the current model pool lies within the bound given by
@@ -145,7 +145,7 @@ class ModelPool : public std::map<owlapi::model::IRI, size_t>
          * \param indent indentation level
          * \return stringified object
          */
-        static std::string toString(const std::vector<ModelPool>& modelPoolSet, uint32_t indent = 0);
+        static std::string toString(const std::vector<ModelPool>& modelPoolList, uint32_t indent = 0);
 
         /**
          * Compute all combinations that can be generated from the given model

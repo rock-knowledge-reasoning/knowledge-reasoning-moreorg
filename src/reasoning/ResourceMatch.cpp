@@ -183,7 +183,7 @@ Gecode::Space* ResourceMatch::copy()
 
 ResourceMatch::Solution ResourceMatch::solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& modelRequirements,
         const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& providerResources,
-        OWLOntology::Ptr ontology)
+        const OWLOntology::Ptr& ontology)
 {
     ModelBound::List required = toModelBoundList(modelRequirements);
     ModelBound::List available = toModelBoundList(providerResources);
@@ -191,8 +191,34 @@ ResourceMatch::Solution ResourceMatch::solve(const std::vector<owlapi::model::OW
     return solve(required, available, ontology);
 }
 
-ResourceMatch::Solution ResourceMatch::solve(const ModelBound::List& required, const ModelBound::List& available, OWLOntology::Ptr ontology)
+ResourceMatch::Solution ResourceMatch::solve(const ModelBound::List& required,
+        const ModelBound::List& _available,
+        const OWLOntology::Ptr& ontology)
 {
+
+    if(_available.empty())
+    {
+        throw std::runtime_error("moreorg::reasoning::ResourceMatch::solve: no available models");
+    }
+
+    owlapi::model::OWLOntologyAsk ask(ontology);
+
+    ModelBound::List available = _available;
+    for(size_t a = 0; a < available.size()-1; ++a)
+    {
+        ModelBound* available_a = &available[a];
+        for(size_t b = a; b < available.size(); ++b)
+        {
+            ModelBound* available_b = &available[b];
+
+            if(ask.isSubClassOf(available_b->model, available_a->model))
+            {
+                available_a->min += available_b->min;
+                available_a->max += available_b->max;
+            }
+        }
+    }
+
     LOG_INFO_S << "Solve:" << std::endl
         << "    required: " << std::endl
         << "    " << ModelBound::toString(required, 8) << std::endl

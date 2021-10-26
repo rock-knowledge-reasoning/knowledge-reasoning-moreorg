@@ -158,11 +158,11 @@ public:
      */
     static ResourceMatch::Solution solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& modelRequirements,
             const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& providerResources,
-            owlapi::model::OWLOntology::Ptr ontology);
+            const owlapi::model::OWLOntology::Ptr& ontology);
 
     static ResourceMatch::Solution solve(const ModelBound::List& required,
             const ModelBound::List& available,
-            owlapi::model::OWLOntology::Ptr ontology);
+            const owlapi::model::OWLOntology::Ptr& ontology);
 
     static ResourceMatch::Solution solve(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& modelRequirements,
             const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& providerResources,

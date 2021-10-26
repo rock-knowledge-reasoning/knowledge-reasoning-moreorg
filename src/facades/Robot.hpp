@@ -8,7 +8,7 @@
 namespace moreorg {
     class Agent;
 namespace policies {
-    class Distribution;
+    struct Distribution;
 }
 }
 

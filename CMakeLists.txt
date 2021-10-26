@@ -10,6 +10,48 @@ project(moreorg
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_custom_target(tidy
+    COMMAND clang-tidy -format-style=file -checks=* -header-filter=/usr/include/*,/opt/*,. -p ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/src/* > ${CMAKE_BINARY_DIR}/clang-tidy.report.log
+    COMMAND cmake -E echo 'Generated clang-tidy report: ${CMAKE_BINARY_DIR}/clang-tidy.report.log'
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+
+if(ENABLE_CLANG_TIDY)
+    set(CMAKE_CXX_CLANG_TIDY
+        clang-tidy;
+        -header-filter=/usr/include/*,/opt/*,.;
+        -checks=*;
+    )
+endif()
+
+if(ENABLE_COVERAGE)
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        add_definitions(--coverage)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+        set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage")
+
+        add_custom_target(coverage
+            COMMAND lcov --directory . --capture --no-external --output-file cov.info
+            COMMAND lcov --remove cov.info '/opt' '*/test/*' '/usr/*' '*/install/*' --output-file cov.info.general_cleaned
+            COMMAND lcov --remove cov.info.general_cleaned '*/moreorg/ccf/*' '*/moreorg/src/ccf/*' '*/moreorg/src/organization_model/*' --output-file cov.info.cleaned
+            COMMAND genhtml -o ./cov cov.info.cleaned
+            COMMAND cmake -E remove cov.info cov.info.cleaned cov.info.general_cleaned
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        add_custom_target(cleancov
+            COMMAND find . -type f -regex '.*.gcno' -exec rm {} +
+            COMMAND find . -type f -regex '.*.gcda' -exec rm {} +
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+    else()
+        message(FATAL_ERROR "Code coverage only works in Debug versions" )
+    endif()
+endif()
+
 
 rock_init()
 rock_standard_layout()
