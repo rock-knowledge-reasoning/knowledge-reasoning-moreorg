@@ -167,6 +167,7 @@
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#MotionPlanning"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#SelfLocalization"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Camera_Front"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Camera_Top"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_EmiActive_Bottom"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_EmiActive_Endeffector"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_EmiPassive_East"/>
@@ -206,6 +207,15 @@
     <!-- http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Camera_Front -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Camera_Front">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Camera_Top -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/Sherpa#Sherpa_Camera_Top">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera"/>
         <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>

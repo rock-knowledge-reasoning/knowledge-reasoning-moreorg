@@ -122,7 +122,6 @@ namespace moreorg
             std::map<ModelBound, ResourceInstance::List> assignments;
             try
             {
-
                 // Check how often a full redundancy of the top level model is given
                 while (true)
                 {

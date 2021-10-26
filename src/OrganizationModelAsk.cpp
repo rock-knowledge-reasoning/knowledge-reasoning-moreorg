@@ -500,7 +500,7 @@ std::vector<OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getRequiredCar
             agents[m.first] = m.second;
         } else if(ontology().isSubClassOf(m.first, vocabulary::OM::Functionality()))
         {
-            agents[m.first] = m.second;
+            functionalities[m.first] = m.second;
         }
     }
 
@@ -596,7 +596,6 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
                     std::runtime_error("moreorg::OrganizationModelAsk::getCardinalityRestrictions:"
                         " expected OWLObjectCardinalityRestriction");
             }
-
             // Update the cardinality with the actual model count
             uint32_t cardinality = modelCount*restriction->getCardinality();
             if(max2Min && restriction->getCardinalityRestrictionType() == OWLCardinalityRestriction::MAX)
