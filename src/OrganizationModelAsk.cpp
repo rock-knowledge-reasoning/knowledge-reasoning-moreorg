@@ -500,11 +500,12 @@ std::vector<OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getRequiredCar
             agents[m.first] = m.second;
         } else if(ontology().isSubClassOf(m.first, vocabulary::OM::Functionality()))
         {
-            agents[m.first] = m.second;
+            functionalities[m.first] = m.second;
         }
     }
 
-    std::vector<OWLCardinalityRestriction::Ptr> f_required = getCardinalityRestrictions(functionalities, objectProperty, OWLCardinalityRestriction::SUM_OP);
+    // Consider a shared use of resources reqgarding functionalities
+    std::vector<OWLCardinalityRestriction::Ptr> f_required = getCardinalityRestrictions(functionalities, objectProperty, OWLCardinalityRestriction::MIN_OP);
     std::vector<OWLCardinalityRestriction::Ptr> r_required = getCardinalityRestrictions(agents, objectProperty, OWLCardinalityRestriction::SUM_OP, true);
 
     std::vector<OWLCardinalityRestriction::Ptr> required = OWLCardinalityRestrictionOps::join(f_required, r_required, OWLCardinalityRestriction::MIN_OP);
