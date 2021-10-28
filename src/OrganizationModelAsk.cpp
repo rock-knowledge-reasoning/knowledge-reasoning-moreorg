@@ -504,7 +504,8 @@ std::vector<OWLCardinalityRestriction::Ptr> OrganizationModelAsk::getRequiredCar
         }
     }
 
-    std::vector<OWLCardinalityRestriction::Ptr> f_required = getCardinalityRestrictions(functionalities, objectProperty, OWLCardinalityRestriction::SUM_OP);
+    // Consider a shared use of resources reqgarding functionalities
+    std::vector<OWLCardinalityRestriction::Ptr> f_required = getCardinalityRestrictions(functionalities, objectProperty, OWLCardinalityRestriction::MIN_OP);
     std::vector<OWLCardinalityRestriction::Ptr> r_required = getCardinalityRestrictions(agents, objectProperty, OWLCardinalityRestriction::SUM_OP, true);
 
     std::vector<OWLCardinalityRestriction::Ptr> required = OWLCardinalityRestrictionOps::join(f_required, r_required, OWLCardinalityRestriction::MIN_OP);

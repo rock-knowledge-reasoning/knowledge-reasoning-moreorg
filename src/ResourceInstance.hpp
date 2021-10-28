@@ -25,6 +25,13 @@ public:
 
     static std::string toString(const List& list, size_t indent = 0);
 
+    /**
+      * Convert ResourceInstance::List to a ModelPool to allow validation
+      * of general model count
+      * \return ModelPool that this list of ResourceInstances represents
+      */
+    static ModelPool toModelPool(const ResourceInstance::List& resources);
+
 private:
     owlapi::model::IRI mName;
     owlapi::model::IRI mModel;

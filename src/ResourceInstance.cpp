@@ -30,4 +30,15 @@ std::string ResourceInstance::toString(const List& list, size_t indent)
     return ss.str();
 }
 
+ModelPool ResourceInstance::toModelPool(const ResourceInstance::List& resources)
+{
+    ModelPool modelPool;
+    for(const ResourceInstance& ri : resources)
+    {
+        size_t value = modelPool.getValue(ri.getModel(), 0);
+        modelPool[ri.getModel()] = value + 1;
+    }
+    return modelPool;
+}
+
 } // end namespace moreorg
