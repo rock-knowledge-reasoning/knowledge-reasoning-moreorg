@@ -629,16 +629,21 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
 
 ResourceInstance::List OrganizationModelAsk::getRelated(const Agent& agent,
         const owlapi::model::IRI& qualification,
-        const owlapi::model::IRI& objectProperty) const
+        const owlapi::model::IRI& objectProperty, bool includeFunctionalities) const
 {
     ResourceInstance::List allRelatedInstances;
     for(const AtomicAgent& aa : agent.getAtomicAgents())
     {
         const IRI& modelName = aa.getModel();
 
-        ResourceInstance::PtrList agentRelatedResources = getRelated(modelName, qualification, objectProperty);
+        ResourceInstance::PtrList agentRelatedResources = getRelated(modelName, qualification, objectProperty, includeFunctionalities);
         for(const ResourceInstance::Ptr resourceInstance : agentRelatedResources)
         {
+            // if (resourceInstance->getModel().toString().find("Provider") != std::string::npos)
+            // {
+            //     continue;
+            // }
+            
             ResourceInstance r(*resourceInstance.get());
             r.setAtomicAgent(aa);
             allRelatedInstances.push_back(r);
@@ -649,7 +654,7 @@ ResourceInstance::List OrganizationModelAsk::getRelated(const Agent& agent,
 
 ResourceInstance::PtrList OrganizationModelAsk::getRelated(const owlapi::model::IRI& model,
         const owlapi::model::IRI& qualification,
-        const owlapi::model::IRI& objectProperty) const
+        const owlapi::model::IRI& objectProperty, bool includeFunctionalities) const
 {
     std::map<IRI, ResourceInstance::PtrList>::const_iterator cit = mRelatedResourceCache.find(model);
     if(mRelatedResourceCache.end() != cit)
@@ -667,16 +672,18 @@ ResourceInstance::PtrList OrganizationModelAsk::getRelated(const owlapi::model::
                 relatedInstanceModels.front());
         resourceInstances.push_back(r);
     }
-
-    IRIList types = mOntologyAsk.allTypesOf(model);
-    for(const IRI& type : types)
+    if (includeFunctionalities)
     {
-        if(mOntologyAsk.isSubClassOf(type, vocabulary::OM::Functionality()))
+        IRIList types = mOntologyAsk.allTypesOf(model);
+        for(const IRI& type : types)
         {
-            ResourceInstance::Ptr r = make_shared<ResourceInstance>(type, type);
-            resourceInstances.push_back(r);
+            if(mOntologyAsk.isSubClassOf(type, vocabulary::OM::Functionality()))
+            {
+                ResourceInstance::Ptr r = make_shared<ResourceInstance>(type, type);
+                resourceInstances.push_back(r);
+            }
         }
-    }
+    }    
 
     mRelatedResourceCache[model] = resourceInstances;
     return resourceInstances;

@@ -395,14 +395,14 @@ public:
      */
     std::vector<ResourceInstance> getRelated(const Agent& agent,
             const owlapi::model::IRI& qualification = vocabulary::OM::Resource(),
-            const owlapi::model::IRI& objectProperty = vocabulary::OM::has()) const;
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has(), bool includeFunctionalities = true) const;
 
     /**
      * Compute the instance list for a given model
      */
     std::vector< shared_ptr<ResourceInstance> > getRelated(const owlapi::model::IRI& model,
             const owlapi::model::IRI& qualification = vocabulary::OM::Resource(),
-            const owlapi::model::IRI& objectProperty = vocabulary::OM::has()) const;
+            const owlapi::model::IRI& objectProperty = vocabulary::OM::has(), bool includeFunctionalities = true) const;
 
     /**
      * Allow only subclasses of a particular type in a model pool

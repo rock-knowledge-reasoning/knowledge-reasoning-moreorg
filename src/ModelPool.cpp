@@ -282,6 +282,7 @@ bool ModelPool::isNull() const
     return true;
 }
 
+
 ModelPoolDelta::ModelPoolDelta(const ModelPool& pool)
 {
     ModelPool::const_iterator cit = pool.begin();
