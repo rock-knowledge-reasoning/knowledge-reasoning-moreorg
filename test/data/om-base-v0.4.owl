@@ -863,7 +863,7 @@ Can be inferred from other properties describing the corresponding dimensions</r
     <!-- http://www.rock-robotics.org/2014/01/om-base#ConstantPDF -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#ConstantPDF">
-        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDensityFunction"/>
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDistributionFunction"/>
     </owl:Class>
     
 
@@ -871,7 +871,7 @@ Can be inferred from other properties describing the corresponding dimensions</r
     <!-- http://www.rock-robotics.org/2014/01/om-base#ExponentialPDF -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#ExponentialPDF">
-        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDensityFunction"/>
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDistributionFunction"/>
     </owl:Class>
     
 
@@ -898,16 +898,16 @@ Can be inferred from other properties describing the corresponding dimensions</r
     
 
 
-    <!-- http://www.rock-robotics.org/2014/01/om-base#ProbabilityDensityFunction -->
+    <!-- http://www.rock-robotics.org/2014/01/om-base#ProbabilityDistributionFunction -->
 
-    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDensityFunction"/>
+    <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDistributionFunction"/>
     
 
 
     <!-- http://www.rock-robotics.org/2014/01/om-base#WeibullPDF -->
 
     <owl:Class rdf:about="http://www.rock-robotics.org/2014/01/om-base#WeibullPDF">
-        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDensityFunction"/>
+        <rdfs:subClassOf rdf:resource="http://www.rock-robotics.org/2014/01/om-base#ProbabilityDistributionFunction"/>
     </owl:Class>
     
 

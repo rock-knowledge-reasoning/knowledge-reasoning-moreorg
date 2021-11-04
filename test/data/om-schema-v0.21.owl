@@ -824,6 +824,36 @@
     
 
 
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_e144k_b5 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_e144k_b5">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#WeibullPDF"/>
+        <om-base:beta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">5.0</om-base:beta>
+        <om-base:eta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">144000.0</om-base:eta>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_e288k_b5 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_e288k_b5">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#WeibullPDF"/>
+        <om-base:beta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">5.0</om-base:beta>
+        <om-base:eta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">288000.0</om-base:eta>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_e360k_b5 -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_e360k_b5">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#WeibullPDF"/>
+        <om-base:beta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">5.0</om-base:beta>
+        <om-base:eta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">360000.0</om-base:eta>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.rock-robotics.org/2014/01/om-schema#PayloadLogisticsHub -->
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PayloadLogisticsHub">
