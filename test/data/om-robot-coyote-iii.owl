@@ -150,6 +150,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/CoyoteIII#CoyoteIII_Camera_Front">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#Camera"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -158,6 +159,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/CoyoteIII#CoyoteIII_EmiPassive_Front">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -166,6 +168,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/CoyoteIII#CoyoteIII_EmiPassive_Rear">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#EmiPassive"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -174,6 +177,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/CoyoteIII#CoyoteIII_LaserScanner_Front">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#LaserScanner"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -182,6 +186,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/CoyoteIII#CoyoteIII_PowerSource">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_longtime"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 

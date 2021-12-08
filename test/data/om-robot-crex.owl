@@ -176,7 +176,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2015/12/robots/CREX#CREX_PowerSource">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PowerSource"/>
-        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Constant_Hardware_unfailable"/>
+        <om-schema:has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_longtime"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 

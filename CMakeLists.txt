@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_TYPE Release)
 
 add_custom_target(tidy
     COMMAND clang-tidy -format-style=file -checks=* -header-filter=/usr/include/*,/opt/*,. -p ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/src/* > ${CMAKE_BINARY_DIR}/clang-tidy.report.log

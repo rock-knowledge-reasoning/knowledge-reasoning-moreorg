@@ -708,6 +708,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#LogisticHubProvider">
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#LogisticHubProvider"/>
+        <has rdf:resource="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_0"/>
     </owl:NamedIndividual>
     
 
@@ -810,6 +811,16 @@
         <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#WeibullPDF"/>
         <om-base:beta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">10.0</om-base:beta>
         <om-base:eta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">720000.0</om-base:eta>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_longtime -->
+
+    <owl:NamedIndividual rdf:about="http://www.rock-robotics.org/2014/01/om-schema#PDF_Weibull_Hardware_longtime">
+        <rdf:type rdf:resource="http://www.rock-robotics.org/2014/01/om-base#WeibullPDF"/>
+        <om-base:beta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">5.0</om-base:beta>
+        <om-base:eta rdf:datatype="http://www.w3.org/2001/XMLSchema#double">7200000.0</om-base:eta>
     </owl:NamedIndividual>
     
 

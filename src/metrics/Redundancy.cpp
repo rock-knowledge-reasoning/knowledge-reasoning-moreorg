@@ -258,6 +258,7 @@ namespace moreorg
             for (const ProbabilityOfFailure &survivability : models)
             {
                 LOG_INFO_S << "Probability of survival: " << survivability.toString();
+                std::cout << "time 0: " << t0 << " time 1: " << t1 << " Survivability: " << survivability.getProbabilityOfSurvivalConditionalWithRedundancy(t0, t1) << " , " << survivability.getRequirement().toString() << std::endl;
                 fullModelSurvival *=
                     survivability.getProbabilityOfSurvivalConditionalWithRedundancy(t0, t1);
             }
