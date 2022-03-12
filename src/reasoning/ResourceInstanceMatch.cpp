@@ -263,7 +263,10 @@ ResourceInstance::List ResourceInstanceMatch::Solution::removeAssignmentsFromLis
                     {
                         return ri.getName() == availableAgent.getName();
                     });
-                    if (listIterator != available.end()) available.erase(listIterator);                    
+                    if (listIterator != available.end())
+                    {
+                        available.erase(listIterator);
+                    }
                 }
             }
             

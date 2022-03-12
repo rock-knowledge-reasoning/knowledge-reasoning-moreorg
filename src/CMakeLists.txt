@@ -81,7 +81,10 @@ rock_library(moreorg
         metrics/ModelSurvivability.cpp
         metrics/Probability.cpp
         metrics/ProbabilityOfFailure.cpp
-        metrics/DistributionFunctions.cpp
+        metrics/ProbabilityDensityFunction.cpp
+        metrics/pdfs/ConstantPDF.cpp
+        metrics/pdfs/ExponentialPDF.cpp
+        metrics/pdfs/WeibullPDF.cpp
         Metric.cpp
         ModelPool.cpp
         ModelPoolIterator.cpp
@@ -149,7 +152,10 @@ rock_library(moreorg
         metrics/ModelSurvivability.hpp
         metrics/Probability.hpp
         metrics/ProbabilityOfFailure.hpp
-        metrics/DistributionFunctions.hpp
+        metrics/ProbabilityDensityFunction.hpp
+        metrics/pdfs/ConstantPDF.hpp
+        metrics/pdfs/ExponentialPDF.hpp
+        metrics/pdfs/WeibullPDF.hpp
         Metric.hpp
         ModelPool.hpp
         ModelPoolIterator.hpp

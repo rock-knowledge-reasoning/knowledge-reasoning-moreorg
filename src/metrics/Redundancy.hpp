@@ -4,7 +4,8 @@
 #include <moreorg/OrganizationModel.hpp>
 #include <moreorg/Metric.hpp>
 #include "../vocabularies/OM.hpp"
-#include "DistributionFunctions.hpp"
+#include "ProbabilityDensityFunction.hpp"
+#include "pdfs/WeibullPDF.hpp"
 #include "ProbabilityOfFailure.hpp"
 #include <map>
 
@@ -35,14 +36,15 @@ public:
      * Default probability of survival
      */
     Redundancy(const OrganizationModelAsk& organization,
-        const ProbabilityDensityFunction::Ptr& defaultPDF = make_shared<WeibullPDF>(36000., 1.), // 36000s = 10h
-        const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
+               const ProbabilityDensityFunction::Ptr& defaultPDF = make_shared<pdfs::WeibullPDF>(36000., 1.), // 36000s = 10h
+               const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
 
 
     double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
-            const ResourceInstance::List &availableAgents, double t0 = 0, double t1 = 0) const;
+                         const ResourceInstance::List &availableAgents, double t0 = 0, double t1 = 0) const;
 
-    double computeSequential(const owlapi::model::IRIList& functions, const ResourceInstance::List& modelPool) const;
+    double computeSequential(const owlapi::model::IRIList& functions,
+                             const ResourceInstance::List& modelPool) const;
     double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ResourceInstance::List& modelPool, bool sharedUse = true) const;
 
     // ProbabilityOfFailure::List getSharedUseMetricModelsList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,

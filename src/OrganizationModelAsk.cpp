@@ -628,8 +628,9 @@ std::vector<owlapi::model::OWLCardinalityRestriction::Ptr> OrganizationModelAsk:
 }
 
 ResourceInstance::List OrganizationModelAsk::getRelated(const Agent& agent,
-        const owlapi::model::IRI& qualification,
-        const owlapi::model::IRI& objectProperty, bool includeFunctionalities) const
+         const owlapi::model::IRI& qualification,
+         const owlapi::model::IRI& objectProperty,
+         bool includeFunctionalities) const
 {
     ResourceInstance::List allRelatedInstances;
     for(const AtomicAgent& aa : agent.getAtomicAgents())
@@ -653,8 +654,9 @@ ResourceInstance::List OrganizationModelAsk::getRelated(const Agent& agent,
 }
 
 ResourceInstance::PtrList OrganizationModelAsk::getRelated(const owlapi::model::IRI& model,
-        const owlapi::model::IRI& qualification,
-        const owlapi::model::IRI& objectProperty, bool includeFunctionalities) const
+         const owlapi::model::IRI& qualification,
+         const owlapi::model::IRI& objectProperty,
+         bool includeFunctionalities) const
 {
     std::map<IRI, ResourceInstance::PtrList>::const_iterator cit = mRelatedResourceCache.find(model);
     if(mRelatedResourceCache.end() != cit)
