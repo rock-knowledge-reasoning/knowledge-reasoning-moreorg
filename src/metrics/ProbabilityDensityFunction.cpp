@@ -21,9 +21,7 @@ ProbabilityDensityFunction::Ptr ProbabilityDensityFunction::getInstance(const Or
             OWLLiteral::Ptr value = annotationValue->asLiteral();      
             // LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
             return make_shared<pdfs::ConstantPDF>(value->getDouble());
-        }
-
-        if (organizationModelAsk.ontology().isInstanceOf(iri, vocabulary::OMBase::WeibullPDF()))
+        } else if (organizationModelAsk.ontology().isInstanceOf(iri, vocabulary::OMBase::WeibullPDF()))
         {
             OWLAnnotationValue::Ptr annotationValue_eta = organizationModelAsk.ontology().getAnnotationValue(iriList.front(), vocabulary::OMBase::eta());
             OWLAnnotationValue::Ptr annotationValue_beta = organizationModelAsk.ontology().getAnnotationValue(iriList.front(), vocabulary::OMBase::beta());
@@ -33,17 +31,20 @@ ProbabilityDensityFunction::Ptr ProbabilityDensityFunction::getInstance(const Or
 
             // LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
             return make_shared<pdfs::WeibullPDF>(value_eta->getDouble(), value_beta->getDouble());
-        }
-        if (organizationModelAsk.ontology().isInstanceOf(iri, vocabulary::OMBase::ExponentialPDF()))
+        } else if (organizationModelAsk.ontology().isInstanceOf(iri, vocabulary::OMBase::ExponentialPDF()))
         {
             OWLAnnotationValue::Ptr annotationValue = organizationModelAsk.ontology().getAnnotationValue(iriList.front(), vocabulary::OMBase::lambda());
             OWLLiteral::Ptr value = annotationValue->asLiteral();      
             // LOG_DEBUG_S << "Retrieved probability of failure for '" << qualification << ": " << value->getDouble();
             return make_shared<pdfs::ExponentialPDF>(value->getDouble());
+        } else {
+            throw std::invalid_argument("moreorg::metrics::ProbabilityDensityFunction::getInstance no probability density function instance was found for: "
+                                  + iri.toString() + " and " + qualification.toString());
         }
     }
 
-  throw std::invalid_argument("moreorg::metrics::ProbabilityDensityFunction::getInstance no related probability density function instance was found!");
+    throw std::invalid_argument("moreorg::metrics::ProbabilityDensityFunction::getInstance no related probability density function instance was found for: "
+                              + qualification.toString());
 }
 
 } // namespace metrics

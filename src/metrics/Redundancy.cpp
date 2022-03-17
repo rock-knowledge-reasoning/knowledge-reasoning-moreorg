@@ -152,12 +152,12 @@ double Redundancy::computeMetric(
 
     if (fullModelRedundancy == 0)
     {
-        LOG_WARN_S << "Redundancy: the minimal resource requirements have not been "
-                      "fulfilled. Redundancy cannot be computed"
-                   << "available: " << ResourceInstance::toString(available, 4)
-                   << "required: " << ModelBound::toString(modelBoundRequired, 4);
-        throw std::runtime_error("owlapi::metrics::Redundancy: minimal resource "
-                                 "requirement have not been fulfilled");
+        std::stringstream ss;
+        ss << "owlapi::metrics::Redundancy: the minimal resource requirements have not been "
+           << "fulfilled. Redundancy cannot be computed" << std::endl
+           << "available: " << ResourceInstance::toString(available, 4)
+           << "required: " << ModelBound::toString(modelBoundRequired, 4);
+        throw std::runtime_error(ss.str());
     }
 
     //  Find weakest spot in the model
@@ -179,16 +179,9 @@ double Redundancy::computeMetric(
             // owlapi)
             probabilityDensityFunction = ProbabilityDensityFunction::getInstance(
                 mOrganizationModelAsk, required.model);
-            // if(!probabilityDensityFunction)
-            // {
-            //     throw
-            //     std::invalid_argument("moreorg::metrics::Redundancy::computeMetrics
-            //     probability density function was not set!");
-            // }
         }
-        catch (...)
+        catch(const std::exception& e)
         {
-
             probabilityDensityFunction = mDefaultProbabilityDensityFunction;
         }
 

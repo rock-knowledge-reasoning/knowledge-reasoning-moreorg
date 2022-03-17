@@ -32,6 +32,8 @@ public:
       */
     static ModelPool toModelPool(const ResourceInstance::List& resources);
 
+    bool operator<(const ResourceInstance& other) const;
+
 private:
     owlapi::model::IRI mName;
     owlapi::model::IRI mModel;

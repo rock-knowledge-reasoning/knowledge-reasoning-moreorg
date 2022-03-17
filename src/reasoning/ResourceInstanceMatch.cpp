@@ -58,6 +58,7 @@ ResourceInstanceMatch::ResourceInstanceMatch(const ModelBound::List& required,
     Gecode::Matrix<Gecode::IntVarArray> modelAssignment(mModelAssignment,
             /*width --> col*/ available.size(), /* height --> row*/ required.size());
 
+    std::map<ResourceInstance, Gecode::IntVarArgs> resourceAssignments;
     for(size_t ri = 0; ri < mRequiredModelBound.size(); ++ri)
     {
         const ModelBound& requiredModelBound = mRequiredModelBound[ri];
@@ -76,11 +77,13 @@ ResourceInstanceMatch::ResourceInstanceMatch(const ModelBound::List& required,
             rel(*this, m, Gecode::IRT_GQ, 0);
 
             // upper bound
-            // check if the available model supports the required, i.e. is
-            // either class or subclass
+            // check if the available model supports the required, i.e.,
+            // is either class or subclass
             // if so, then use max required value as upper bound
             const ResourceInstance& availableResource = mAvailableResources[ai];
             const owlapi::model::IRI& availableModel = availableResource.getModel();
+
+            resourceAssignments[availableResource] << m;
 
             if(requiredModel == availableModel || ask.ontology().isSubClassOf(availableModel, requiredModel))
             {
@@ -106,20 +109,11 @@ ResourceInstanceMatch::ResourceInstanceMatch(const ModelBound::List& required,
         rel(*this, sum(args) >= requiredModelBound.min);
     }
 
-
-    //for(size_t ai = 0; ai < mAvailableResources.size(); ++ai)
-    //{
-    //    const ResourceInstance& availableResource = mAvailableResource[ai];
-
-    //    Gecode::IntVarArgs args;
-    //    for(size_t ri = 0; ri < mRequiredModelBound.size(); ++ri)
-    //    {
-    //        Gecode::IntVar m = modelAssignment(ai, ri);
-    //        args << m;
-    //    }
-    //    // Maximum number of available resources should not exceed the
-    //    rel(*this, sum(args) <= availableModelBound.max);
-    //}
+    // Each resource can be only assigned once
+    for(const std::pair<ResourceInstance, Gecode::IntVarArgs>& assignments : resourceAssignments)
+    {
+        rel(*this, sum(assignments.second) <= 1);
+    }
 
     // Set branchers -- since otherwise we will have no assigned solutions
     //branch(*this, mModelAssignment, Gecode::INT_VAR_SIZE_MAX(), Gecode::INT_VAL_SPLIT_MIN());
@@ -146,7 +140,10 @@ Gecode::Space* ResourceInstanceMatch::copy()
     return new ResourceInstanceMatch(*this);
 }
 
-ResourceInstanceMatch::Solution ResourceInstanceMatch::solve(const ModelBound::List& required, const ResourceInstance::List& available, const OrganizationModelAsk& ask)
+ResourceInstanceMatch::Solution ResourceInstanceMatch::solve(
+    const ModelBound::List& required,
+    const ResourceInstance::List& available,
+    const OrganizationModelAsk& ask)
 {
     LOG_INFO_S << "Solve:" << std::endl
         << "    required: " << std::endl

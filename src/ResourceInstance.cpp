@@ -41,4 +41,9 @@ ModelPool ResourceInstance::toModelPool(const ResourceInstance::List& resources)
     return modelPool;
 }
 
+bool ResourceInstance::operator<(const ResourceInstance& other) const
+{
+    return other.toString() < this->toString();
+}
+
 } // end namespace moreorg
