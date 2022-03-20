@@ -1,3 +1,6 @@
+#ifndef MOREORG_METRICS_PDFS_EXPONENTIAL_PDF_HPP
+#define MOREORG_METRICS_PDFS_EXPONENTIAL_PDF_HPP
+
 #include "../ProbabilityDensityFunction.hpp"
 
 namespace moreorg {
@@ -19,3 +22,5 @@ class ExponentialPDF : public ProbabilityDensityFunction
 } // end namespace distribution_functions
 } // end namespace metrics
 } // end namespace moreorg
+
+#endif // MOREORG_METRICS_PDFS_EXPONENTIAL_PDF_HPP

@@ -50,7 +50,7 @@ public:
 
     static ModelPool merge(const ModelCombinationSet& a, const ModelCombination& b);
 
-    static ModelPool merge(const std::set<ModelPool>& pool);
+    static ModelPool merge(const std::set<ModelPool>& modelPoolSet);
 
     /**
      * Multiply the cardinalities with a given factor

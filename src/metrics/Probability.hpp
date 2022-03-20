@@ -1,3 +1,6 @@
+#ifndef MOREORG_METRICS_PROBABILITY_HPP
+#define MOREORG_METRICS_PROBABILITY_HPP
+
 #include <owlapi/OWLApi.hpp>
 #include <owlapi/model/IRI.hpp>
 #include "../ResourceInstance.hpp"
@@ -44,3 +47,5 @@ class Probability
 };
 } // end namespace metrics
 } // end namespace moreorg
+
+#endif // MOREORG_METRICS_PROBABILITY_HPP

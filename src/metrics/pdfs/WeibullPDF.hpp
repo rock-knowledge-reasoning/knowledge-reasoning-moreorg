@@ -1,3 +1,6 @@
+#ifndef MOREORG_METRICS_PDFS_WEIBULL_PDF_HPP
+#define MOREORG_METRICS_PDFS_WEIBULL_PDF_HPP
+
 #include "../ProbabilityDensityFunction.hpp"
 
 namespace moreorg {
@@ -23,3 +26,4 @@ class WeibullPDF : public ProbabilityDensityFunction
 } // end namespace metrics
 } // end namespace moreorg
 
+#endif // MOREORG_METRICS_PDFS_WEIBULL_PDF_HPP

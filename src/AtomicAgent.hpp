@@ -27,9 +27,9 @@ class AtomicAgent
     /// Name of the instance derived from model IRI and id
     std::string mName;
 public:
-    typedef std::vector<AtomicAgent> List;
-    typedef std::set<AtomicAgent> Set;
-    typedef std::map<owlapi::model::IRI, std::set<AtomicAgent> > TypeMap;
+    using List = std::vector<AtomicAgent>;
+    using Set = std::set<AtomicAgent>;
+    using TypeMap = std::map<owlapi::model::IRI, std::set<AtomicAgent> >;
 
     /**
      * Default constructor to allow usage in lists and maps

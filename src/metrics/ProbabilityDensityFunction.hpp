@@ -1,5 +1,5 @@
-#ifndef PROBABILITY_DENSITY_FUNCTION_HPP
-#define PROBABILITY_DENSITY_FUNCTION_HPP
+#ifndef MOREORG_METRICS_PROBABILITY_DENSITY_FUNCTION_HPP
+#define MOREORG_METRICS_PROBABILITY_DENSITY_FUNCTION_HPP
 
 #include <math.h>
 #include <stdexcept>
@@ -28,4 +28,4 @@ class ProbabilityDensityFunction
 } // namespace metrics
 } // namespace moreorg
 
-#endif // PROBABILITY_DENSITY_FUNCTION_HPP
+#endif // MOREORG_METRICS_PROBABILITY_DENSITY_FUNCTION_HPP

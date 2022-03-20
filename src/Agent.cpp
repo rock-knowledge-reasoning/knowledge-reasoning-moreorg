@@ -130,4 +130,4 @@ std::ostream& operator<<(std::ostream& os, const Agent::Set& agents)
     return os;
 }
 
-}
+} // end namespace moreorg
