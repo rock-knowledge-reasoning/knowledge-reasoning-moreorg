@@ -266,7 +266,7 @@ pddl_planner::representation::Problem PDDLExporter::toProblem()
 
     pddl_planner::representation::Problem problem("om-partial", toDomain());
 
-    for(const std::pair<std::string, IRIList>& instance : mAgentName2Instance)
+    for(const auto& instance : mAgentName2Instance)
     {
         try
         {

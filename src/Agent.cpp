@@ -27,7 +27,7 @@ Agent::Agent(const AtomicAgent::Set& atomicAgents)
 Agent::Agent(const ModelPool& modelPool)
     : mAtomicAgents()
 {
-    for(const std::pair<IRI, size_t>& p : modelPool)
+    for(const std::pair<const IRI, size_t>& p : modelPool)
     {
         for(size_t i = 0; i < p.second; ++i)
         {

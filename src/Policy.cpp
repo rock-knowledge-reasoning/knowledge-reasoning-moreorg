@@ -38,7 +38,7 @@ Policy::computeSharesByType(const owlapi::model::IRI& property,
     {
         double sumOfPropertyValues = 0;
         std::map<IRI, double> propertyValues;
-        for(const ModelPool::value_type p : modelPool)
+        for(const ModelPool::value_type& p : modelPool)
         {
             const IRI& agentType = p.first;
             size_t numberOfInstances = p.second;
@@ -50,7 +50,7 @@ Policy::computeSharesByType(const owlapi::model::IRI& property,
             sumOfPropertyValues += propertyValue * numberOfInstances;
         }
 
-        for(const std::pair<IRI, double>& p : propertyValues)
+        for(const std::pair<const IRI, double>& p : propertyValues)
         {
             sharesByType[p.first] = p.second / sumOfPropertyValues;
         }

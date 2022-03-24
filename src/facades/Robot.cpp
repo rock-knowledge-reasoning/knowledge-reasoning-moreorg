@@ -365,11 +365,11 @@ void Robot::updateManipulationProperties()
                 actorModel,
                 vocabulary::OM::resolve("Manipulator"));
 
-        for(const std::map<IRI, std::map<IRI, double>>::value_type v :
+        for(const std::map<IRI, std::map<IRI, double>>::value_type& v :
             manipulators)
         {
             const std::map<IRI, double>& properties = v.second;
-            for(const std::pair<IRI, double>& p : properties)
+            for(const std::pair<const IRI, double>& p : properties)
             {
                 if(vocabulary::OM::resolve("minPickingHeight") == p.first)
                 {
