@@ -12,8 +12,8 @@
 namespace moreorg {
 namespace utils {
 
-typedef AtomicAgent::List Coalition;
-typedef std::vector<Coalition> CoalitionStructure;
+using Coalition = AtomicAgent::List;
+using CoalitionStructure = std::vector<Coalition>;
 
 std::ostream& operator<<(std::ostream& os, const Coalition& coalition);
 std::ostream& operator<<(std::ostream& os, const CoalitionStructure& list);
@@ -45,9 +45,8 @@ std::ostream& operator<<(std::ostream& os, const Bounds& bounds);
 class CoalitionStructureGeneration
 {
 public:
-    typedef boost::function1<double, const Coalition&> CoalitionValueFunction;
-    typedef boost::function1<double, const CoalitionStructure&>
-        CoalitionStructureValueFunction;
+    using CoalitionValueFunction = boost::function1<double, const Coalition&>;
+    using CoalitionStructureValueFunction = boost::function1<double, const CoalitionStructure&>;
 
     struct Statistics
     {
@@ -66,17 +65,16 @@ private:
     Statistics mStatistics;
 
     // Agents listed by size of the coalition
-    typedef std::map<size_t, std::set<Coalition>> AgentCoalitionMap;
+    using AgentCoalitionMap = std::map<size_t, std::set<Coalition>>;
     AgentCoalitionMap mAgentCoalitionMap;
 
-    typedef std::map<size_t, Bounds> CoalitionBoundMap;
+    using CoalitionBoundMap = std::map<size_t, Bounds>;
     CoalitionBoundMap mCoalitionBoundMap;
 
     CoalitionValueFunction mCoalitionValueFunction;
     CoalitionStructureValueFunction mCoalitionStructureValueFunction;
 
-    typedef std::map<numeric::IntegerPartition, Bounds>
-        IntegerPartitionBoundsMap;
+    using IntegerPartitionBoundsMap = std::map<numeric::IntegerPartition, Bounds>;
     IntegerPartitionBoundsMap mIntegerPartitionBoundsMap;
 
     mutable boost::mutex mSolutionMutex;

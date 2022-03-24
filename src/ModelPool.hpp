@@ -8,8 +8,8 @@
 
 namespace moreorg {
 
-typedef owlapi::model::IRIList ModelCombination;
-typedef std::set<ModelCombination> ModelCombinationSet;
+using ModelCombination = owlapi::model::IRIList;
+using ModelCombinationSet = std::set<ModelCombination>;
 
 /**
  * \class ModelPool
@@ -20,8 +20,8 @@ typedef std::set<ModelCombination> ModelCombinationSet;
 class ModelPool : public std::map<owlapi::model::IRI, size_t>
 {
 public:
-    typedef std::vector<ModelPool> List;
-    typedef std::set<ModelPool> Set;
+    using List = std::vector<ModelPool>;
+    using Set = std::set<ModelPool>;
 
     /**
      * Default constructor

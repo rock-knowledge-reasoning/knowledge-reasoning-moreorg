@@ -8,7 +8,7 @@ namespace moreorg {
 class OrganizationModelTell
 {
 public:
-    typedef shared_ptr<OrganizationModelTell> Ptr;
+    using Ptr = shared_ptr<OrganizationModelTell>;
 
     OrganizationModelTell(OrganizationModel::Ptr om);
 

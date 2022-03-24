@@ -7,12 +7,12 @@
 namespace moreorg {
 namespace policies {
 
-typedef Agent::Set Selection;
+using Selection = Agent::Set;
 
 class SelectionPolicy : public Policy
 {
 public:
-    typedef shared_ptr<SelectionPolicy> Ptr;
+    using Ptr = shared_ptr<SelectionPolicy>;
 
     SelectionPolicy(const owlapi::model::IRI& iri = owlapi::model::IRI());
 

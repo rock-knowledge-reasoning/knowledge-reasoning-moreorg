@@ -13,7 +13,7 @@ namespace moreorg {
 class OrganizationModelAsk;
 class OrganizationModelTell;
 
-typedef std::vector<owlapi::model::IRIList> CandidatesList;
+using CandidatesList = std::vector<owlapi::model::IRIList>;
 
 /**
  * \mainpage Organization modelling with OWL
@@ -46,7 +46,7 @@ class OrganizationModel
     friend class OrganizationModelTell;
 
 public:
-    typedef shared_ptr<OrganizationModel> Ptr;
+    using Ptr = shared_ptr<OrganizationModel>;
 
     /**
      * Constructor to create an organization model from a given model

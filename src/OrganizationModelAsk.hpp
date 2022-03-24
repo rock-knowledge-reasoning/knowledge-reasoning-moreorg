@@ -28,7 +28,7 @@ class OrganizationModelAsk
     friend class algebra::ResourceSupportVector;
 
 public:
-    typedef shared_ptr<OrganizationModelAsk> Ptr;
+    using Ptr = shared_ptr<OrganizationModelAsk>;
 
     /**
      * Default constructor for an instance of organization model ask

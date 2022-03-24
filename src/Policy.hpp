@@ -16,8 +16,8 @@ namespace moreorg {
 class Policy
 {
 public:
-    typedef shared_ptr<Policy> Ptr;
-    typedef owlapi::model::IRI Id;
+    using Ptr = shared_ptr<Policy>;
+    using Id = owlapi::model::IRI;
 
     static const size_t MAX_POLICY_ELEMENTS = 100;
 

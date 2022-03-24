@@ -22,8 +22,8 @@ enum Type { UNKNOWN = 0, REDUNDANCY };
 
 } // end namespace metrics
 
-typedef owlapi::model::IRI ServiceIRI;
-typedef owlapi::model::IRI ActorIRI;
+using ServiceIRI = owlapi::model::IRI;
+using ActorIRI = owlapi::model::IRI;
 typedef std::map<std::pair<ServiceIRI, ActorIRI>, double> MetricMap;
 
 /**
@@ -34,8 +34,8 @@ typedef std::map<std::pair<ServiceIRI, ActorIRI>, double> MetricMap;
 class Metric
 {
 public:
-    typedef shared_ptr<Metric> Ptr;
-    typedef std::vector<Metric> List;
+    using Ptr = shared_ptr<Metric>;
+    using List = std::vector<Metric>;
 
     /**
      * Metric for an organization model

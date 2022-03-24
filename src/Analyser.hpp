@@ -24,14 +24,14 @@ namespace moreorg {
 class Analyser
 {
 public:
-    typedef std::vector<StatusSample::ConstRawPtrList> StatusSampleIndex;
+    using StatusSampleIndex = std::vector<StatusSample::ConstRawPtrList>;
     typedef std::vector<RequirementSample::ConstRawPtrList>
         RequirementSampleIndex;
 
     typedef std::function<double(size_t, const AtomicAgent&)>
         AtomicAgentSampleFunc;
     typedef std::function<double(size_t, const Agent&)> AgentSampleFunc;
-    typedef std::function<double(size_t)> OrganizationSampleFunc;
+    using OrganizationSampleFunc = std::function<double(size_t)>;
     /// Function to compute value vector for a coalition structure
     // typedef std::function< std::vector<double>(size_t, const Agent&) >
     // CoalitionStructureValueFunc;

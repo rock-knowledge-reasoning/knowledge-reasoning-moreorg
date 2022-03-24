@@ -43,8 +43,8 @@ struct InterfaceConnection
     std::string toString() const;
 };
 
-typedef std::vector<InterfaceConnection> InterfaceConnectionList;
-typedef std::vector<InterfaceConnectionList> InterfaceCombinationList;
+using InterfaceConnectionList = std::vector<InterfaceConnection>;
+using InterfaceCombinationList = std::vector<InterfaceConnectionList>;
 
 std::ostream& operator<<(std::ostream& os,
                          const InterfaceConnection& connection);

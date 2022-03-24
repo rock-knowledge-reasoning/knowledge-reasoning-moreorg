@@ -10,9 +10,9 @@ namespace moreorg {
 class Service
 {
 public:
-    typedef double QualityOfService;
-    typedef double Duration;
-    typedef double Safety;
+    using QualityOfService = double;
+    using Duration = double;
+    using Safety = double;
 
     Service(const owlapi::model::IRI& model)
         : mModel(model)
@@ -33,8 +33,8 @@ private:
     Safety mSafety;
 };
 
-typedef std::vector<Service> ServiceList;
-typedef std::set<Service> ServiceSet;
+using ServiceList = std::vector<Service>;
+using ServiceSet = std::set<Service>;
 
 } // end namespace moreorg
 #endif // ORGANIZATION_MODEL_SERVICE_HPP

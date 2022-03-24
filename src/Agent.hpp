@@ -18,8 +18,8 @@ namespace moreorg {
 class Agent
 {
 public:
-    typedef std::vector<Agent> List;
-    typedef std::set<Agent> Set;
+    using List = std::vector<Agent>;
+    using Set = std::set<Agent>;
 
     /// The operational status of a agent
     enum OperationalStatus {
@@ -133,7 +133,7 @@ private:
 };
 
 /// A coalition structure is a list of (composite) agents
-typedef Agent::List CoalitionStructure;
+using CoalitionStructure = Agent::List;
 
 std::ostream& operator<<(std::ostream& os, const Agent::Set& agents);
 

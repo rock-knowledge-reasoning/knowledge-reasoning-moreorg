@@ -14,7 +14,7 @@ namespace metrics {
 class Probability
 {
 public:
-    typedef std::vector<Probability> List;
+    using List = std::vector<Probability>;
 
     Probability(
         const reasoning::ModelBound& requirement,

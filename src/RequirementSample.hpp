@@ -13,8 +13,8 @@ namespace moreorg {
 class RequirementSample : public Sample
 {
 public:
-    typedef std::vector<RequirementSample> List;
-    typedef std::vector<const RequirementSample*> ConstRawPtrList;
+    using List = std::vector<RequirementSample>;
+    using ConstRawPtrList = std::vector<const RequirementSample*>;
 
     RequirementSample(const Resource::Set& resources,
                       const ModelPool& agentPool,

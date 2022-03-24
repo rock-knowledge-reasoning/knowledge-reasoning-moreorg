@@ -22,9 +22,9 @@ namespace moreorg {
 class StatusSample : public Sample
 {
 public:
-    typedef std::vector<StatusSample> List;
-    typedef std::vector<const StatusSample*> ConstRawPtrList;
-    typedef std::map<const StatusSample*, double> RawPtr2Double;
+    using List = std::vector<StatusSample>;
+    using ConstRawPtrList = std::vector<const StatusSample*>;
+    using RawPtr2Double = std::map<const StatusSample*, double>;
 
     StatusSample();
 

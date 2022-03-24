@@ -226,11 +226,11 @@ public:
 
 template <typename T> struct Coalition
 {
-    typedef T Atom;
-    typedef Set<T> Constraint;
-    typedef SetOfSets<T> Constraints;
+    using Atom = T;
+    using Constraint = Set<T>;
+    using Constraints = SetOfSets<T>;
 
-    typedef Set<Coalition<T>> Coalitions;
+    using Coalitions = Set<Coalition<T>>;
 
     Constraints positive;
     Constraints negative;
@@ -330,17 +330,17 @@ inline std::ostream& operator<<(std::ostream& out, const Coalition<T>& val)
 template <typename T, template <class> class C = Coalition> class CCF
 {
 public:
-    typedef T Atom;
-    typedef Set<T> Atoms;
-    typedef std::vector<T> AtomsVector;
-    typedef Set<T> Constraint;
-    typedef SetOfSets<T> Constraints;
-    typedef C<T> Coalition;
-    typedef Set<C<T>> Coalitions;
-    typedef std::vector<Coalitions> CoalitionsList;
-    typedef Constraints PositiveConstraints;
-    typedef Constraints NegativeConstraints;
-    typedef std::vector<T> AStar;
+    using Atom = T;
+    using Atoms = Set<T>;
+    using AtomsVector = std::vector<T>;
+    using Constraint = Set<T>;
+    using Constraints = SetOfSets<T>;
+    using Coalition = C<T>;
+    using Coalitions = Set<C<T>>;
+    using CoalitionsList = std::vector<Coalitions>;
+    using PositiveConstraints = Constraints;
+    using NegativeConstraints = Constraints;
+    using AStar = std::vector<T>;
 
 private:
     Atoms mAtoms;

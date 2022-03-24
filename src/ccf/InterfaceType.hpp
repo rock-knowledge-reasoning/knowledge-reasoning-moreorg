@@ -8,7 +8,7 @@
 namespace multiagent {
 namespace ccf {
 
-typedef uint8_t LocalInterfaceId;
+using LocalInterfaceId = uint8_t;
 
 class InterfaceType
 {

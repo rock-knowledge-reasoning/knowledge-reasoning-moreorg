@@ -64,7 +64,7 @@ class InferenceRule
 public:
     virtual ~InferenceRule() = default;
 
-    typedef shared_ptr<InferenceRule> Ptr;
+    using Ptr = shared_ptr<InferenceRule>;
 
     void load(const owlapi::model::IRI& dataproperty,
               const owlapi::model::IRI& ruleRelation,

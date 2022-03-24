@@ -7,9 +7,9 @@
 namespace multiagent {
 namespace ccf {
 
-typedef uint8_t ActorType;
-typedef uint8_t LocalActorId;
-typedef uint16_t ActorId;
+using ActorType = uint8_t;
+using LocalActorId = uint8_t;
+using ActorId = uint16_t;
 
 class Actor
 {

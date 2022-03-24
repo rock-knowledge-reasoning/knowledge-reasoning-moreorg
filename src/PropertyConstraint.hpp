@@ -22,8 +22,8 @@ class Robot;
 class PropertyConstraint
 {
 public:
-    typedef std::vector<PropertyConstraint> List;
-    typedef std::set<PropertyConstraint> Set;
+    using List = std::vector<PropertyConstraint>;
+    using Set = std::set<PropertyConstraint>;
     typedef std::map<owlapi::model::IRI, PropertyConstraint::Set> Clusters;
 
     enum ConstraintType {

@@ -9,7 +9,7 @@ namespace inference_rules {
 class CompositeAgentRule : public InferenceRule
 {
 public:
-    typedef shared_ptr<CompositeAgentRule> Ptr;
+    using Ptr = shared_ptr<CompositeAgentRule>;
 
     double apply(const facades::Robot& robot) const override;
 };

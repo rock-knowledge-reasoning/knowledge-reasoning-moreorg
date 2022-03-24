@@ -13,8 +13,8 @@ namespace moreorg {
 class Resource
 {
 public:
-    typedef std::vector<Resource> List;
-    typedef std::set<Resource> Set;
+    using List = std::vector<Resource>;
+    using Set = std::set<Resource>;
 
     Resource(const owlapi::model::IRI& model = owlapi::model::IRI());
 
@@ -75,7 +75,7 @@ private:
     PropertyConstraint::Set mPropertyConstraints;
 };
 
-typedef Resource Functionality;
+using Functionality = Resource;
 
 } // namespace moreorg
 #endif // ORGANIZATION_MODEL_RESOURCE_HPP

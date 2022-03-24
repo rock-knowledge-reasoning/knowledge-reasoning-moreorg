@@ -112,7 +112,7 @@ protected:
     virtual Gecode::Space* copy(void);
 
 public:
-    typedef shared_ptr<ResourceInstanceMatch> Ptr;
+    using Ptr = shared_ptr<ResourceInstanceMatch>;
     class Solution
     {
     public:

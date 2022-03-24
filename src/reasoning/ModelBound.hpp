@@ -14,7 +14,7 @@ namespace reasoning {
  */
 struct ModelBound
 {
-    typedef std::vector<ModelBound> List;
+    using List = std::vector<ModelBound>;
 
     static uint32_t MAX_THRESHOLD;
 

@@ -6,8 +6,8 @@
 namespace multiagent {
 namespace ccf {
 
-typedef uint8_t CompatibilityType;
-typedef uint32_t InterfaceId;
+using CompatibilityType = uint8_t;
+using InterfaceId = uint32_t;
 
 class Interface
 {

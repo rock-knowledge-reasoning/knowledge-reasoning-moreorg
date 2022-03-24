@@ -20,8 +20,8 @@ namespace reasoning {
 
 typedef std::map<owlapi::model::IRI, std::vector<int>> TypeInstanceMap;
 typedef std::map<owlapi::model::IRI, owlapi::model::IRIList> AllowedTypesMap;
-typedef owlapi::model::IRIList InstanceList;
-typedef owlapi::model::IRIList TypeList;
+using InstanceList = owlapi::model::IRIList;
+using TypeList = owlapi::model::IRIList;
 
 /**
  * ResourceMatch allows to search for a valid solution for checking cardinality
@@ -109,7 +109,7 @@ protected:
     virtual Gecode::Space* copy(void);
 
 public:
-    typedef shared_ptr<ResourceMatch> Ptr;
+    using Ptr = shared_ptr<ResourceMatch>;
     class Solution
     {
     public:

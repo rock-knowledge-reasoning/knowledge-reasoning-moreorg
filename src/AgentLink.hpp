@@ -9,7 +9,7 @@ namespace moreorg {
 class AgentLink
 {
 public:
-    typedef std::set<AgentLink> Set;
+    using Set = std::set<AgentLink>;
 
     AgentLink() = default;
 

@@ -13,7 +13,7 @@ class ProbabilityDensityFunction
 {
 
 public:
-    typedef shared_ptr<ProbabilityDensityFunction> Ptr;
+    using Ptr = shared_ptr<ProbabilityDensityFunction>;
 
     virtual ~ProbabilityDensityFunction() = default;
 

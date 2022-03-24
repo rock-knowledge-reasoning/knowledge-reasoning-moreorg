@@ -9,9 +9,9 @@ namespace moreorg {
 class ResourceInstance
 {
 public:
-    typedef shared_ptr<ResourceInstance> Ptr;
-    typedef std::vector<ResourceInstance> List;
-    typedef std::vector<Ptr> PtrList;
+    using Ptr = shared_ptr<ResourceInstance>;
+    using List = std::vector<ResourceInstance>;
+    using PtrList = std::vector<Ptr>;
 
     ResourceInstance(const owlapi::model::IRI& name,
                      const owlapi::model::IRI& model);

@@ -19,7 +19,7 @@ struct Distribution
 class DistributionPolicy : public Policy
 {
 public:
-    typedef shared_ptr<DistributionPolicy> Ptr;
+    using Ptr = shared_ptr<DistributionPolicy>;
 
     DistributionPolicy() = default;
 

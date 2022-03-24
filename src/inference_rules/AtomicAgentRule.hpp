@@ -10,7 +10,7 @@ namespace inference_rules {
 class AtomicAgentRule : public InferenceRule
 {
 public:
-    typedef shared_ptr<AtomicAgentRule> Ptr;
+    using Ptr = shared_ptr<AtomicAgentRule>;
 
     double apply(const facades::Robot& robot) const override;
 };
