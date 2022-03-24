@@ -3,7 +3,8 @@
 
 namespace moreorg {
 
-ResourceInstance::ResourceInstance(const owlapi::model::IRI& name, const owlapi::model::IRI& model)
+ResourceInstance::ResourceInstance(const owlapi::model::IRI& name,
+                                   const owlapi::model::IRI& model)
     : mName(name)
     , mModel(model)
 {
@@ -11,7 +12,7 @@ ResourceInstance::ResourceInstance(const owlapi::model::IRI& name, const owlapi:
 
 std::string ResourceInstance::toString(size_t indent) const
 {
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     std::stringstream ss;
     ss << hspace << mName.toString() << " [" << mModel.toString() << "] --> ";
     ss << mAtomicAgent.getName();
@@ -21,7 +22,7 @@ std::string ResourceInstance::toString(size_t indent) const
 std::string ResourceInstance::toString(const List& list, size_t indent)
 {
     std::stringstream ss;
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     ss << hspace << "ResourceInstances:" << std::endl;
     for(const ResourceInstance& instance : list)
     {

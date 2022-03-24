@@ -1,8 +1,8 @@
-#include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
+#include <boost/test/unit_test.hpp>
 
-#include <moreorg/ccf/CCF.hpp>
 #include <moreorg/OrganizationModel.hpp>
+#include <moreorg/ccf/CCF.hpp>
 #include <set>
 
 using namespace moreorg;
@@ -17,21 +17,26 @@ BOOST_AUTO_TEST_CASE(handle_sets)
         SetOfSets<int> setOfSets;
 
         SetOfSets<int> setUnion = setOfSets.createUnion(set);
-        BOOST_REQUIRE_MESSAGE( setUnion.size() == 1, "Union with empty set " << setUnion.toString());
-        BOOST_REQUIRE_MESSAGE( setUnion.containsEmptySet(), "Union with empty set " << setUnion.toString());
+        BOOST_REQUIRE_MESSAGE(setUnion.size() == 1,
+                              "Union with empty set " << setUnion.toString());
+        BOOST_REQUIRE_MESSAGE(setUnion.containsEmptySet(),
+                              "Union with empty set " << setUnion.toString());
     }
     {
         Set<int> set;
         set.insert(0);
         set.insert(1);
-        BOOST_REQUIRE_MESSAGE( set.size() == 2, "Set of size 2");
+        BOOST_REQUIRE_MESSAGE(set.size() == 2, "Set of size 2");
 
         SetOfSets<int> setOfSets;
         SetOfSets<int> setUnion = setOfSets.createUnion(set);
-        BOOST_REQUIRE_MESSAGE( setUnion.size() == 1, "Union with non empty set " << setUnion.toString());
-        BOOST_REQUIRE_MESSAGE( !setUnion.containsEmptySet(), "Union does not contain empty set " << setUnion.toString());
+        BOOST_REQUIRE_MESSAGE(setUnion.size() == 1,
+                              "Union with non empty set "
+                                  << setUnion.toString());
+        BOOST_REQUIRE_MESSAGE(!setUnion.containsEmptySet(),
+                              "Union does not contain empty set "
+                                  << setUnion.toString());
     }
-
 }
 
 BOOST_AUTO_TEST_CASE(handle_reference_ccf)
@@ -101,8 +106,10 @@ BOOST_AUTO_TEST_CASE(handle_reference_ccf)
         IRIList aStar = ccf.computeConstrainedCoalitions(coalitions);
 
         BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
-        BOOST_TEST_MESSAGE("Positive constraints: " << ccf.getPositiveConstraints().toString() );
-        BOOST_TEST_MESSAGE("Negative constraints: " << ccf.getNegativeConstraints().toString() );
+        BOOST_TEST_MESSAGE("Positive constraints: "
+                           << ccf.getPositiveConstraints().toString());
+        BOOST_TEST_MESSAGE("Negative constraints: "
+                           << ccf.getNegativeConstraints().toString());
         BOOST_TEST_MESSAGE("Coalitions: " << coalitions.toString());
         BOOST_TEST_MESSAGE("AStar: " << aStar);
 
@@ -132,7 +139,7 @@ BOOST_AUTO_TEST_CASE(compute_coalitions)
 
         for(CCF<IRI>::Atom atom : atoms)
         {
-            ccf.addPositiveConstraint( CCF<IRI>::Constraint(atom));
+            ccf.addPositiveConstraint(CCF<IRI>::Constraint(atom));
         }
 
         // Negative
@@ -146,8 +153,10 @@ BOOST_AUTO_TEST_CASE(compute_coalitions)
         CCF<IRI>::Coalitions coalitions;
         IRIList aStar = ccf.computeConstrainedCoalitions(coalitions);
         BOOST_TEST_MESSAGE("Atoms: " << atoms.toString());
-        BOOST_TEST_MESSAGE("Positive constraints: " << ccf.getPositiveConstraints().toString() );
-        BOOST_TEST_MESSAGE("Negative constraints: " << ccf.getNegativeConstraints().toString() );
+        BOOST_TEST_MESSAGE("Positive constraints: "
+                           << ccf.getPositiveConstraints().toString());
+        BOOST_TEST_MESSAGE("Negative constraints: "
+                           << ccf.getNegativeConstraints().toString());
         BOOST_TEST_MESSAGE("Coalitions: " << coalitions.toString());
         BOOST_TEST_MESSAGE("AStar: " << aStar);
 
@@ -157,11 +166,12 @@ BOOST_AUTO_TEST_CASE(compute_coalitions)
             BOOST_TEST_MESSAGE("Coalitions: " << c.toString());
         }
 
-        std::vector< CCF<IRI>::Coalitions > feasibleCoalitionStructure;
+        std::vector<CCF<IRI>::Coalitions> feasibleCoalitionStructure;
         ccf.computeFeasibleCoalitions(list, feasibleCoalitionStructure);
         for(CCF<IRI>::Coalitions structure : feasibleCoalitionStructure)
         {
-            BOOST_TEST_MESSAGE("Feasible coalition structure: " << structure.toString());
+            BOOST_TEST_MESSAGE(
+                "Feasible coalition structure: " << structure.toString());
         }
     }
 }

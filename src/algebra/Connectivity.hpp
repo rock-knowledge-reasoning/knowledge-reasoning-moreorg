@@ -1,36 +1,36 @@
 #ifndef ORGANIZATION_MODEL_ALGEBRA_CONNECTIVITY_HPP
 #define ORGANIZATION_MODEL_ALGEBRA_CONNECTIVITY_HPP
 
-#include <gecode/set.hh>
-#include <gecode/search.hh>
 #include <base/Time.hpp>
 #include <functional>
-#include <unordered_map>
+#include <gecode/search.hh>
+#include <gecode/set.hh>
 #include <tuple>
+#include <unordered_map>
 
-#include <numeric/Stats.hpp>
-#include <graph_analysis/BaseGraph.hpp>
 #include "../OrganizationModelAsk.hpp"
 #include "../vocabularies/OM.hpp"
+#include <graph_analysis/BaseGraph.hpp>
+#include <numeric/Stats.hpp>
 #include <qxcfg/Configuration.hpp>
 
 namespace moreorg {
 namespace algebra {
 
-typedef std::tuple<ModelPool, owlapi::model::IRI, owlapi::model::IRI, double, size_t>
-    FeasibilityQuery;
+typedef std::
+    tuple<ModelPool, owlapi::model::IRI, owlapi::model::IRI, double, size_t>
+        FeasibilityQuery;
 
 typedef std::unordered_map<FeasibilityQuery,
-        std::pair<graph_analysis::BaseGraph::Ptr, bool> > QueryCache;
+                           std::pair<graph_analysis::BaseGraph::Ptr, bool>>
+    QueryCache;
 } // end namespace algebra
 } // end namespace moreorg
-
 
 namespace std {
 using namespace owlapi::model;
 using namespace moreorg::algebra;
-template<>
-struct hash< FeasibilityQuery >
+template <> struct hash<FeasibilityQuery>
 {
     size_t operator()(const FeasibilityQuery& query) const
     {
@@ -75,18 +75,21 @@ class Connectivity : public Gecode::Space
     // Index of interface mapping and interface index range correspond to the
     // same model instance
     //
-    /// List the interfaces and associate the list with corresponding model instance
-    /// as such allows to map an agent (as model instance) to the list of
-    //interfaces
-    std::vector< std::pair<owlapi::model::IRI, owlapi::model::IRIList> > mInterfaceMapping;
+    /// List the interfaces and associate the list with corresponding model
+    /// instance as such allows to map an agent (as model instance) to the list
+    /// of
+    // interfaces
+    std::vector<std::pair<owlapi::model::IRI, owlapi::model::IRIList>>
+        mInterfaceMapping;
     /// Register the interface index ranges
     typedef std::pair<uint32_t, uint32_t> IndexRange;
     // Per model instance, list the range of interfaces that are associated with
     // this model to speed up information access
-    std::vector< IndexRange > mInterfaceIndexRanges;
+    std::vector<IndexRange> mInterfaceIndexRanges;
 
-    /// Map from the index of a (connection) variable to the two agents/index of index ranges
-    std::vector< std::pair<size_t, size_t> > mIdx2Agents;
+    /// Map from the index of a (connection) variable to the two agents/index of
+    /// index ranges
+    std::vector<std::pair<size_t, size_t>> mIdx2Agents;
 
     // |#ofInterface|*a0Idx + a1Idx
     Gecode::IntVarArray mConnections;
@@ -121,7 +124,6 @@ class Connectivity : public Gecode::Space
     void maxOneLink(Gecode::IntVarArray& connections);
 
 public:
-
     struct Statistics
     {
         Statistics();
@@ -136,12 +138,12 @@ public:
          *     depth: maximum depth of search tree
          *     restart: number of restarts
          *     nogood: number of nogoods posted
-         * \see http://www.gecode.org/doc-latest/reference/classGecode_1_1Search_1_1Statistics.html
+         * \see
+         * http://www.gecode.org/doc-latest/reference/classGecode_1_1Search_1_1Statistics.html
          */
         Gecode::Search::Statistics csp;
 
         std::string toString(size_t indent = 0) const;
-
 
         /**
          * Get a description of the field of the statistics vector
@@ -152,16 +154,18 @@ public:
          * Compute the combined stats
          * \see getStatsDescription
          */
-        static std::vector<numeric::Stats<double> > compute(const std::vector<Connectivity::Statistics>& stats);
+        static std::vector<numeric::Stats<double>>
+        compute(const std::vector<Connectivity::Statistics>& stats);
 
-        static std::string toString(const std::vector<Connectivity::Statistics>& stats);
+        static std::string
+        toString(const std::vector<Connectivity::Statistics>& stats);
     };
 
     Connectivity(const ModelPool& modelPool,
-            const OrganizationModelAsk& ask,
-            const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface"),
-            const owlapi::model::IRI& property = vocabulary::OM::has()
-    );
+                 const OrganizationModelAsk& ask,
+                 const owlapi::model::IRI& interfaceBaseClass =
+                     vocabulary::OM::resolve("ElectroMechanicalInterface"),
+                 const owlapi::model::IRI& property = vocabulary::OM::has());
 
     /**
      * Search support
@@ -170,9 +174,12 @@ public:
      */
     Connectivity(Connectivity& s);
 
-    virtual ~Connectivity() {};
+    virtual ~Connectivity(){};
 
-    static void setConfiguration(const qxcfg::Configuration& configuration) { msConfiguration = configuration; }
+    static void setConfiguration(const qxcfg::Configuration& configuration)
+    {
+        msConfiguration = configuration;
+    }
 
     qxcfg::Configuration& getConfiguration() { return msConfiguration; }
 
@@ -194,8 +201,13 @@ public:
      * be considered
      * \return True if a connection is feasible, false otherwise
      */
-    static bool isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask, double timeoutInMs = 0, size_t minFeasible = 1,
-            const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface") );
+    static bool
+    isFeasible(const ModelPool& modelPool,
+               const OrganizationModelAsk& ask,
+               double timeoutInMs = 0,
+               size_t minFeasible = 1,
+               const owlapi::model::IRI& interfaceBaseClass =
+                   vocabulary::OM::resolve("ElectroMechanicalInterface"));
 
     /**
      * Check whether a model pool can be fully connected
@@ -206,8 +218,14 @@ public:
      * \param baseGraph that hold the resulting connection graph
      * \return True if a connection is feasible, false otherwise
      */
-    static bool isFeasible(const ModelPool& modelPool, const OrganizationModelAsk& ask, graph_analysis::BaseGraph::Ptr& baseGraph, double timeoutInMs = 0, size_t minFeasible = 1,
-            const owlapi::model::IRI& interfaceBaseClass = vocabulary::OM::resolve("ElectroMechanicalInterface") );
+    static bool
+    isFeasible(const ModelPool& modelPool,
+               const OrganizationModelAsk& ask,
+               graph_analysis::BaseGraph::Ptr& baseGraph,
+               double timeoutInMs = 0,
+               size_t minFeasible = 1,
+               const owlapi::model::IRI& interfaceBaseClass =
+                   vocabulary::OM::resolve("ElectroMechanicalInterface"));
 
     /**
      * Convert solution to string
@@ -224,13 +242,19 @@ public:
     /**
      * Return the number of evaluations for the last feasibility check
      */
-    static const Connectivity::Statistics& getStatistics() { return msStatistics; }
+    static const Connectivity::Statistics& getStatistics()
+    {
+        return msStatistics;
+    }
 
     /**
      * Retrieve the connection graph of the last feasibility check
      * \return connection graph
      */
-    static const graph_analysis::BaseGraph::Ptr& getConnectionGraph() { return msConnectionGraph; }
+    static const graph_analysis::BaseGraph::Ptr& getConnectionGraph()
+    {
+        return msConnectionGraph;
+    }
 
     /**
      * Reset / Clear the used query cache
@@ -246,15 +270,15 @@ protected:
 
     class NoConnectionInterfaces : public std::runtime_error
     {
-        public:
-            NoConnectionInterfaces(const std::string& message)
-                : std::runtime_error(message)
-            {}
+    public:
+        NoConnectionInterfaces(const std::string& message)
+            : std::runtime_error(message)
+        {
+        }
     };
 
     static QueryCache msQueryCache;
 };
-
 
 } // end namespace algebra
 } // end namespace moreorg

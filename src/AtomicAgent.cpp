@@ -1,7 +1,7 @@
 #include "AtomicAgent.hpp"
 
-#include <sstream>
 #include "OrganizationModelAsk.hpp"
+#include <sstream>
 
 namespace moreorg {
 
@@ -9,7 +9,8 @@ AtomicAgent::AtomicAgent()
     : mModel()
     , mId(0)
     , mName("unknown")
-{}
+{
+}
 
 AtomicAgent::AtomicAgent(size_t id, const owlapi::model::IRI& model)
     : mModel(model)
@@ -27,16 +28,18 @@ std::string AtomicAgent::toString() const
     if(mModel != owlapi::model::IRI())
     {
         ss << mModel.getFragment();
-    } else {
+    } else
+    {
         ss << mModel;
     }
     ss << ")";
     return ss.str();
 }
 
-std::string AtomicAgent::toString(const AtomicAgent::List& agents, size_t indent)
+std::string AtomicAgent::toString(const AtomicAgent::List& agents,
+                                  size_t indent)
 {
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     std::stringstream ss;
     if(agents.empty())
     {
@@ -55,7 +58,7 @@ std::string AtomicAgent::toString(const AtomicAgent::List& agents, size_t indent
 
 std::string AtomicAgent::toString(const AtomicAgent::Set& agents, size_t indent)
 {
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     std::stringstream ss;
     if(agents.empty())
     {
@@ -78,7 +81,7 @@ moreorg::ModelPool AtomicAgent::getModelPool(const AtomicAgent::List& agents)
     for(const AtomicAgent& agent : agents)
     {
         owlapi::model::IRI model = agent.getModel();
-        modelPool[model] +=1;
+        modelPool[model] += 1;
     }
     return modelPool;
 }
@@ -89,31 +92,34 @@ moreorg::ModelPool AtomicAgent::getModelPool(const AtomicAgent::Set& agents)
     for(const AtomicAgent& agent : agents)
     {
         owlapi::model::IRI model = agent.getModel();
-        modelPool[model] +=1;
+        modelPool[model] += 1;
     }
     return modelPool;
 }
 
 AtomicAgent::List AtomicAgent::getIntersection(const AtomicAgent::Set& a0,
-        const AtomicAgent::Set& a1)
+                                               const AtomicAgent::Set& a1)
 {
-     std::vector<AtomicAgent> intersection;
-     std::set_intersection(a0.begin(), a0.end(),
-             a1.begin(), a1.end(),
-             std::back_inserter(intersection)
-     );
-     return intersection;
+    std::vector<AtomicAgent> intersection;
+    std::set_intersection(a0.begin(),
+                          a0.end(),
+                          a1.begin(),
+                          a1.end(),
+                          std::back_inserter(intersection));
+    return intersection;
 }
 
 AtomicAgent::List AtomicAgent::getDifference(const AtomicAgent::Set& a0,
-        const AtomicAgent::Set& a1)
+                                             const AtomicAgent::Set& a1)
 {
     // computing remaining, i.e.  remainingInA0 = from - to
     std::vector<AtomicAgent> remainingInA0;
 
-    std::set_difference(a0.begin(), a0.end(),
-            a1.begin(), a1.end(),
-            std::inserter(remainingInA0, remainingInA0.begin()));
+    std::set_difference(a0.begin(),
+                        a0.end(),
+                        a1.begin(),
+                        a1.end(),
+                        std::inserter(remainingInA0, remainingInA0.begin()));
 
     return remainingInA0;
 }
@@ -131,7 +137,7 @@ AtomicAgent::List AtomicAgent::toList(const moreorg::ModelPool& modelPool)
 {
     List agents;
     moreorg::ModelPool::const_iterator cit = modelPool.cbegin();
-    for(;cit != modelPool.cend(); ++cit)
+    for(; cit != modelPool.cend(); ++cit)
     {
         const owlapi::model::IRI& model = cit->first;
         size_t count = cit->second;
@@ -149,15 +155,15 @@ AtomicAgent::List AtomicAgent::toList(const moreorg::ModelPool& modelPool)
 facades::Robot AtomicAgent::getFacade(const OrganizationModelAsk& ask) const
 {
     return facades::Robot::getInstance(mModel, ask);
-
 }
 
-AtomicAgent::TypeMap AtomicAgent::toTypeMap(const AtomicAgent::Set& atomicAgents)
+AtomicAgent::TypeMap
+AtomicAgent::toTypeMap(const AtomicAgent::Set& atomicAgents)
 {
     TypeMap typeMap;
     for(const AtomicAgent& aa : atomicAgents)
     {
-        typeMap[ aa.getModel() ].insert(aa);
+        typeMap[aa.getModel()].insert(aa);
     }
     return typeMap;
 }
@@ -165,20 +171,21 @@ AtomicAgent::TypeMap AtomicAgent::toTypeMap(const AtomicAgent::Set& atomicAgents
 std::string AtomicAgent::toString(const TypeMap& typeMap, size_t indent)
 {
     std::stringstream ss;
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
 
     for(const TypeMap::value_type& v : typeMap)
     {
         ss << hspace << v.first.getFragment() << ":" << std::endl;
         ss << hspace << "    ";
         AtomicAgent::Set::iterator cit = v.second.begin();
-        for(;cit != v.second.end();)
+        for(; cit != v.second.end();)
         {
             ss << cit->getId();
             if(++cit == v.second.end())
             {
                 break;
-            } else {
+            } else
+            {
                 ss << ", ";
             }
         }

@@ -3,10 +3,9 @@
 namespace moreorg {
 
 Sample::Sample(const base::Position& fromLocation,
-           const base::Position& toLocation,
-           size_t fromTime,
-           size_t toTime
-    )
+               const base::Position& toLocation,
+               size_t fromTime,
+               size_t toTime)
     : mFromLocation(fromLocation)
     , mToLocation(toLocation)
     , mFromTime(fromTime)
@@ -14,7 +13,6 @@ Sample::Sample(const base::Position& fromLocation,
 {
 }
 
-Sample::~Sample()
-{}
+Sample::~Sample() {}
 
 } // end namespace moreorg

@@ -4,7 +4,7 @@ namespace moreorg {
 namespace policies {
 
 Selection AllSelection::apply(const Selection& agents,
-            const OrganizationModelAsk& ask) const
+                              const OrganizationModelAsk& ask) const
 {
     Agent all;
     for(const Agent& a : agents)

@@ -2,8 +2,8 @@
 #include "../Agent.hpp"
 #include "../facades/Robot.hpp"
 
-#include <stdexcept>
 #include <muParser.h>
+#include <stdexcept>
 
 namespace moreorg {
 namespace inference_rules {
@@ -12,9 +12,10 @@ double CompositeAgentRule::apply(const facades::Robot& robot) const
 {
     if(robot.getModelPool().numberOfInstances() <= 1)
     {
-        throw std::runtime_error("moreorg::inference_rules::CompositeAgentRule::apply"
-                " trying to apply CompositeAgentRule to Atomic agent"
-                + robot.getModelPool().toString(4));
+        throw std::runtime_error(
+            "moreorg::inference_rules::CompositeAgentRule::apply"
+            " trying to apply CompositeAgentRule to Atomic agent" +
+            robot.getModelPool().toString(4));
     }
 
     mu::Parser muParser;
@@ -26,7 +27,7 @@ double CompositeAgentRule::apply(const facades::Robot& robot) const
         muParser.DefineConst(p.first, value);
     }
     muParser.SetExpr(mPreparedRule);
-    //muParser.EnableDebugDump(true,true);
+    // muParser.EnableDebugDump(true,true);
     return muParser.Eval();
 }
 

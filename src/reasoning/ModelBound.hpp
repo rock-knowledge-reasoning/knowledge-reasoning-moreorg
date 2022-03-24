@@ -1,9 +1,9 @@
 #ifndef ORGANIZATION_MODEL_REASONING_MODEL_BOUND_HPP
 #define ORGANIZATION_MODEL_REASONING_MODEL_BOUND_HPP
 
-#include <vector>
 #include <map>
 #include <owlapi/model/IRI.hpp>
+#include <vector>
 
 namespace moreorg {
 namespace reasoning {
@@ -47,11 +47,14 @@ struct ModelBound
      * \param removeNegative Remove results with a negative result
      * \returns a - b
      */
-    static ModelBound::List substractMin(const ModelBound::List& a, const ModelBound::List& b, bool removeNegative = false);
+    static ModelBound::List substractMin(const ModelBound::List& a,
+                                         const ModelBound::List& b,
+                                         bool removeNegative = false);
 
     /**
      * Decrement min and max values
-     * \throws std::runtime_error if null values exist and cannot be further decremented
+     * \throws std::runtime_error if null values exist and cannot be further
+     * decremented
      */
     void decrement();
 

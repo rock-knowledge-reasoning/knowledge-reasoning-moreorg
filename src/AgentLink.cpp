@@ -2,10 +2,10 @@
 
 namespace moreorg {
 
-AgentLink::AgentLink(const AgentInterface& source,
-        const AgentInterface& target)
+AgentLink::AgentLink(const AgentInterface& source, const AgentInterface& target)
     : mSource(source)
     , mTarget(target)
-{}
+{
+}
 
 } // end namespace moreorg

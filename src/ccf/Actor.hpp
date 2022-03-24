@@ -29,6 +29,6 @@ public:
 
 std::ostream& operator<<(std::ostream& os, const Actor& a);
 
-} // end namespace caf
+} // namespace ccf
 } // end namespace multiagent
 #endif // MULTIAGENT_CCF_ACTOR_HPP

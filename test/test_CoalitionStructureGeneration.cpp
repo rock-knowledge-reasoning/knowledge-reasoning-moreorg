@@ -1,16 +1,18 @@
-#include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
+#include <boost/test/unit_test.hpp>
 
 #include <moreorg/utils/CoalitionStructureGeneration.hpp>
 
 using namespace multiagent::utils;
 
-void updateCostMap(std::map<Coalition, double>& costMap, const std::string& desc, double cost)
+void updateCostMap(std::map<Coalition, double>& costMap,
+                   const std::string& desc,
+                   double cost)
 {
     Coalition c;
     for(size_t i = 0; i < desc.size(); ++i)
     {
-        std::string name = desc.substr(i,1);
+        std::string name = desc.substr(i, 1);
         c.push_back(name);
     }
     std::sort(c.begin(), c.end());
@@ -19,7 +21,7 @@ void updateCostMap(std::map<Coalition, double>& costMap, const std::string& desc
 
 double coalitionValueFunction(const Coalition& coalition)
 {
-//    return coalition.size();
+    //    return coalition.size();
 
     Coalition c = coalition;
     std::sort(c.begin(), c.end());
@@ -52,24 +54,25 @@ double coalitionValueFunction(const Coalition& coalition)
     updateCostMap(costMap, "opqr", 5400);
     updateCostMap(costMap, "stuvwxyz", 15400);
 
-   // std::map<Coalition, double>::const_iterator cit = costMap.begin();
-   // for(; cit != costMap.end(); ++cit)
-   // {
-   //     Coalition c = cit->first;
-   //     std::string s;
-   //     for(size_t i = 0; i < c.size(); ++i)
-   //     {
-   //         s += c[i];
-   //     }
-   //     BOOST_TEST_MESSAGE("Return value: " << cit->second << " for " << s);
-   // }
+    // std::map<Coalition, double>::const_iterator cit = costMap.begin();
+    // for(; cit != costMap.end(); ++cit)
+    // {
+    //     Coalition c = cit->first;
+    //     std::string s;
+    //     for(size_t i = 0; i < c.size(); ++i)
+    //     {
+    //         s += c[i];
+    //     }
+    //     BOOST_TEST_MESSAGE("Return value: " << cit->second << " for " << s);
+    // }
 
     std::map<Coalition, double>::const_iterator cit = costMap.find(coalition);
     if(cit != costMap.end())
     {
         return cit->second;
-    } else {
-        double value = coalition.size()*coalition.size();
+    } else
+    {
+        double value = coalition.size() * coalition.size();
         return value;
     }
 }
@@ -79,7 +82,7 @@ double coalitionStructureValueFunction(const CoalitionStructure& c)
     double value = 0.0;
     for(int i = 0; i < c.size(); ++i)
     {
-        value += coalitionValueFunction( c[i] );
+        value += coalitionValueFunction(c[i]);
     }
     return value;
 }
@@ -94,20 +97,34 @@ BOOST_AUTO_TEST_CASE(it_should_compute_csg)
         ss << a;
         agents.push_back(ss.str());
     }
-    CoalitionStructureGeneration csg(agents, coalitionValueFunction, coalitionStructureValueFunction);
+    CoalitionStructureGeneration csg(agents,
+                                     coalitionValueFunction,
+                                     coalitionStructureValueFunction);
     BOOST_TEST_MESSAGE("Preparation done: " << csg.toString());
     csg.anytimeSearch(1.0);
     while(!csg.anytimeSearchCompleted())
     {
         sleep(1);
-        BOOST_TEST_MESSAGE("Intermediate result: " << CoalitionStructureGeneration::toString( csg.currentBestSolution()) << ", value: " << coalitionStructureValueFunction(csg.currentBestSolution()) << ", quality: " << csg.currentBestSolutionQuality() );
+        BOOST_TEST_MESSAGE(
+            "Intermediate result: "
+            << CoalitionStructureGeneration::toString(csg.currentBestSolution())
+            << ", value: "
+            << coalitionStructureValueFunction(csg.currentBestSolution())
+            << ", quality: " << csg.currentBestSolutionQuality());
     }
-    BOOST_TEST_MESSAGE("Final result: " << CoalitionStructureGeneration::toString(csg.currentBestSolution()) << ", value: " << coalitionStructureValueFunction(csg.currentBestSolution()) );
+    BOOST_TEST_MESSAGE("Final result: "
+                       << CoalitionStructureGeneration::toString(
+                              csg.currentBestSolution())
+                       << ", value: "
+                       << coalitionStructureValueFunction(
+                              csg.currentBestSolution()));
 
     csg.reset();
     BOOST_TEST_MESSAGE("Reset done: " << csg.toString());
     CoalitionStructure cs = csg.findBest(1.0);
-    BOOST_TEST_MESSAGE("Found best: " << CoalitionStructureGeneration::toString(cs) << ", value: " << coalitionStructureValueFunction(cs));
+    BOOST_TEST_MESSAGE("Found best: "
+                       << CoalitionStructureGeneration::toString(cs)
+                       << ", value: " << coalitionStructureValueFunction(cs));
 }
 
 BOOST_AUTO_TEST_CASE(it_should_compute_csg_anytime)
@@ -120,14 +137,26 @@ BOOST_AUTO_TEST_CASE(it_should_compute_csg_anytime)
         ss << a;
         agents.push_back(ss.str());
     }
-    CoalitionStructureGeneration csg(agents, coalitionValueFunction, coalitionStructureValueFunction);
+    CoalitionStructureGeneration csg(agents,
+                                     coalitionValueFunction,
+                                     coalitionStructureValueFunction);
     BOOST_TEST_MESSAGE("Preparation done: " << csg.toString());
     csg.anytimeSearch(1.0);
     while(!csg.anytimeSearchCompleted())
     {
         sleep(1);
-        BOOST_TEST_MESSAGE("Intermediate result: " << CoalitionStructureGeneration::toString( csg.currentBestSolution()) << ", value: " << coalitionStructureValueFunction(csg.currentBestSolution()) << ", quality: " << csg.currentBestSolutionQuality() );
+        BOOST_TEST_MESSAGE(
+            "Intermediate result: "
+            << CoalitionStructureGeneration::toString(csg.currentBestSolution())
+            << ", value: "
+            << coalitionStructureValueFunction(csg.currentBestSolution())
+            << ", quality: " << csg.currentBestSolutionQuality());
         BOOST_TEST_MESSAGE("      " << csg.getStatistics().toString());
     }
-    BOOST_TEST_MESSAGE("Final result: " << CoalitionStructureGeneration::toString(csg.currentBestSolution()) << ", value: " << coalitionStructureValueFunction(csg.currentBestSolution()) );
+    BOOST_TEST_MESSAGE("Final result: "
+                       << CoalitionStructureGeneration::toString(
+                              csg.currentBestSolution())
+                       << ", value: "
+                       << coalitionStructureValueFunction(
+                              csg.currentBestSolution()));
 }

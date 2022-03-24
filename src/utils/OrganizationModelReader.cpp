@@ -1,13 +1,13 @@
 #include "../OrganizationModelAsk.hpp"
-#include "../vocabularies/OM.hpp"
 #include "../facades/Robot.hpp"
 #include "../io/LatexWriter.hpp"
+#include "../vocabularies/OM.hpp"
 
-#include <set>
-#include <iostream>
-#include <sstream>
-#include <math.h>
 #include <boost/program_options.hpp>
+#include <iostream>
+#include <math.h>
+#include <set>
+#include <sstream>
 
 using namespace owlapi::model;
 using namespace moreorg;
@@ -17,14 +17,19 @@ int main(int argc, char** argv)
     namespace po = boost::program_options;
 
     po::options_description description("allowed options");
-    description.add_options()
-        ("help","describe arguments")
-        ("om", po::value<std::string>(), "path or iri to the organization model")
-        ("latex", "Activate latex export")
-        ("compact", "Activate latex export in a single table for all agents")
-        ("columns", po::value<size_t>(), "Number of columns of the latex table, when in compact mode")
-        ("output", po::value<size_t>(), "Path to the output file (default /tmp/moreorg-ccf-analysis.log")
-        ;
+    description.add_options()("help", "describe arguments")(
+        "om",
+        po::value<std::string>(),
+        "path or iri to the organization model")("latex",
+                                                 "Activate latex export")(
+        "compact",
+        "Activate latex export in a single table for all agents")(
+        "columns",
+        po::value<size_t>(),
+        "Number of columns of the latex table, when in compact mode")(
+        "output",
+        po::value<size_t>(),
+        "Path to the output file (default /tmp/moreorg-ccf-analysis.log");
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, description), vm);
@@ -46,14 +51,16 @@ int main(int argc, char** argv)
     if(vm.count("om"))
     {
         std::string om = vm["om"].as<std::string>();
-        if(om.substr(0,7) == "http://")
+        if(om.substr(0, 7) == "http://")
         {
             owlapi::model::IRI iri(om);
             organizationModel = OrganizationModel::getInstance(iri);
-        } else {
+        } else
+        {
             organizationModel = OrganizationModel::getInstance(om);
         }
-    } else {
+    } else
+    {
         std::cout << description << std::endl;
         exit(1);
     }
@@ -61,21 +68,25 @@ int main(int argc, char** argv)
     if(vm.count("latex"))
     {
         OrganizationModelAsk ask(organizationModel);
-        owlapi::model::IRIList agentTypes = ask.ontology().allSubClassesOf(vocabulary::OM::Actor());
+        owlapi::model::IRIList agentTypes =
+            ask.ontology().allSubClassesOf(vocabulary::OM::Actor());
         std::stringstream ss;
         std::vector<facades::Robot> robots;
         for(const owlapi::model::IRI& agentType : agentTypes)
         {
-            try {
+            try
+            {
                 ModelPool modelPool;
                 modelPool[agentType] = 1;
                 OrganizationModelAsk lask(organizationModel, modelPool, false);
-                facades::Robot robot = facades::Robot::getInstance(agentType, lask);
+                facades::Robot robot =
+                    facades::Robot::getInstance(agentType, lask);
                 if(!vm.count("compact"))
                 {
                     ss << io::LatexWriter::toString(robot);
                     ss << std::endl;
-                } else {
+                } else
+                {
                     robots.push_back(robot);
                 }
             } catch(const std::runtime_error& e)
@@ -95,7 +106,7 @@ int main(int argc, char** argv)
             for(size_t i = 0; i < robots.size(); ++i)
             {
                 subGroup.push_back(robots[i]);
-                if((i+1)%columns == 0)
+                if((i + 1) % columns == 0)
                 {
                     ss << io::LatexWriter::toString(subGroup);
                     subGroup.clear();
@@ -105,7 +116,6 @@ int main(int argc, char** argv)
             {
                 ss << io::LatexWriter::toString(subGroup);
             }
-
         }
         std::cout << ss.str();
     }

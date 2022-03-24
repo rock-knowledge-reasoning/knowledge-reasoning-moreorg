@@ -28,15 +28,22 @@ BOOST_AUTO_TEST_CASE(merge)
 
     {
         Resource a0(modelA);
-        PropertyConstraint pcA0(propertyA, PropertyConstraint::GREATER_EQUAL, 10);
+        PropertyConstraint pcA0(propertyA,
+                                PropertyConstraint::GREATER_EQUAL,
+                                10);
         a0.addPropertyConstraint(pcA0);
 
         Resource a1(modelA);
-        PropertyConstraint pcA1(propertyA, PropertyConstraint::GREATER_EQUAL, 20);
+        PropertyConstraint pcA1(propertyA,
+                                PropertyConstraint::GREATER_EQUAL,
+                                20);
         a1.addPropertyConstraint(pcA1);
 
         a0.merge(a1);
-        BOOST_REQUIRE_MESSAGE(a0.getPropertyConstraints().size() == 2, "Merge should result in 2 property constraints, but was " << a0.getPropertyConstraints().size());
+        BOOST_REQUIRE_MESSAGE(
+            a0.getPropertyConstraints().size() == 2,
+            "Merge should result in 2 property constraints, but was "
+                << a0.getPropertyConstraints().size());
 
         // Checkin sets
         Resource b0(modelB);
@@ -50,7 +57,9 @@ BOOST_AUTO_TEST_CASE(merge)
         bSet.insert(b0);
 
         Resource::Set r = Resource::merge(aSet, bSet);
-        BOOST_REQUIRE_MESSAGE(r.size() == 2, "Merge should result in two functionalities, was " << r.size());
+        BOOST_REQUIRE_MESSAGE(r.size() == 2,
+                              "Merge should result in two functionalities, was "
+                                  << r.size());
     }
 }
 
@@ -68,18 +77,23 @@ BOOST_AUTO_TEST_CASE(merge_single_set)
     PropertyConstraint pcA1(propertyA, PropertyConstraint::GREATER_EQUAL, 4);
     a1.addPropertyConstraint(pcA1);
 
-    Resource::Set resources = { a0, a1 };
+    Resource::Set resources = {a0, a1};
     Resource::Set mergedResources = Resource::merge(resources);
-    BOOST_REQUIRE_MESSAGE(mergedResources.size() == 1, "Merged resources of size"
-            " 1");
+    BOOST_REQUIRE_MESSAGE(mergedResources.size() == 1,
+                          "Merged resources of size"
+                          " 1");
 
-    PropertyConstraint::Set constraints = mergedResources.begin()->getPropertyConstraints();
-    BOOST_REQUIRE_MESSAGE(constraints.size() == 2, "There should be two"
-            "constraints, was " << constraints.size());
-    PropertyConstraint::Set expectedConstraints = { pcA1, pcA0 };
-    BOOST_REQUIRE_MESSAGE(constraints == expectedConstraints, "Property constraint should equal "
-            << PropertyConstraint::toString(expectedConstraints, 4)
-            << " was "
+    PropertyConstraint::Set constraints =
+        mergedResources.begin()->getPropertyConstraints();
+    BOOST_REQUIRE_MESSAGE(constraints.size() == 2,
+                          "There should be two"
+                          "constraints, was "
+                              << constraints.size());
+    PropertyConstraint::Set expectedConstraints = {pcA1, pcA0};
+    BOOST_REQUIRE_MESSAGE(
+        constraints == expectedConstraints,
+        "Property constraint should equal "
+            << PropertyConstraint::toString(expectedConstraints, 4) << " was "
             << PropertyConstraint::toString(constraints, 4));
 }
 
@@ -94,16 +108,21 @@ BOOST_AUTO_TEST_CASE(merge_single_resource)
     PropertyConstraint pcA1(propertyA, PropertyConstraint::GREATER_EQUAL, 4);
     a1.addPropertyConstraint(pcA1);
 
-    Resource::Set resources = { a0, a1 };
+    Resource::Set resources = {a0, a1};
     Resource::Set mergedResources = Resource::merge(resources);
-    BOOST_REQUIRE_MESSAGE(mergedResources.size() == 1, "There should be only"
-            " one resource");
+    BOOST_REQUIRE_MESSAGE(mergedResources.size() == 1,
+                          "There should be only"
+                          " one resource");
 
-    PropertyConstraint::Set constraints = mergedResources.begin()->getPropertyConstraints();
-    BOOST_REQUIRE_MESSAGE(constraints.size() == 1, "There should be one constraint");
+    PropertyConstraint::Set constraints =
+        mergedResources.begin()->getPropertyConstraints();
+    BOOST_REQUIRE_MESSAGE(constraints.size() == 1,
+                          "There should be one constraint");
     PropertyConstraint constraint = *constraints.begin();
-    BOOST_REQUIRE_MESSAGE(constraint == pcA1, "Property constraint should equal "
-            << pcA1.toString() << ", was " << constraint.toString());
+    BOOST_REQUIRE_MESSAGE(constraint == pcA1,
+                          "Property constraint should equal "
+                              << pcA1.toString() << ", was "
+                              << constraint.toString());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

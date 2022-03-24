@@ -9,8 +9,8 @@ class ModelPoolIterator
 {
 public:
     ModelPoolIterator(const ModelPool& start,
-            const ModelPool& end,
-            const ModelPool& stepSize);
+                      const ModelPool& end,
+                      const ModelPool& stepSize);
 
     bool next();
     const ModelPool& current() const { return mCurrent; }
@@ -33,4 +33,3 @@ private:
 
 } // end namespace moreorg
 #endif // ORGANIZATION_MODEL_MODEL_POOL_ITERATOR_HPP
-

@@ -1,6 +1,6 @@
 #include "DistributionPolicy.hpp"
-#include "../vocabularies/OM.hpp"
 #include "../Agent.hpp"
+#include "../vocabularies/OM.hpp"
 
 using namespace owlapi::model;
 
@@ -8,27 +8,33 @@ namespace moreorg {
 namespace policies {
 
 DistributionPolicy::DistributionPolicy(const IRI& iri,
-        const OrganizationModelAsk& ask)
+                                       const OrganizationModelAsk& ask)
     : Policy(iri)
     , mAsk(ask)
 {
     {
-        OWLAnnotationValue::Ptr annotationValue = ask.ontology().getAnnotationValue(iri, vocabulary::OM::resolve("hasAtomicAgentRule"));
+        OWLAnnotationValue::Ptr annotationValue =
+            ask.ontology().getAnnotationValue(
+                iri,
+                vocabulary::OM::resolve("hasAtomicAgentRule"));
         IRI atomicAgentRule = annotationValue->asIRI();
-        mAtomicAgentRule = InferenceRule::loadAtomicAgentRule(atomicAgentRule, ask);
+        mAtomicAgentRule =
+            InferenceRule::loadAtomicAgentRule(atomicAgentRule, ask);
     }
 
     {
-        OWLAnnotationValue::Ptr annotationValue = ask.ontology().getAnnotationValue(iri,
-            vocabulary::OM::resolve("hasCompositeAgentRule"));
+        OWLAnnotationValue::Ptr annotationValue =
+            ask.ontology().getAnnotationValue(
+                iri,
+                vocabulary::OM::resolve("hasCompositeAgentRule"));
         IRI compositeAgentRule = annotationValue->asIRI();
         mCompositeAgentRule =
-        InferenceRule::loadCompositeAgentRule(compositeAgentRule, ask);
+            InferenceRule::loadCompositeAgentRule(compositeAgentRule, ask);
     }
 }
 
 Distribution DistributionPolicy::apply(const ModelPool& modelPool,
-        const OrganizationModelAsk& ask) const
+                                       const OrganizationModelAsk& ask) const
 {
     Distribution distribution;
     if(modelPool.numberOfInstances() == 1)
@@ -40,7 +46,7 @@ Distribution DistributionPolicy::apply(const ModelPool& modelPool,
     facades::Robot robot = facades::Robot::getInstance(modelPool, ask);
     double denom = mCompositeAgentRule->apply(robot);
 
-    for(const std::pair<IRI,size_t>& p : modelPool)
+    for(const std::pair<IRI, size_t>& p : modelPool)
     {
         ModelPool atomicAgent;
         atomicAgent[p.first] = 1;

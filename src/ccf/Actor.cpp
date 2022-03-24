@@ -8,7 +8,8 @@ Actor::Actor() {}
 Actor::Actor(ActorType type, LocalActorId id)
     : mType(type)
     , mLocalId(id)
-{}
+{
+}
 
 bool Actor::operator<(const Actor& other) const
 {
@@ -18,7 +19,8 @@ bool Actor::operator<(const Actor& other) const
     } else if(mType == other.mType)
     {
         return mLocalId < other.mLocalId;
-    } else {
+    } else
+    {
         return false;
     }
 }
@@ -30,7 +32,7 @@ bool Actor::operator==(const Actor& other) const
 
 std::ostream& operator<<(std::ostream& os, const Actor& a)
 {
-    os << a.getType() << (char) (a.getLocalId() + 48);
+    os << a.getType() << (char)(a.getLocalId() + 48);
     return os;
 }
 

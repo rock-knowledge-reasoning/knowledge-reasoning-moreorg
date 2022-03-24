@@ -9,17 +9,17 @@ namespace pdfs {
 
 class WeibullPDF : public ProbabilityDensityFunction
 {
-  private:
+private:
     double mEta;
     double b_;
     double t0_;
 
-    public:
-      WeibullPDF(double eta, double b, double t0 = -1);
+public:
+    WeibullPDF(double eta, double b, double t0 = -1);
 
-      double getValue (double t = 0) const override;
+    double getValue(double t = 0) const override;
 
-      double getConditional (double t0 = 0, double t1 = 0) const override;
+    double getConditional(double t0 = 0, double t1 = 0) const override;
 };
 
 } // end namespace pdfs

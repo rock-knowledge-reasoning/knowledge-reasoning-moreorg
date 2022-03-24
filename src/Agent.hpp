@@ -1,8 +1,8 @@
 #ifndef ORGANIZATION_MODEL_AGENT_HPP
 #define ORGANIZATION_MODEL_AGENT_HPP
 
-#include "AtomicAgent.hpp"
 #include "AgentLink.hpp"
+#include "AtomicAgent.hpp"
 #include "OrganizationModelAsk.hpp"
 
 namespace moreorg {
@@ -22,14 +22,19 @@ public:
     typedef std::set<Agent> Set;
 
     /// The operational status of a agent
-    enum OperationalStatus { UNKNOWN_OPERATIONAL_STATUS = 0, OPERATIVE, DORMANT };
+    enum OperationalStatus {
+        UNKNOWN_OPERATIONAL_STATUS = 0,
+        OPERATIVE,
+        DORMANT
+    };
 
     static std::map<OperationalStatus, std::string> OperationalStatusTxt;
 
     /**
      * Default constructor to allow lists and map usage
      */
-    Agent();
+    Agent() = default;
+
     Agent(const AtomicAgent& atomicAgent);
     Agent(const AtomicAgent::List& atomicAgents);
     Agent(const AtomicAgent::Set& atomicAgents);
@@ -75,10 +80,18 @@ public:
     /**
      * Get the links between the set of agents
      */
-    const AgentLink::Set& getLinks() const  { return mLinks; }
+    const AgentLink::Set& getLinks() const { return mLinks; }
 
-    bool operator<(const Agent& other) const { return this->mAtomicAgents < other.mAtomicAgents; }
-    bool operator==(const Agent& other) const { return this->mAtomicAgents == other.mAtomicAgents; }
+    bool operator<(const Agent& other) const
+    {
+        return this->mAtomicAgents < other.mAtomicAgents;
+    }
+
+    bool operator==(const Agent& other) const
+    {
+        return this->mAtomicAgents == other.mAtomicAgents;
+    }
+
     size_t size() const { return mAtomicAgents.size(); }
 
     /**
@@ -91,13 +104,14 @@ public:
 
     /**
      * Get the list of all atomic agents that are part of the agent set
-     * \return return all atomic agents that are part of a set of (composite) agents
+     * \return return all atomic agents that are part of a set of (composite)
+     * agents
      */
     static AtomicAgent::Set allAtomicAgents(const Agent::Set& agents);
 
     /**
-     * Compute intersection with other agent (considering the set of atomic * agents)
-     * \return intersection of atomic agents
+     * Compute intersection with other agent (considering the set of atomic *
+     * agents) \return intersection of atomic agents
      */
     AtomicAgent::List getIntersection(const Agent& other) const;
 
@@ -124,6 +138,5 @@ typedef Agent::List CoalitionStructure;
 std::ostream& operator<<(std::ostream& os, const Agent::Set& agents);
 
 } // end namespace moreorg
-
 
 #endif // ORGANIZATION_MODEL_AGENT_HPP

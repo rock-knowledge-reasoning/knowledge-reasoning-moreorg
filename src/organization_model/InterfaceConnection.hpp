@@ -1,8 +1,8 @@
 #ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP
 #define ORGANIZATION_MODEL_ORGANIZATION_MODEL_INTERFACE_CONNECTION_HPP
 
-#include <owlapi/model/IRI.hpp>
 #include <moreorg/organization_model/ActorModelLink.hpp>
+#include <owlapi/model/IRI.hpp>
 
 namespace moreorg {
 namespace moreorg {
@@ -10,7 +10,8 @@ namespace moreorg {
 struct InterfaceConnection
 {
     InterfaceConnection();
-    InterfaceConnection(const owlapi::model::IRI& interface0, const owlapi::model::IRI& interface1);
+    InterfaceConnection(const owlapi::model::IRI& interface0,
+                        const owlapi::model::IRI& interface1);
 
     owlapi::model::IRI begin;
     owlapi::model::IRI end;
@@ -21,7 +22,10 @@ struct InterfaceConnection
     owlapi::model::IRIList parents;
     owlapi::model::IRIList modelParents;
 
-    void setActorModelLink(const ActorModelLink& link) { actorModelLink = link; }
+    void setActorModelLink(const ActorModelLink& link)
+    {
+        actorModelLink = link;
+    }
 
     void addParent(const owlapi::model::IRI& parent);
     bool sameParents(const InterfaceConnection& other) const;
@@ -39,12 +43,14 @@ struct InterfaceConnection
     std::string toString() const;
 };
 
-typedef std::vector< InterfaceConnection > InterfaceConnectionList;
-typedef std::vector< InterfaceConnectionList > InterfaceCombinationList;
+typedef std::vector<InterfaceConnection> InterfaceConnectionList;
+typedef std::vector<InterfaceConnectionList> InterfaceCombinationList;
 
-std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection);
+std::ostream& operator<<(std::ostream& os,
+                         const InterfaceConnection& connection);
 std::ostream& operator<<(std::ostream& os, const InterfaceConnectionList& list);
-std::ostream& operator<<(std::ostream& os, const InterfaceCombinationList& list);
+std::ostream& operator<<(std::ostream& os,
+                         const InterfaceCombinationList& list);
 
 } // end namespace moreorg
 } // end namespace moreorg

@@ -1,11 +1,11 @@
 #ifndef ORGANIZATION_MODEL_ANALYSER_HPP
 #define ORGANIZATION_MODEL_ANALYSER_HPP
 
-#include "OrganizationModelAsk.hpp"
-#include "StatusSample.hpp"
-#include "RequirementSample.hpp"
 #include "Heuristics.hpp"
 #include "Metric.hpp"
+#include "OrganizationModelAsk.hpp"
+#include "RequirementSample.hpp"
+#include "StatusSample.hpp"
 #include <numeric/Stats.hpp>
 
 namespace moreorg {
@@ -18,20 +18,23 @@ namespace moreorg {
  * the activities
  *
  * All function which only use \a time as argument, will refer to
- * the organization, otherwise the following suffixes are used: A: Agent, AA: AtomicAgent, O: Organization.
+ * the organization, otherwise the following suffixes are used: A: Agent, AA:
+ * AtomicAgent, O: Organization.
  */
 class Analyser
 {
 public:
     typedef std::vector<StatusSample::ConstRawPtrList> StatusSampleIndex;
-    typedef std::vector<RequirementSample::ConstRawPtrList> RequirementSampleIndex;
+    typedef std::vector<RequirementSample::ConstRawPtrList>
+        RequirementSampleIndex;
 
-    typedef std::function<double(size_t, const AtomicAgent&)> AtomicAgentSampleFunc;
+    typedef std::function<double(size_t, const AtomicAgent&)>
+        AtomicAgentSampleFunc;
     typedef std::function<double(size_t, const Agent&)> AgentSampleFunc;
     typedef std::function<double(size_t)> OrganizationSampleFunc;
     /// Function to compute value vector for a coalition structure
-    //typedef std::function< std::vector<double>(size_t, const Agent&) > CoalitionStructureValueFunc;
-
+    // typedef std::function< std::vector<double>(size_t, const Agent&) >
+    // CoalitionStructureValueFunc;
 
     /// Sample types for atomic agents
     enum AtomicAgentSampleType {
@@ -44,7 +47,8 @@ public:
         AA_Redundancy
     };
 
-    static std::map<AtomicAgentSampleType,std::string> AtomicAgentSampleTypeTxt;
+    static std::map<AtomicAgentSampleType, std::string>
+        AtomicAgentSampleTypeTxt;
 
     /// Sample types for (composite) agents
     enum AgentSampleType {
@@ -55,7 +59,7 @@ public:
         A_Redundancy
     };
 
-    static std::map<AgentSampleType,std::string> AgentSampleTypeTxt;
+    static std::map<AgentSampleType, std::string> AgentSampleTypeTxt;
 
     /// Sample types for organizations
     enum OrganizationSampleType {
@@ -65,7 +69,8 @@ public:
         O_RedundancyMax
     };
 
-    static std::map<OrganizationSampleType,std::string> OrganizationSampleTypeTxt;
+    static std::map<OrganizationSampleType, std::string>
+        OrganizationSampleTypeTxt;
 
     /**
      * Default constructor
@@ -97,7 +102,8 @@ public:
     /**
      * Retrieve all samples for a given atomic agent
      */
-    StatusSample::ConstRawPtrList statusSamplesFor(const AtomicAgent& atomicAgent) const;
+    StatusSample::ConstRawPtrList
+    statusSamplesFor(const AtomicAgent& atomicAgent) const;
 
     /**
      * Retrieve all samples at a given time point
@@ -128,7 +134,6 @@ public:
      */
     std::vector<Resource::Set> getRequirements(size_t time) const;
 
-
     /**
      * Get the current activities at time t
      * \param time
@@ -136,19 +141,23 @@ public:
     std::vector<activity::Type> getActivities(size_t time) const;
 
     // UNIQUE SIGNATURES TO ALLOW THE USAGE OF BIND
-    double getEnergyReductionAbsoluteAA(size_t time, const AtomicAgent& atomicAgent) const
+    double getEnergyReductionAbsoluteAA(size_t time,
+                                        const AtomicAgent& atomicAgent) const
     {
         return getEnergyReductionAbsolute(time, atomicAgent);
     }
-    double getEnergyReductionRelativeAA(size_t time, const AtomicAgent& atomicAgent) const
+    double getEnergyReductionRelativeAA(size_t time,
+                                        const AtomicAgent& atomicAgent) const
     {
         return getEnergyReductionRelative(time, atomicAgent);
     }
-    double getTravelDistanceAA(size_t time, const AtomicAgent& atomicAgent) const
+    double getTravelDistanceAA(size_t time,
+                               const AtomicAgent& atomicAgent) const
     {
         return getTravelDistance(time, atomicAgent);
     }
-    double getTravelDistanceToNextPOIAA(size_t time, const AtomicAgent& atomicAgent) const
+    double getTravelDistanceToNextPOIAA(size_t time,
+                                        const AtomicAgent& atomicAgent) const
     {
         return getTravelDistanceToNextPOI(time, atomicAgent);
     }
@@ -164,14 +173,16 @@ public:
     /**
      * Select required columns for the atomic agent sample
      */
-    void setSampleColumnsAA(const std::vector<AtomicAgentSampleType>& columnTypes);
+    void
+    setSampleColumnsAA(const std::vector<AtomicAgentSampleType>& columnTypes);
 
     std::string getSampleColumnDescriptionAA() const;
 
     /**
      * Retrieve sample (row) for an atomic agent
      */
-    std::vector<double> getSampleAA(size_t time, const AtomicAgent& atomicAgent) const;
+    std::vector<double> getSampleAA(size_t time,
+                                    const AtomicAgent& atomicAgent) const;
 
     double getEnergyReductionAbsoluteA(size_t time, const Agent& agent) const
     {
@@ -205,7 +216,8 @@ public:
     /**
      * Select required columns for the orgamization
      */
-    void setSampleColumnsO(const std::vector<OrganizationSampleType>& columnTypes);
+    void
+    setSampleColumnsO(const std::vector<OrganizationSampleType>& columnTypes);
 
     std::string getSampleColumnDescriptionO() const;
 
@@ -213,7 +225,6 @@ public:
      * Retrieve sample (row) for an organization
      */
     std::vector<double> getSampleO(size_t time) const;
-
 
     /**
      * Get the energy reduction for an individual agent, when assuming the given
@@ -229,7 +240,10 @@ public:
      * \param toTime
      * \return absolute energy reduction
      */
-    double getEnergyReductionAbsolute(const StatusSample* sample, const AtomicAgent& atomicAgent, size_t fromTime, size_t toTime) const;
+    double getEnergyReductionAbsolute(const StatusSample* sample,
+                                      const AtomicAgent& atomicAgent,
+                                      size_t fromTime,
+                                      size_t toTime) const;
 
     /**
      * Get the absolute energy reduction at \p time for \p atomicAgent
@@ -237,7 +251,8 @@ public:
      * \param atomicAgent
      * \return energy reduction
      */
-    double getEnergyReductionAbsolute(size_t time, const AtomicAgent& atomicAgent) const;
+    double getEnergyReductionAbsolute(size_t time,
+                                      const AtomicAgent& atomicAgent) const;
 
     /**
      * Get the absolute energy reduction at \p time for \p agent
@@ -255,14 +270,16 @@ public:
      */
     double getEnergyAvailableAbsolute(size_t time, const Agent& agent) const;
 
-
     /**
      * Get absolute energy reduction at \p time
      * \param time
      * \return list of values which corresponding to the current coalition
      * structure
      */
-    std::vector<double> getEnergyReductionAbsolute(size_t time) const { return getCoalitionStructureValue(time, A_EnergyReductionAbsolute); }
+    std::vector<double> getEnergyReductionAbsolute(size_t time) const
+    {
+        return getCoalitionStructureValue(time, A_EnergyReductionAbsolute);
+    }
 
     /**
      * Get absolute available energy at \p time for the active coalition
@@ -271,7 +288,10 @@ public:
      * \return list of values which corresponding to the current coalition
      * structure
      */
-    std::vector<double> getEnergyAvailableAbsolute(size_t time) const { return getCoalitionStructureValue(time, A_EnergyAvailableAbsolute); }
+    std::vector<double> getEnergyAvailableAbsolute(size_t time) const
+    {
+        return getCoalitionStructureValue(time, A_EnergyAvailableAbsolute);
+    }
 
     /**
      * Compute the remaining energy relative to the full energy capacity of the
@@ -297,7 +317,8 @@ public:
      * \param atomicAgent
      * \return relative energy reduction
      */
-    double getEnergyReductionRelative(size_t time, const AtomicAgent& atomicAgent) const;
+    double getEnergyReductionRelative(size_t time,
+                                      const AtomicAgent& atomicAgent) const;
 
     /**
      * Compute the relative available energy (with respect to agents' full
@@ -307,8 +328,10 @@ public:
      * structure
      * \see getCoalitionStructure
      */
-    std::vector<double> getEnergyAvailableRelative(size_t time) const { return getCoalitionStructureValue(time, A_EnergyAvailableRelative); }
-
+    std::vector<double> getEnergyAvailableRelative(size_t time) const
+    {
+        return getCoalitionStructureValue(time, A_EnergyAvailableRelative);
+    }
 
     /**
      * Compute the value vector for a coalition structure, based on a given
@@ -317,7 +340,8 @@ public:
      * \param type AgentSampleType
      * \return coalition structure vector
      */
-    std::vector<double> getCoalitionStructureValue(size_t time, AgentSampleType type) const;
+    std::vector<double> getCoalitionStructureValue(size_t time,
+                                                   AgentSampleType type) const;
 
     /**
      * Compute the median of a number of values
@@ -327,10 +351,22 @@ public:
 
     static double getMedianAbsoluteDeviation(const std::vector<double>& values);
 
-    static double getMin(const std::vector<double>& values) { return getStats(values).min(); }
-    static double getMax(const std::vector<double>& values) { return getStats(values).max(); }
-    static double getMean(const std::vector<double>& values) { return getStats(values).mean(); }
-    static double getStdev(const std::vector<double>& values) { return getStats(values).stdev(); }
+    static double getMin(const std::vector<double>& values)
+    {
+        return getStats(values).min();
+    }
+    static double getMax(const std::vector<double>& values)
+    {
+        return getStats(values).max();
+    }
+    static double getMean(const std::vector<double>& values)
+    {
+        return getStats(values).mean();
+    }
+    static double getStdev(const std::vector<double>& values)
+    {
+        return getStats(values).stdev();
+    }
 
     static numeric::Stats<double> getStats(const std::vector<double>& values);
 
@@ -338,23 +374,35 @@ public:
      * Get the energy distribution as median absolute deviation (MAD)
      * \return median absolute deviation at \p time
      */
-    double getEnergyMAD(size_t time) const { return getMedianAbsoluteDeviation(getEnergyAvailableRelative(time)); }
+    double getEnergyMAD(size_t time) const
+    {
+        return getMedianAbsoluteDeviation(getEnergyAvailableRelative(time));
+    }
 
     /**
      * Get the min relative available energy at \p time
      * This allows to identify critical energy levels
      * \return minimal available energy (relative to an agents full capacity)
      */
-    double getEnergyAvailableMinRelative(size_t time) const { return getMin( getEnergyAvailableRelative(time) ); }
+    double getEnergyAvailableMinRelative(size_t time) const
+    {
+        return getMin(getEnergyAvailableRelative(time));
+    }
 
     /**
      * Get the minimum redundancy
      */
-    double getMinRedundancy(size_t time) const { return getMin( getRedundancy(time) ); }
+    double getMinRedundancy(size_t time) const
+    {
+        return getMin(getRedundancy(time));
+    }
     /**
      * Get the maximum redundancy
      */
-    double getMaxRedundancy(size_t time) const { return getMax( getRedundancy(time) ); }
+    double getMaxRedundancy(size_t time) const
+    {
+        return getMax(getRedundancy(time));
+    }
 
     // atomic agents:
     // - travelledDistance
@@ -379,7 +427,8 @@ public:
      * (POI)
      * \return distance to next POI
      */
-    double getTravelDistanceToNextPOI(size_t time, const AtomicAgent& atomicAgent) const;
+    double getTravelDistanceToNextPOI(size_t time,
+                                      const AtomicAgent& atomicAgent) const;
 
     /**
      * Get operative time, i.e., when the functionality of this atomic agent
@@ -403,7 +452,6 @@ public:
      */
     // double getWaitTime(size_t time, const AtomicAgent& atomicAgent) const;
 
-
     // ORGANIZATIONAL METRICS
     // to be applied on top of this interface
     // e.g. average between nearest neighbors
@@ -415,7 +463,6 @@ public:
 
     std::vector<double> getMetric(size_t time, metrics::Type metric) const;
 
-
     /**
      * Compute redundancies for the coalition structure Compute redundancies for
      * the coalition structure
@@ -425,7 +472,10 @@ public:
     /**
      * Return metric to compute safety property
      */
-    Metric::Ptr getMetric(metrics::Type metric = metrics::REDUNDANCY) const { return Metric::getInstance(metric, mAsk); }
+    Metric::Ptr getMetric(metrics::Type metric = metrics::REDUNDANCY) const
+    {
+        return Metric::getInstance(metric, mAsk);
+    }
 
     /**
      * Get the heuristic
@@ -438,7 +488,6 @@ private:
     Heuristics mHeuristics;
 
     // TODO: include metric in general
-
 
     /// Sample of the actual status
     StatusSample::List mStatusSamples;
@@ -455,10 +504,12 @@ private:
     RequirementSampleIndex mTimeIndexedRequirementSamples;
     /// Map of atomic agents to related samples -- since no parallel activities
     /// are possible a sample list can be used
-    std::map<AtomicAgent, StatusSample::ConstRawPtrList> mAtomicAgentIndexedSamples;
+    std::map<AtomicAgent, StatusSample::ConstRawPtrList>
+        mAtomicAgentIndexedSamples;
 
     /// Sampling function depending on the sample time
-    std::map<AtomicAgentSampleType, AtomicAgentSampleFunc> mAtomicAgentSampleFunctionMap;
+    std::map<AtomicAgentSampleType, AtomicAgentSampleFunc>
+        mAtomicAgentSampleFunctionMap;
     std::vector<AtomicAgentSampleType> mAtomicAgentSampleTypes;
     std::vector<AtomicAgentSampleFunc> mAtomicAgentSampleFunctions;
 
@@ -466,7 +517,8 @@ private:
     std::vector<AgentSampleType> mAgentSampleTypes;
     std::vector<AgentSampleFunc> mAgentSampleFunctions;
 
-    std::map<OrganizationSampleType, OrganizationSampleFunc> mOrganizationSampleFunctionMap;
+    std::map<OrganizationSampleType, OrganizationSampleFunc>
+        mOrganizationSampleFunctionMap;
     std::vector<OrganizationSampleType> mOrganizationSampleTypes;
     std::vector<OrganizationSampleFunc> mOrganizationSampleFunctions;
 
@@ -474,8 +526,6 @@ private:
     // queries:
     //     get information about atomic agent at time t
     //     get information about composite agents at time t
-
-
 };
 
 } // end namespace moreorg

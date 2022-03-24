@@ -1,8 +1,8 @@
 #include "InterfaceConnection.hpp"
-#include <stdint.h>
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <stdint.h>
 
 using namespace owlapi::model;
 
@@ -10,10 +10,12 @@ namespace moreorg {
 namespace moreorg {
 
 InterfaceConnection::InterfaceConnection() {}
-InterfaceConnection::InterfaceConnection(const IRI& interface0, const IRI& interface1)
+InterfaceConnection::InterfaceConnection(const IRI& interface0,
+                                         const IRI& interface1)
     : begin(interface0)
     , end(interface1)
-{}
+{
+}
 
 void InterfaceConnection::addParent(const IRI& parent)
 {
@@ -29,12 +31,17 @@ bool InterfaceConnection::sameParents(const InterfaceConnection& other) const
     return other.parents == this->parents;
 }
 
-bool InterfaceConnection::useSameInterface(const InterfaceConnection& other) const
+bool InterfaceConnection::useSameInterface(
+    const InterfaceConnection& other) const
 {
-    return other.begin == this->begin || other.begin == this->end || other.end == this->begin || other.end == this->end;
+    return other.begin == this->begin || other.begin == this->end ||
+           other.end == this->begin || other.end == this->end;
 }
 
-bool InterfaceConnection::selfReferencing() const { return parents.size() == 2 && parents[0] != parents[1]; }
+bool InterfaceConnection::selfReferencing() const
+{
+    return parents.size() == 2 && parents[0] != parents[1];
+}
 
 bool InterfaceConnection::operator<(const InterfaceConnection& other) const
 {
@@ -58,14 +65,19 @@ bool InterfaceConnection::operator==(const InterfaceConnection& other) const
 
 std::string InterfaceConnection::toString() const
 {
-    //return "InterfaceConnection from: " + begin.getFragment() + " to: " + end.getFragment() + "\n        parents: " + parents[0].getFragment() + " to " + parents[1].getFragment();
+    // return "InterfaceConnection from: " + begin.getFragment() + " to: " +
+    // end.getFragment() + "\n        parents: " + parents[0].getFragment() + "
+    // to " + parents[1].getFragment();
     std::stringstream ss;
-    ss << "InterfaceConnection from: " << begin.toString() << " to: " << end.toString();
-    //ss << std::endl << "        parents: " << parents[0].getFragment() << " to " << parents[1].getFragment();
+    ss << "InterfaceConnection from: " << begin.toString()
+       << " to: " << end.toString();
+    // ss << std::endl << "        parents: " << parents[0].getFragment() << "
+    // to " << parents[1].getFragment();
     return ss.str();
 }
 
-std::ostream& operator<<(std::ostream& os, const InterfaceConnection& connection)
+std::ostream& operator<<(std::ostream& os,
+                         const InterfaceConnection& connection)
 {
     os << connection.toString();
     return os;

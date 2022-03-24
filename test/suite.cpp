@@ -3,20 +3,23 @@
 // only once (here)
 //#define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
+#include <boost/test/unit_test.hpp>
 
-std::string rdfTestFiles[] = { "test/data/om-schema-v0.1.owl", "test/data/om-schema-v0.2.owl", "test/data/om-schema-v0.5.owl" };
+std::string rdfTestFiles[] = {"test/data/om-schema-v0.1.owl",
+                              "test/data/om-schema-v0.2.owl",
+                              "test/data/om-schema-v0.5.owl"};
 
 std::string getRootDir()
 {
     char buffer[1024];
-    BOOST_REQUIRE_MESSAGE( readlink("/proc/self/exe", buffer, 1024) != -1, "Retrieving current execution path");
+    BOOST_REQUIRE_MESSAGE(readlink("/proc/self/exe", buffer, 1024) != -1,
+                          "Retrieving current execution path");
     std::string str(buffer);
-    std::vector<std::string> foldernames = { "organization_model", "moreorg" };
+    std::vector<std::string> foldernames = {"organization_model", "moreorg"};
     std::string mainfolder;
     size_t textPos;
-    for(const std::string& foldername : foldernames )
+    for(const std::string& foldername : foldernames)
     {
         size_t pos = str.rfind(foldername + "/");
         if(pos != std::string::npos)

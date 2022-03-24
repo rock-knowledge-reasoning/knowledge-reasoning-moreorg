@@ -1,12 +1,12 @@
 #ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
 #define ORGANIZATION_MODEL_ORGANIZATION_MODEL_HPP
 
-#include <stdint.h>
+#include "FunctionalityMapping.hpp"
+#include "QueryCache.hpp"
+#include "Service.hpp"
 #include <moreorg/SharedPtr.hpp>
 #include <owlapi/model/OWLOntology.hpp>
-#include "FunctionalityMapping.hpp"
-#include "Service.hpp"
-#include "QueryCache.hpp"
+#include <stdint.h>
 
 namespace moreorg {
 
@@ -48,23 +48,26 @@ class OrganizationModel
 public:
     typedef shared_ptr<OrganizationModel> Ptr;
 
-
     /**
-     * Constructor to create an organization model from a given model description
-     * identified through an IRI
-     * \see owlapi::model::OWLOntologyIO::load
+     * Constructor to create an organization model from a given model
+     * description identified through an IRI \see
+     * owlapi::model::OWLOntologyIO::load
      */
     explicit OrganizationModel(const owlapi::model::IRI& iri);
 
     /**
-     * Constructor to create an OrganizationModel from an existing description file
-     * \param filename File name to an rdf/xml formatted ontology description file
+     * Constructor to create an OrganizationModel from an existing description
+     * file \param filename File name to an rdf/xml formatted ontology
+     * description file
      */
     explicit OrganizationModel(const std::string& filename = "");
 
     owlapi::model::OWLOntology::Ptr ontology() { return mpOntology; }
 
-    const owlapi::model::OWLOntology::Ptr ontology() const { return mpOntology; }
+    const owlapi::model::OWLOntology::Ptr ontology() const
+    {
+        return mpOntology;
+    }
 
     /**
      * Perform a deep copy of the OrganizationModel, thus
@@ -73,8 +76,10 @@ public:
      */
     OrganizationModel copy() const;
 
-    static std::string toString(const Pool2FunctionMap& poolFunctionMap, uint32_t indent = 0);
-    static std::string toString(const Function2PoolMap& functionPoolMap, uint32_t indent = 0);
+    static std::string toString(const Pool2FunctionMap& poolFunctionMap,
+                                uint32_t indent = 0);
+    static std::string toString(const Function2PoolMap& functionPoolMap,
+                                uint32_t indent = 0);
 
     static ModelPool combination2ModelPool(const ModelCombination& combination);
     static ModelCombination modelPool2Combination(const ModelPool& pool);

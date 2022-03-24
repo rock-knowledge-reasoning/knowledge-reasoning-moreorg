@@ -13,7 +13,7 @@ OrganizationModel::OrganizationModel(const owlapi::model::IRI& iri)
 }
 
 OrganizationModel::OrganizationModel(const std::string& filename)
-    : mpOntology( new OWLOntology())
+    : mpOntology(new OWLOntology())
 {
     if(!filename.empty())
     {
@@ -28,38 +28,48 @@ OrganizationModel OrganizationModel::copy() const
     return om;
 }
 
-std::string OrganizationModel::toString(const Pool2FunctionMap& combinationFunctionMap, uint32_t indent)
+std::string
+OrganizationModel::toString(const Pool2FunctionMap& combinationFunctionMap,
+                            uint32_t indent)
 {
     std::stringstream ss;
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     ss << hspace << "pool --> functions: " << std::endl;
     Pool2FunctionMap::const_iterator cit = combinationFunctionMap.begin();
     for(; cit != combinationFunctionMap.end(); ++cit)
     {
-        ss << hspace << "    pool:    " << IRI::toString((cit->first).toModelCombination(), true) << std::endl;
-        ss << hspace << "      --> functions: " << IRI::toString(cit->second, true) << std::endl;
+        ss << hspace << "    pool:    "
+           << IRI::toString((cit->first).toModelCombination(), true)
+           << std::endl;
+        ss << hspace
+           << "      --> functions: " << IRI::toString(cit->second, true)
+           << std::endl;
     }
     return ss.str();
 }
 
-std::string OrganizationModel::toString(const Function2PoolMap& functionCombinationMap, uint32_t indent)
+std::string
+OrganizationModel::toString(const Function2PoolMap& functionCombinationMap,
+                            uint32_t indent)
 {
     std::stringstream ss;
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
 
     ss << hspace << "function --> combinations: ";
     Function2PoolMap::const_iterator cit = functionCombinationMap.begin();
     for(; cit != functionCombinationMap.end(); ++cit)
     {
-        ss << hspace << "    function:    " << cit->first.getFragment() << std::endl;
+        ss << hspace << "    function:    " << cit->first.getFragment()
+           << std::endl;
         ss << hspace << "        supported by combination:" << std::endl;
-        ss << ModelPool::toString(cit->second,  indent + 8) << std::endl;
+        ss << ModelPool::toString(cit->second, indent + 8) << std::endl;
     }
 
     return ss.str();
 }
 
-ModelPool OrganizationModel::combination2ModelPool(const ModelCombination& combination)
+ModelPool
+OrganizationModel::combination2ModelPool(const ModelCombination& combination)
 {
     ModelPool modelPool;
     ModelCombination::const_iterator cit = combination.begin();
@@ -88,7 +98,6 @@ ModelCombination OrganizationModel::modelPool2Combination(const ModelPool& pool)
     return combination;
 }
 
-
 std::string OrganizationModel::toString(const ModelCombinationSet& combinations)
 {
     std::stringstream ss;
@@ -105,12 +114,14 @@ std::string OrganizationModel::toString(const ModelCombinationSet& combinations)
     return ss.str();
 }
 
-OrganizationModel::Ptr OrganizationModel::getInstance(const std::string& filename)
+OrganizationModel::Ptr
+OrganizationModel::getInstance(const std::string& filename)
 {
     return make_shared<OrganizationModel>(filename);
 }
 
-OrganizationModel::Ptr OrganizationModel::getInstance(const owlapi::model::IRI& iri)
+OrganizationModel::Ptr
+OrganizationModel::getInstance(const owlapi::model::IRI& iri)
 {
     return make_shared<OrganizationModel>(iri);
 }

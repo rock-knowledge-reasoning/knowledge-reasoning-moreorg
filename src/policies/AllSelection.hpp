@@ -13,7 +13,7 @@ public:
     virtual ~AllSelection() = default;
 
     Selection apply(const Selection& agent,
-            const OrganizationModelAsk& ask) const override;
+                    const OrganizationModelAsk& ask) const override;
 };
 
 } // end namespace policies

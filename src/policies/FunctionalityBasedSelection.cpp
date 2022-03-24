@@ -4,13 +4,16 @@
 namespace moreorg {
 namespace policies {
 
-FunctionalityBasedSelection::FunctionalityBasedSelection(const owlapi::model::IRI& functionality)
+FunctionalityBasedSelection::FunctionalityBasedSelection(
+    const owlapi::model::IRI& functionality)
     : SelectionPolicy(functionality.toString() + "_FunctionalityBasedSelection")
     , mFunctionality(functionality)
-{}
+{
+}
 
-policies::Selection FunctionalityBasedSelection::apply(const policies::Selection& agents,
-        const OrganizationModelAsk& ask) const
+policies::Selection
+FunctionalityBasedSelection::apply(const policies::Selection& agents,
+                                   const OrganizationModelAsk& ask) const
 {
     Resource resource(mFunctionality);
     ModelPool::Set supportedModels = ask.getResourceSupport(resource);
@@ -25,7 +28,7 @@ policies::Selection FunctionalityBasedSelection::apply(const policies::Selection
         {
             if(!Algebra::delta(supportedModel, modelPool).isNegative())
             {
-                selectedModels.insert( Agent(supportedModel) );
+                selectedModels.insert(Agent(supportedModel));
                 ++modelCount;
             }
         }

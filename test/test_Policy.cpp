@@ -1,7 +1,7 @@
-#include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
-#include <moreorg/policies/SelectionPolicy.hpp>
+#include <boost/test/unit_test.hpp>
 #include <moreorg/policies/DistributionPolicy.hpp>
+#include <moreorg/policies/SelectionPolicy.hpp>
 
 using namespace moreorg;
 using namespace owlapi::model;
@@ -15,24 +15,25 @@ BOOST_AUTO_TEST_CASE(get_instance)
     IRI crex = vocabulary::OM::resolve("CREX");
     IRI payload = vocabulary::OM::resolve("Payload");
 
-
     ModelPool modelPool;
     modelPool[sherpa] = 1;
     modelPool[payload] = 1;
     modelPool[crex] = 1;
     Agent a(modelPool);
 
-
     OrganizationModelAsk ask(om, modelPool, true);
 
-    Policy::Ptr policy = Policy::getInstance(vocabulary::OM::resolve("TransportProviderSelection"), ask);
+    Policy::Ptr policy = Policy::getInstance(
+        vocabulary::OM::resolve("TransportProviderSelection"),
+        ask);
 
     policies::Selection selection =
-        dynamic_pointer_cast<policies::SelectionPolicy>(policy)->apply({a}, ask);
+        dynamic_pointer_cast<policies::SelectionPolicy>(policy)->apply({a},
+                                                                       ask);
 
     for(const Agent& a : selection)
     {
-        BOOST_TEST_MESSAGE("Selected Agent: " << a.toString() );
+        BOOST_TEST_MESSAGE("Selected Agent: " << a.toString());
     }
 }
 
@@ -43,7 +44,6 @@ BOOST_AUTO_TEST_CASE(distribution)
     IRI crex = vocabulary::OM::resolve("CREX");
     IRI payload = vocabulary::OM::resolve("Payload");
 
-
     {
         ModelPool modelPool;
         modelPool[sherpa] = 1;
@@ -51,22 +51,28 @@ BOOST_AUTO_TEST_CASE(distribution)
         modelPool[crex] = 1;
         Agent a(modelPool);
 
-
         OrganizationModelAsk ask(om, modelPool, true);
 
-        Policy::Ptr policy =
-            Policy::getInstance(vocabulary::OM::resolve("DistributionPolicy_EnergyProvider"), ask);
+        Policy::Ptr policy = Policy::getInstance(
+            vocabulary::OM::resolve("DistributionPolicy_EnergyProvider"),
+            ask);
 
         policies::Distribution distribution =
-            dynamic_pointer_cast<policies::DistributionPolicy>(policy)->apply(a.getType(),
-                    ask);
+            dynamic_pointer_cast<policies::DistributionPolicy>(policy)->apply(
+                a.getType(),
+                ask);
 
-        BOOST_REQUIRE_MESSAGE(distribution.shares[sherpa] > 0.8, "Contribution of "
-                << sherpa << " > 0.8, was " << distribution.shares[sherpa]);
-        BOOST_REQUIRE_MESSAGE(distribution.shares[payload] == 0, "Contribution of "
-                << payload << " = 0, was " << distribution.shares[payload]);
-        BOOST_REQUIRE_MESSAGE(distribution.shares[crex] > 0.15, "Contribution of "
-                << crex << " > 0.15, was " << distribution.shares[crex]);
+        BOOST_REQUIRE_MESSAGE(distribution.shares[sherpa] > 0.8,
+                              "Contribution of "
+                                  << sherpa << " > 0.8, was "
+                                  << distribution.shares[sherpa]);
+        BOOST_REQUIRE_MESSAGE(distribution.shares[payload] == 0,
+                              "Contribution of "
+                                  << payload << " = 0, was "
+                                  << distribution.shares[payload]);
+        BOOST_REQUIRE_MESSAGE(distribution.shares[crex] > 0.15,
+                              "Contribution of " << crex << " > 0.15, was "
+                                                 << distribution.shares[crex]);
     }
     {
         ModelPool modelPool;
@@ -75,15 +81,19 @@ BOOST_AUTO_TEST_CASE(distribution)
 
         OrganizationModelAsk ask(om, modelPool, true);
 
-        Policy::Ptr policy =
-            Policy::getInstance(vocabulary::OM::resolve("DistributionPolicy_EnergyProvider"), ask);
+        Policy::Ptr policy = Policy::getInstance(
+            vocabulary::OM::resolve("DistributionPolicy_EnergyProvider"),
+            ask);
 
         policies::Distribution distribution =
-            dynamic_pointer_cast<policies::DistributionPolicy>(policy)->apply(a.getType(),
-                    ask);
+            dynamic_pointer_cast<policies::DistributionPolicy>(policy)->apply(
+                a.getType(),
+                ask);
 
-        BOOST_REQUIRE_MESSAGE(distribution.shares[sherpa] = 1.0, "Contribution of "
-                << sherpa << " = 1.0, was " << distribution.shares[sherpa]);
+        BOOST_REQUIRE_MESSAGE(distribution.shares[sherpa] = 1.0,
+                              "Contribution of "
+                                  << sherpa << " = 1.0, was "
+                                  << distribution.shares[sherpa]);
     }
 }
 

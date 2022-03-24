@@ -4,15 +4,10 @@ using namespace owlapi::model;
 
 namespace moreorg {
 
-std::map<Agent::OperationalStatus, std::string> Agent::OperationalStatusTxt =
-{
-     { Agent::UNKNOWN_OPERATIONAL_STATUS, "unknown operational status" },
-     { Agent::OPERATIVE,                  "operative" },
-     { Agent::DORMANT,                    "dormant"   }
-};
-
-Agent::Agent()
-{}
+std::map<Agent::OperationalStatus, std::string> Agent::OperationalStatusTxt = {
+    {Agent::UNKNOWN_OPERATIONAL_STATUS, "unknown operational status"},
+    {Agent::OPERATIVE, "operative"},
+    {Agent::DORMANT, "dormant"}};
 
 Agent::Agent(const AtomicAgent& atomicAgent)
 {
@@ -32,9 +27,9 @@ Agent::Agent(const AtomicAgent::Set& atomicAgents)
 Agent::Agent(const ModelPool& modelPool)
     : mAtomicAgents()
 {
-    for(const std::pair<IRI,size_t>& p : modelPool)
+    for(const std::pair<IRI, size_t>& p : modelPool)
     {
-        for(size_t i= 0; i < p.second; ++i)
+        for(size_t i = 0; i < p.second; ++i)
         {
             AtomicAgent a(i, p.first);
             add(a);
@@ -60,7 +55,7 @@ ModelPool Agent::getType() const
 
 std::string Agent::toString(size_t indent) const
 {
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     std::stringstream ss;
     ss << hspace << "Agent:" << std::endl;
     for(const AtomicAgent& aa : mAtomicAgents)
@@ -72,7 +67,7 @@ std::string Agent::toString(size_t indent) const
 
 std::string Agent::toString(const List& agents, size_t indent)
 {
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     std::stringstream ss;
     ss << hspace << "Agents:" << std::endl;
     for(const Agent& a : agents)
@@ -84,7 +79,7 @@ std::string Agent::toString(const List& agents, size_t indent)
 
 std::string Agent::toString(const Set& agents, size_t indent)
 {
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     std::stringstream ss;
     ss << hspace << "Agents:" << std::endl;
     for(const Agent& a : agents)
@@ -100,7 +95,7 @@ AtomicAgent::Set Agent::allAtomicAgents(const Agent::Set& agents)
     for(const Agent& agent : agents)
     {
         atomicAgents.insert(agent.getAtomicAgents().begin(),
-                agent.getAtomicAgents().end());
+                            agent.getAtomicAgents().end());
     }
     return atomicAgents;
 }
@@ -112,14 +107,14 @@ AtomicAgent::List Agent::getIntersection(const Agent& other) const
 
 bool Agent::intersectsWith(const Agent& other) const
 {
-    return !AtomicAgent::getIntersection(mAtomicAgents, other.mAtomicAgents).empty();
+    return !AtomicAgent::getIntersection(mAtomicAgents, other.mAtomicAgents)
+                .empty();
 }
 
 AtomicAgent::List Agent::getDifference(const Agent& other) const
 {
     return AtomicAgent::getDifference(mAtomicAgents, other.mAtomicAgents);
 }
-
 
 std::ostream& operator<<(std::ostream& os, const Agent::Set& agents)
 {

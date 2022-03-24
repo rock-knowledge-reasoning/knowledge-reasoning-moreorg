@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
+#include <moreorg/Algebra.hpp>
 #include <moreorg/ModelPool.hpp>
 #include <moreorg/ModelPoolIterator.hpp>
-#include <moreorg/Algebra.hpp>
 #include <moreorg/vocabularies/OM.hpp>
 
 using namespace moreorg;
@@ -64,7 +64,9 @@ BOOST_AUTO_TEST_CASE(iterator)
             ModelPool pool = iterator.current();
             BOOST_TEST_MESSAGE(pool.toString());
         }
-        BOOST_REQUIRE_MESSAGE(i == 10, "Iterations expected: 10 but counted '" << i << "'");
+        BOOST_REQUIRE_MESSAGE(i == 10,
+                              "Iterations expected: 10 but counted '" << i
+                                                                      << "'");
     }
 
     step["a"] = 2;
@@ -78,7 +80,9 @@ BOOST_AUTO_TEST_CASE(iterator)
             BOOST_TEST_MESSAGE(pool.toString());
         }
         // 1 3 5 7 9 10
-        BOOST_REQUIRE_MESSAGE(i == 6, "Iterations expected: 6, but counted '" << i << "'");
+        BOOST_REQUIRE_MESSAGE(i == 6,
+                              "Iterations expected: 6, but counted '" << i
+                                                                      << "'");
     }
 
     to["a"] = 3;
@@ -96,9 +100,9 @@ BOOST_AUTO_TEST_CASE(iterator)
             BOOST_TEST_MESSAGE(pool.toString());
         }
         // 1 3 5 7 9 10
-    //    BOOST_REQUIRE_MESSAGE(i == 6, "Iterations expected: 6, but counted '" << i << "'");
+        //    BOOST_REQUIRE_MESSAGE(i == 6, "Iterations expected: 6, but counted
+        //    '" << i << "'");
     }
-
 }
 
 BOOST_AUTO_TEST_CASE(apply_upper_bound)
@@ -137,16 +141,23 @@ BOOST_AUTO_TEST_CASE(apply_upper_bound)
     }
 
     {
-        ModelCombinationSet boundedSet = modelPool.applyUpperBound(combinations, modelPool);
-        BOOST_REQUIRE_MESSAGE(boundedSet.size() == 2, "BoundedSet: expected size: 2 was " << boundedSet.size() << ": " << OrganizationModel::toString(boundedSet) );
+        ModelCombinationSet boundedSet =
+            modelPool.applyUpperBound(combinations, modelPool);
+        BOOST_REQUIRE_MESSAGE(boundedSet.size() == 2,
+                              "BoundedSet: expected size: 2 was "
+                                  << boundedSet.size() << ": "
+                                  << OrganizationModel::toString(boundedSet));
     }
 
     {
         // empty upper bound
         ModelPool pool;
-        ModelCombinationSet boundedSet = modelPool.applyUpperBound(combinations,
-                pool);
-        BOOST_REQUIRE_MESSAGE(boundedSet.size() == 3, "BoundedSet: expected size: 3 was " << boundedSet.size() << ": " << OrganizationModel::toString(boundedSet) );
+        ModelCombinationSet boundedSet =
+            modelPool.applyUpperBound(combinations, pool);
+        BOOST_REQUIRE_MESSAGE(boundedSet.size() == 3,
+                              "BoundedSet: expected size: 3 was "
+                                  << boundedSet.size() << ": "
+                                  << OrganizationModel::toString(boundedSet));
     }
 }
 

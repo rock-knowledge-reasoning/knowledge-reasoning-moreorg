@@ -1,7 +1,7 @@
-#include <iostream>
-#include <stdio.h>
 #include "OrganizationModel.hpp"
 #include "ccf/CCF.hpp"
+#include <iostream>
+#include <stdio.h>
 
 int main(int argc, char** argv)
 {
@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 
     if(!o_filename.empty())
     {
-        OrganizationModel om( o_filename );
+        OrganizationModel om(o_filename);
         om.setMaximumNumberOfLinks(2);
 
         using namespace moreorg;
@@ -42,7 +42,8 @@ int main(int argc, char** argv)
 
         om.refresh(true);
         std::cout << om.getStatistics();
-    } else {
+    } else
+    {
         fprintf(stderr, "usage: %s <filename>\n", argv[0]);
     }
 }

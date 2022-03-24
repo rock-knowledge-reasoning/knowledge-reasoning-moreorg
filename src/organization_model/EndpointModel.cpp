@@ -6,13 +6,13 @@ using namespace owlapi::model;
 namespace moreorg {
 namespace moreorg {
 
-EndpointModel::EndpointModel()
-{}
+EndpointModel::EndpointModel() {}
 
 EndpointModel::EndpointModel(const IRI& actorModel, const IRI& interfaceRole)
     : mActorModel(actorModel)
     , mInterfaceRole(interfaceRole)
-{}
+{
+}
 
 bool EndpointModel::operator<(const EndpointModel& other) const
 {
@@ -32,7 +32,8 @@ bool EndpointModel::operator<(const EndpointModel& other) const
 
 bool EndpointModel::operator==(const EndpointModel& other) const
 {
-    return this->mActorModel == other.mActorModel && this->mInterfaceRole == other.mInterfaceRole;
+    return this->mActorModel == other.mActorModel &&
+           this->mInterfaceRole == other.mInterfaceRole;
 }
 
 std::string EndpointModel::toString() const

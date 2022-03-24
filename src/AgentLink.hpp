@@ -13,13 +13,11 @@ public:
 
     AgentLink() = default;
 
-    AgentLink(const AgentInterface& source,
-            const AgentInterface& target);
+    AgentLink(const AgentInterface& source, const AgentInterface& target);
 
 private:
     AgentInterface mSource;
     AgentInterface mTarget;
-
 };
 
 } // end namespace moreorg

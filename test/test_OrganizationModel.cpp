@@ -1,13 +1,13 @@
-#include <boost/test/unit_test.hpp>
 #include "test_utils.hpp"
+#include <boost/test/unit_test.hpp>
 
-#include <owlapi/io/OWLOntologyIO.hpp>
 #include <moreorg/OrganizationModel.hpp>
 #include <moreorg/OrganizationModelAsk.hpp>
 #include <moreorg/exporter/PDDLExporter.hpp>
-#include <numeric/Combinatorics.hpp>
 #include <moreorg/metrics/Redundancy.hpp>
 #include <moreorg/vocabularies/OM.hpp>
+#include <numeric/Combinatorics.hpp>
+#include <owlapi/io/OWLOntologyIO.hpp>
 
 using namespace moreorg;
 using namespace moreorg::vocabulary;
@@ -23,25 +23,30 @@ BOOST_AUTO_TEST_CASE(load_file)
     BOOST_TEST_MESSAGE("Loaded model" << ontologyAsk.allClasses());
 }
 
-
 BOOST_AUTO_TEST_CASE(function_combination_mapping)
 {
     using namespace owlapi::vocabulary;
     using namespace owlapi::model;
 
-    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()) );
+    OrganizationModel::Ptr om(new OrganizationModel(getOMSchema()));
 
     ModelPool items;
     items[OM::resolve("BaseCamp")] = 1;
 
     OrganizationModelAsk ask(om, items, true);
     {
-        algebra::SupportType supportType = ask.getSupportType(OM::resolve("PayloadLogisticHub"), items);
-        BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT, "Full support for payload logistic hub");
+        algebra::SupportType supportType =
+            ask.getSupportType(OM::resolve("PayloadLogisticHub"), items);
+        BOOST_REQUIRE_MESSAGE(supportType == algebra::FULL_SUPPORT,
+                              "Full support for payload logistic hub");
     }
     {
-        algebra::SupportType supportType = ask.getSupportType(OM::resolve("TransportProvider"), items);
-        BOOST_REQUIRE_MESSAGE(supportType == algebra::PARTIAL_SUPPORT, "Partial support for transport service expected, but is : " << algebra::SupportTypeTxt[supportType]);
+        algebra::SupportType supportType =
+            ask.getSupportType(OM::resolve("TransportProvider"), items);
+        BOOST_REQUIRE_MESSAGE(
+            supportType == algebra::PARTIAL_SUPPORT,
+            "Partial support for transport service expected, but is : "
+                << algebra::SupportTypeTxt[supportType]);
     }
 
     items[OM::resolve("Sherpa")] = 3;
@@ -49,7 +54,9 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
     items[OM::resolve("CoyoteIII")] = 3;
 
     ModelPool::Set modelPoolSet = items.allCombinations();
-    BOOST_TEST_MESSAGE("All combinations of three agent types with cardinality 3: " << ModelPool::toString(modelPoolSet) );
+    BOOST_TEST_MESSAGE(
+        "All combinations of three agent types with cardinality 3: "
+        << ModelPool::toString(modelPoolSet));
 
     items[OM::resolve("Payload")] = 2;
     items[OM::resolve("PayloadCamera")] = 5;
@@ -61,11 +68,15 @@ BOOST_AUTO_TEST_CASE(function_combination_mapping)
     BOOST_TEST_MESSAGE("FunctionalityMapping " << fm.toString());
 
     fm.save("/tmp/test-moreorg-functionality-mapping");
-    FunctionalityMapping fmLoaded = FunctionalityMapping::fromFile("/tmp/test-moreorg-functionality-mapping");
+    FunctionalityMapping fmLoaded = FunctionalityMapping::fromFile(
+        "/tmp/test-moreorg-functionality-mapping");
 
-    BOOST_REQUIRE_MESSAGE(fmLoaded.getModelPool() == items, "Loaded model has all resources" << fmLoaded.toString());
-    BOOST_REQUIRE_MESSAGE(fmLoaded.getFunctionalSaturationBound().at(OM::resolve("BaseCamp"))
-            == 1, "Saturation bound loaded" << fmLoaded.toString());
+    BOOST_REQUIRE_MESSAGE(fmLoaded.getModelPool() == items,
+                          "Loaded model has all resources"
+                              << fmLoaded.toString());
+    BOOST_REQUIRE_MESSAGE(fmLoaded.getFunctionalSaturationBound().at(
+                              OM::resolve("BaseCamp")) == 1,
+                          "Saturation bound loaded" << fmLoaded.toString());
 }
 
 BOOST_AUTO_TEST_CASE(resource_support)
@@ -85,10 +96,13 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
         Resource::Set functionalities;
-        functionalities.insert( Resource(OM::resolve("StereoImageProvider")) );
+        functionalities.insert(Resource(OM::resolve("StereoImageProvider")));
 
         ModelPool::Set modelPools = ask.getResourceSupport(functionalities);
-        BOOST_REQUIRE_MESSAGE(modelPools.size() == 0, "No combinations that support stereo image provider expected 0 was " << modelPools.size());
+        BOOST_REQUIRE_MESSAGE(
+            modelPools.size() == 0,
+            "No combinations that support stereo image provider expected 0 was "
+                << modelPools.size());
     }
     {
         ModelPool items;
@@ -98,14 +112,16 @@ BOOST_AUTO_TEST_CASE(resource_support)
         OrganizationModelAsk ask(om, items, false);
 
         Resource::Set functionalities;
-        functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
+        functionalities.insert(Resource(OM::resolve("StereoImageProvider")));
 
         ModelPool::Set combinations = ask.getResourceSupport(functionalities);
-        BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations of "
+        BOOST_REQUIRE_MESSAGE(
+            combinations.size() == 2,
+            "Two combinations of "
                 << items.toString(4)
-                << " that support stereo image provider, but were " << combinations.size()
-                << " "
-                << ModelPool::toString(combinations) );
+                << " that support stereo image provider, but were "
+                << combinations.size() << " "
+                << ModelPool::toString(combinations));
     }
     {
         ModelPool items;
@@ -116,25 +132,34 @@ BOOST_AUTO_TEST_CASE(resource_support)
             OrganizationModelAsk ask(om, items, false);
 
             Resource::Set functionalities;
-            functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
+            functionalities.insert(
+                Resource(OM::resolve("StereoImageProvider")));
 
-            ModelPool::Set combinations = ask.getResourceSupport(functionalities);
-            BOOST_REQUIRE_MESSAGE(combinations.size() == 2, "Two combinations "
+            ModelPool::Set combinations =
+                ask.getResourceSupport(functionalities);
+            BOOST_REQUIRE_MESSAGE(
+                combinations.size() == 2,
+                "Two combinations "
                     << items.toString(4)
-                    << " that support stereo image provider, but were " << combinations.size()
-                    << " "
-                    << ModelPool::toString(combinations) );
+                    << " that support stereo image provider, but were "
+                    << combinations.size() << " "
+                    << ModelPool::toString(combinations));
         }
         {
             OrganizationModelAsk ask(om, items, true);
 
             Resource::Set functionalities;
-            functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
+            functionalities.insert(
+                Resource(OM::resolve("StereoImageProvider")));
 
-            ModelPool::Set combinations = ask.getResourceSupport(functionalities);
-            BOOST_REQUIRE_MESSAGE(combinations.size() == 1, "With functional bound only one combination that supports stereo image provider, but were " << combinations.size()
-                    << " "
-                    << ModelPool::toString(combinations) );
+            ModelPool::Set combinations =
+                ask.getResourceSupport(functionalities);
+            BOOST_REQUIRE_MESSAGE(
+                combinations.size() == 1,
+                "With functional bound only one combination that supports "
+                "stereo image provider, but were "
+                    << combinations.size() << " "
+                    << ModelPool::toString(combinations));
         }
     }
 
@@ -151,13 +176,14 @@ BOOST_AUTO_TEST_CASE(resource_support)
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
         Resource::Set functionalities;
-        functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
-        functionalities.insert( Resource(OM::resolve("ImageProvider") ) );
-        functionalities.insert( Resource(OM::resolve("EmiPowerProvider") ) );
+        functionalities.insert(Resource(OM::resolve("StereoImageProvider")));
+        functionalities.insert(Resource(OM::resolve("ImageProvider")));
+        functionalities.insert(Resource(OM::resolve("EmiPowerProvider")));
 
-        //std::set<ModelCombinationSet> combinations = ask.getResourceSupport(services);
-        //std::set<ModelCombinationSet>::const_iterator cit = combinations.begin();
-        //for(; cit != combinations.end(); ++cit)
+        // std::set<ModelCombinationSet> combinations =
+        // ask.getResourceSupport(services);
+        // std::set<ModelCombinationSet>::const_iterator cit =
+        // combinations.begin(); for(; cit != combinations.end(); ++cit)
         //{
         //    BOOST_TEST_MESSAGE("ModelCombination");
         //    const ModelCombinationSet& list = *cit;
@@ -168,45 +194,63 @@ BOOST_AUTO_TEST_CASE(resource_support)
         //    }
         //}
 
-        //BOOST_REQUIRE_MESSAGE(combinations.size() > 1000, "Combinations that support stereo image provider, was " << combinations.size());
+        // BOOST_REQUIRE_MESSAGE(combinations.size() > 1000, "Combinations that
+        // support stereo image provider, was " << combinations.size());
 
         {
             OrganizationModelAsk ask(om);
-            BOOST_REQUIRE_THROW(ask.getFunctionalSaturationBound(functionalities), std::invalid_argument);
+            BOOST_REQUIRE_THROW(
+                ask.getFunctionalSaturationBound(functionalities),
+                std::invalid_argument);
         }
         {
             OrganizationModelAsk ask(om, items);
-            ModelPool modelPoolBounded = ask.getFunctionalSaturationBound(functionalities);
-            BOOST_TEST_MESSAGE("ModelPoolBounded: " << modelPoolBounded.toString());
+            ModelPool modelPoolBounded =
+                ask.getFunctionalSaturationBound(functionalities);
+            BOOST_TEST_MESSAGE(
+                "ModelPoolBounded: " << modelPoolBounded.toString());
 
             {
                 OrganizationModelAsk minimalAsk(om, modelPoolBounded, false);
-                ModelPool::Set combinations = minimalAsk.getResourceSupport(functionalities);
+                ModelPool::Set combinations =
+                    minimalAsk.getResourceSupport(functionalities);
                 std::set<ModelPool>::const_iterator cit = combinations.begin();
                 for(; cit != combinations.end(); ++cit)
                 {
-                    BOOST_TEST_MESSAGE("ModelCombination: " << cit->toString() );
+                    BOOST_TEST_MESSAGE("ModelCombination: " << cit->toString());
                 }
 
-
-                BOOST_CHECK_MESSAGE(combinations.size() == 6,
-                        "Without functional saturation bound: six combinations that support stereo image provider, image provider and emi power provider, was " << combinations.size() << " "
+                BOOST_CHECK_MESSAGE(
+                    combinations.size() == 6,
+                    "Without functional saturation bound: six combinations "
+                    "that support stereo image provider, image provider and "
+                    "emi power provider, was "
+                        << combinations.size() << " "
                         << ModelPool::toString(combinations, 4) << " "
-                        << "\nBounded model pool: " << ModelPoolDelta(modelPoolBounded).toString());
+                        << "\nBounded model pool: "
+                        << ModelPoolDelta(modelPoolBounded).toString());
             }
             {
                 OrganizationModelAsk minimalAsk(om, modelPoolBounded, true);
-                ModelPool::Set combinations = minimalAsk.getBoundedResourceSupport(functionalities);
+                ModelPool::Set combinations =
+                    minimalAsk.getBoundedResourceSupport(functionalities);
                 std::set<ModelPool>::const_iterator cit = combinations.begin();
                 for(; cit != combinations.end(); ++cit)
                 {
-                    BOOST_TEST_MESSAGE("ModelCombination: " << cit->toString() );
+                    BOOST_TEST_MESSAGE("ModelCombination: " << cit->toString());
                 }
 
-                BOOST_CHECK_MESSAGE(combinations.size() == 1, "With functional saturation bound: one combinations that support stereo image provider, image provider and emi power provider, was " << combinations.size() << " "
+                BOOST_CHECK_MESSAGE(
+                    combinations.size() == 1,
+                    "With functional saturation bound: one combinations that "
+                    "support stereo image provider, image provider and emi "
+                    "power provider, was "
+                        << combinations.size() << " "
                         << ModelPool::toString(combinations, 4) << " "
-                        << "\nBounded model pool: " << ModelPoolDelta(modelPoolBounded).toString()
-                        << "\nFunctionality: " << minimalAsk.getFunctionalityMapping().toString());
+                        << "\nBounded model pool: "
+                        << ModelPoolDelta(modelPoolBounded).toString()
+                        << "\nFunctionality: "
+                        << minimalAsk.getFunctionalityMapping().toString());
             }
         }
     }
@@ -230,11 +274,14 @@ BOOST_AUTO_TEST_CASE(resource_support_crex)
         // http://www.rock-robotics.org/2014/01/om-schema#EmiPowerProvider]
 
         Resource::Set functionalities;
-        functionalities.insert( Resource(OM::resolve("StereoImageProvider") ) );
+        functionalities.insert(Resource(OM::resolve("StereoImageProvider")));
 
         ModelPool::Set combinations = ask.getResourceSupport(functionalities);
 
-        BOOST_REQUIRE_MESSAGE(combinations.size() == 0, "No combinations that support stereo image provider expected 0 was " << combinations.size());
+        BOOST_REQUIRE_MESSAGE(
+            combinations.size() == 0,
+            "No combinations that support stereo image provider expected 0 was "
+                << combinations.size());
     }
 }
 
@@ -247,10 +294,9 @@ BOOST_AUTO_TEST_CASE(load_qudt)
         OWLOntologyIO::load(IRI("http://qudt.org/2.1/schema/qudt"));
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
 
-//BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
+// BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling)
 //{
 //    OrganizationModel om;
 //
@@ -306,13 +352,18 @@ BOOST_AUTO_TEST_SUITE_END()
 //    om.createInstance("Mapping/instance#10", OM::Resource(), "Mapping");
 //    om.createInstance("Mapping/instance#20", OM::Resource(), "Mapping");
 //
-//    BOOST_REQUIRE_MESSAGE(ontology->isInstanceOf("Mapping/instance#0", OM::Resource()), "Instance of Mapping");
-//    BOOST_REQUIRE_MESSAGE(ontology->isRelatedTo("Mapping/instance#0", OM::modelledBy(), "Mapping"), "Resource Mapping/instance#0 typeOf Mapping");
+//    BOOST_REQUIRE_MESSAGE(ontology->isInstanceOf("Mapping/instance#0",
+//    OM::Resource()), "Instance of Mapping");
+//    BOOST_REQUIRE_MESSAGE(ontology->isRelatedTo("Mapping/instance#0",
+//    OM::modelledBy(), "Mapping"), "Resource Mapping/instance#0 typeOf
+//    Mapping");
 //
-//    om.createInstance("Localization/instance#0", OM::Resource(), "Localization");
-//    om.createInstance("Localization/instance#1", OM::Resource(), "Localization");
-//    om.createInstance("Localization/instance#10", OM::Resource(), "Localization");
-//    om.createInstance("Localization/instance#20", OM::Resource(), "Localization");
+//    om.createInstance("Localization/instance#0", OM::Resource(),
+//    "Localization"); om.createInstance("Localization/instance#1",
+//    OM::Resource(), "Localization");
+//    om.createInstance("Localization/instance#10", OM::Resource(),
+//    "Localization"); om.createInstance("Localization/instance#20",
+//    OM::Resource(), "Localization");
 //
 //    om.createInstance("Locomotion/instance#0", OM::Resource(), "Locomotion");
 //    om.createInstance("Locomotion/instance#1", OM::Resource(), "Locomotion");
@@ -320,26 +371,32 @@ BOOST_AUTO_TEST_SUITE_END()
 //    om.createInstance("Locomotion/instance#10", OM::Resource(), "Locomotion");
 //    om.createInstance("Locomotion/instance#20", OM::Resource(), "Locomotion");
 //
-//    om.createInstance("EmiActive/requirement#0", OM::Requirement(), "EmiActive");
-//    om.createInstance("EmiActive/instance#0" , OM::Interface(), "EmiActive");
-//    om.createInstance("EmiActive/instance#1" , OM::Interface(), "EmiActive");
-//    om.createInstance("EmiActive/instance#2" , OM::Interface(), "EmiActive");
-//    om.createInstance("EmiActive/instance#3" , OM::Interface(), "EmiActive");
-//    om.createInstance("EmiActive/instance#10", OM::Interface(), "EmiActive");
-//    om.createInstance("EmiActive/instance#11", OM::Interface(), "EmiActive");
-//    om.createInstance("EmiActive/instance#30", OM::Interface(), "EmiActive");
+//    om.createInstance("EmiActive/requirement#0", OM::Requirement(),
+//    "EmiActive"); om.createInstance("EmiActive/instance#0" , OM::Interface(),
+//    "EmiActive"); om.createInstance("EmiActive/instance#1" , OM::Interface(),
+//    "EmiActive"); om.createInstance("EmiActive/instance#2" , OM::Interface(),
+//    "EmiActive"); om.createInstance("EmiActive/instance#3" , OM::Interface(),
+//    "EmiActive"); om.createInstance("EmiActive/instance#10", OM::Interface(),
+//    "EmiActive"); om.createInstance("EmiActive/instance#11", OM::Interface(),
+//    "EmiActive"); om.createInstance("EmiActive/instance#30", OM::Interface(),
+//    "EmiActive");
 //
-//    om.createInstance("EmiPassive/requirement#0", OM::Requirement(), "EmiPassive");
-//    om.createInstance("EmiPassive/instance#0" , OM::Interface(), "EmiPassive");
-//    om.createInstance("EmiPassive/instance#1" , OM::Interface(), "EmiPassive");
-//    om.createInstance("EmiPassive/instance#2" , OM::Interface(), "EmiPassive");
-//    om.createInstance("EmiPassive/instance#3" , OM::Interface(), "EmiPassive");
-//    om.createInstance("EmiPassive/instance#11", OM::Interface(), "EmiPassive");
-//    om.createInstance("EmiPassive/instance#12", OM::Interface(), "EmiPassive");
-//    om.createInstance("EmiPassive/instance#13", OM::Interface(), "EmiPassive");
-//    om.createInstance("EmiPassive/instance#10", OM::Interface(), "EmiPassive");
-//    om.createInstance("EmiPassive/instance#20", OM::Interface(), "EmiPassive");
-//    om.createInstance("EmiPassive/instance#30", OM::Interface(), "EmiPassive");
+//    om.createInstance("EmiPassive/requirement#0", OM::Requirement(),
+//    "EmiPassive"); om.createInstance("EmiPassive/instance#0" ,
+//    OM::Interface(), "EmiPassive"); om.createInstance("EmiPassive/instance#1"
+//    , OM::Interface(), "EmiPassive");
+//    om.createInstance("EmiPassive/instance#2" , OM::Interface(),
+//    "EmiPassive"); om.createInstance("EmiPassive/instance#3" ,
+//    OM::Interface(), "EmiPassive");
+//    om.createInstance("EmiPassive/instance#11", OM::Interface(),
+//    "EmiPassive"); om.createInstance("EmiPassive/instance#12",
+//    OM::Interface(), "EmiPassive");
+//    om.createInstance("EmiPassive/instance#13", OM::Interface(),
+//    "EmiPassive"); om.createInstance("EmiPassive/instance#10",
+//    OM::Interface(), "EmiPassive");
+//    om.createInstance("EmiPassive/instance#20", OM::Interface(),
+//    "EmiPassive"); om.createInstance("EmiPassive/instance#30",
+//    OM::Interface(), "EmiPassive");
 //
 //    om.createInstance("Camera/requirement#0" , OM::Requirement(), "Camera");
 //    om.createInstance("Camera/requirement#1" , OM::Requirement(), "Camera");
@@ -348,67 +405,93 @@ BOOST_AUTO_TEST_SUITE_END()
 //    om.createInstance("Camera/instance#20" , OM::Resource(), "Camera");
 //    om.createInstance("Camera/instance#30" , OM::Resource(), "Camera");
 //
-//    om.createInstance("PowerSource/requirement#0", OM::Requirement(), "PowerSource");
-//    om.createInstance("PowerSource/instance#0", OM::Resource(), "PowerSource");
+//    om.createInstance("PowerSource/requirement#0", OM::Requirement(),
+//    "PowerSource"); om.createInstance("PowerSource/instance#0",
+//    OM::Resource(), "PowerSource");
 //
 //    ontology->instanceOf("ImageProvider", OM::ServiceModel());
-//    // to allow a higher arity, e.g., for a stereo camera that requires distinct services
-//    om.createInstance("ImageProvider/requirement#0", OM::Requirement(), "ImageProvider");
-//    om.createInstance("ImageProvider/requirement#1", OM::Requirement(), "ImageProvider");
+//    // to allow a higher arity, e.g., for a stereo camera that requires
+//    distinct services om.createInstance("ImageProvider/requirement#0",
+//    OM::Requirement(), "ImageProvider");
+//    om.createInstance("ImageProvider/requirement#1", OM::Requirement(),
+//    "ImageProvider");
 //
 //    ontology->instanceOf("StereoImageProvider", OM::ServiceModel());
-//    om.createInstance("StereoImageProvider/requirement#0", OM::Service(), "StereoImageProvider");
+//    om.createInstance("StereoImageProvider/requirement#0", OM::Service(),
+//    "StereoImageProvider");
 //
 //    ontology->refresh();
-//    BOOST_REQUIRE_MESSAGE( ontology->allInstancesOf("Thing").size() != 0, "# of instances of Thing > 0, i.e. " << ontology->allInstancesOf("Thing").size());
+//    BOOST_REQUIRE_MESSAGE( ontology->allInstancesOf("Thing").size() != 0, "#
+//    of instances of Thing > 0, i.e. " <<
+//    ontology->allInstancesOf("Thing").size());
 //
 //    //// Service definitions
 //    ontology->instanceOf("MoveTo", OM::ServiceModel());
 //    om.createInstance("Mapping/requirement#0", OM::Requirement(), "Mapping");
-//    om.createInstance("Localization/requirement#0", OM::Requirement(), "Mapping");
-//    om.createInstance("Locomotion/requirement#0", OM::Requirement(), "Mapping");
+//    om.createInstance("Localization/requirement#0", OM::Requirement(),
+//    "Mapping"); om.createInstance("Locomotion/requirement#0",
+//    OM::Requirement(), "Mapping");
 //    // The following requirement is already defined
-//    // om.createInstance("PowerSource/requirement#0", OM::Requirement(), "PowerSource");
+//    // om.createInstance("PowerSource/requirement#0", OM::Requirement(),
+//    "PowerSource");
 //
 //    ontology->relatedTo("MoveTo", OM::dependsOn(), "Mapping/requirement#0");
-//    ontology->relatedTo("MoveTo", OM::dependsOn(), "Localization/requirement#0");
-//    ontology->relatedTo("MoveTo", OM::dependsOn(), "Locomotion/requirement#0");
-//    ontology->relatedTo("MoveTo", OM::dependsOn(), "PowerSource/requirement#0");
+//    ontology->relatedTo("MoveTo", OM::dependsOn(),
+//    "Localization/requirement#0"); ontology->relatedTo("MoveTo",
+//    OM::dependsOn(), "Locomotion/requirement#0");
+//    ontology->relatedTo("MoveTo", OM::dependsOn(),
+//    "PowerSource/requirement#0");
 //
-//    BOOST_REQUIRE_MESSAGE( ontology->isRelatedTo("MoveTo", OM::dependsOn(), "Mapping/requirement#0"), "Check dependency");
+//    BOOST_REQUIRE_MESSAGE( ontology->isRelatedTo("MoveTo", OM::dependsOn(),
+//    "Mapping/requirement#0"), "Check dependency");
 //
 //    om.createInstance("Camera/requirement#0", OM::Requirement(), "Camera");
-//    om.createInstance("PowerSource/requirement#0", OM::Requirement(), "PowerSource");
-//    ontology->relatedTo("ImageProvider", OM::dependsOn(), "Camera/requirement#0");
-//    ontology->relatedTo("ImageProvider", OM::dependsOn(), "PowerSource/requirement#0");
+//    om.createInstance("PowerSource/requirement#0", OM::Requirement(),
+//    "PowerSource"); ontology->relatedTo("ImageProvider", OM::dependsOn(),
+//    "Camera/requirement#0"); ontology->relatedTo("ImageProvider",
+//    OM::dependsOn(), "PowerSource/requirement#0");
 //
 //
 //    ontology->instanceOf("StereoImageProvider", OM::ServiceModel());
-//    ontology->relatedTo("StereoImageProvider", OM::dependsOn(), "ImageProvider/requirement#0");
-//    ontology->relatedTo("StereoImageProvider", OM::dependsOn(), "ImageProvider/requirement#1");
+//    ontology->relatedTo("StereoImageProvider", OM::dependsOn(),
+//    "ImageProvider/requirement#0"); ontology->relatedTo("StereoImageProvider",
+//    OM::dependsOn(), "ImageProvider/requirement#1");
 //
 //    om.createInstance("MoveTo/requirement#0", OM::Requirement(), "MoveTo");
 //    ontology->instanceOf("LocationImageProvider", OM::ServiceModel());
-//    ontology->relatedTo("LocationImageProvider", OM::dependsOn(), "ImageProvider/requirement#0");
-//    ontology->relatedTo("LocationImageProvider", OM::dependsOn(), "MoveTo/requirement#0");
+//    ontology->relatedTo("LocationImageProvider", OM::dependsOn(),
+//    "ImageProvider/requirement#0");
+//    ontology->relatedTo("LocationImageProvider", OM::dependsOn(),
+//    "MoveTo/requirement#0");
 //
-//    om.createInstance("LocationImageProvider/requirement#0", OM::Requirement(), "LocationImageProvider");
-//    ontology->alias("location_image_provider", "LocationImageProvider/requirement#0", KnowledgeBase::INSTANCE);
+//    om.createInstance("LocationImageProvider/requirement#0",
+//    OM::Requirement(), "LocationImageProvider");
+//    ontology->alias("location_image_provider",
+//    "LocationImageProvider/requirement#0", KnowledgeBase::INSTANCE);
 //    {
 //        ontology->refresh();
-//        int allInstances = ontology->allRelatedInstances("location_image_provider",OM::modelledBy()).size();
-//        BOOST_REQUIRE_MESSAGE ( ontology->allRelatedInstances("location_image_provider",OM::modelledBy()).size() == 1, "All related instances " << allInstances << " expected > 2" );
+//        int allInstances =
+//        ontology->allRelatedInstances("location_image_provider",OM::modelledBy()).size();
+//        BOOST_REQUIRE_MESSAGE (
+//        ontology->allRelatedInstances("location_image_provider",OM::modelledBy()).size()
+//        == 1, "All related instances " << allInstances << " expected > 2" );
 //
-//        allInstances = ontology->allRelatedInstances("LocationImageProvider",OM::dependsOn()).size();
-//        BOOST_REQUIRE_MESSAGE ( ontology->allRelatedInstances("LocationImageProvider",OM::dependsOn()).size() == 2, "All related instances " << allInstances << " expected > 2" );
+//        allInstances =
+//        ontology->allRelatedInstances("LocationImageProvider",OM::dependsOn()).size();
+//        BOOST_REQUIRE_MESSAGE (
+//        ontology->allRelatedInstances("LocationImageProvider",OM::dependsOn()).size()
+//        == 2, "All related instances " << allInstances << " expected > 2" );
 //    }
 //
 //    ontology->instanceOf("PowerProvider", OM::ServiceModel());
 //    om.createInstance("EmiPowerProvider", OM::Service(), "PowerProvider");
-//    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(), "EmiActive/requirement#0");
-//    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(), "EmiPassive/requirement#0");
-//    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(), "PowerSource/requirement#0");
-//    om.createInstance("EmiPowerPowerSource/requirement#0", OM::Requirement(), "EmiPowerProvider");
+//    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(),
+//    "EmiActive/requirement#0"); ontology->relatedTo("EmiPowerProvider",
+//    OM::dependsOn(), "EmiPassive/requirement#0");
+//    ontology->relatedTo("EmiPowerProvider", OM::dependsOn(),
+//    "PowerSource/requirement#0");
+//    om.createInstance("EmiPowerPowerSource/requirement#0", OM::Requirement(),
+//    "EmiPowerProvider");
 //
 //    //// Actor definition
 //    ontology->instanceOf("Sherpa",OM::ActorModel());
@@ -420,8 +503,9 @@ BOOST_AUTO_TEST_SUITE_END()
 //    ontology->alias("crex", "CREX/instance#0", KnowledgeBase::INSTANCE);
 //
 //    ontology->instanceOf("PayloadCamera",OM::ActorModel());
-//    om.createInstance("PayloadCamera/instance#0",OM::Actor(), "PayloadCamera");
-//    ontology->alias("payload_camera", "PayloadCamera/instance#0", KnowledgeBase::INSTANCE);
+//    om.createInstance("PayloadCamera/instance#0",OM::Actor(),
+//    "PayloadCamera"); ontology->alias("payload_camera",
+//    "PayloadCamera/instance#0", KnowledgeBase::INSTANCE);
 //
 //    ontology->transitiveProperty(OM::has());
 //    ontology->relatedTo("Sherpa", OM::has(), "Mapping/instance#10");
@@ -449,10 +533,11 @@ BOOST_AUTO_TEST_SUITE_END()
 //
 //    //// Mission requirements
 //    ontology->instanceOf("simple_mission", "Mission");
-//    ontology->relatedTo("simple_mission", OM::dependsOn(), "LocationImageProvider/requirement#0");
-//    ontology->refresh();
+//    ontology->relatedTo("simple_mission", OM::dependsOn(),
+//    "LocationImageProvider/requirement#0"); ontology->refresh();
 //
-//    assert ( ontology->allRelatedInstances("simple_mission", OM::dependsOn()).size() != 0 );
+//    assert ( ontology->allRelatedInstances("simple_mission",
+//    OM::dependsOn()).size() != 0 );
 //
 //    ontology->allInverseRelatedInstances("Camera/instance#0",OM::dependsOn());
 //    ontology->allInverseRelatedInstances("Camera/instance#0",OM::has());
@@ -466,7 +551,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 //
 //
-//BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_with_punning)
+// BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_with_punning)
 //{
 //    using namespace moreorg::vocabulary;
 //
@@ -475,21 +560,24 @@ BOOST_AUTO_TEST_SUITE_END()
 //    BOOST_TEST_MESSAGE(om.ontology()->toString());
 //    {
 //        {
-//            IRI iri = om.ontology()->relatedInstance(OM::Service(), OM::modelledBy(), OM::ResourceModel());
-//            BOOST_REQUIRE_MESSAGE(iri == OM::ServiceModel(), "Service is modelledBy ServiceModel");
+//            IRI iri = om.ontology()->relatedInstance(OM::Service(),
+//            OM::modelledBy(), OM::ResourceModel()); BOOST_REQUIRE_MESSAGE(iri
+//            == OM::ServiceModel(), "Service is modelledBy ServiceModel");
 //        }
 //        {
-//            IRI iri = om.ontology()->relatedInstance(OM::ServiceModel(), OM::models(), OM::Resource());
-//            BOOST_REQUIRE_MESSAGE(iri == OM::Service(), "ServiceModel is models Service");
+//            IRI iri = om.ontology()->relatedInstance(OM::ServiceModel(),
+//            OM::models(), OM::Resource()); BOOST_REQUIRE_MESSAGE(iri ==
+//            OM::Service(), "ServiceModel is models Service");
 //        }
 //        {
 //            IRI iri = om.getResourceModel(OM::resolve("EmiActive"));
-//            BOOST_REQUIRE_MESSAGE(iri == OM::resolve("EmiActive"), "EmiActive should have EmiActive as model");
+//            BOOST_REQUIRE_MESSAGE(iri == OM::resolve("EmiActive"), "EmiActive
+//            should have EmiActive as model");
 //        }
 //    }
 //}
 //
-//BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
+// BOOST_AUTO_TEST_CASE(it_should_handle_om_modelling_via_construction)
 //{
 //    using namespace moreorg::vocabulary;
 //    OrganizationModel om( getRootDir() + "/test/data/om-schema-v0.5.owl" );
@@ -498,19 +586,23 @@ BOOST_AUTO_TEST_SUITE_END()
 //        IRI instance = om.createNewInstance(OM::resolve("Sherpa"), true);
 //
 //        BOOST_TEST_MESSAGE("Created new from model" << instance);
-//        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
+//        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance,
+//        OM::Actor()), "New model instance of Actor");
 //    }
 //    {
 //        IRI instance = om.createNewInstance(OM::resolve("CREX"), true);
 //
 //        BOOST_TEST_MESSAGE("Created new from model" << instance);
-//        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
+//        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance,
+//        OM::Actor()), "New model instance of Actor");
 //    }
 //    {
-//        IRI instance = om.createNewInstance(OM::resolve("PayloadCamera"), true);
+//        IRI instance = om.createNewInstance(OM::resolve("PayloadCamera"),
+//        true);
 //
 //        BOOST_TEST_MESSAGE("Created new from model" << instance);
-//        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance, OM::Actor()), "New model instance of Actor");
+//        BOOST_REQUIRE_MESSAGE( om.ontology()->isInstanceOf(instance,
+//        OM::Actor()), "New model instance of Actor");
 //    }
 //
 //    om.refresh();
@@ -539,7 +631,8 @@ BOOST_AUTO_TEST_SUITE_END()
 //    {
 //        std::string instanceName = atomicActor.getFragment();
 //        problem.addInitialStatus(Expression("operative",instanceName));
-//        problem.addInitialStatus(Expression("at",instanceName, "location_s0"));
+//        problem.addInitialStatus(Expression("at",instanceName,
+//        "location_s0"));
 //    }
 //
 //    std::string distance = "10";
@@ -548,18 +641,21 @@ BOOST_AUTO_TEST_SUITE_END()
 //    do
 //    {
 //        std::vector<std::string> current = combination.current();
-//        problem.addInitialStatus( Expression("=", Expression("distance", current[0], current[1]), Expression(distance) ));
-//        problem.addInitialStatus( Expression("=", Expression("distance", current[1], current[0]), Expression(distance) ));
+//        problem.addInitialStatus( Expression("=", Expression("distance",
+//        current[0], current[1]), Expression(distance) ));
+//        problem.addInitialStatus( Expression("=", Expression("distance",
+//        current[1], current[0]), Expression(distance) ));
 //
 //    } while(combination.next());
 //
-//    problem.addInitialStatus( Expression("=", Expression("distance", "location_c0", "location_p0"), Expression("10")));
+//    problem.addInitialStatus( Expression("=", Expression("distance",
+//    "location_c0", "location_p0"), Expression("10")));
 //
 //    BOOST_REQUIRE_MESSAGE(true, "Domain:" << domain.toLISP());
 //    BOOST_REQUIRE_MESSAGE(true, "Problem:" << problem.toLISP());
 //}
 //
-//BOOST_AUTO_TEST_CASE(it_should_handle_actorlinkmodel)
+// BOOST_AUTO_TEST_CASE(it_should_handle_actorlinkmodel)
 //{
 //    using namespace moreorg::organization_model;
 //
@@ -590,8 +686,20 @@ BOOST_AUTO_TEST_SUITE_END()
 //    std::set< std::vector<ActorModelLink> > actorSet;
 //    // Extra
 //    {
-//        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiActive-requirement-0");
-//        EndpointModel modelB("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
+//        EndpointModel modelA("http://test#PayloadCamera",
+//        "http://test#EmiActive-requirement-0"); EndpointModel
+//        modelB("http://test#PayloadCamera",
+//        "http://test#EmiPassive-requirement-0"); ActorModelLink link(modelA,
+//        modelB); std::vector<ActorModelLink> compositeActor;
+//        compositeActor.push_back(link);
+//        std::sort(compositeActor.begin(), compositeActor.end());
+//        actorSet.insert(compositeActor);
+//    }
+//    // Extra
+//    {
+//        EndpointModel modelA("http://test#PayloadCamera",
+//        "http://test#EmiPassive-requirement-0"); EndpointModel
+//        modelB("http://test#Sherpa", "http://test#EmiActive-requirement-0");
 //        ActorModelLink link(modelA, modelB);
 //        std::vector<ActorModelLink> compositeActor;
 //        compositeActor.push_back(link);
@@ -600,8 +708,9 @@ BOOST_AUTO_TEST_SUITE_END()
 //    }
 //    // Extra
 //    {
-//        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
-//        EndpointModel modelB("http://test#Sherpa", "http://test#EmiActive-requirement-0");
+//        EndpointModel modelA("http://test#PayloadCamera",
+//        "http://test#EmiPassive-requirement-0"); EndpointModel
+//        modelB("http://test#Sherpa", "http://test#EmiActive-requirement-1");
 //        ActorModelLink link(modelA, modelB);
 //        std::vector<ActorModelLink> compositeActor;
 //        compositeActor.push_back(link);
@@ -610,20 +719,11 @@ BOOST_AUTO_TEST_SUITE_END()
 //    }
 //    // Extra
 //    {
-//        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
-//        EndpointModel modelB("http://test#Sherpa", "http://test#EmiActive-requirement-1");
-//        ActorModelLink link(modelA, modelB);
-//        std::vector<ActorModelLink> compositeActor;
-//        compositeActor.push_back(link);
-//        std::sort(compositeActor.begin(), compositeActor.end());
-//        actorSet.insert(compositeActor);
-//    }
-//    // Extra
-//    {
-//        EndpointModel modelA("http://test#PayloadCamera", "http://test#EmiActive-requirement-0");
-//        EndpointModel modelB("http://test#PayloadCamera", "http://test#EmiPassive-requirement-0");
-//        ActorModelLink link(modelA, modelB);
-//        std::vector<ActorModelLink> compositeActor;
+//        EndpointModel modelA("http://test#PayloadCamera",
+//        "http://test#EmiActive-requirement-0"); EndpointModel
+//        modelB("http://test#PayloadCamera",
+//        "http://test#EmiPassive-requirement-0"); ActorModelLink link(modelA,
+//        modelB); std::vector<ActorModelLink> compositeActor;
 //        compositeActor.push_back(link);
 //        std::sort(compositeActor.begin(), compositeActor.end());
 //        actorSet.insert(compositeActor);

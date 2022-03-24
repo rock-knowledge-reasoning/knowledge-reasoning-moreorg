@@ -13,7 +13,8 @@ public:
     typedef std::vector<ResourceInstance> List;
     typedef std::vector<Ptr> PtrList;
 
-    ResourceInstance(const owlapi::model::IRI& name, const owlapi::model::IRI& model);
+    ResourceInstance(const owlapi::model::IRI& name,
+                     const owlapi::model::IRI& model);
 
     const owlapi::model::IRI& getName() const { return mName; }
     const owlapi::model::IRI& getModel() const { return mModel; }
@@ -26,10 +27,10 @@ public:
     static std::string toString(const List& list, size_t indent = 0);
 
     /**
-      * Convert ResourceInstance::List to a ModelPool to allow validation
-      * of general model count
-      * \return ModelPool that this list of ResourceInstances represents
-      */
+     * Convert ResourceInstance::List to a ModelPool to allow validation
+     * of general model count
+     * \return ModelPool that this list of ResourceInstances represents
+     */
     static ModelPool toModelPool(const ResourceInstance::List& resources);
 
     bool operator<(const ResourceInstance& other) const;
@@ -42,6 +43,5 @@ private:
     AtomicAgent mAtomicAgent;
 };
 
-
-}
+} // namespace moreorg
 #endif // MOREORG_RESOURCE_INSTANCE_HPP

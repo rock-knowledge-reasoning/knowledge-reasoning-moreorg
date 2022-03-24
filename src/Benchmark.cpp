@@ -1,12 +1,12 @@
-#include <moreorg/algebra/Connectivity.hpp>
-#include <iostream>
-#include <fstream>
-#include <unistd.h>
+#include "ModelPoolIterator.hpp"
+#include "metrics/Redundancy.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
+#include <fstream>
 #include <graph_analysis/GraphIO.hpp>
-#include "metrics/Redundancy.hpp"
-#include "ModelPoolIterator.hpp"
+#include <iostream>
+#include <moreorg/algebra/Connectivity.hpp>
+#include <unistd.h>
 
 using namespace owlapi::model;
 using namespace moreorg;
@@ -23,7 +23,7 @@ struct Spec
     {
         std::stringstream ss;
         ss << "model: " << organizationModelIRI << std::endl;
-        ss << "from: "  << from.toString(4) << std::endl;
+        ss << "from: " << from.toString(4) << std::endl;
         ss << "to: " << to.toString(4) << std::endl;
         ss << "stepsize: " << stepSize.toString(4) << std::endl;
         return ss.str();
@@ -49,43 +49,54 @@ Spec loadSpec(const std::string& filename)
             if(spec.organizationModelIRI == IRI())
             {
                 spec.organizationModelIRI = IRI(line);
-            } else {
+            } else
+            {
                 boost::char_separator<char> sep(" ");
-                boost::tokenizer< boost::char_separator<char> > tokens(line, sep);
+                boost::tokenizer<boost::char_separator<char>> tokens(line, sep);
 
                 std::vector<std::string> columns(tokens.begin(), tokens.end());
                 if(columns.size() < 2)
                 {
-                    std::invalid_argument("moreorg::Benchmark: invalid column: '" + line + "' in spec");
+                    std::invalid_argument(
+                        "moreorg::Benchmark: invalid column: '" + line +
+                        "' in spec");
                 }
 
                 // Column: iri <from> <to> <stepsize>
                 std::string iri = columns.at(0);
                 std::string numberColumn = columns.at(1);
-                spec.from[owlapi::model::IRI(iri)] = boost::lexical_cast<uint32_t>(columns.at(1));
+                spec.from[owlapi::model::IRI(iri)] =
+                    boost::lexical_cast<uint32_t>(columns.at(1));
                 if(columns.size() >= 3)
                 {
-                    spec.to[owlapi::model::IRI(iri)] = boost::lexical_cast<uint32_t>(columns.at(2));
-                } else {
+                    spec.to[owlapi::model::IRI(iri)] =
+                        boost::lexical_cast<uint32_t>(columns.at(2));
+                } else
+                {
                     spec.to = spec.from;
                 }
                 if(columns.size() >= 4)
                 {
-                    spec.stepSize[owlapi::model::IRI(iri)] = boost::lexical_cast<uint32_t>(columns.at(3));
+                    spec.stepSize[owlapi::model::IRI(iri)] =
+                        boost::lexical_cast<uint32_t>(columns.at(3));
                 }
             }
         }
         specFile.close();
-    } else {
-        throw std::runtime_error("moreorg::Benchmark: failed to load spec from: " + filename );
+    } else
+    {
+        throw std::runtime_error(
+            "moreorg::Benchmark: failed to load spec from: " + filename);
     }
     return spec;
 }
 
-std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const OrganizationModel::Ptr& om, const ModelPool& modelPool,
-        size_t epochs,
-        size_t minFeasible,
-        size_t timeoutInS)
+std::vector<algebra::Connectivity::Statistics>
+runModelPoolTest(const OrganizationModel::Ptr& om,
+                 const ModelPool& modelPool,
+                 size_t epochs,
+                 size_t minFeasible,
+                 size_t timeoutInS)
 {
     OrganizationModelAsk ask(om, modelPool, true);
     std::vector<algebra::Connectivity::Statistics> stats;
@@ -95,32 +106,44 @@ std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const Organizat
     for(size_t i = 0; i < epochs; ++i)
     {
         BaseGraph::Ptr baseGraph;
-        bool feasible = algebra::Connectivity::isFeasible(modelPool, ask, baseGraph, timeoutInS*1000, minFeasible);
+        bool feasible = algebra::Connectivity::isFeasible(modelPool,
+                                                          ask,
+                                                          baseGraph,
+                                                          timeoutInS * 1000,
+                                                          minFeasible);
         if(baseGraph)
         {
             std::stringstream ss;
             ss << "/tmp/organization-model-bm-connectivity-";
             ss << i;
 
-            graph_analysis::io::GraphIO::write(ss.str(), baseGraph, graph_analysis::representation::GEXF);
-            graph_analysis::io::GraphIO::write(ss.str(), baseGraph, graph_analysis::representation::GRAPHVIZ);
-
+            graph_analysis::io::GraphIO::write(
+                ss.str(),
+                baseGraph,
+                graph_analysis::representation::GEXF);
+            graph_analysis::io::GraphIO::write(
+                ss.str(),
+                baseGraph,
+                graph_analysis::representation::GRAPHVIZ);
         }
 
-        stats.push_back( algebra::Connectivity::getStatistics() );
+        stats.push_back(algebra::Connectivity::getStatistics());
 
         if(!feasible)
         {
-            LOG_WARN_S << "moreorg::Benchmark: graph is not feasible in epoch #" << i;
+            LOG_WARN_S << "moreorg::Benchmark: graph is not feasible in epoch #"
+                       << i;
         }
     }
 
-    //std::cout << algebra::Connectivity::Statistics::toString(stats) << std::endl;
+    // std::cout << algebra::Connectivity::Statistics::toString(stats) <<
+    // std::endl;
 
-    //Metric::Ptr metrics = Metric::getInstance(metrics::REDUNDANCY, ask);
-    //IRIList functions = ask.ontology().allSubClassesOf(vocabulary::OM::Functionality());
-    //std::cout << std::endl << "Functions" << std::endl;
-    //for(const IRI& f : functions)
+    // Metric::Ptr metrics = Metric::getInstance(metrics::REDUNDANCY, ask);
+    // IRIList functions =
+    // ask.ontology().allSubClassesOf(vocabulary::OM::Functionality());
+    // std::cout
+    // << std::endl << "Functions" << std::endl; for(const IRI& f : functions)
     //{
     //    double value;
     //    try {
@@ -137,9 +160,11 @@ std::vector< algebra::Connectivity::Statistics> runModelPoolTest(const Organizat
     return stats;
 }
 
-std::vector<numeric::Stats<double> > runFunctionalSaturationBoundTest(OrganizationModel::Ptr om, const ModelPool& modelPool,
-        size_t epochs,
-        size_t neighbourHoodSize)
+std::vector<numeric::Stats<double>>
+runFunctionalSaturationBoundTest(OrganizationModel::Ptr om,
+                                 const ModelPool& modelPool,
+                                 size_t epochs,
+                                 size_t neighbourHoodSize)
 {
 
     double feasibilityCheckTimeoutInMs = 20000;
@@ -163,23 +188,29 @@ std::vector<numeric::Stats<double> > runFunctionalSaturationBoundTest(Organizati
 
         {
             base::Time start = base::Time::now();
-            OrganizationModelAsk ask(om, modelPool, true,
-                    feasibilityCheckTimeoutInMs,
-                    interfaceBaseClass,
-                    neighbourHood);
+            OrganizationModelAsk ask(om,
+                                     modelPool,
+                                     true,
+                                     feasibilityCheckTimeoutInMs,
+                                     interfaceBaseClass,
+                                     neighbourHood);
             duration = (base::Time::now() - start).toSeconds();
             timeWithSatBound.update(duration);
-            numberOfFunctionsWithSatBounds.update( ask.getFunctionalityMapping().getCache().size());
-            numberOfAgentsWithSatBound.update( ask.getFunctionalityMapping().getActiveModelPools().size());
+            numberOfFunctionsWithSatBounds.update(
+                ask.getFunctionalityMapping().getCache().size());
+            numberOfAgentsWithSatBound.update(
+                ask.getFunctionalityMapping().getActiveModelPools().size());
             if(i == 0)
             {
-                std::cout << "Functionality map using saturation bound: " << std::endl;
-                std::cout << ask.getFunctionalityMapping().toString() << std::endl;
+                std::cout << "Functionality map using saturation bound: "
+                          << std::endl;
+                std::cout << ask.getFunctionalityMapping().toString()
+                          << std::endl;
             }
         }
     }
 
-    std::vector< numeric::Stats<double> > stats;
+    std::vector<numeric::Stats<double>> stats;
     stats.push_back(timeWithoutSatBound);
     stats.push_back(timeWithSatBound);
     stats.push_back(numberOfFunctionsWithoutSatBounds);
@@ -194,14 +225,17 @@ void printUsage(char** argv)
     std::cout << "usage: " << argv[0] << std::endl;
     std::cout << "    -o <organization-model-file>" << std::endl;
     std::cout << "    -e <number-of-epochs>" << std::endl;
-    std::cout << "    -m <number-of-minimum-feasible-solutions>"  << std::endl;
+    std::cout << "    -m <number-of-minimum-feasible-solutions>" << std::endl;
     std::cout << "    -s <test-specification-file>" << std::endl;
-    std::cout << "    -l <logfile-to-generate> (default is /tmp/organization-model-benchmark.log)" << std::endl;
-    std::cout << "    -t <benchmark-type: functional_saturation (fsat) or connectivity (con)" << std::endl;
+    std::cout << "    -l <logfile-to-generate> (default is "
+                 "/tmp/organization-model-benchmark.log)"
+              << std::endl;
+    std::cout << "    -t <benchmark-type: functional_saturation (fsat) or "
+                 "connectivity (con)"
+              << std::endl;
     std::cout << "    -c <configuration-file>" << std::endl;
     std::cout << "    -a <abort/timeout in s>" << std::endl;
 }
-
 
 // how to create an n-d representation for exploration of the interface
 // compatibility landscape
@@ -219,7 +253,7 @@ int main(int argc, char** argv)
     std::string type = "con";
     size_t timeoutInS = 60;
     size_t neighbourHoodSize = 0;
-    while((c = getopt(argc,argv, "o:e:m:s:l:t:c:a:n:")) != -1)
+    while((c = getopt(argc, argv, "o:e:m:s:l:t:c:a:n:")) != -1)
     {
         if(optarg)
         {
@@ -254,8 +288,8 @@ int main(int argc, char** argv)
                 // spec
                 case 's':
                 {
-                   specfile = optarg;
-                   break;
+                    specfile = optarg;
+                    break;
                 }
                 // l
                 case 'l':
@@ -281,7 +315,8 @@ int main(int argc, char** argv)
 
                     if(!(type == "con" || type == "fsat"))
                     {
-                        std::cout << "Error: test type '" << type << "' unknown" << std::endl;
+                        std::cout << "Error: test type '" << type << "' unknown"
+                                  << std::endl;
                         printUsage(argv);
                         exit(0);
                     }
@@ -321,7 +356,8 @@ int main(int argc, char** argv)
     if(!filename.empty())
     {
         om = make_shared<OrganizationModel>(filename);
-    } else {
+    } else
+    {
         om = make_shared<OrganizationModel>(spec.organizationModelIRI);
     }
 
@@ -343,15 +379,19 @@ int main(int argc, char** argv)
         log << "timeout in s: " << timeoutInS << std::endl;
         log << "# number of epochs: " << epochs << std::endl;
         log << "# minfeasible: " << minFeasible << std::endl;
-        log << "# [model #] " << algebra::Connectivity::Statistics::getStatsDescription() << std::endl;
+        log << "# [model #] "
+            << algebra::Connectivity::Statistics::getStatsDescription()
+            << std::endl;
 
         ModelPoolIterator mit(spec.from, spec.to, spec.stepSize);
         while(mit.next())
         {
             ModelPool current = mit.current();
-            std::vector<algebra::Connectivity::Statistics> stats = runModelPoolTest(om, current, epochs, minFeasible, timeoutInS);
+            std::vector<algebra::Connectivity::Statistics> stats =
+                runModelPoolTest(om, current, epochs, minFeasible, timeoutInS);
 
-            std::vector<numeric::Stats<double> > numericStats = algebra::Connectivity::Statistics::compute(stats);
+            std::vector<numeric::Stats<double>> numericStats =
+                algebra::Connectivity::Statistics::compute(stats);
             // record the number of model instances
             ModelPool::const_iterator cit = current.begin();
             for(; cit != current.end(); ++cit)
@@ -361,30 +401,30 @@ int main(int argc, char** argv)
             }
             for(const numeric::Stats<double>& s : numericStats)
             {
-                log << s.mean()
-                    << " "
-                    << s.stdev()
-                    << " ";
+                log << s.mean() << " " << s.stdev() << " ";
             }
             log << std::endl;
         }
     } else if(type == "fsat")
     {
         log << "# number of epochs: " << epochs << std::endl;
-        log << "# [model #] [time w/o sat bound] [stdev] [time w sat bound] [stdev]"
-            << " [functions w/o sat bound] [stdev] [functions w sat bound] [stdev]"
+        log << "# [model #] [time w/o sat bound] [stdev] [time w sat bound] "
+               "[stdev]"
+            << " [functions w/o sat bound] [stdev] [functions w sat bound] "
+               "[stdev]"
             << " [agent w/o sat bound] [stdev] [agents w sat bound] [stddev]"
-            << " [neighbourhood-size]"
-            << std::endl;
+            << " [neighbourhood-size]" << std::endl;
 
         ModelPoolIterator mit(spec.from, spec.to, spec.stepSize);
         while(mit.next())
         {
-            ModelPool current  = mit.current();
+            ModelPool current = mit.current();
             std::cout << "Current: " << current.toString(4) << std::endl;
-            std::vector<numeric::Stats<double> > numericStats =
-                runFunctionalSaturationBoundTest(om, current, epochs,
-                        neighbourHoodSize);
+            std::vector<numeric::Stats<double>> numericStats =
+                runFunctionalSaturationBoundTest(om,
+                                                 current,
+                                                 epochs,
+                                                 neighbourHoodSize);
 
             ModelPool::const_iterator cit = current.begin();
             for(; cit != current.end(); ++cit)
@@ -394,10 +434,7 @@ int main(int argc, char** argv)
             }
             for(const numeric::Stats<double>& s : numericStats)
             {
-                log << s.mean()
-                    << " "
-                    << s.stdev()
-                    << " ";
+                log << s.mean() << " " << s.stdev() << " ";
             }
             log << neighbourHoodSize << " ";
             log << std::endl;

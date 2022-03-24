@@ -54,7 +54,6 @@ public:
 
     VOCABULARY_ADD_WORD(energyCapacity);
 
-
     VOCABULARY_ADD_WORD(nominalLength);
     VOCABULARY_ADD_WORD(nominalWidth);
     VOCABULARY_ADD_WORD(nominalHeight);
@@ -70,5 +69,5 @@ public:
 };
 
 } // end namespace vocabulary
-} // end namespace owlapi
+} // namespace moreorg
 #endif // OWLAPI_VOCABULARIES_OM_HPP

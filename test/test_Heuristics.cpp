@@ -1,7 +1,7 @@
+#include "test_utils.hpp"
 #include <boost/test/unit_test.hpp>
 #include <moreorg/Heuristics.hpp>
 #include <moreorg/vocabularies/OM.hpp>
-#include "test_utils.hpp"
 
 using namespace moreorg;
 using namespace owlapi::model;
@@ -24,12 +24,12 @@ struct HeuristicsFixture
         AtomicAgent::List sherpas;
         for(size_t i = 0; i < modelPool[sherpa]; ++i)
         {
-            sherpas.push_back( AtomicAgent(i, sherpa));
+            sherpas.push_back(AtomicAgent(i, sherpa));
         }
         AtomicAgent::List payloads;
         for(size_t i = 0; i < modelPool[payload]; ++i)
         {
-            payloads.push_back( AtomicAgent(i, payload));
+            payloads.push_back(AtomicAgent(i, payload));
         }
 
         Agent agent0;
@@ -49,20 +49,20 @@ struct HeuristicsFixture
         atomicAgents.insert(payloads.begin(), payloads.end());
 
         StatusSample sample0(agent0,
-                base::Position(0,0,0),
-                base::Position(0,100,0),
-                0,
-                100,
-                Agent::OPERATIVE,
-                activity::BUSY);
+                             base::Position(0, 0, 0),
+                             base::Position(0, 100, 0),
+                             0,
+                             100,
+                             Agent::OPERATIVE,
+                             activity::BUSY);
 
         StatusSample sample1(agent1,
-                base::Position(0,0,0),
-                base::Position(100,0,0),
-                0,
-                100,
-                Agent::OPERATIVE,
-                activity::BUSY);
+                             base::Position(0, 0, 0),
+                             base::Position(100, 0, 0),
+                             0,
+                             100,
+                             Agent::OPERATIVE,
+                             activity::BUSY);
 
         statusSamples.push_back(sample0);
         statusSamples.push_back(sample1);
@@ -96,22 +96,23 @@ BOOST_AUTO_TEST_CASE(estimate_current_position)
     OrganizationModelAsk ask(om, modelPool, true);
 
     Heuristics heuristics(ask);
-    base::Position fromPosition(0.0,0.0,0.0);
-    base::Position toPosition(100.0,0.0,0.0);
+    base::Position fromPosition(0.0, 0.0, 0.0);
+    base::Position toPosition(100.0, 0.0, 0.0);
     size_t durationInS = 60;
     // expecting 0.5 m/s for Sherpa
-    double expectedDistance = 60*0.5;
+    double expectedDistance = 60 * 0.5;
 
     AtomicAgent atomicAgent(0, sherpa);
     Agent agent(atomicAgent);
 
-    base::Position position = heuristics.positionLinear(agent,
-            fromPosition,
-            toPosition,
-            durationInS);
+    base::Position position =
+        heuristics.positionLinear(agent, fromPosition, toPosition, durationInS);
 
-    BOOST_REQUIRE_MESSAGE(position.x() == expectedDistance && position.y() == 0 && position.z() == 0,
-            "Position estimate: " << position.x() << "/" << position.y() << "/" << position.z());
+    BOOST_REQUIRE_MESSAGE(position.x() == expectedDistance &&
+                              position.y() == 0 && position.z() == 0,
+                          "Position estimate: " << position.x() << "/"
+                                                << position.y() << "/"
+                                                << position.z());
 }
 
 BOOST_FIXTURE_TEST_CASE(energy, HeuristicsFixture)
@@ -119,20 +120,21 @@ BOOST_FIXTURE_TEST_CASE(energy, HeuristicsFixture)
     for(const StatusSample& s : statusSamples)
     {
         double energyConsumption = heuristics->getEnergyConsumption(&s);
-        BOOST_REQUIRE_MESSAGE(energyConsumption != 0, "EnergyConsumption should be greater than 0, was " << energyConsumption);
+        BOOST_REQUIRE_MESSAGE(energyConsumption != 0,
+                              "EnergyConsumption should be greater than 0, was "
+                                  << energyConsumption);
 
         for(const AtomicAgent& aa : s.getAgent().getAtomicAgents())
         {
-            double energyReduction = heuristics->getEnergyReductionAbsolute(&s,
-                    aa,
-                    0,
-                    0);
+            double energyReduction =
+                heuristics->getEnergyReductionAbsolute(&s, aa, 0, 0);
 
-            BOOST_REQUIRE_MESSAGE(energyReduction == 0, "EnergyReduction for " << aa.toString() << " should be 0, was "
-                    << energyReduction);
+            BOOST_REQUIRE_MESSAGE(energyReduction == 0,
+                                  "EnergyReduction for " << aa.toString()
+                                                         << " should be 0, was "
+                                                         << energyReduction);
         }
     }
-
 }
 
 BOOST_FIXTURE_TEST_CASE(reconfiguration_cost, HeuristicsFixture)
@@ -154,8 +156,12 @@ BOOST_FIXTURE_TEST_CASE(reconfiguration_cost, HeuristicsFixture)
         coalitionStructure1.insert(agent0);
         coalitionStructure1.insert(agent1);
 
-        double cost = heuristics->getReconfigurationCost(coalitionStructure0, coalitionStructure1);
-        BOOST_REQUIRE_MESSAGE(cost == 0, "Same agent coalition structure reconfiguration cost should be 0, was " << cost);
+        double cost = heuristics->getReconfigurationCost(coalitionStructure0,
+                                                         coalitionStructure1);
+        BOOST_REQUIRE_MESSAGE(cost == 0,
+                              "Same agent coalition structure reconfiguration "
+                              "cost should be 0, was "
+                                  << cost);
     }
 
     Agent agent2;
@@ -170,9 +176,12 @@ BOOST_FIXTURE_TEST_CASE(reconfiguration_cost, HeuristicsFixture)
         Agent::Set coalitionStructure1;
         coalitionStructure1.insert(agent2);
 
-        double cost = heuristics->getReconfigurationCost(coalitionStructure0, coalitionStructure1);
-        double expectedCost = 600*2 + 180*3;
-        BOOST_REQUIRE_MESSAGE(cost == expectedCost, "Reconfiguration cost should be '" << expectedCost << "', was " << cost);
+        double cost = heuristics->getReconfigurationCost(coalitionStructure0,
+                                                         coalitionStructure1);
+        double expectedCost = 600 * 2 + 180 * 3;
+        BOOST_REQUIRE_MESSAGE(cost == expectedCost,
+                              "Reconfiguration cost should be '"
+                                  << expectedCost << "', was " << cost);
     }
 }
 

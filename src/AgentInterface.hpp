@@ -11,7 +11,7 @@ public:
     AgentInterface() = default;
 
     AgentInterface(const AtomicAgent& agent,
-            const owlapi::model::IRI& interface);
+                   const owlapi::model::IRI& interface);
 
     const AtomicAgent& getAgent() const;
 

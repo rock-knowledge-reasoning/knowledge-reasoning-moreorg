@@ -1,17 +1,16 @@
 #ifndef ORGANIZATION_MODEL_METRICS_REDUNDANCY_HPP
 #define ORGANIZATION_MODEL_METRICS_REDUNDANCY_HPP
 
-#include <moreorg/OrganizationModel.hpp>
-#include <moreorg/Metric.hpp>
 #include "../vocabularies/OM.hpp"
 #include "ProbabilityDensityFunction.hpp"
-#include "pdfs/WeibullPDF.hpp"
 #include "ProbabilityOfFailure.hpp"
+#include "pdfs/WeibullPDF.hpp"
 #include <map>
+#include <moreorg/Metric.hpp>
+#include <moreorg/OrganizationModel.hpp>
 
 namespace moreorg {
 namespace metrics {
-
 
 /**
  * Compute redundancy for a model
@@ -35,19 +34,29 @@ public:
     /**
      * Default probability of survival
      */
-    Redundancy(const OrganizationModelAsk& organization,
-               const ProbabilityDensityFunction::Ptr& defaultPDF = make_shared<pdfs::WeibullPDF>(36000., 1.), // 36000s = 10h
-               const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
+    Redundancy(
+        const OrganizationModelAsk& organization,
+        const ProbabilityDensityFunction::Ptr& defaultPDF =
+            make_shared<pdfs::WeibullPDF>(36000., 1.), // 36000s = 10h
+        const owlapi::model::IRI& objectProperty = vocabulary::OM::has());
 
-
-    double computeMetric(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
-                         const ResourceInstance::List &availableAgents, double t0 = 0, double t1 = 0) const;
+    double computeMetric(
+        const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>&
+            required,
+        const ResourceInstance::List& availableAgents,
+        double t0 = 0,
+        double t1 = 0) const;
 
     double computeSequential(const owlapi::model::IRIList& functions,
                              const ResourceInstance::List& modelPool) const;
-    double computeSequential(const std::vector<owlapi::model::IRISet>& functionalRequirement, const ResourceInstance::List& modelPool, bool sharedUse = true) const;
+    double computeSequential(
+        const std::vector<owlapi::model::IRISet>& functionalRequirement,
+        const ResourceInstance::List& modelPool,
+        bool sharedUse = true) const;
 
-    // ProbabilityOfFailure::List getSharedUseMetricModelsList(const std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required, std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
+    // ProbabilityOfFailure::List getSharedUseMetricModelsList(const
+    // std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& required,
+    // std::vector<owlapi::model::OWLCardinalityRestriction::Ptr>& available,
     //                              double t0 = 0, double t1 = 0) const;
 
     /**
@@ -66,19 +75,29 @@ public:
      * Compute metric interpretation when individual <function,model> tuples are
      * used sequentially
      */
-    double sequentialUse(const std::vector<double>& values) const { return serial(values); }
+    double sequentialUse(const std::vector<double>& values) const
+    {
+        return serial(values);
+    }
 
     /**
      * Set the default probability survial that shall be used for computed the
      * redundancy
      */
-    void setDefaultProbabilityDensityFunction(const ProbabilityDensityFunction::Ptr& pdf_ptr) { mDefaultProbabilityDensityFunction = pdf_ptr; }
+    void setDefaultProbabilityDensityFunction(
+        const ProbabilityDensityFunction::Ptr& pdf_ptr)
+    {
+        mDefaultProbabilityDensityFunction = pdf_ptr;
+    }
 
     /**
      * Get the default probability survial that shall be used for computed the
      * redundancy
      */
-    ProbabilityDensityFunction::Ptr getDefaultProbabilityDensityFunction() { return mDefaultProbabilityDensityFunction; }
+    ProbabilityDensityFunction::Ptr getDefaultProbabilityDensityFunction()
+    {
+        return mDefaultProbabilityDensityFunction;
+    }
 
 private:
     ProbabilityDensityFunction::Ptr mDefaultProbabilityDensityFunction;

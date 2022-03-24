@@ -1,23 +1,23 @@
 #include "Metric.hpp"
+#include "Agent.hpp"
+#include "metrics/Redundancy.hpp"
+#include "vocabularies/OM.hpp"
+#include <base-logging/Logging.hpp>
 #include <iostream>
 #include <sstream>
-#include <base-logging/Logging.hpp>
-#include "vocabularies/OM.hpp"
-#include "metrics/Redundancy.hpp"
-#include "Agent.hpp"
 
 namespace moreorg {
 
-std::map<metrics::Type,Metric::Ptr> Metric::msMetrics;
+std::map<metrics::Type, Metric::Ptr> Metric::msMetrics;
 
 Metric::Metric(metrics::Type type,
-        const OrganizationModelAsk& organization,
-        const owlapi::model::IRI& property)
+               const OrganizationModelAsk& organization,
+               const owlapi::model::IRI& property)
     : mOrganizationModelAsk(organization)
     , mType(type)
     , mProperty(property)
-{}
-
+{
+}
 
 MetricMap Metric::getMetricMap() const
 {
@@ -26,28 +26,33 @@ MetricMap Metric::getMetricMap() const
 
     MetricMap metricMap;
 
-    IRIList actorModels = mOrganizationModelAsk.ontology().allSubClassesOf( vocabulary::OM::Actor() );
-    IRIList services = mOrganizationModelAsk.ontology().allSubClassesOf( vocabulary::OM::Service() );
+    IRIList actorModels = mOrganizationModelAsk.ontology().allSubClassesOf(
+        vocabulary::OM::Actor());
+    IRIList services = mOrganizationModelAsk.ontology().allSubClassesOf(
+        vocabulary::OM::Service());
 
     for(const IRI& actorModel : actorModels)
     {
         AtomicAgent agent0(0, actorModel);
         Agent agent;
         agent.add(agent0);
-        ResourceInstance::List available = mOrganizationModelAsk.getRelated(agent);
+        ResourceInstance::List available =
+            mOrganizationModelAsk.getRelated(agent);
         for(const IRI& service : services)
         {
-            try {
-                LOG_DEBUG_S << "Compute metric for: " << actorModel << " and " << service;
+            try
+            {
+                LOG_DEBUG_S << "Compute metric for: " << actorModel << " and "
+                            << service;
 
                 double metric = compute(service, available);
                 std::pair<ServiceIRI, ActorIRI> key(service, actorModel);
                 metricMap[key] = metric;
 
                 LOG_INFO_S << "Metric:" << std::endl
-                    << "    actorModel :  " << actorModel << std::endl
-                    << "    service: " << service << std::endl
-                    << "    value:   " << metric;
+                           << "    actorModel :  " << actorModel << std::endl
+                           << "    service: " << service << std::endl
+                           << "    value:   " << metric;
 
             } catch(const std::invalid_argument& e)
             {
@@ -63,14 +68,16 @@ MetricMap Metric::getMetricMap() const
     return metricMap;
 }
 
-double Metric::compute(const owlapi::model::IRI& function, const ResourceInstance& model) const
+double Metric::compute(const owlapi::model::IRI& function,
+                       const ResourceInstance& model) const
 {
     ResourceInstance::List available;
     available.push_back(model);
     return compute(function, available);
 }
 
-double Metric::compute(const owlapi::model::IRI& function, const ResourceInstance::List& modelPool) const
+double Metric::compute(const owlapi::model::IRI& function,
+                       const ResourceInstance::List& modelPool) const
 {
     using namespace owlapi::model;
     IRISet functionSet;
@@ -79,7 +86,10 @@ double Metric::compute(const owlapi::model::IRI& function, const ResourceInstanc
     return computeExclusiveUse(functionSet, modelPool);
 }
 
-double Metric::computeSharedUse(const ModelPool& required, const ResourceInstance::List& available, double t0, double t1) const
+double Metric::computeSharedUse(const ModelPool& required,
+                                const ResourceInstance::List& available,
+                                double t0,
+                                double t1) const
 {
     using namespace owlapi::model;
     std::vector<OWLCardinalityRestriction::Ptr> r_required =
@@ -89,16 +99,16 @@ double Metric::computeSharedUse(const ModelPool& required, const ResourceInstanc
     {
         double value = computeMetric(r_required, r_available, t0, t1);
         return value;
-    }
-    catch(const std::exception& e)
+    } catch(const std::exception& e)
     {
-        throw std::invalid_argument("moreorg::Metric::computeSharedUse: could not compute metric. Maybe no requirements were found?");
+        throw std::invalid_argument("moreorg::Metric::computeSharedUse: could "
+                                    "not compute metric. Maybe no "
+                                    "requirements were found?");
     }
-    
-
 }
 
-double Metric::computeSharedUse(const owlapi::model::IRISet& functions, const ResourceInstance::List& modelPool) const
+double Metric::computeSharedUse(const owlapi::model::IRISet& functions,
+                                const ResourceInstance::List& modelPool) const
 {
     using namespace owlapi::model;
 
@@ -107,13 +117,15 @@ double Metric::computeSharedUse(const owlapi::model::IRISet& functions, const Re
     for(; fit != functions.end(); ++fit)
     {
         const IRI& function = *fit;
-        values.push_back( compute(function, modelPool) );
+        values.push_back(compute(function, modelPool));
     }
 
     return sequentialUse(values);
 }
 
-double Metric::computeExclusiveUse(const ModelPool& required, const ResourceInstance::List& available) const
+double
+Metric::computeExclusiveUse(const ModelPool& required,
+                            const ResourceInstance::List& available) const
 {
     using namespace owlapi::model;
 
@@ -123,13 +135,13 @@ double Metric::computeExclusiveUse(const ModelPool& required, const ResourceInst
         mOrganizationModelAsk.getRequiredCardinalities(required, mProperty);
 
     return computeMetric(r_required, r_available);
-
 }
 
-double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const ResourceInstance::List& modelPool) const
+double
+Metric::computeExclusiveUse(const owlapi::model::IRISet& functions,
+                            const ResourceInstance::List& modelPool) const
 {
     using namespace owlapi::model;
-
 
     ModelPool required;
     IRISet::const_iterator fit = functions.begin();
@@ -139,7 +151,8 @@ double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const
         required[function] = 1;
     }
 
-    std::vector<OWLCardinalityRestriction::Ptr> requirements = mOrganizationModelAsk.getRequiredCardinalities(required, mProperty);
+    std::vector<OWLCardinalityRestriction::Ptr> requirements =
+        mOrganizationModelAsk.getRequiredCardinalities(required, mProperty);
 
     // Get model restrictions, i.e. in effect what has to be available for the
     // given models
@@ -148,10 +161,11 @@ double Metric::computeExclusiveUse(const owlapi::model::IRISet& functions, const
     return computeMetric(requirements, availableResources);
 }
 
-
-Metric::Ptr Metric::getInstance(metrics::Type type, const OrganizationModelAsk& organization)
+Metric::Ptr Metric::getInstance(metrics::Type type,
+                                const OrganizationModelAsk& organization)
 {
-    std::map<metrics::Type, Metric::Ptr>::const_iterator cit = msMetrics.find(type);
+    std::map<metrics::Type, Metric::Ptr>::const_iterator cit =
+        msMetrics.find(type);
     if(cit != msMetrics.end())
     {
         return cit->second;
@@ -168,12 +182,13 @@ Metric::Ptr Metric::getInstance(metrics::Type type, const OrganizationModelAsk& 
         default:
             break;
     }
-    throw std::invalid_argument("moreorg::Metric::getInstance: failed to retrieve a type");
+    throw std::invalid_argument(
+        "moreorg::Metric::getInstance: failed to retrieve a type");
 }
 
 std::string Metric::toString(const MetricMap& map, uint32_t indent)
 {
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     std::stringstream ss;
     MetricMap::const_iterator cit = map.begin();
     for(; cit != map.end(); ++cit)
@@ -181,7 +196,8 @@ std::string Metric::toString(const MetricMap& map, uint32_t indent)
         std::pair<ServiceIRI, ActorIRI> pair = cit->first;
         double metric = cit->second;
 
-        ss << hspace << "Service: " << pair.first << ", Actor: " << pair.second << " --> metric: " << metric;
+        ss << hspace << "Service: " << pair.first << ", Actor: " << pair.second
+           << " --> metric: " << metric;
         ss << std::endl;
     }
 
@@ -189,4 +205,3 @@ std::string Metric::toString(const MetricMap& map, uint32_t indent)
 }
 
 } // end namespace moreorg
-

@@ -23,5 +23,5 @@ public:
 };
 
 } // end namespace vocabulary
-} // end namespace owlapi
+} // namespace moreorg
 #endif // ORGANIZATION_MODEL_VOCABULARIES_OMBASE_HPP

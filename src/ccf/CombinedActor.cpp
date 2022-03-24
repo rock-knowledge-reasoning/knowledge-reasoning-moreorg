@@ -1,16 +1,19 @@
 #include "CombinedActor.hpp"
 
 #include <algorithm>
-#include <numeric/Combinatorics.hpp>
 #include <base-logging/Logging.hpp>
 #include <base/Time.hpp>
+#include <numeric/Combinatorics.hpp>
 
 namespace multiagent {
 namespace ccf {
 
 CombinedActor::CombinedActor() {}
 
-CombinedActor::CombinedActor(const Link& link, const std::set<LinkGroup>& linkGroups, LinkGroupMap* linkGroupMap, InterfaceLinkMap* interfaceLinkMap)
+CombinedActor::CombinedActor(const Link& link,
+                             const std::set<LinkGroup>& linkGroups,
+                             LinkGroupMap* linkGroupMap,
+                             InterfaceLinkMap* interfaceLinkMap)
     : mLinks()
     , mLinkGroupMap(linkGroupMap)
     , mInterfaceLinkMap(interfaceLinkMap)
@@ -21,7 +24,8 @@ CombinedActor::CombinedActor(const Link& link, const std::set<LinkGroup>& linkGr
 
 void CombinedActor::addLink(const Link& link)
 {
-    std::pair< std::set<Link>::const_iterator, bool> result = mLinks.insert(link);
+    std::pair<std::set<Link>::const_iterator, bool> result =
+        mLinks.insert(link);
     if(!result.second)
     {
         throw std::runtime_error("Link already exists");
@@ -36,8 +40,8 @@ bool CombinedActor::operator<(const CombinedActor& other) const
 }
 
 /**
- * Return a set of probably valid links -- does not remove the blacklist here, but
- * when trying to add the link
+ * Return a set of probably valid links -- does not remove the blacklist here,
+ * but when trying to add the link
  */
 std::set<Link> CombinedActor::getWhitelistLinks() const
 {
@@ -68,17 +72,21 @@ void CombinedActor::blacklist(const Link& link)
 
         // Interfaces
         {
-            std::pair< std::set<Interface>::const_iterator, bool> result = mBlackListInterface.insert(link.getFirstInterface());
+            std::pair<std::set<Interface>::const_iterator, bool> result =
+                mBlackListInterface.insert(link.getFirstInterface());
             if(!result.second)
             {
-                throw std::runtime_error("Link invalid: first interface already blacklisted");
+                throw std::runtime_error(
+                    "Link invalid: first interface already blacklisted");
             }
         }
         {
-            std::pair< std::set<Interface>::const_iterator, bool> result = mBlackListInterface.insert(link.getSecondInterface());
+            std::pair<std::set<Interface>::const_iterator, bool> result =
+                mBlackListInterface.insert(link.getSecondInterface());
             if(!result.second)
             {
-                throw std::runtime_error("Link invalid: second interface already blacklisted");
+                throw std::runtime_error(
+                    "Link invalid: second interface already blacklisted");
             }
         }
         mWhiteListInterface.erase(link.getFirstInterface());

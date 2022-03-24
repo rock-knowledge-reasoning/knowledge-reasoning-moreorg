@@ -1,9 +1,9 @@
 #ifndef MULTIAGENT_CCF_INTERFACE_TYPE_HPP
 #define MULTIAGENT_CCF_INTERFACE_TYPE_HPP
 
+#include <moreorg/ccf/Actor.hpp>
 #include <ostream>
 #include <stdint.h>
-#include <moreorg/ccf/Actor.hpp>
 
 namespace multiagent {
 namespace ccf {
@@ -12,7 +12,8 @@ typedef uint8_t LocalInterfaceId;
 
 class InterfaceType
 {
-    friend std::ostream& operator<<(std::ostream& os, const InterfaceType& interfaceType);
+    friend std::ostream& operator<<(std::ostream& os,
+                                    const InterfaceType& interfaceType);
 
     ActorType mActorType;
     LocalInterfaceId mLocalInterfaceId;
@@ -23,7 +24,6 @@ public:
 
     bool operator<(const InterfaceType& other) const;
     bool operator==(const InterfaceType& other) const;
-
 };
 
 std::ostream& operator<<(std::ostream& os, const InterfaceType& interfaceType);

@@ -6,16 +6,18 @@ using namespace owlapi::model;
 namespace moreorg {
 namespace policies {
 
-AgentSizeBasedSelection::AgentSizeBasedSelection(const IRI& comparisonRelation, size_t value)
+AgentSizeBasedSelection::AgentSizeBasedSelection(const IRI& comparisonRelation,
+                                                 size_t value)
     : SelectionPolicy(vocabulary::OM::resolve("AgentSizeBasedSelection_" +
-                comparisonRelation.getFragment() + "_" +
-                std::to_string(value)))
+                                              comparisonRelation.getFragment() +
+                                              "_" + std::to_string(value)))
     , mOperator(comparisonRelation)
     , mValue(value)
-{}
+{
+}
 
 Selection AgentSizeBasedSelection::apply(const Selection& selection,
-    const OrganizationModelAsk& ask) const
+                                         const OrganizationModelAsk& ask) const
 {
     Selection updatedSelection;
     for(const Agent& a : selection)

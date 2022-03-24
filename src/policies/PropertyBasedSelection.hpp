@@ -12,17 +12,16 @@ public:
     PropertyBasedSelection() = default;
 
     PropertyBasedSelection(const owlapi::model::IRI& property,
-            const owlapi::model::IRI& op);
+                           const owlapi::model::IRI& op);
 
     virtual ~PropertyBasedSelection() = default;
 
     Selection apply(const policies::Selection& selection,
-            const OrganizationModelAsk& ask) const override;
+                    const OrganizationModelAsk& ask) const override;
 
 protected:
     owlapi::model::IRI mProperty;
     owlapi::model::IRI mOperator;
-
 };
 
 } // end namespace policies

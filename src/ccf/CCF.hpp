@@ -1,23 +1,21 @@
 #ifndef ORGANIZATION_MODEL_CCF_CCF_HPP
 #define ORGANIZATION_MODEL_CCF_CCF_HPP
 
-#include <set>
-#include <vector>
 #include <algorithm>
+#include <base-logging/Logging.hpp>
+#include <set>
 #include <sstream>
 #include <stdint.h>
-#include <base-logging/Logging.hpp>
+#include <vector>
 
 /**
  * This is an implementation of the Constrained Coalition Formation algorithm
  * as suggested by Rahwan et. al "Constrained Coalition Formation",2011
  */
 
-namespace moreorg
-{
+namespace moreorg {
 
-template<typename T>
-class Set
+template <typename T> class Set
 {
 protected:
     std::set<T> mSet;
@@ -26,26 +24,22 @@ public:
     typedef typename std::set<T>::const_iterator const_iterator;
     typedef typename std::set<T>::iterator iterator;
 
-    Set()
-    {}
+    Set() {}
 
-    Set(const T& initial)
-    {
-        insert(initial);
-    }
+    Set(const T& initial) { insert(initial); }
 
     bool isSupersetOf(const Set<T>& other) const
     {
         // this set can only be a superset of other
         // if it has more items
-        if( other.mSet.size() >= mSet.size())
+        if(other.mSet.size() >= mSet.size())
         {
             return false;
         }
 
         for(const T& item : other)
         {
-            if(!mSet.count(item) )
+            if(!mSet.count(item))
             {
                 return false;
             }
@@ -56,7 +50,10 @@ public:
 
     bool includes(const Set<T>& other) const
     {
-        return std::includes(this->begin(), this->end(), other.begin(), other.end());
+        return std::includes(this->begin(),
+                             this->end(),
+                             other.begin(),
+                             other.end());
     }
 
     Set<T> createUnion(const Set<T>& s) const
@@ -87,17 +84,18 @@ public:
 
     bool insert(const T& item)
     {
-        std::pair< typename std::set<T>::iterator, bool> it = mSet.insert(item);
+        std::pair<typename std::set<T>::iterator, bool> it = mSet.insert(item);
         return it.second;
     }
 
-    const T& first() const { assert(!empty()); return *mSet.begin(); }
+    const T& first() const
+    {
+        assert(!empty());
+        return *mSet.begin();
+    }
     void clear() { mSet.clear(); }
 
-    bool operator<( const Set<T>& other) const
-    {
-        return mSet < other.mSet;
-    }
+    bool operator<(const Set<T>& other) const { return mSet < other.mSet; }
 
     bool contains(const T& item) const { return mSet.count(item); }
 
@@ -113,14 +111,13 @@ public:
         std::string s = ss.str();
         if(!mSet.empty())
         {
-            s = s.substr(0, s.size()-1);
+            s = s.substr(0, s.size() - 1);
         }
         return s + "}";
     }
 };
 
-template<typename T>
-class SetOfSets : public Set< Set<T> >
+template <typename T> class SetOfSets : public Set<Set<T>>
 {
 
 public:
@@ -128,18 +125,18 @@ public:
 
     SetOfSets(const Set<T>& initial)
     {
-        this->insert( initial );
-        assert( Set< Set<T> >::size() == 1 );
+        this->insert(initial);
+        assert(Set<Set<T>>::size() == 1);
     }
 
     bool containsEmptySet() const
     {
-        if(Set< Set<T> >::mSet.empty())
+        if(Set<Set<T>>::mSet.empty())
         {
             return false;
         }
 
-        for(const Set<T>& s : Set< Set<T> >::mSet)
+        for(const Set<T>& s : Set<Set<T>>::mSet)
         {
             if(s.empty())
             {
@@ -177,7 +174,7 @@ public:
     Set<T> flatten() const
     {
         Set<T> newSet;
-        for(const Set<T>& s : Set< Set<T> >::mSet)
+        for(const Set<T>& s : Set<Set<T>>::mSet)
         {
             for(const T& t : s)
             {
@@ -190,7 +187,7 @@ public:
     bool includes(const SetOfSets<T>& other) const
     {
         bool includes = false;
-        for(const Set<T>& thisSubset : Set< Set<T> >::mSet)
+        for(const Set<T>& thisSubset : Set<Set<T>>::mSet)
         {
             for(const Set<T>& otherSubset : other)
             {
@@ -212,41 +209,39 @@ public:
     {
         std::stringstream ss;
         ss << "{";
-        for(const Set<T>& s : Set< Set<T> >::mSet)
+        for(const Set<T>& s : Set<Set<T>>::mSet)
         {
             ss << s.toString();
             ss << ",";
         }
 
         std::string s = ss.str();
-        if(!Set< Set<T> >::mSet.empty())
+        if(!Set<Set<T>>::mSet.empty())
         {
-            s = s.substr(0, s.size()-1);
+            s = s.substr(0, s.size() - 1);
         }
         return s + "}";
     }
 };
 
-
-template<typename T>
-struct Coalition
+template <typename T> struct Coalition
 {
     typedef T Atom;
     typedef Set<T> Constraint;
     typedef SetOfSets<T> Constraints;
 
-    typedef Set< Coalition<T> > Coalitions;
+    typedef Set<Coalition<T>> Coalitions;
 
     Constraints positive;
     Constraints negative;
 
-    Coalition()
-    {}
+    Coalition() {}
 
     Coalition(Constraints positive, Constraints negative)
         : positive(positive)
         , negative(negative)
-    {}
+    {
+    }
 
     std::string toString(bool positiveOnly = false) const
     {
@@ -280,7 +275,8 @@ struct Coalition
         {
             if(positive.includes(c))
             {
-                LOG_DEBUG_S << "Positive " << positive.toString() << " includes " << c.toString();
+                LOG_DEBUG_S << "Positive " << positive.toString()
+                            << " includes " << c.toString();
                 return true;
             }
         }
@@ -288,12 +284,12 @@ struct Coalition
         return false;
     }
 
-    Set< Coalition<T> > getFeasibleCoalitions() const
+    Set<Coalition<T>> getFeasibleCoalitions() const
     {
-        Set< Coalition<T> > coalitions;
+        Set<Coalition<T>> coalitions;
         for(const Constraint& p : positive)
         {
-            coalitions.insert( Coalition(p, Constraints()) );
+            coalitions.insert(Coalition(p, Constraints()));
         }
 
         return coalitions;
@@ -317,7 +313,7 @@ struct Coalition
     }
 };
 
-template<class T>
+template <class T>
 inline std::ostream& operator<<(std::ostream& out, const Coalition<T>& val)
 {
     out << val.toString();
@@ -331,8 +327,7 @@ inline std::ostream& operator<<(std::ostream& out, const Coalition<T>& val)
  *    p -> Set of Sets
  *    pStar -> Set of sets
  */
-template<typename T, template<class> class C = Coalition>
-class CCF
+template <typename T, template <class> class C = Coalition> class CCF
 {
 public:
     typedef T Atom;
@@ -341,7 +336,7 @@ public:
     typedef Set<T> Constraint;
     typedef SetOfSets<T> Constraints;
     typedef C<T> Coalition;
-    typedef Set< C<T> > Coalitions;
+    typedef Set<C<T>> Coalitions;
     typedef std::vector<Coalitions> CoalitionsList;
     typedef Constraints PositiveConstraints;
     typedef Constraints NegativeConstraints;
@@ -354,7 +349,6 @@ private:
     uint32_t mMaximumCoalitionSize;
 
 public:
-
     CCF(const AtomsVector& atoms)
     {
         for(const Atom& atom : atoms)
@@ -371,10 +365,19 @@ public:
         mMaximumCoalitionSize = mAtoms.size();
     }
 
-    void setMaximumCoalitionSize(uint32_t size) { mMaximumCoalitionSize = size; }
+    void setMaximumCoalitionSize(uint32_t size)
+    {
+        mMaximumCoalitionSize = size;
+    }
 
-    bool addNegativeConstraint(const Constraint& c) { return mNegativeConstraints.insert(c); }
-    bool addPositiveConstraint(const Constraint& c) { return mPositiveConstraints.insert(c); }
+    bool addNegativeConstraint(const Constraint& c)
+    {
+        return mNegativeConstraints.insert(c);
+    }
+    bool addPositiveConstraint(const Constraint& c)
+    {
+        return mPositiveConstraints.insert(c);
+    }
 
     Constraints getNegativeConstraints() const { return mNegativeConstraints; }
     Constraints getPositiveConstraints() const { return mPositiveConstraints; }
@@ -404,7 +407,7 @@ public:
         }
 
         if(!atoms.empty())
-                return atoms.first();
+            return atoms.first();
 
         throw std::runtime_error("No atoms left");
     }
@@ -412,37 +415,56 @@ public:
     AStar computeConstrainedCoalitions(Coalitions& coalitions)
     {
         LOG_DEBUG_S << "Init compute constrained coalitions: " << std::endl
-            << "    atoms:        " << mAtoms.toString() << std::endl
-            << "    p:            " << mPositiveConstraints.toString() << std::endl
-            << "    n:            " << mNegativeConstraints.toString() << std::endl;
+                    << "    atoms:        " << mAtoms.toString() << std::endl
+                    << "    p:            " << mPositiveConstraints.toString()
+                    << std::endl
+                    << "    n:            " << mNegativeConstraints.toString()
+                    << std::endl;
 
         AStar aStar;
         Constraints constraints;
-        computeConstrainedCoalitions(mAtoms, mPositiveConstraints, mNegativeConstraints, constraints, constraints, coalitions, aStar);
+        computeConstrainedCoalitions(mAtoms,
+                                     mPositiveConstraints,
+                                     mNegativeConstraints,
+                                     constraints,
+                                     constraints,
+                                     coalitions,
+                                     aStar);
 
-        LOG_DEBUG_S << "End of algorithm: Coalitions: " << coalitions.toString();
+        LOG_DEBUG_S << "End of algorithm: Coalitions: "
+                    << coalitions.toString();
         return aStar;
     }
 
-    void computeConstrainedCoalitions(Atoms atoms, PositiveConstraints p, NegativeConstraints n,
-            PositiveConstraints pStar, NegativeConstraints nStar, Coalitions& coalitions, AStar& aStar, bool positiveBranch = true, Atom a = Atom())
+    void computeConstrainedCoalitions(Atoms atoms,
+                                      PositiveConstraints p,
+                                      NegativeConstraints n,
+                                      PositiveConstraints pStar,
+                                      NegativeConstraints nStar,
+                                      Coalitions& coalitions,
+                                      AStar& aStar,
+                                      bool positiveBranch = true,
+                                      Atom a = Atom())
     {
         std::string label;
         if(positiveBranch)
         {
             label = "with ";
-        } else {
+        } else
+        {
             label = "without ";
         }
         label += a.toString();
 
-        LOG_DEBUG_S << "compute constrained coalitions [" << label << "]: " << std::endl
-            << "    atoms:        " << atoms.toString() << std::endl
-            << "    p:            " << p.toString() << std::endl
-            << "    n:            " << n.toString() << std::endl
-            << "    p*:           " << pStar.toString() << std::endl
-            << "    n*:           " << nStar.toString() << std::endl
-            << "    coalitions:   " << coalitions.toString() << std::endl;
+        LOG_DEBUG_S << "compute constrained coalitions [" << label
+                    << "]: " << std::endl
+                    << "    atoms:        " << atoms.toString() << std::endl
+                    << "    p:            " << p.toString() << std::endl
+                    << "    n:            " << n.toString() << std::endl
+                    << "    p*:           " << pStar.toString() << std::endl
+                    << "    n*:           " << nStar.toString() << std::endl
+                    << "    coalitions:   " << coalitions.toString()
+                    << std::endl;
 
         // Remove redundant constraints
         // i.e. find the 'smallest' constrained by removing
@@ -478,24 +500,25 @@ public:
         }
 
         LOG_DEBUG_S << "Removed redunant: " << std::endl
-            << "    atoms:        " << atoms.toString() << std::endl
-            << "    p:            " << p.toString() << std::endl
-            << "    n:            " << n.toString() << std::endl
-            << "    p*:           " << pStar.toString() << std::endl
-            << "    n*:           " << nStar.toString() << std::endl
-            << "    coalitions:   " << coalitions.toString() << std::endl;
-
+                    << "    atoms:        " << atoms.toString() << std::endl
+                    << "    p:            " << p.toString() << std::endl
+                    << "    n:            " << n.toString() << std::endl
+                    << "    p*:           " << pStar.toString() << std::endl
+                    << "    n*:           " << nStar.toString() << std::endl
+                    << "    coalitions:   " << coalitions.toString()
+                    << std::endl;
 
         // Dealing with special cases
-        // "Only one constraint, either positive or negative is left to be satisfied", i.e.
-        // if there is a constraint in N with exactly one agent
+        // "Only one constraint, either positive or negative is left to be
+        // satisfied", i.e. if there is a constraint in N with exactly one agent
         {
             NegativeConstraints tmpSet = n;
             for(Constraint nc : tmpSet)
             {
                 if(nc.size() == 1)
                 {
-                    LOG_DEBUG_S << "Constraint with exactly one agent: " << nc.toString();
+                    LOG_DEBUG_S << "Constraint with exactly one agent: "
+                                << nc.toString();
                     atoms = atoms.without(nc.first());
                     nStar = nStar.createUnion(nc);
                     n = n.without(nc);
@@ -503,10 +526,13 @@ public:
             }
         }
 
-        // By definition if p contains the empty set, all constraints in P are satisfied
+        // By definition if p contains the empty set, all constraints in P are
+        // satisfied
         if(p.containsEmptySet() && n.size() == 1)
         {
-            LOG_DEBUG_S << "P contains empty set and one negative constraint only" << p.toString();
+            LOG_DEBUG_S
+                << "P contains empty set and one negative constraint only"
+                << p.toString();
             nStar = nStar.createUnion(n);
             n.clear();
         }
@@ -514,56 +540,66 @@ public:
         // one coalition remaining and no negative contraints
         if(p.size() == 1 && n.empty())
         {
-            // Set the resulting coalition by combining all known positive constraints
-            pStar = PositiveConstraints( p.createUnion(pStar).flatten() );
+            // Set the resulting coalition by combining all known positive
+            // constraints
+            pStar = PositiveConstraints(p.createUnion(pStar).flatten());
 
             // reset positive constraint set
             p.clear();
-            p = p.createUnion( Constraint() );
+            p = p.createUnion(Constraint());
             LOG_DEBUG_S << "Create p union " << p.toString();
         }
 
         LOG_DEBUG_S << "Processed special cases: " << std::endl
-            << "    atoms:        " << atoms.toString() << std::endl
-            << "    p:            " << p.toString() << std::endl
-            << "    n:            " << n.toString() << std::endl
-            << "    p*:           " << pStar.toString() << std::endl
-            << "    n*:           " << nStar.toString() << std::endl
-            << "    coalitions:   " << coalitions.toString() << std::endl;
+                    << "    atoms:        " << atoms.toString() << std::endl
+                    << "    p:            " << p.toString() << std::endl
+                    << "    n:            " << n.toString() << std::endl
+                    << "    p*:           " << pStar.toString() << std::endl
+                    << "    n*:           " << nStar.toString() << std::endl
+                    << "    coalitions:   " << coalitions.toString()
+                    << std::endl;
 
         // Check termination criteria
-        // By definition if p contains the empty set, all constraints in P are satisfied
-        // By definition if n contains the empty set, all constraints in n are satisfied
-        // Thus we can terminate and add the found coalition
-        if( p.containsEmptySet() && n.empty())
+        // By definition if p contains the empty set, all constraints in P are
+        // satisfied By definition if n contains the empty set, all constraints
+        // in n are satisfied Thus we can terminate and add the found coalition
+        if(p.containsEmptySet() && n.empty())
         {
             Coalition coalition(pStar, nStar);
             LOG_DEBUG_S << "Termination: p contains empty set and n is empty";
-            LOG_DEBUG_S << "Termination: existing coalition " << coalitions.toString();
-            LOG_DEBUG_S << "Termination: adding coalition " << coalition.toString();
+            LOG_DEBUG_S << "Termination: existing coalition "
+                        << coalitions.toString();
+            LOG_DEBUG_S << "Termination: adding coalition "
+                        << coalition.toString();
             coalitions.insert(coalition);
-            LOG_DEBUG_S << "Termination: resulting coalitions " << coalitions.toString();
-            LOG_DEBUG_S << "Termination: negative constraints " << nStar.toString();
+            LOG_DEBUG_S << "Termination: resulting coalitions "
+                        << coalitions.toString();
+            LOG_DEBUG_S << "Termination: negative constraints "
+                        << nStar.toString();
             // all membership contraints satisfied
             return;
         }
 
-        // By definition if P is an empty set and N containts an empty Set the constraints cannot be satisfied
-        if( p.empty() || n.containsEmptySet())
+        // By definition if P is an empty set and N containts an empty Set the
+        // constraints cannot be satisfied
+        if(p.empty() || n.containsEmptySet())
         {
-            // Termination because the membership constraints cannot be satisfied
-            LOG_DEBUG_S << "Termination: p is empty or n contains empty set: p " << p.toString() << ", n " << n.toString();
+            // Termination because the membership constraints cannot be
+            // satisfied
+            LOG_DEBUG_S << "Termination: p is empty or n contains empty set: p "
+                        << p.toString() << ", n " << n.toString();
             return;
         }
 
         // if ... size constraints. Not important for us right now
-        if( pStar.flatten().size() > mMaximumCoalitionSize)
+        if(pStar.flatten().size() > mMaximumCoalitionSize)
         {
-            LOG_DEBUG_S << "Termination: maximum coalition size exceeded: " << mMaximumCoalitionSize;
+            LOG_DEBUG_S << "Termination: maximum coalition size exceeded: "
+                        << mMaximumCoalitionSize;
             return;
         }
 
-        if( mAtoms.empty())
+        if(mAtoms.empty())
         {
             LOG_DEBUG_S << "Termination: no atoms left";
             return;
@@ -572,11 +608,13 @@ public:
         // Initialize divide and conquer
         // select an atom
         Atom atom;
-        try {
+        try
+        {
             if(positiveBranch)
             {
                 atom = selectAtom(atoms, p);
-            } else {
+            } else
+            {
                 atom = selectAtom(atoms, n);
             }
         } catch(const std::runtime_error& e)
@@ -585,7 +623,7 @@ public:
             return;
         }
 
-        if( pStar.empty())
+        if(pStar.empty())
         {
             // Record this for the latter generation of coalitions
             aStar.push_back(atom);
@@ -596,7 +634,7 @@ public:
         NegativeConstraints ncs_not_ai; // N Not ai
         // All coalitions that do not involve ai, but when joined with
         // ai are part of the prohibited set
-        NegativeConstraints ncs_ai; //N Tilde ai
+        NegativeConstraints ncs_ai; // N Tilde ai
 
         // Here we filter out the selected atom and create
         // two sets:
@@ -604,15 +642,16 @@ public:
         // ncs_not_ai -> finally all subsets that never related to atom
         for(Constraint nc : n)
         {
-            if( nc.contains(atom) )
+            if(nc.contains(atom))
             {
                 Constraint constraint = nc.without(atom);
-                //if(!constraint.empty())
+                // if(!constraint.empty())
                 //{
-                    ncs_ai = ncs_ai.createUnion(constraint);
+                ncs_ai = ncs_ai.createUnion(constraint);
                 //}
-            } else {
-                ncs_not_ai = ncs_not_ai.createUnion( nc );
+            } else
+            {
+                ncs_not_ai = ncs_not_ai.createUnion(nc);
             }
         }
 
@@ -625,43 +664,67 @@ public:
 
         for(Constraint pc : p)
         {
-            if( pc.contains(atom) )
+            if(pc.contains(atom))
             {
                 Constraint constraint = pc.without(atom);
-                //if(!constraint.empty())
+                // if(!constraint.empty())
                 //{
-                    pcs_ai = pcs_ai.createUnion(constraint);
+                pcs_ai = pcs_ai.createUnion(constraint);
                 //}
-            } else {
+            } else
+            {
                 pcs_not_ai = pcs_not_ai.createUnion(pc);
             }
         }
 
-        PositiveConstraints newPStar = PositiveConstraints( pStar.createUnion( PositiveConstraints( atom ) ).flatten() );
+        PositiveConstraints newPStar = PositiveConstraints(
+            pStar.createUnion(PositiveConstraints(atom)).flatten());
 
         LOG_DEBUG_S << "Prepare divide and conquer for: " << atom << std::endl
-            << "    atoms:        " << atoms.toString() << std::endl
-            << "    p:            " << p.toString() << std::endl
-            << "    n:            " << n.toString() << std::endl
-            << "    p*:           " << pStar.toString() << std::endl
-            << "    n*:           " << nStar.toString() << std::endl
-            << "    pcs_ai~:      " << pcs_ai.toString() << std::endl
-            << "    pcs_not_ai:   " << pcs_not_ai.toString() << std::endl
-            << "    ncs_ai~:      " << ncs_ai.toString() << std::endl
-            << "    ncs_not_ai:   " << ncs_not_ai.toString() << std::endl
-            << "    coalitions:   " << coalitions.toString() << std::endl;
-
+                    << "    atoms:        " << atoms.toString() << std::endl
+                    << "    p:            " << p.toString() << std::endl
+                    << "    n:            " << n.toString() << std::endl
+                    << "    p*:           " << pStar.toString() << std::endl
+                    << "    n*:           " << nStar.toString() << std::endl
+                    << "    pcs_ai~:      " << pcs_ai.toString() << std::endl
+                    << "    pcs_not_ai:   " << pcs_not_ai.toString()
+                    << std::endl
+                    << "    ncs_ai~:      " << ncs_ai.toString() << std::endl
+                    << "    ncs_not_ai:   " << ncs_not_ai.toString()
+                    << std::endl
+                    << "    coalitions:   " << coalitions.toString()
+                    << std::endl;
 
         // apply divide and conquer
         Atoms remainingAtoms = atoms.without(atom);
-        // Positive constraints: pcs_not_ai and pcs_ai -> all coalitions that are allowed joined with those that lead to permitted combinations with ai
-        // Negative constraints: ncs_not_ai and ncs_ai -> all coalitions that are not allowed joined with those that lead to prohibited combinations with ai
-        computeConstrainedCoalitions( remainingAtoms , pcs_not_ai.createUnion(pcs_ai), ncs_not_ai.createUnion(ncs_ai), newPStar, nStar, coalitions, aStar, true, atom);
-        computeConstrainedCoalitions( remainingAtoms, pcs_not_ai, ncs_not_ai, pStar, nStar.createUnion(atom), coalitions, aStar, false, atom);
+        // Positive constraints: pcs_not_ai and pcs_ai -> all coalitions that
+        // are allowed joined with those that lead to permitted combinations
+        // with ai Negative constraints: ncs_not_ai and ncs_ai -> all coalitions
+        // that are not allowed joined with those that lead to prohibited
+        // combinations with ai
+        computeConstrainedCoalitions(remainingAtoms,
+                                     pcs_not_ai.createUnion(pcs_ai),
+                                     ncs_not_ai.createUnion(ncs_ai),
+                                     newPStar,
+                                     nStar,
+                                     coalitions,
+                                     aStar,
+                                     true,
+                                     atom);
+        computeConstrainedCoalitions(remainingAtoms,
+                                     pcs_not_ai,
+                                     ncs_not_ai,
+                                     pStar,
+                                     nStar.createUnion(atom),
+                                     coalitions,
+                                     aStar,
+                                     false,
+                                     atom);
     }
 
     /**
-     * Based on the information on aStar, i.e. the structure of the base cases, we create the necessary set of coalitions
+     * Based on the information on aStar, i.e. the structure of the base cases,
+     * we create the necessary set of coalitions
      */
     CoalitionsList createLists(AStar aStar, Coalitions coalitions)
     {
@@ -673,18 +736,21 @@ public:
         for(const Coalition& coalition : coalitions)
         {
             bool foundList = false;
-            // Picking a feasible coaltion -- in our case they should be feasible by default
+            // Picking a feasible coaltion -- in our case they should be
+            // feasible by default
             for(size_t i = 0; i < aStar.size(); ++i)
             {
                 Atom a = aStar[i];
-                if( coalition.positive.first().contains(a) )
+                if(coalition.positive.first().contains(a))
                 {
                     list[i].insert(coalition);
 
                     foundList = true;
                     break;
-                } else {
-                    LOG_DEBUG_S << a << " not in " << coalition.positive.toString();
+                } else
+                {
+                    LOG_DEBUG_S << a << " not in "
+                                << coalition.positive.toString();
                 }
             }
 
@@ -698,29 +764,39 @@ public:
         return list;
     }
 
-    bool checkFeasibility(Coalition c)
-    {
-        return true;
-    }
+    bool checkFeasibility(Coalition c) { return true; }
 
-    void computeFeasibleCoalitions(const CoalitionsList& list, std::vector<Coalitions>& coalitions, const Coalitions& baseCoalition = Coalition(), size_t level = 0)
+    void
+    computeFeasibleCoalitions(const CoalitionsList& list,
+                              std::vector<Coalitions>& coalitions,
+                              const Coalitions& baseCoalition = Coalition(),
+                              size_t level = 0)
     {
         // Pick coalition
         Coalitions coalitionStructure = baseCoalition;
         for(const Coalition& listCoalition : list[level])
         {
-            Coalitions feasibleCoalitions = listCoalition.getFeasibleCoalitions();
+            Coalitions feasibleCoalitions =
+                listCoalition.getFeasibleCoalitions();
             for(Coalition c : feasibleCoalitions)
             {
                 coalitionStructure.insert(c);
 
                 // if(checkFeasibility(coalitionStructure))
-                if(Coalition::getUniqueElements(coalitionStructure).size() == mAtoms.size())
+                if(Coalition::getUniqueElements(coalitionStructure).size() ==
+                   mAtoms.size())
                 {
-                    LOG_DEBUG_S << "Check all atoms used in coalition structure, i.e. structure complete: " << coalitionStructure.toString() << " unique elements: " << Coalition::getUniqueElements(coalitionStructure).size() << " atoms: " << mAtoms.size();
+                    LOG_DEBUG_S
+                        << "Check all atoms used in coalition structure, i.e. "
+                           "structure complete: "
+                        << coalitionStructure.toString() << " unique elements: "
+                        << Coalition::getUniqueElements(coalitionStructure)
+                               .size()
+                        << " atoms: " << mAtoms.size();
                     coalitions.push_back(coalitionStructure);
                     // eval and update
-                } else {
+                } else
+                {
                     if(level < list.size() - 1)
                     {
                         LOG_DEBUG_S << "Use list: " << level;
@@ -731,26 +807,34 @@ public:
                         {
                             for(const Coalition& coalition : coalitionStructure)
                             {
-                                for(const Constraint& constraint : coalition.positive)
+                                for(const Constraint& constraint :
+                                    coalition.positive)
                                 {
                                     for(const Atom& atom : constraint)
                                     {
-                                        nextLevelCoalition.negative.insert( Constraint(atom) );
+                                        nextLevelCoalition.negative.insert(
+                                            Constraint(atom));
                                     }
                                 }
                             }
                         }
 
-                        LOG_DEBUG_S << "Check feasibility: on level: " << level << " with coalition struct: " << coalitionStructure.toString();
-                        computeFeasibleCoalitions(list, coalitions, coalitionStructure, level);
-                    } else {
-                        LOG_DEBUG_S << "Level " << level << " vs. " << list.size();
+                        LOG_DEBUG_S << "Check feasibility: on level: " << level
+                                    << " with coalition struct: "
+                                    << coalitionStructure.toString();
+                        computeFeasibleCoalitions(list,
+                                                  coalitions,
+                                                  coalitionStructure,
+                                                  level);
+                    } else
+                    {
+                        LOG_DEBUG_S << "Level " << level << " vs. "
+                                    << list.size();
                     }
                 }
             }
         }
     }
-
 };
 
 } // end namespace moreorg

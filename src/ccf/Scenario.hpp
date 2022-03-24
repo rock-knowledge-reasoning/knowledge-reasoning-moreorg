@@ -2,20 +2,27 @@
 #define MULTIAGENT_CCF_SCENARIO_HPP
 
 #include <map>
+#include <moreorg/ModelPool.hpp>
+#include <moreorg/ccf/Link.hpp>
 #include <set>
 #include <vector>
-#include <moreorg/ccf/Link.hpp>
-#include <moreorg/ModelPool.hpp>
 
 namespace multiagent {
 namespace ccf {
 
 class ActorDescription
 {
-    std::map<CompatibilityType,size_t> mInterfaceCount;
+    std::map<CompatibilityType, size_t> mInterfaceCount;
+
 public:
-    void setInterfaceCount(CompatibilityType type, size_t count) { mInterfaceCount[type] = count; }
-    size_t getInterfaceCount(CompatibilityType type) { return mInterfaceCount[type]; }
+    void setInterfaceCount(CompatibilityType type, size_t count)
+    {
+        mInterfaceCount[type] = count;
+    }
+    size_t getInterfaceCount(CompatibilityType type)
+    {
+        return mInterfaceCount[type];
+    }
 };
 
 class Scenario
@@ -27,7 +34,8 @@ class Scenario
 
     std::vector<ActorType> mActorTypes;
     std::vector<CompatibilityType> mInterfaceCompatibilityTypes;
-    std::map<CompatibilityType, std::vector<CompatibilityType> > mInterfaceCompatibility;
+    std::map<CompatibilityType, std::vector<CompatibilityType>>
+        mInterfaceCompatibility;
 
     std::map<Actor, ActorDescription> mActors;
     std::vector<Actor> mActorList;
@@ -48,11 +56,11 @@ class Scenario
     std::set<LinkType> mInvalidLinkTypes;
 
     // All links that connect the same actors
-    std::map<LinkGroup, std::set<Link> > mLinkGroupMap;
+    std::map<LinkGroup, std::set<Link>> mLinkGroupMap;
     std::set<LinkGroup> mAvailableLinkGroups;
 
-    std::map<Actor, std::set<Link> > mActorLinkMap;
-    std::map<Interface, std::set<Link> > mInterfaceLinkMap;
+    std::map<Actor, std::set<Link>> mActorLinkMap;
+    std::map<Interface, std::set<Link>> mInterfaceLinkMap;
 
 protected:
     void createLinks();
@@ -69,17 +77,28 @@ public:
     std::map<LinkType, size_t> getValidLinkTypes() { return mValidLinkTypes; }
     std::set<LinkType> getInvalidLinkTypes() { return mInvalidLinkTypes; }
 
+    std::map<LinkGroup, std::set<Link>> getLinkGroupMap() const
+    {
+        return mLinkGroupMap;
+    }
+    std::set<LinkGroup> getAvailableLinkGroups() const
+    {
+        return mAvailableLinkGroups;
+    }
+    std::map<Actor, std::set<Link>> getActorLinkMap() const
+    {
+        return mActorLinkMap;
+    }
+    std::map<Interface, std::set<Link>> getInterfaceLinkMap() const
+    {
+        return mInterfaceLinkMap;
+    }
 
-    std::map<LinkGroup, std::set<Link> > getLinkGroupMap() const { return mLinkGroupMap; }
-    std::set<LinkGroup> getAvailableLinkGroups() const { return mAvailableLinkGroups; }
-    std::map<Actor, std::set<Link> > getActorLinkMap() const { return mActorLinkMap; }
-    std::map<Interface, std::set<Link> > getInterfaceLinkMap() const { return mInterfaceLinkMap; }
-
-    void collectCombinations(
-            const std::vector<Actor>& allowedActors,
-            std::vector<Actor> actors, std::set<Link> links,
-            moreorg::ModelPool::Set& agentSpaceModelPools,
-            std::set< std::set<Link> >& linkSpaceSets);
+    void collectCombinations(const std::vector<Actor>& allowedActors,
+                             std::vector<Actor> actors,
+                             std::set<Link> links,
+                             moreorg::ModelPool::Set& agentSpaceModelPools,
+                             std::set<std::set<Link>>& linkSpaceSets);
 
     size_t getNumberOfActors() const { return mActors.size(); }
     static Scenario fromConsole();
@@ -89,7 +108,6 @@ public:
     std::string report() const;
 
     void setModelCount(char key, uint32_t value) { mModelPool[key] = value; }
-
 };
 
 } // end namespace ccf

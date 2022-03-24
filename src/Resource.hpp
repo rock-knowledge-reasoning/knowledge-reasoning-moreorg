@@ -1,9 +1,9 @@
 #ifndef ORGANIZATION_MODEL_RESOURCE_HPP
 #define ORGANIZATION_MODEL_RESOURCE_HPP
 
+#include "PropertyConstraint.hpp"
 #include <map>
 #include <set>
-#include "PropertyConstraint.hpp"
 
 namespace moreorg {
 
@@ -21,10 +21,10 @@ public:
     virtual ~Resource();
 
     Resource(const owlapi::model::IRI& model,
-            const PropertyConstraint::List& propertyConstraints);
+             const PropertyConstraint::List& propertyConstraints);
 
     Resource(const owlapi::model::IRI& model,
-            const PropertyConstraint::Set& propertyConstraints);
+             const PropertyConstraint::Set& propertyConstraints);
 
     bool operator<(const Resource& other) const;
     bool operator==(const Resource& other) const;
@@ -41,10 +41,14 @@ public:
      */
     static owlapi::model::IRISet getModels(const Resource::Set& a);
 
-
-
-    void setPropertyConstraints(const PropertyConstraint::Set& constraints) { mPropertyConstraints = constraints; }
-    const PropertyConstraint::Set& getPropertyConstraints() const { return mPropertyConstraints; }
+    void setPropertyConstraints(const PropertyConstraint::Set& constraints)
+    {
+        mPropertyConstraints = constraints;
+    }
+    const PropertyConstraint::Set& getPropertyConstraints() const
+    {
+        return mPropertyConstraints;
+    }
 
     void addPropertyConstraint(const PropertyConstraint& constraint);
 
@@ -56,8 +60,10 @@ public:
 
     std::string toString(size_t indent = 0) const;
 
-    static std::string toString(const Resource::List& requirements, size_t indent = 0);
-    static std::string toString(const Resource::Set& requirements, size_t indent = 0);
+    static std::string toString(const Resource::List& requirements,
+                                size_t indent = 0);
+    static std::string toString(const Resource::Set& requirements,
+                                size_t indent = 0);
 
     void merge(const Resource& other);
     static Resource merge(const Resource& a, const Resource& b);

@@ -3,8 +3,7 @@
 namespace multiagent {
 namespace ccf {
 
-LinkType::LinkType()
-{}
+LinkType::LinkType() {}
 
 LinkType::LinkType(InterfaceType type0, InterfaceType type1)
 {
@@ -12,7 +11,8 @@ LinkType::LinkType(InterfaceType type0, InterfaceType type1)
     {
         mFirstInterfaceType = type0;
         mSecondInterfaceType = type1;
-    } else {
+    } else
+    {
         mFirstInterfaceType = type1;
         mSecondInterfaceType = type0;
     }
@@ -26,7 +26,8 @@ bool LinkType::operator<(const LinkType& other) const
     } else if(mFirstInterfaceType == other.mFirstInterfaceType)
     {
         return mSecondInterfaceType < other.mSecondInterfaceType;
-    } else {
+    } else
+    {
         return false;
     }
 }

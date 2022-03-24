@@ -1,9 +1,9 @@
 #ifndef ORGANIZATION_MODEL_REQUIREMENT_SAMPLE_HPP
 #define ORGANIZATION_MODEL_REQUIREMENT_SAMPLE_HPP
 
-#include "Sample.hpp"
-#include "Resource.hpp"
 #include "ModelPool.hpp"
+#include "Resource.hpp"
+#include "Sample.hpp"
 
 namespace moreorg {
 
@@ -13,16 +13,15 @@ namespace moreorg {
 class RequirementSample : public Sample
 {
 public:
-
     typedef std::vector<RequirementSample> List;
     typedef std::vector<const RequirementSample*> ConstRawPtrList;
 
     RequirementSample(const Resource::Set& resources,
-           const ModelPool& agentPool,
-           const base::Position& fromLocation,
-           const base::Position& toLocation,
-           size_t fromTime,
-           size_t toTime);
+                      const ModelPool& agentPool,
+                      const base::Position& fromLocation,
+                      const base::Position& toLocation,
+                      size_t fromTime,
+                      size_t toTime);
 
     virtual ~RequirementSample();
 
@@ -41,10 +40,7 @@ public:
 protected:
     Resource::Set mResources;
     ModelPool mAgentPool;
-
 };
-
-
 
 } // end namespace moreorg
 #endif // ORGANIZATION_MODEL_REQUIREMENT_SAMPLE_HPP

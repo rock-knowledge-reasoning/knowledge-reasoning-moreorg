@@ -21,7 +21,8 @@ class PDDLExporter
 public:
     PDDLExporter(const OrganizationModelAsk& ask, size_t maxCoalitionSize = 15);
 
-    enum Keyword { AND,
+    enum Keyword {
+        AND,
         NOT,
         OR,
         WHEN,
@@ -106,14 +107,14 @@ private:
      * \return list of instances (as list of ModelCombinations) with atomic
      * agents as <IRI-Model><number>
      */
-    std::vector<owlapi::model::IRIList> createAgentInstances(const ModelPool& pool);
+    std::vector<owlapi::model::IRIList>
+    createAgentInstances(const ModelPool& pool);
 
     /**
      * Get the agent name for a given coalition
      * \param coalition Agent as list of atomic agents
      */
     std::string agentName(const owlapi::model::IRIList& agentInstance) const;
-
 };
 
 } // end namespace moreorg

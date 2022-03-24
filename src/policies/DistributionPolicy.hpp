@@ -1,8 +1,8 @@
 #ifndef ORGANIZATION_MODEL_POLICIES_DISTRIBUTION_POLICY_HPP
 #define ORGANIZATION_MODEL_POLICIES_DISTRIBUTION_POLICY_HPP
 
-#include "../Policy.hpp"
 #include "../InferenceRule.hpp"
+#include "../Policy.hpp"
 
 namespace moreorg {
 namespace policies {
@@ -24,12 +24,13 @@ public:
     DistributionPolicy() = default;
 
     DistributionPolicy(const owlapi::model::IRI& property,
-            const OrganizationModelAsk& ask);
+                       const OrganizationModelAsk& ask);
 
     virtual ~DistributionPolicy() = default;
 
     virtual Distribution apply(const ModelPool& modelPool,
-            const OrganizationModelAsk& ask) const;
+                               const OrganizationModelAsk& ask) const;
+
 protected:
     OrganizationModelAsk mAsk;
 
@@ -37,7 +38,7 @@ protected:
     InferenceRule::Ptr mCompositeAgentRule;
 };
 
-} // policies
-} // moreorg
+} // namespace policies
+} // namespace moreorg
 
 #endif // ORGANIZATION_MODEL_POLICIES_DISTRIBUTION_POLICY_HPP

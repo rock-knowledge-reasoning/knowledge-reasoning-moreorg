@@ -6,35 +6,33 @@
 #endif
 
 #ifdef USE_BOOST_SHARED_PTR
-#include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 #else
-#include <memory>
 #include <functional>
+#include <memory>
 #endif
 
-namespace moreorg
-{
+namespace moreorg {
 #ifdef USE_BOOST_SHARED_PTR
-    using ::boost::shared_ptr;
-    using ::boost::make_shared;
-    using ::boost::dynamic_pointer_cast;
-    using ::boost::static_pointer_cast;
-    using ::boost::function1;
-    using ::boost::bind;
-    namespace placeholder = ::boost;
+using ::boost::bind;
+using ::boost::dynamic_pointer_cast;
+using ::boost::function1;
+using ::boost::make_shared;
+using ::boost::shared_ptr;
+using ::boost::static_pointer_cast;
+namespace placeholder = ::boost;
 #else
-    using ::std::shared_ptr;
-    using ::std::make_shared;
-    using ::std::dynamic_pointer_cast;
-    using ::std::static_pointer_cast;
-    using ::std::function;
-    using ::std::bind;
-    namespace placeholder = ::std::placeholders;
-    template <class T, class U>
-    using function1 = ::std::function<T(U)>;
+using ::std::bind;
+using ::std::dynamic_pointer_cast;
+using ::std::function;
+using ::std::make_shared;
+using ::std::shared_ptr;
+using ::std::static_pointer_cast;
+namespace placeholder = ::std::placeholders;
+template <class T, class U> using function1 = ::std::function<T(U)>;
 #endif
-}
+} // namespace moreorg
 
 #endif // ORGANIZATION_MODEL_SHARED_PTR_HPP

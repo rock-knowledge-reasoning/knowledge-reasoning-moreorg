@@ -1,8 +1,8 @@
 #ifndef ORGANIZATION_MODEL_POLICIES_SELECTION_POLICY_HPP
 #define ORGANIZATION_MODEL_POLICIES_SELECTION_POLICY_HPP
 
-#include "../Policy.hpp"
 #include "../Agent.hpp"
+#include "../Policy.hpp"
 
 namespace moreorg {
 namespace policies {
@@ -23,15 +23,18 @@ public:
      * updated selection
      */
     virtual Selection apply(const Selection& agentSelection,
-            const OrganizationModelAsk& ask) const;
+                            const OrganizationModelAsk& ask) const;
 
-    void add(const SelectionPolicy::Ptr& policy) { mPolicyChain.push_back(policy); }
+    void add(const SelectionPolicy::Ptr& policy)
+    {
+        mPolicyChain.push_back(policy);
+    }
 
 protected:
     std::vector<SelectionPolicy::Ptr> mPolicyChain;
 };
 
-} // policies
-} // moreorg
+} // namespace policies
+} // namespace moreorg
 
 #endif // ORGANIZATION_MODEL_POLICIES_SELECTION_POLICY_HPP

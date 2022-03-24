@@ -9,8 +9,8 @@ namespace policies {
 class FunctionalityBasedSelection : public SelectionPolicy
 {
 public:
-    FunctionalityBasedSelection(const owlapi::model::IRI& functionality =
-            owlapi::model::IRI());
+    FunctionalityBasedSelection(
+        const owlapi::model::IRI& functionality = owlapi::model::IRI());
 
     virtual ~FunctionalityBasedSelection() = default;
 
@@ -18,11 +18,10 @@ public:
      *
      */
     policies::Selection apply(const policies::Selection& agent,
-            const OrganizationModelAsk& ask) const override;
+                              const OrganizationModelAsk& ask) const override;
 
 protected:
     owlapi::model::IRI mFunctionality;
-
 };
 
 } // end namespace policies

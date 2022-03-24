@@ -18,18 +18,22 @@ class Interface
 
 public:
     Interface();
-    Interface(Actor actor, LocalInterfaceId interfaceId, CompatibilityType type);
+    Interface(Actor actor,
+              LocalInterfaceId interfaceId,
+              CompatibilityType type);
 
     Actor getActor() const { return mActor; }
     LocalInterfaceId getLocalId() const { return mLocalId; }
 
     // Interface type consists of an actor and local interface id
     InterfaceType getType() const { return mType; }
-    CompatibilityType getCompatibilityType() const { return mCompatibilityType; }
+    CompatibilityType getCompatibilityType() const
+    {
+        return mCompatibilityType;
+    }
 
     bool operator<(const Interface& other) const;
     bool operator==(const Interface& other) const;
-
 };
 
 std::ostream& operator<<(std::ostream& os, const Interface& i);

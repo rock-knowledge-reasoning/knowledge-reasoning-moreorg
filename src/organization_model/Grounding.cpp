@@ -7,11 +7,13 @@ namespace moreorg {
 
 Grounding::Grounding(const RequirementsGrounding& grounding)
     : mRequirementToResourceMap(grounding)
-{}
+{
+}
 
 bool Grounding::isComplete() const
 {
-    RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
+    RequirementsGrounding::const_iterator mip =
+        mRequirementToResourceMap.begin();
     for(; mip != mRequirementToResourceMap.end(); ++mip)
     {
         if(!isComplete(mip->second))
@@ -39,7 +41,8 @@ bool Grounding::isComplete(const std::vector<IRI>& partialGrounding) const
 RequirementsGrounding Grounding::ungroundedRequirements() const
 {
     RequirementsGrounding ungroundedRequirements;
-    RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
+    RequirementsGrounding::const_iterator mip =
+        mRequirementToResourceMap.begin();
     for(; mip != mRequirementToResourceMap.end(); ++mip)
     {
         const std::vector<IRI>& groundings = mip->second;
@@ -66,11 +69,12 @@ std::string Grounding::toString() const
     std::stringstream ss;
     ss << "Grounding:" << std::endl;
 
-    RequirementsGrounding::const_iterator mip = mRequirementToResourceMap.begin();
+    RequirementsGrounding::const_iterator mip =
+        mRequirementToResourceMap.begin();
     for(; mip != mRequirementToResourceMap.end(); ++mip)
     {
         ss << "Requirement:" << std::endl;
-        ss << "    " << mip->first  << std::endl;
+        ss << "    " << mip->first << std::endl;
         ss << "Grounding:" << std::endl;
         ss << mip->second << std::endl;
     }

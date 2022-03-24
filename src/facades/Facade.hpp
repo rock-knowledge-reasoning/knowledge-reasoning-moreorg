@@ -14,14 +14,17 @@ public:
 
     virtual ~Facade();
 
-    const OrganizationModelAsk& organizationAsk() const { return mOrganizationModelAsk; }
+    const OrganizationModelAsk& organizationAsk() const
+    {
+        return mOrganizationModelAsk;
+    }
 
     /**
      * Get the available value of use the default
      */
     double getDoubleValueOrDefault(const owlapi::model::IRI& agentModel,
-            const owlapi::model::IRI& propertyName,
-            double defaultValue) const;
+                                   const owlapi::model::IRI& propertyName,
+                                   double defaultValue) const;
 
 protected:
     Facade();

@@ -1,14 +1,15 @@
 #include "ActorModelLink.hpp"
-#include <iostream>
 #include <algorithm>
 #include <assert.h>
+#include <iostream>
 
 namespace moreorg {
 namespace moreorg {
 
 ActorModelLink::ActorModelLink() {}
 
-ActorModelLink::ActorModelLink(const EndpointModel& endpoint0, const EndpointModel& endpoint1)
+ActorModelLink::ActorModelLink(const EndpointModel& endpoint0,
+                               const EndpointModel& endpoint1)
 {
     mEndpoints.push_back(endpoint0);
     mEndpoints.push_back(endpoint1);
@@ -56,7 +57,9 @@ std::string ActorModelLink::toString() const
     return txt;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<ActorModelLink> > modelSet)
+std::ostream&
+operator<<(std::ostream& os,
+           const std::vector<std::vector<ActorModelLink>> modelSet)
 {
     int count = 0;
     for(const std::vector<ActorModelLink>& compositeActorModel : modelSet)

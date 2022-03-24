@@ -1,29 +1,28 @@
 #include "PropertyConstraint.hpp"
+#include "facades/Robot.hpp"
 #include <sstream>
 #include <tuple>
-#include "facades/Robot.hpp"
 
 namespace moreorg {
 
-std::map<PropertyConstraint::ConstraintType, std::string> PropertyConstraint::TypeTxt = {
-    {PropertyConstraint::UNKNOWN, "UNKNOWN"},
-    {PropertyConstraint::EQUAL, "=="},
-    {PropertyConstraint::LESS_THAN, "<"},
-    {PropertyConstraint::LESS_EQUAL, "<="},
-    {PropertyConstraint::GREATER_EQUAL, ">="},
-    {PropertyConstraint::GREATER_THAN, ">"},
-    {CONSTRAINT_TYPE_END, "ConstraintTypeEnd"}
-    }
-    ;
+std::map<PropertyConstraint::ConstraintType, std::string>
+    PropertyConstraint::TypeTxt = {{PropertyConstraint::UNKNOWN, "UNKNOWN"},
+                                   {PropertyConstraint::EQUAL, "=="},
+                                   {PropertyConstraint::LESS_THAN, "<"},
+                                   {PropertyConstraint::LESS_EQUAL, "<="},
+                                   {PropertyConstraint::GREATER_EQUAL, ">="},
+                                   {PropertyConstraint::GREATER_THAN, ">"},
+                                   {CONSTRAINT_TYPE_END, "ConstraintTypeEnd"}};
 
 PropertyConstraint::PropertyConstraint()
     : mType(UNKNOWN)
     , mRValProperty()
-{}
+{
+}
 
 PropertyConstraint::PropertyConstraint(const owlapi::model::IRI& dataProperty,
-        ConstraintType c,
-        double value)
+                                       ConstraintType c,
+                                       double value)
     : mType(c)
     , mDataProperty(dataProperty)
     , mValue(value)
@@ -32,8 +31,8 @@ PropertyConstraint::PropertyConstraint(const owlapi::model::IRI& dataProperty,
 }
 
 PropertyConstraint::PropertyConstraint(const owlapi::model::IRI& dataProperty,
-        ConstraintType c,
-        const owlapi::model::IRI& rvalProperty)
+                                       ConstraintType c,
+                                       const owlapi::model::IRI& rvalProperty)
     : mType(c)
     , mDataProperty(dataProperty)
     , mValue()
@@ -46,16 +45,20 @@ std::string PropertyConstraint::toString() const
     std::stringstream ss;
     if(!mRValProperty.empty())
     {
-        ss << mDataProperty.toString() << " " << TypeTxt[mType] << " " << mRValProperty.toString();
-    } else {
-        ss << mDataProperty.toString() << " " << TypeTxt[mType] << " " << mValue;
+        ss << mDataProperty.toString() << " " << TypeTxt[mType] << " "
+           << mRValProperty.toString();
+    } else
+    {
+        ss << mDataProperty.toString() << " " << TypeTxt[mType] << " "
+           << mValue;
     }
     return ss.str();
 }
 
-std::string PropertyConstraint::toString(const PropertyConstraint::List& list, size_t indent)
+std::string PropertyConstraint::toString(const PropertyConstraint::List& list,
+                                         size_t indent)
 {
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     std::stringstream ss;
     for(const PropertyConstraint& pc : list)
     {
@@ -64,7 +67,8 @@ std::string PropertyConstraint::toString(const PropertyConstraint::List& list, s
     return ss.str();
 }
 
-std::string PropertyConstraint::toString(const PropertyConstraint::Set& set, size_t indent)
+std::string PropertyConstraint::toString(const PropertyConstraint::Set& set,
+                                         size_t indent)
 {
     PropertyConstraint::List list(set.begin(), set.end());
     return toString(list, indent);
@@ -72,8 +76,8 @@ std::string PropertyConstraint::toString(const PropertyConstraint::Set& set, siz
 
 bool PropertyConstraint::operator==(const PropertyConstraint& other) const
 {
-    return other.mType == mType && other.mDataProperty == mDataProperty && other.mValue == mValue
-        && other.mRValProperty == mRValProperty;
+    return other.mType == mType && other.mDataProperty == mDataProperty &&
+           other.mValue == mValue && other.mRValProperty == mRValProperty;
 }
 
 bool PropertyConstraint::operator<(const PropertyConstraint& other) const
@@ -96,7 +100,8 @@ bool PropertyConstraint::operator<(const PropertyConstraint& other) const
             if(mRValProperty < other.mRValProperty)
             {
                 return true;
-            } else {
+            } else
+            {
                 return mValue < other.mValue;
             }
         }
@@ -104,12 +109,13 @@ bool PropertyConstraint::operator<(const PropertyConstraint& other) const
     return false;
 }
 
-PropertyConstraint::Clusters PropertyConstraint::getClusters(const PropertyConstraint::Set& constraints)
+PropertyConstraint::Clusters
+PropertyConstraint::getClusters(const PropertyConstraint::Set& constraints)
 {
     std::map<owlapi::model::IRI, PropertyConstraint::Set> clustered;
     for(const PropertyConstraint& constraint : constraints)
     {
-        clustered[constraint.getProperty()].insert( constraint );
+        clustered[constraint.getProperty()].insert(constraint);
     }
     return clustered;
 }

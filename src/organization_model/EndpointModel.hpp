@@ -16,7 +16,8 @@ class EndpointModel
 
 public:
     EndpointModel();
-    EndpointModel(const owlapi::model::IRI& actorModel, const owlapi::model::IRI& interfaceRole);
+    EndpointModel(const owlapi::model::IRI& actorModel,
+                  const owlapi::model::IRI& interfaceRole);
 
     bool operator<(const EndpointModel& other) const;
 
@@ -28,4 +29,3 @@ public:
 } // end namespace moreorg
 } // end namespace moreorg
 #endif // ORGANIZATION_MODEL_ORGANIZATION_MODEL_ENDPOINT_MODEL_HPP
-

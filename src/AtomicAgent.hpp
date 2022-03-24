@@ -1,12 +1,12 @@
 #ifndef ORGANIZATION_MODEL_AGENT_INSTANCE_HPP
 #define ORGANIZATION_MODEL_AGENT_INSTANCE_HPP
 
-#include <owlapi/model/IRI.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/set.hpp>
 #include "ModelPool.hpp"
 #include "facades/Robot.hpp"
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/set.hpp>
+#include <owlapi/model/IRI.hpp>
 
 namespace moreorg {
 
@@ -26,10 +26,11 @@ class AtomicAgent
     size_t mId;
     /// Name of the instance derived from model IRI and id
     std::string mName;
+
 public:
     using List = std::vector<AtomicAgent>;
     using Set = std::set<AtomicAgent>;
-    using TypeMap = std::map<owlapi::model::IRI, std::set<AtomicAgent> >;
+    using TypeMap = std::map<owlapi::model::IRI, std::set<AtomicAgent>>;
 
     /**
      * Default constructor to allow usage in lists and maps
@@ -39,13 +40,13 @@ public:
     /**
      * Preferred role constructor
      * \param name Name/Id of the role
-     * \param model Model identification id, which needs to be unique for all atomic
-     * agents of the same model
+     * \param model Model identification id, which needs to be unique for all
+     * atomic agents of the same model
      */
     AtomicAgent(size_t id, const owlapi::model::IRI& model);
 
     const owlapi::model::IRI& getModel() const { return mModel; }
-    size_t getId() const  { return mId; }
+    size_t getId() const { return mId; }
     const std::string& getName() const { return mName; }
 
     std::string toString() const;
@@ -65,31 +66,43 @@ public:
      * Compute the cardinality of an agent model inside a given list of agents
      * \return cardinality
      */
-    static size_t getCardinality(const List& agents, const owlapi::model::IRI& agentModel) { return getModelPool(agents)[agentModel]; }
+    static size_t getCardinality(const List& agents,
+                                 const owlapi::model::IRI& agentModel)
+    {
+        return getModelPool(agents)[agentModel];
+    }
 
     /**
      * Get the intersection of two atomic agent sets
      * \return The set of agent which are shared between two sets of atomic
      * agents
      */
-    static AtomicAgent::List getIntersection(const AtomicAgent::Set& a0, const AtomicAgent::Set& a1);
+    static AtomicAgent::List getIntersection(const AtomicAgent::Set& a0,
+                                             const AtomicAgent::Set& a1);
 
     /**
      * Get the difference set between to atomic agent sets
      * \return different set
      */
-    static AtomicAgent::List getDifference(const AtomicAgent::Set& a0, const AtomicAgent::Set& a1);
+    static AtomicAgent::List getDifference(const AtomicAgent::Set& a0,
+                                           const AtomicAgent::Set& a1);
 
     bool operator<(const AtomicAgent& other) const;
-    bool operator==(const AtomicAgent& other) const { return mModel == other.mModel && mId == other.mId; }
-    bool operator!=(const AtomicAgent& other) const { return ! (*this == other); }
-
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    bool operator==(const AtomicAgent& other) const
     {
-        ar & mModel;
-        ar & mId;
-        ar & mName;
+        return mModel == other.mModel && mId == other.mId;
+    }
+    bool operator!=(const AtomicAgent& other) const
+    {
+        return !(*this == other);
+    }
+
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        ar& mModel;
+        ar& mId;
+        ar& mName;
     }
 
     /**

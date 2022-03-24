@@ -11,8 +11,7 @@ public:
     Sample(const base::Position& fromLocation,
            const base::Position& toLocation,
            size_t fromTime,
-           size_t toTime
-    );
+           size_t toTime);
 
     virtual ~Sample();
 
@@ -28,10 +27,16 @@ public:
      * \return true if \p time lies in the interval of getFromTime and
      * getToTime
      */
-    bool matchesTime(size_t time) const { return time >= mFromTime && time <= mToTime; }
+    bool matchesTime(size_t time) const
+    {
+        return time >= mFromTime && time <= mToTime;
+    }
 
-    bool sameLocation(const Sample& other) const { return mFromLocation == other.mFromLocation &&
-        mToLocation == other.mToLocation; }
+    bool sameLocation(const Sample& other) const
+    {
+        return mFromLocation == other.mFromLocation &&
+               mToLocation == other.mToLocation;
+    }
 
 protected:
     base::Position mFromLocation;
@@ -40,5 +45,5 @@ protected:
     size_t mToTime;
 };
 
-};
+};     // namespace moreorg
 #endif // ORGANIZATION_MODEL_SAMPLE_HPP

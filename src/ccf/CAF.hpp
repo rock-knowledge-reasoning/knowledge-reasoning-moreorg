@@ -1,11 +1,11 @@
 #ifndef MULTIAGENT_COMBINED_ACTOR_HPP
 #define MULTIAGENT_COMBINED_ACTOR_HPP
 
-#include <set>
-#include <vector>
 #include <map>
 #include <moreorg/ccf/Link.hpp>
 #include <moreorg/ccf/LinkGroup.hpp>
+#include <set>
+#include <vector>
 
 namespace multiagent {
 namespace ccf {
@@ -13,14 +13,15 @@ namespace ccf {
 class CombinedActor
 {
 
-    friend std::ostream& operator<<(std::ostream& os, const CombinedActor& actor);
+    friend std::ostream& operator<<(std::ostream& os,
+                                    const CombinedActor& actor);
 
 protected:
     std::set<Link> mLinks;
 
-    typedef std::map<LinkGroup, std::set<Link> > LinkGroupMap;
+    typedef std::map<LinkGroup, std::set<Link>> LinkGroupMap;
     LinkGroupMap* mLinkGroupMap;
-    typedef std::map<Interface, std::set<Link> > InterfaceLinkMap;
+    typedef std::map<Interface, std::set<Link>> InterfaceLinkMap;
     InterfaceLinkMap* mInterfaceLinkMap;
 
     std::set<LinkGroup> mBlackListLinkGroup;
@@ -32,22 +33,31 @@ protected:
 public:
     CombinedActor();
 
-    CombinedActor(const Link& link, const std::set<LinkGroup>& linkGroups, LinkGroupMap* linkGroupMap, InterfaceLinkMap* interfaceLinkMap);
+    CombinedActor(const Link& link,
+                  const std::set<LinkGroup>& linkGroups,
+                  LinkGroupMap* linkGroupMap,
+                  InterfaceLinkMap* interfaceLinkMap);
 
     void addLink(const Link& link);
     bool operator<(const CombinedActor& other) const;
 
     /**
-     * Return a set of probably valid links -- does not remove the blacklist here, but
-     * when trying to add the link
+     * Return a set of probably valid links -- does not remove the blacklist
+     * here, but when trying to add the link
      */
     std::set<Link> getWhitelistLinks() const;
     void blacklist(const Link& link);
 
-    std::set<LinkGroup> getWhiteListLinkGroup() const { return mWhiteListLinkGroup; } 
-    std::set<Interface> getWhiteListInterface() const { return mWhiteListInterface; }
+    std::set<LinkGroup> getWhiteListLinkGroup() const
+    {
+        return mWhiteListLinkGroup;
+    }
+    std::set<Interface> getWhiteListInterface() const
+    {
+        return mWhiteListInterface;
+    }
 
-    std::set<Link> getLinks() const { return mLinks; } 
+    std::set<Link> getLinks() const { return mLinks; }
 };
 
 std::ostream& operator<<(std::ostream& os, const CombinedActor& actor);

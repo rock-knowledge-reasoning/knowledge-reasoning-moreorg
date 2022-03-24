@@ -9,17 +9,17 @@ namespace policies {
 class AgentSizeBasedSelection : public SelectionPolicy
 {
 public:
-    AgentSizeBasedSelection(const owlapi::model::IRI& comparisonRelation, size_t value);
+    AgentSizeBasedSelection(const owlapi::model::IRI& comparisonRelation,
+                            size_t value);
 
     virtual ~AgentSizeBasedSelection() = default;
 
     Selection apply(const Selection& agent,
-            const OrganizationModelAsk& ask) const override;
+                    const OrganizationModelAsk& ask) const override;
 
 protected:
     owlapi::model::IRI mOperator;
     size_t mValue;
-
 };
 
 } // end namespace policies

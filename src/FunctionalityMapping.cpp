@@ -1,20 +1,20 @@
 #include "FunctionalityMapping.hpp"
-#include <sstream>
 #include <algorithm>
-#include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
+#include <fstream>
+#include <sstream>
 
 #include "Algebra.hpp"
 
 namespace moreorg {
 
-FunctionalityMapping::FunctionalityMapping()
-{}
+FunctionalityMapping::FunctionalityMapping() {}
 
-FunctionalityMapping::FunctionalityMapping(const ModelPool& modelPool,
-        const owlapi::model::IRIList& functionalities,
-        const ModelPool& functionalSaturationBound)
+FunctionalityMapping::FunctionalityMapping(
+    const ModelPool& modelPool,
+    const owlapi::model::IRIList& functionalities,
+    const ModelPool& functionalSaturationBound)
     : mModelPool(modelPool)
     , mFunctionalities(functionalities)
     , mFunctionalSaturationBound(functionalSaturationBound)
@@ -27,19 +27,24 @@ FunctionalityMapping::FunctionalityMapping(const ModelPool& modelPool,
     }
 }
 
-const ModelPool::Set& FunctionalityMapping::getModelPools(const owlapi::model::IRI& iri) const
+const ModelPool::Set&
+FunctionalityMapping::getModelPools(const owlapi::model::IRI& iri) const
 {
     Function2PoolMap::const_iterator cit = mFunction2Pool.find(iri);
     if(cit != mFunction2Pool.end())
     {
         return cit->second;
-    } else {
-        throw std::invalid_argument("moreorg::FunctionalityMapping::getModelPools: could not find"
-                " model pools with function: " + iri.toString());
+    } else
+    {
+        throw std::invalid_argument(
+            "moreorg::FunctionalityMapping::getModelPools: could not find"
+            " model pools with function: " +
+            iri.toString());
     }
 }
 
-owlapi::model::IRIList FunctionalityMapping::getFunctionalities(const ModelPool& pool) const
+owlapi::model::IRIList
+FunctionalityMapping::getFunctionalities(const ModelPool& pool) const
 {
     owlapi::model::IRIList functions;
     for(const Function2PoolMap::value_type& p : mFunction2Pool)
@@ -62,7 +67,8 @@ owlapi::model::IRIList FunctionalityMapping::getFunctionalities(const ModelPool&
     return functions;
 }
 
-void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRI& function)
+void FunctionalityMapping::add(const ModelPool& modelPool,
+                               const owlapi::model::IRI& function)
 {
     if(!modelPool.empty())
     {
@@ -72,7 +78,8 @@ void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::
     }
 }
 
-void FunctionalityMapping::add(const ModelPool& modelPool, const owlapi::model::IRIList& functionModels)
+void FunctionalityMapping::add(const ModelPool& modelPool,
+                               const owlapi::model::IRIList& functionModels)
 {
     using namespace owlapi::model;
     IRIList::const_iterator cit = functionModels.begin();
@@ -107,7 +114,7 @@ FunctionalityMapping FunctionalityMapping::fromFile(const std::string& filename)
             }
 
             boost::char_separator<char> sep(" ");
-            boost::tokenizer< boost::char_separator<char> > tokens(line, sep);
+            boost::tokenizer<boost::char_separator<char>> tokens(line, sep);
             std::vector<std::string> columns(tokens.begin(), tokens.end());
             if(columns.size() == 2)
             {
@@ -118,11 +125,15 @@ FunctionalityMapping FunctionalityMapping::fromFile(const std::string& filename)
             } else if(columns.size() == 1)
             {
                 IRI functionalityModel = IRI(columns.at(0));
-                functionalityMapping.mFunctionalities.push_back(functionalityModel);
-                Function2PoolMap::const_iterator cit = functionalityMapping.mFunction2Pool.find(functionalityModel);
+                functionalityMapping.mFunctionalities.push_back(
+                    functionalityModel);
+                Function2PoolMap::const_iterator cit =
+                    functionalityMapping.mFunction2Pool.find(
+                        functionalityModel);
                 if(cit == functionalityMapping.mFunction2Pool.end())
                 {
-                    functionalityMapping.mFunction2Pool[functionalityModel] = ModelPool::Set();
+                    functionalityMapping.mFunction2Pool[functionalityModel] =
+                        ModelPool::Set();
                 }
             } else
             {
@@ -148,7 +159,7 @@ FunctionalityMapping FunctionalityMapping::fromFile(const std::string& filename)
             }
 
             boost::char_separator<char> sep(" ");
-            boost::tokenizer< boost::char_separator<char> > tokens(line, sep);
+            boost::tokenizer<boost::char_separator<char>> tokens(line, sep);
             std::vector<std::string> columns(tokens.begin(), tokens.end());
             if(columns.size() == 2)
             {
@@ -211,9 +222,10 @@ void FunctionalityMapping::save(const std::string& filename) const
             mappingFile << "# AGENTS (MODEL POOLS)" << std::endl;
             for(const ModelPool& pool : m.second)
             {
-                for(const std::pair<IRI,size_t>& resource : pool)
+                for(const std::pair<IRI, size_t>& resource : pool)
                 {
-                    mappingFile << resource.first.toString() << " " << resource.second << std::endl;
+                    mappingFile << resource.first.toString() << " "
+                                << resource.second << std::endl;
                 }
                 mappingFile << std::endl;
             }
@@ -223,11 +235,10 @@ void FunctionalityMapping::save(const std::string& filename) const
     }
 }
 
-
 std::string FunctionalityMapping::toString(uint32_t indent) const
 {
     std::stringstream ss;
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     ss << hspace << "FunctionalityMapping:" << std::endl;
     ss << mModelPool.toString(indent) << std::endl;
     ss << hspace << "FunctionalSaturationBound -- ";
@@ -238,7 +249,8 @@ std::string FunctionalityMapping::toString(uint32_t indent) const
         ss << hspace << "Function --> Pool:" << std::endl;
         for(; cit != mFunction2Pool.end(); ++cit)
         {
-            ss << hspace << "   - function: " << cit->first.toString() << std::endl;
+            ss << hspace << "   - function: " << cit->first.toString()
+               << std::endl;
             ss << hspace << "     pools: " << std::endl;
 
             const ModelPool::Set& modelPoolSet = cit->second;

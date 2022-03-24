@@ -1,14 +1,14 @@
 #ifndef ORGANIZATION_MODEL_PROPERTY_CONSTRAINTS_HPP
 #define ORGANIZATION_MODEL_PROPERTY_CONSTRAINTS_HPP
 
-#include <vector>
-#include <set>
 #include <map>
 #include <owlapi/model/IRI.hpp>
+#include <set>
+#include <vector>
 
 namespace moreorg {
 namespace facades {
-    class Robot;
+class Robot;
 }
 
 /**
@@ -56,8 +56,9 @@ public:
      * \param c constraint/relation type
      * \param value Constraining value
      */
-    PropertyConstraint(const owlapi::model::IRI& dataProperty, ConstraintType c,
-            double value);
+    PropertyConstraint(const owlapi::model::IRI& dataProperty,
+                       ConstraintType c,
+                       double value);
 
     /**
      * Standard constructor for a property constraint
@@ -65,8 +66,9 @@ public:
      * \param c constraint/relation type
      * \param rvalDataProperty Reference to constraining data property
      */
-    PropertyConstraint(const owlapi::model::IRI& dataProperty, ConstraintType c,
-            const owlapi::model::IRI& rvalDataProperty);
+    PropertyConstraint(const owlapi::model::IRI& dataProperty,
+                       ConstraintType c,
+                       const owlapi::model::IRI& rvalDataProperty);
 
     /**
      * Get the constraint type
@@ -87,7 +89,8 @@ public:
     double getValue() const { return mValue; }
 
     /**
-     * Dynamically retrieve a valueProperty with respect to a robot (maybe composite system);
+     * Dynamically retrieve a valueProperty with respect to a robot (maybe
+     * composite system);
      */
     double getReferenceValue(const facades::Robot& robot) const;
 
@@ -101,13 +104,15 @@ public:
      * Stringify list of objects
      * \return string representing list of property constraints
      */
-    static std::string toString(const PropertyConstraint::List& list, size_t indent);
+    static std::string toString(const PropertyConstraint::List& list,
+                                size_t indent);
 
     /**
      * Stringify list of objects
      * \return string representing set of property constraints
      */
-    static std::string toString(const PropertyConstraint::Set& set, size_t indent);
+    static std::string toString(const PropertyConstraint::Set& set,
+                                size_t indent);
 
     /**
      * Cluster the set of constraints, based on the referred property

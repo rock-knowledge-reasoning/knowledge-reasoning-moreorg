@@ -7,7 +7,9 @@
 namespace moreorg {
 namespace moreorg {
 
-typedef std::map<owlapi::model::OWLRestriction::Ptr, std::vector<owlapi::model::IRI> > RequirementsGrounding;
+typedef std::map<owlapi::model::OWLRestriction::Ptr,
+                 std::vector<owlapi::model::IRI>>
+    RequirementsGrounding;
 
 /**
  * Grounding allows to map a requirement / restriction to a given set of
@@ -21,7 +23,10 @@ class Grounding
 public:
     Grounding(const RequirementsGrounding& grounding);
 
-    const RequirementsGrounding& getRequirementsGrounding() { return mRequirementToResourceMap; }
+    const RequirementsGrounding& getRequirementsGrounding()
+    {
+        return mRequirementToResourceMap;
+    }
 
     /**
      * Check if grounding is complete
@@ -31,7 +36,8 @@ public:
     /**
      * Check if IRIList contains ungrounded elements
      */
-    bool isComplete(const std::vector<owlapi::model::IRI>& partialGrounding) const;
+    bool
+    isComplete(const std::vector<owlapi::model::IRI>& partialGrounding) const;
 
     /**
      * Provide the open ungrounded requirements
@@ -50,7 +56,6 @@ public:
      * \return Stringified Grounding object
      */
     std::string toString() const;
-
 };
 
 } // end namespace moreorg

@@ -4,11 +4,11 @@ namespace moreorg {
 namespace activity {
 
 std::map<Type, std::string> TypeTxt = {
-    { UNKNOWN, "unknown"},
-    { TRANSPORT, "transport" },
-    { RECONFIGURATION, "reconfiguration" },
-    { IDLE, "idle" },
-    { BUSY, "busy" },
+    {UNKNOWN, "unknown"},
+    {TRANSPORT, "transport"},
+    {RECONFIGURATION, "reconfiguration"},
+    {IDLE, "idle"},
+    {BUSY, "busy"},
 };
 
 } // end namespace activity

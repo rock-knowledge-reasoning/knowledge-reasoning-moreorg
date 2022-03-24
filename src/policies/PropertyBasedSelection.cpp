@@ -1,7 +1,7 @@
 #include "PropertyBasedSelection.hpp"
+#include "../algebra/CompositionFunction.hpp"
 #include "../facades/Robot.hpp"
 #include "../vocabularies/OM.hpp"
-#include "../algebra/CompositionFunction.hpp"
 #include <base-logging/Logging.hpp>
 
 using namespace owlapi::model;
@@ -10,16 +10,17 @@ namespace moreorg {
 namespace policies {
 
 PropertyBasedSelection::PropertyBasedSelection(const IRI& property,
-        const IRI& op)
-    : SelectionPolicy(property.toString() + "_" + op.getFragment() + "_PropertyBasedSelection")
+                                               const IRI& op)
+    : SelectionPolicy(property.toString() + "_" + op.getFragment() +
+                      "_PropertyBasedSelection")
     , mProperty(property)
     , mOperator(op)
 {
 }
 
-policies::Selection PropertyBasedSelection::apply(
-        const policies::Selection& selection,
-        const OrganizationModelAsk& ask) const
+policies::Selection
+PropertyBasedSelection::apply(const policies::Selection& selection,
+                              const OrganizationModelAsk& ask) const
 {
     std::map<Agent, double> values;
 
@@ -30,9 +31,11 @@ policies::Selection PropertyBasedSelection::apply(
         // how to combine a property, e.g., for two or more system contributing
         // to the value
         // TODO: allow to configure composition function
-        values[a] = robot.getCompositeDataPropertyValue(mProperty,
-                    bind(&algebra::CompositionFunction::weightedSum,placeholder::_1,placeholder::_2)
-                );
+        values[a] = robot.getCompositeDataPropertyValue(
+            mProperty,
+            bind(&algebra::CompositionFunction::weightedSum,
+                 placeholder::_1,
+                 placeholder::_2));
     }
 
     if(selection.empty())
@@ -69,7 +72,8 @@ policies::Selection PropertyBasedSelection::apply(
         return Agent::Set({minAgent});
     }
     throw std::runtime_error("moreorg::policies::PropertyBasedSelection::apply"
-            " failed to identify operator '" + mOperator.toString() + "'");
+                             " failed to identify operator '" +
+                             mOperator.toString() + "'");
 }
 
 } // end namespace policies

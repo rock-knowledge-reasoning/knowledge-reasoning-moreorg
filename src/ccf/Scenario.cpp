@@ -1,11 +1,11 @@
 #include "Scenario.hpp"
-#include <numeric/Combinatorics.hpp>
-#include <numeric/LimitedCombination.hpp>
-#include <iostream>
-#include <fstream>
+#include "../ModelPool.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
-#include "../ModelPool.hpp"
+#include <fstream>
+#include <iostream>
+#include <numeric/Combinatorics.hpp>
+#include <numeric/LimitedCombination.hpp>
 
 using namespace numeric;
 
@@ -18,7 +18,6 @@ Scenario::Scenario()
     mInterfaceCompatibilityTypes.push_back('f');
 }
 
-
 Scenario Scenario::fromConsole()
 {
     Scenario scenario;
@@ -28,7 +27,8 @@ Scenario Scenario::fromConsole()
     std::cin >> numberOfActorTypes;
 
     char currentActorType = 'a';
-    std::cout << "Please provide information about the actor types: " << std::endl;
+    std::cout << "Please provide information about the actor types: "
+              << std::endl;
 
     for(size_t i = 0; i < numberOfActorTypes; ++i)
     {
@@ -44,13 +44,13 @@ Scenario Scenario::fromConsole()
         std::cout << "The available number of EMI+ for this type:" << std::endl;
         std::cout << "Male EMI: " << std::endl;
         std::cin >> maleEmiCount;
-        actorDescription.setInterfaceCount('m',maleEmiCount);
+        actorDescription.setInterfaceCount('m', maleEmiCount);
 
         size_t femaleEmiCount;
         std::cout << "The available number of EMI- for this type:" << std::endl;
         std::cout << "Female EMI: " << std::endl;
         std::cin >> femaleEmiCount;
-        actorDescription.setInterfaceCount('f',femaleEmiCount);
+        actorDescription.setInterfaceCount('f', femaleEmiCount);
         scenario.mActorTypes.push_back(currentActorType);
 
         uint8_t localActorId = 0;
@@ -88,18 +88,22 @@ Scenario Scenario::fromFile(const std::string& filename)
             // column is
             // <# of instances> <# of male interfaces> <# of female interfaces>
             boost::char_separator<char> sep(" ");
-            boost::tokenizer< boost::char_separator<char> > tokens(line, sep);
+            boost::tokenizer<boost::char_separator<char>> tokens(line, sep);
 
             std::vector<std::string> columns(tokens.begin(), tokens.end());
             if(columns.size() != 3)
             {
-                std::invalid_argument("moreorg::ccf::Scenario: invalid column: '" + line + "' in spec");
+                std::invalid_argument(
+                    "moreorg::ccf::Scenario: invalid column: '" + line +
+                    "' in spec");
             }
 
-            size_t numberOfInstances = boost::lexical_cast<size_t>(columns.at(0));
-            size_t numberOfMaleInterfaces = boost::lexical_cast<size_t>(columns.at(1));
-            size_t numberOfFemaleInterfaces = boost::lexical_cast<size_t>(columns.at(2));
-
+            size_t numberOfInstances =
+                boost::lexical_cast<size_t>(columns.at(0));
+            size_t numberOfMaleInterfaces =
+                boost::lexical_cast<size_t>(columns.at(1));
+            size_t numberOfFemaleInterfaces =
+                boost::lexical_cast<size_t>(columns.at(2));
 
             ActorDescription actorDescription;
             actorDescription.setInterfaceCount('m', numberOfMaleInterfaces);
@@ -118,8 +122,10 @@ Scenario Scenario::fromFile(const std::string& filename)
             ++actorType;
         }
         specFile.close();
-    } else {
-        throw std::runtime_error("moreorg::ccf::Scenario: failed to load spec from: " + filename );
+    } else
+    {
+        throw std::runtime_error(
+            "moreorg::ccf::Scenario: failed to load spec from: " + filename);
     }
 
     return spec;
@@ -137,17 +143,19 @@ void Scenario::compute(size_t maxCoalitionSize)
 
         LocalInterfaceId localInterfaceId = 0;
 
-
         // Collect all interfaces (actor, localinterface, interface type)
         // Add interfaces per actor
-        std::vector<CompatibilityType>::const_iterator iit = mInterfaceCompatibilityTypes.begin();
+        std::vector<CompatibilityType>::const_iterator iit =
+            mInterfaceCompatibilityTypes.begin();
         for(; iit != mInterfaceCompatibilityTypes.end(); ++iit)
         {
             // Initialize interfaces
             CompatibilityType interfaceType = *iit;
-            for(uint8_t i = 0; i < actorDescription.getInterfaceCount(interfaceType); ++i)
+            for(uint8_t i = 0;
+                i < actorDescription.getInterfaceCount(interfaceType);
+                ++i)
             {
-                Interface interface(actor,localInterfaceId++, interfaceType);
+                Interface interface(actor, localInterfaceId++, interfaceType);
                 mInterfaces.push_back(interface);
             }
         }
@@ -171,16 +179,19 @@ void Scenario::createLinks()
     Combination<Interface> combinations(mInterfaces, 2, numeric::EXACT);
 
     // Compute all invalid and possibly(!) valid links
-    do {
+    do
+    {
         std::vector<Interface> interfaceCombination = combinations.current();
-        Link link(interfaceCombination[0], interfaceCombination[1] );
+        Link link(interfaceCombination[0], interfaceCombination[1]);
         // Same type is not compatible
-        if(interfaceCombination[0].getCompatibilityType() == interfaceCombination[1].getCompatibilityType())
+        if(interfaceCombination[0].getCompatibilityType() ==
+           interfaceCombination[1].getCompatibilityType())
         {
             mInvalidLinks.push_back(link);
             mInvalidLinkTypes.insert(link.getType());
-        } else {
-            links.push_back( link );
+        } else
+        {
+            links.push_back(link);
         }
     } while(combinations.next());
 
@@ -215,11 +226,14 @@ void Scenario::createLinks()
     }
 
     moreorg::ModelPool::Set agentSpaceModelPools;
-    std::set< std::set<Link> > linkSpaceModelPools;
+    std::set<std::set<Link>> linkSpaceModelPools;
 
     int count = 0;
-    numeric::LimitedCombination<char> linkCombinations(mModelPool, mMaxCoalitionSize, numeric::MAX);
-    do {
+    numeric::LimitedCombination<char> linkCombinations(mModelPool,
+                                                       mMaxCoalitionSize,
+                                                       numeric::MAX);
+    do
+    {
         ++count;
         std::vector<char> agentTypes = linkCombinations.current();
         if(agentTypes.size() == 1)
@@ -230,42 +244,57 @@ void Scenario::createLinks()
         // Create a representative actor combination for this type
         std::vector<Actor> actors = mActorList;
         std::vector<Actor> representativeActor;
-        for(char agentType: agentTypes)
+        for(char agentType : agentTypes)
         {
-            std::vector<Actor>::iterator it = std::find_if(actors.begin(), actors.end(), [agentType](const Actor& actor)
-                    {
-                        return actor.getType() == agentType;
-                    });
+            std::vector<Actor>::iterator it =
+                std::find_if(actors.begin(),
+                             actors.end(),
+                             [agentType](const Actor& actor) {
+                                 return actor.getType() == agentType;
+                             });
             representativeActor.push_back(*it);
             actors.erase(it);
         }
 
         // Find all feasible combinations for this type in link space
-     //   std::cout << "Collect: " << count << std::endl;
-        size_t coalitionSize = std::min(mMaxCoalitionSize, representativeActor.size());
-        Combination<Actor> actorCombination(representativeActor, coalitionSize, EXACT);
-        do {
+        //   std::cout << "Collect: " << count << std::endl;
+        size_t coalitionSize =
+            std::min(mMaxCoalitionSize, representativeActor.size());
+        Combination<Actor> actorCombination(representativeActor,
+                                            coalitionSize,
+                                            EXACT);
+        do
+        {
             std::vector<Actor> actors = actorCombination.current();
-    //        std::cout << "Actors: " << actors.size() << std::endl;
-            collectCombinations(actors, actors, std::set<Link>(), agentSpaceModelPools, linkSpaceModelPools);
+            //        std::cout << "Actors: " << actors.size() << std::endl;
+            collectCombinations(actors,
+                                actors,
+                                std::set<Link>(),
+                                agentSpaceModelPools,
+                                linkSpaceModelPools);
         } while(actorCombination.next());
     } while(linkCombinations.next());
 
     mNumberOfActorTypesTheoreticalBound = count;
-    mNumberOfActorTypesAgentSpace = agentSpaceModelPools.size() + mActorTypes.size();
-    mNumberOfActorTypesLinkSpace = linkSpaceModelPools.size() + mActorTypes.size();
+    mNumberOfActorTypesAgentSpace =
+        agentSpaceModelPools.size() + mActorTypes.size();
+    mNumberOfActorTypesLinkSpace =
+        linkSpaceModelPools.size() + mActorTypes.size();
 
     std::cout << "Max: " << mMaxCoalitionSize << std::endl;
-    std::cout << "ModelPool: Agents " << agentSpaceModelPools.size() << std::endl << moreorg::ModelPool::toString(agentSpaceModelPools) << std::endl;
-    //std::cout << "ModelPool: Link " << linkSpaceModelPools << std::endl;
+    std::cout << "ModelPool: Agents " << agentSpaceModelPools.size()
+              << std::endl
+              << moreorg::ModelPool::toString(agentSpaceModelPools)
+              << std::endl;
+    // std::cout << "ModelPool: Link " << linkSpaceModelPools << std::endl;
 }
 
 void Scenario::collectCombinations(
-        const std::vector<Actor>& allowedActors,
-        std::vector<Actor> actors, std::set<Link> links,
-        moreorg::ModelPool::Set& agentSpaceModelPools,
-        std::set< std::set<Link> >& linkSpaceSets
-        )
+    const std::vector<Actor>& allowedActors,
+    std::vector<Actor> actors,
+    std::set<Link> links,
+    moreorg::ModelPool::Set& agentSpaceModelPools,
+    std::set<std::set<Link>>& linkSpaceSets)
 {
     if(actors.size() == 1)
     {
@@ -286,14 +315,15 @@ void Scenario::collectCombinations(
             {
                 std::string id;
                 {
-                    id += (char) actor.getType();
+                    id += (char)actor.getType();
                     agentSpaceAgentType["http://actor-type#" + id] += 1;
                 }
             }
             agentSpaceModelPools.insert(agentSpaceAgentType);
             linkSpaceSets.insert(links);
         }
-    } else {
+    } else
+    {
         std::set<Link> actorLinks = mActorLinkMap[actors.back()];
         std::set<Link> allowedLinks;
         for(const Link& l : actorLinks)
@@ -301,9 +331,11 @@ void Scenario::collectCombinations(
             Actor a0 = l.getFirstActor();
             Actor a1 = l.getSecondActor();
 
-            if( actors.end() != std::find(allowedActors.begin(), allowedActors.end(), a0) )
+            if(actors.end() !=
+               std::find(allowedActors.begin(), allowedActors.end(), a0))
             {
-                if(actors.end() != std::find(allowedActors.begin(), allowedActors.end(), a1))
+                if(actors.end() !=
+                   std::find(allowedActors.begin(), allowedActors.end(), a1))
                 {
                     allowedLinks.insert(l);
                 }
@@ -311,8 +343,8 @@ void Scenario::collectCombinations(
         }
         actors.pop_back();
 
-        //std::cout << "ActorLinks: " << allowedLinks.size() << std::endl;
-        //for(const Link& l : allowedLinks)
+        // std::cout << "ActorLinks: " << allowedLinks.size() << std::endl;
+        // for(const Link& l : allowedLinks)
         //{
         //    std::cout << "    " << l << std::endl;
         //}
@@ -322,7 +354,11 @@ void Scenario::collectCombinations(
             std::set<Link> addedLink = links;
             addedLink.insert(link);
 
-            collectCombinations(allowedActors, actors, addedLink, agentSpaceModelPools, linkSpaceSets);
+            collectCombinations(allowedActors,
+                                actors,
+                                addedLink,
+                                agentSpaceModelPools,
+                                linkSpaceSets);
         }
     }
 }
@@ -375,24 +411,35 @@ std::string Scenario::report() const
 
 std::ostream& operator<<(std::ostream& os, const Scenario& scenario)
 {
-    os << "# actors:                   " << scenario.mActors.size() << std::endl;
-    os << "# max actor combos:         " << scenario.mNumberOfActorCombinations << std::endl;
-    os << "# interfaces:               " << scenario.mInterfaces.size() << std::endl;
-    os << "# valid links:              " << scenario.mValidLinks.size() << std::endl;
-    os << "# invalid links:            " << scenario.mInvalidLinks.size() << std::endl;
-    os << "# valid link combos:        " << scenario.mNumberOfLinkCombinations << std::endl;
-    os << "# valid link types:         " << scenario.mValidLinkTypes.size() << std::endl;
-    os << "# valid agents (agent space)" << scenario.mNumberOfActorTypesAgentSpace << std::endl;
-    os << "# valid agents (link space) " << scenario.mNumberOfActorTypesLinkSpace << std::endl;
+    os << "# actors:                   " << scenario.mActors.size()
+       << std::endl;
+    os << "# max actor combos:         " << scenario.mNumberOfActorCombinations
+       << std::endl;
+    os << "# interfaces:               " << scenario.mInterfaces.size()
+       << std::endl;
+    os << "# valid links:              " << scenario.mValidLinks.size()
+       << std::endl;
+    os << "# invalid links:            " << scenario.mInvalidLinks.size()
+       << std::endl;
+    os << "# valid link combos:        " << scenario.mNumberOfLinkCombinations
+       << std::endl;
+    os << "# valid link types:         " << scenario.mValidLinkTypes.size()
+       << std::endl;
+    os << "# valid agents (agent space)"
+       << scenario.mNumberOfActorTypesAgentSpace << std::endl;
+    os << "# valid agents (link space) "
+       << scenario.mNumberOfActorTypesLinkSpace << std::endl;
 
-    std::map<LinkType, size_t>::const_iterator cit = scenario.mValidLinkTypes.begin();
+    std::map<LinkType, size_t>::const_iterator cit =
+        scenario.mValidLinkTypes.begin();
     for(; cit != scenario.mValidLinkTypes.end(); ++cit)
     {
         os << "    " << cit->first << " -- " << cit->second << std::endl;
     }
-    os << "# invalid link types: " << scenario.mInvalidLinkTypes.size() << std::endl;
+    os << "# invalid link types: " << scenario.mInvalidLinkTypes.size()
+       << std::endl;
     return os;
 }
 
-} // end namespace caf
+} // namespace ccf
 } // end namespace multiagent

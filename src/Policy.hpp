@@ -6,10 +6,12 @@
 namespace moreorg {
 
 /**
- * Policy class permits to encapsulate and apply distribution and selection rules
+ * Policy class permits to encapsulate and apply distribution and selection
+ * rules
  *
- * \see SelectionPolicy: permits to pick one of more atomic agents, that fulfill a subsystem critera
- * \see DistributionPolicy: compute a shared for each atomic agent forming the general agent
+ * \see SelectionPolicy: permits to pick one of more atomic agents, that fulfill
+ * a subsystem critera \see DistributionPolicy: compute a shared for each atomic
+ * agent forming the general agent
  */
 class Policy
 {
@@ -25,14 +27,13 @@ public:
 
     virtual const owlapi::model::IRI& getIRI() const { return mIRI; }
 
-    std::map<owlapi::model::IRI, double> computeSharesByType(const
-            owlapi::model::IRI& property,
-            const ModelPool& pool,
-            const OrganizationModelAsk& ask
-            ) const;
+    std::map<owlapi::model::IRI, double>
+    computeSharesByType(const owlapi::model::IRI& property,
+                        const ModelPool& pool,
+                        const OrganizationModelAsk& ask) const;
 
     static Policy::Ptr getInstance(const owlapi::model::IRI& policyName,
-            const OrganizationModelAsk& ask);
+                                   const OrganizationModelAsk& ask);
 
 protected:
     owlapi::model::IRI mIRI;

@@ -1,15 +1,15 @@
 #ifndef ORGANIZATION_MODEL_FUNCTIONALITY_MAPPING_HPP
 #define ORGANIZATION_MODEL_FUNCTIONALITY_MAPPING_HPP
 
-#include <set>
 #include "ModelPool.hpp"
+#include <set>
 
 namespace moreorg {
 
 /// Maps a 'combined system' to the functionality it can 'theoretically'
 /// provide when looking at its resources
 typedef std::map<ModelPool, owlapi::model::IRIList> Pool2FunctionMap;
-typedef std::map<owlapi::model::IRI, ModelPool::Set > Function2PoolMap;
+typedef std::map<owlapi::model::IRI, ModelPool::Set> Function2PoolMap;
 
 /**
  * \class FunctionalityMapping
@@ -28,7 +28,7 @@ class FunctionalityMapping
     owlapi::model::IRISet mSupportedFunctionalities;
 
     /// The global functional saturation bound (for all known/considered
-    //functionalities))
+    // functionalities))
     ModelPool mFunctionalSaturationBound;
 
     /// Cache to map from a function to supported ModelPools
@@ -49,15 +49,16 @@ public:
      * should be taken into account
      */
     FunctionalityMapping(const ModelPool& modelPool,
-        const owlapi::model::IRIList& functionalities,
-        const ModelPool& functionalSaturationBound);
+                         const owlapi::model::IRIList& functionalities,
+                         const ModelPool& functionalSaturationBound);
 
     /**
      * Get the list of ModelPools that support a given function
      * \param functionModel IRI of the function model
      * \return set of ModelPool that support the function
      */
-    const ModelPool::Set& getModelPools(const owlapi::model::IRI& functionModel) const;
+    const ModelPool::Set&
+    getModelPools(const owlapi::model::IRI& functionModel) const;
 
     /**
      * Get set of supported functionalities for a given model pool
@@ -77,17 +78,26 @@ public:
     /**
      * Get the model pools which are considered in the functionality mapping
      */
-    const ModelPool::Set& getActiveModelPools() const { return mActiveModelPools; }
+    const ModelPool::Set& getActiveModelPools() const
+    {
+        return mActiveModelPools;
+    }
 
     /**
      * Set the general functional saturation bound
      */
-    void setFunctionalSaturationBound(const ModelPool& bounds) { mFunctionalSaturationBound = bounds; }
+    void setFunctionalSaturationBound(const ModelPool& bounds)
+    {
+        mFunctionalSaturationBound = bounds;
+    }
 
     /**
      * Retrieve the general functional saturation bound
      */
-    const ModelPool& getFunctionalSaturationBound() const { return mFunctionalSaturationBound; }
+    const ModelPool& getFunctionalSaturationBound() const
+    {
+        return mFunctionalSaturationBound;
+    }
 
     /**
      * Retrieve the cache / lookup table
@@ -99,14 +109,16 @@ public:
      * \param modelPool ModelPool that support the function
      * \param function Model of the supported function
      */
-    void add(const ModelPool& modelPool, const owlapi::model::IRI& functionModel);
+    void add(const ModelPool& modelPool,
+             const owlapi::model::IRI& functionModel);
 
     /**
      * Add a list of supported function models for a model pool
      * \param modelPool ModelPool that support the function
      * \param functionModels Models of the supported functions
      */
-    void add(const ModelPool& modelPool, const owlapi::model::IRIList& functionModels);
+    void add(const ModelPool& modelPool,
+             const owlapi::model::IRIList& functionModels);
 
     /**
      * Stringify object
@@ -120,7 +132,10 @@ public:
      * when at least some combination of models supports this functionality
      * \return list of supported functionalities
      */
-    owlapi::model::IRISet getSupportedFunctionalities() const { return mSupportedFunctionalities; }
+    owlapi::model::IRISet getSupportedFunctionalities() const
+    {
+        return mSupportedFunctionalities;
+    }
 
     /**
      * Save the current functionality mapping to a file with given name

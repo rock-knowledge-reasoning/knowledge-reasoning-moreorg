@@ -1,9 +1,9 @@
 #ifndef ORGANIZATION_MODEL_HEURISTICS_HPP
 #define ORGANIZATION_MODEL_HEURISTICS_HPP
-#include <base/Pose.hpp>
 #include "Agent.hpp"
 #include "OrganizationModelAsk.hpp"
 #include "StatusSample.hpp"
+#include <base/Pose.hpp>
 
 namespace moreorg {
 
@@ -33,9 +33,9 @@ public:
      * \return estimated position
      */
     base::Position positionLinear(const Agent& agent,
-            const base::Position& from,
-            const base::Position& to,
-            size_t progressedTime) const;
+                                  const base::Position& from,
+                                  const base::Position& to,
+                                  size_t progressedTime) const;
 
     /**
      * Time estimate for the required travel of agent \p agent from
@@ -46,8 +46,8 @@ public:
      * \return estimated travel time
      */
     double travelTime(const Agent& agent,
-        const base::Position& from,
-        const base::Position& to) const;
+                      const base::Position& from,
+                      const base::Position& to) const;
 
     double travelTime(const StatusSample* sample) const;
 
@@ -61,9 +61,9 @@ public:
      * \return estimated wait time
      */
     double waitTime(const Agent& agent,
-        const base::Position& from,
-        const base::Position& to,
-        size_t availableTime) const;
+                    const base::Position& from,
+                    const base::Position& to,
+                    size_t availableTime) const;
 
     /**
      * Estimate the wait time for a given sample
@@ -83,9 +83,9 @@ public:
      * \return reduction
      */
     double getEnergyReductionAbsolute(const StatusSample* sample,
-            const AtomicAgent& agent,
-            size_t fromTime,
-            size_t toTime) const;
+                                      const AtomicAgent& agent,
+                                      size_t fromTime,
+                                      size_t toTime) const;
 
     /**
      * Compute the reconfiguration cost from a set of agents to another set of
@@ -96,11 +96,11 @@ public:
      *
      * \see getReconfigurationCost
      */
-    double getReconfigurationCost(const Agent::Set& from,
-            const Agent::Set& to,
-            double cooperationTimeInS = 600,
-            double transferTimePerAtomicAgentInS = 180
-            ) const;
+    double
+    getReconfigurationCost(const Agent::Set& from,
+                           const Agent::Set& to,
+                           double cooperationTimeInS = 600,
+                           double transferTimePerAtomicAgentInS = 180) const;
 
     /**
      * Compute the reconfiguration to form a particular target agent from a set
@@ -116,11 +116,12 @@ public:
      * atomic agent in seconds
      * agents
      */
-    double getReconfigurationCost(const Agent& target,
-            const std::map<Agent, AtomicAgent::List>& origins,
-            double cooperationTimeInS = 600,
-            double transferTimePerAtomicAgentInS = 180)
-        const;
+    double
+    getReconfigurationCost(const Agent& target,
+                           const std::map<Agent, AtomicAgent::List>& origins,
+                           double cooperationTimeInS = 600,
+                           double transferTimePerAtomicAgentInS = 180) const;
+
 private:
     OrganizationModelAsk mAsk;
 

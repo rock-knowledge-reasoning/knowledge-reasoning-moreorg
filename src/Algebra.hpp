@@ -12,12 +12,17 @@ public:
     /**
      * Compute delta as b - a
      */
-    static ModelPoolDelta delta(const ModelPoolDelta& a, const ModelPoolDelta& b) { return substract(a,b); }
+    static ModelPoolDelta delta(const ModelPoolDelta& a,
+                                const ModelPoolDelta& b)
+    {
+        return substract(a, b);
+    }
 
     /**
      * Substract a from b, i.e. b-a
      */
-    static ModelPoolDelta substract(const ModelPoolDelta& a, const ModelPoolDelta& b);
+    static ModelPoolDelta substract(const ModelPoolDelta& a,
+                                    const ModelPoolDelta& b);
     static ModelPoolDelta sum(const ModelPoolDelta& a, const ModelPoolDelta& b);
     /**
      * Merge two systems, i.e. when they are identical M o M = M, M o N = M+N
@@ -48,7 +53,8 @@ public:
      */
     static ModelPool min(const ModelPool::List& modelPoolList);
 
-    static ModelPool merge(const ModelCombinationSet& a, const ModelCombination& b);
+    static ModelPool merge(const ModelCombinationSet& a,
+                           const ModelCombination& b);
 
     static ModelPool merge(const std::set<ModelPool>& modelPoolSet);
 
@@ -64,7 +70,8 @@ public:
      *
      * a [max] b = {(0,1),(1,2),(2,0)}
      */
-    static ModelPool::Set maxCompositions(const ModelPool& a, const ModelPool& b);
+    static ModelPool::Set maxCompositions(const ModelPool& a,
+                                          const ModelPool& b);
 
     /**
      * Apply cartesian product like
@@ -78,7 +85,8 @@ public:
      *
      * a [max] b = { {(0,3),(1,1),(2,0)}, {(0,3),(1,2),(2,0)} }
      */
-    static ModelPool::Set maxCompositions(const ModelPool::Set& a, const ModelPool::Set& b);
+    static ModelPool::Set maxCompositions(const ModelPool::Set& a,
+                                          const ModelPool::Set& b);
 
     /**
      * Test if a is a subset of b, i.e., a equal b or b includes a.

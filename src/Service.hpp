@@ -1,9 +1,9 @@
 #ifndef ORGANIZATION_MODEL_SERVICE_HPP
 #define ORGANIZATION_MODEL_SERVICE_HPP
 
+#include <owlapi/model/IRI.hpp>
 #include <set>
 #include <vector>
-#include <owlapi/model/IRI.hpp>
 
 namespace moreorg {
 
@@ -16,7 +16,8 @@ public:
 
     Service(const owlapi::model::IRI& model)
         : mModel(model)
-    {}
+    {
+    }
 
     const owlapi::model::IRI& getModel() const { return mModel; }
 

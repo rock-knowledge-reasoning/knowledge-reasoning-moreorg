@@ -1,8 +1,8 @@
 #ifndef MULTIAGENT_CCF_LINK_HPP
 #define MULTIAGENT_CCF_LINK_HPP
 
-#include <vector>
 #include <set>
+#include <vector>
 
 #include <moreorg/ccf/Actor.hpp>
 #include <moreorg/ccf/Interface.hpp>
@@ -23,11 +23,11 @@ public:
     Link();
 
     Link(Interface first, Interface second);
-    Actor getFirstActor() const   { return mFirst.getActor(); }
-    Actor getSecondActor() const  { return mSecond.getActor(); }
+    Actor getFirstActor() const { return mFirst.getActor(); }
+    Actor getSecondActor() const { return mSecond.getActor(); }
 
     Interface getFirstInterface() const { return mFirst; }
-    Interface getSecondInterface() const  { return mSecond; }
+    Interface getSecondInterface() const { return mSecond; }
 
     LinkGroup getGroup() const;
     LinkType getType() const;
@@ -38,7 +38,8 @@ public:
 std::ostream& operator<<(std::ostream& os, const Link& link);
 std::ostream& operator<<(std::ostream& os, const std::vector<Link>& links);
 std::ostream& operator<<(std::ostream& os, const std::set<Link>& links);
-std::ostream& operator<<(std::ostream& os, const std::set< std::set<Link> >& links);
+std::ostream& operator<<(std::ostream& os,
+                         const std::set<std::set<Link>>& links);
 
 } // end namespace ccf
 } // end namespace multiagent

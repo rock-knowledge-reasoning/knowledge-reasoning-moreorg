@@ -1,16 +1,16 @@
 #ifndef ORGANIZATION_MODEL_FACADES_ROBOT_HPP
 #define ORGANIZATION_MODEL_FACADES_ROBOT_HPP
 
-#include "Facade.hpp"
-#include "../algebra/CompositionFunction.hpp"
 #include "../Policy.hpp"
+#include "../algebra/CompositionFunction.hpp"
+#include "Facade.hpp"
 
 namespace moreorg {
-    class Agent;
+class Agent;
 namespace policies {
-    struct Distribution;
+struct Distribution;
 }
-}
+} // namespace moreorg
 
 namespace moreorg {
 namespace facades {
@@ -22,12 +22,11 @@ namespace facades {
 class Robot : public Facade
 {
 public:
-
     static const Robot& getInstance(const owlapi::model::IRI& actorModel,
-            const OrganizationModelAsk& ask);
+                                    const OrganizationModelAsk& ask);
 
     static const Robot& getInstance(const ModelPool& modelPool,
-            const OrganizationModelAsk& ask);
+                                    const OrganizationModelAsk& ask);
 
     /**
      * Constructor to allow usage in maps
@@ -37,12 +36,14 @@ public:
     /**
      * Facade constructor for an atomic system
      */
-    Robot(const owlapi::model::IRI& actorModel, const OrganizationModelAsk& organizationModelAsk);
+    Robot(const owlapi::model::IRI& actorModel,
+          const OrganizationModelAsk& organizationModelAsk);
 
     /**
      * Facade constructor for a composite system
      */
-    Robot(const ModelPool& modelPool, const OrganizationModelAsk& organizationModelAsk);
+    Robot(const ModelPool& modelPool,
+          const OrganizationModelAsk& organizationModelAsk);
 
     /**
      * Get the model pool behind the robot facade
@@ -130,7 +131,10 @@ public:
      * 1 Watt = 1 kg m3/s3
      *
      */
-    double getNominalPowerConsumption() const { return mNominalPowerConsumption; }
+    double getNominalPowerConsumption() const
+    {
+        return mNominalPowerConsumption;
+    }
 
     /**
      * Energy cost in Ws
@@ -153,14 +157,15 @@ public:
     double estimatedRelativeEnergyCost(double distanceInM) const;
 
     /**
-      * Get share by agent type according to a given policy (by name)
-      */
-    policies::Distribution getDistribution(const owlapi::model::IRI& policyName) const;
+     * Get share by agent type according to a given policy (by name)
+     */
+    policies::Distribution
+    getDistribution(const owlapi::model::IRI& policyName) const;
 
     /**
-      * \return modelpool of agents that are relevant according to the given
-      * policyname
-      */
+     * \return modelpool of agents that are relevant according to the given
+     * policyname
+     */
     std::set<Agent> getSelection(const owlapi::model::IRI& policyName) const;
 
     /**
@@ -200,7 +205,7 @@ public:
     double getAtomicDataPropertyValue(const owlapi::model::IRI& property) const;
 
     double getCompositeDataPropertyValue(const owlapi::model::IRI& property,
-            algebra::CompositionFunc cf) const;
+                                         algebra::CompositionFunc cf) const;
 
     double getDataPropertyValue(const owlapi::model::IRI& property) const;
 
@@ -214,7 +219,6 @@ public:
     double getPropertyValue(const owlapi::model::IRI& property) const;
 
 private:
-
     ModelPool mModelPool;
 
     double mMinAcceleration;
@@ -246,18 +250,19 @@ private:
     // Robot cache
     static std::map<ModelPool, Robot> msRobots;
 
-
     double getLoadAreaSize(const owlapi::model::IRI& agent) const;
 
     /// Try to identify all encountered manipulators in the system
     void updateManipulationProperties();
 
-    void updateProperty(const owlapi::model::IRI& iri, double value, bool useMin);
+    void
+    updateProperty(const owlapi::model::IRI& iri, double value, bool useMin);
 
     /**
      * Extract the drivedBy AnnotationProperty, if set
      */
-    std::string getInferFromAnnotation(const owlapi::model::IRI& property) const;
+    std::string
+    getInferFromAnnotation(const owlapi::model::IRI& property) const;
 };
 
 } // end namespace facades

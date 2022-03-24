@@ -11,7 +11,8 @@ Link::Link(Interface first, Interface second)
     {
         mFirst = first;
         mSecond = second;
-    } else {
+    } else
+    {
         mSecond = first;
         mFirst = second;
     }
@@ -40,7 +41,8 @@ bool Link::operator<(const Link& other) const
     } else if(other.mFirst == mFirst)
     {
         return other.mSecond < mSecond;
-    } else {
+    } else
+    {
         return false;
     }
 }
@@ -71,7 +73,8 @@ std::ostream& operator<<(std::ostream& os, const std::set<Link>& links)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::set< std::set<Link> >& linkSets)
+std::ostream& operator<<(std::ostream& os,
+                         const std::set<std::set<Link>>& linkSets)
 {
     for(const std::set<Link>& linkSet : linkSets)
     {

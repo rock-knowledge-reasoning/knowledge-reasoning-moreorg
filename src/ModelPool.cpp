@@ -1,13 +1,12 @@
 #include "ModelPool.hpp"
-#include <sstream>
-#include <numeric/LimitedCombination.hpp>
-#include "OrganizationModel.hpp"
 #include "Algebra.hpp"
+#include "OrganizationModel.hpp"
+#include <numeric/LimitedCombination.hpp>
+#include <sstream>
 
 namespace moreorg {
 
-ModelPool::ModelPool()
-{}
+ModelPool::ModelPool() {}
 
 ModelPool::ModelPool(const ModelCombination& modelCombination)
 {
@@ -19,7 +18,8 @@ ModelPool::ModelPool(const ModelCombination& modelCombination)
     }
 }
 
-void ModelPool::setResourceCount(const owlapi::model::IRI& resource, size_t count)
+void ModelPool::setResourceCount(const owlapi::model::IRI& resource,
+                                 size_t count)
 {
     (*this)[resource] = count;
 }
@@ -27,16 +27,16 @@ void ModelPool::setResourceCount(const owlapi::model::IRI& resource, size_t coun
 std::string ModelPool::toString(uint32_t indent) const
 {
     std::stringstream ss;
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     ModelPool::const_iterator cit = this->begin();
     ss << hspace << "ModelPool:" << std::endl;
     for(; cit != this->end(); ++cit)
     {
-        ss << "    " << hspace << cit->first << " : " << cit->second << std::endl;
+        ss << "    " << hspace << cit->first << " : " << cit->second
+           << std::endl;
     }
     return ss.str();
 }
-
 
 ModelPool ModelPool::applyUpperBound(const ModelPool& upperBounds) const
 {
@@ -55,8 +55,9 @@ ModelPool ModelPool::applyUpperBound(const ModelPool& upperBounds) const
     return modelPool;
 }
 
-
-ModelCombinationSet ModelPool::applyUpperBound(const ModelCombinationSet& combinations, const ModelPool& upperBound)
+ModelCombinationSet
+ModelPool::applyUpperBound(const ModelCombinationSet& combinations,
+                           const ModelPool& upperBound)
 {
     ModelCombinationSet boundedCombinations;
     ModelCombinationSet::const_iterator cit = combinations.begin();
@@ -70,13 +71,17 @@ ModelCombinationSet ModelPool::applyUpperBound(const ModelCombinationSet& combin
     }
 
     LOG_DEBUG_S << "Upper bound set on resources: " << std::endl
-        << "prev: " << OrganizationModel::toString(combinations) << std::endl
-        << "bound: " << std::endl << ModelPoolDelta(upperBound).toString(4) << std::endl
-        << "bounded: " << OrganizationModel::toString(boundedCombinations);
+                << "prev: " << OrganizationModel::toString(combinations)
+                << std::endl
+                << "bound: " << std::endl
+                << ModelPoolDelta(upperBound).toString(4) << std::endl
+                << "bounded: "
+                << OrganizationModel::toString(boundedCombinations);
     return boundedCombinations;
 }
 
-ModelPool::Set ModelPool::applyLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBound)
+ModelPool::Set ModelPool::applyLowerBound(const ModelPool::Set& modelPools,
+                                          const ModelPool& lowerBound)
 {
     ModelPool::Set boundedModelPools;
     ModelPool::Set::const_iterator cit = modelPools.begin();
@@ -91,13 +96,18 @@ ModelPool::Set ModelPool::applyLowerBound(const ModelPool::Set& modelPools, cons
     }
 
     LOG_DEBUG_S << "Lower bound set on resources: " << std::endl
-        << "prev: " << std::endl << ModelPool::toString(modelPools,4) << std::endl
-        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
-        << "bounded: " << std::endl << ModelPool::toString(boundedModelPools,4);
+                << "prev: " << std::endl
+                << ModelPool::toString(modelPools, 4) << std::endl
+                << "bound: " << std::endl
+                << ModelPoolDelta(lowerBound).toString(4) << std::endl
+                << "bounded: " << std::endl
+                << ModelPool::toString(boundedModelPools, 4);
     return boundedModelPools;
 }
 
-ModelCombinationSet ModelPool::applyLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBound)
+ModelCombinationSet
+ModelPool::applyLowerBound(const ModelCombinationSet& combinations,
+                           const ModelPool& lowerBound)
 {
     ModelCombinationSet boundedCombinations;
     ModelCombinationSet::const_iterator cit = combinations.begin();
@@ -112,13 +122,17 @@ ModelCombinationSet ModelPool::applyLowerBound(const ModelCombinationSet& combin
     }
 
     LOG_DEBUG_S << "Lower bound set on resources: " << std::endl
-        << "prev: " << OrganizationModel::toString(combinations) << std::endl
-        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString() << std::endl
-        << "bounded: " << OrganizationModel::toString(boundedCombinations);
+                << "prev: " << OrganizationModel::toString(combinations)
+                << std::endl
+                << "bound: " << std::endl
+                << ModelPoolDelta(lowerBound).toString() << std::endl
+                << "bounded: "
+                << OrganizationModel::toString(boundedCombinations);
     return boundedCombinations;
 }
 
-ModelPool::Set ModelPool::expandToLowerBound(const ModelPool::Set& modelPools, const ModelPool& lowerBound)
+ModelPool::Set ModelPool::expandToLowerBound(const ModelPool::Set& modelPools,
+                                             const ModelPool& lowerBound)
 {
     ModelPool::Set boundedModelPools;
     if(modelPools.empty())
@@ -137,18 +151,24 @@ ModelPool::Set ModelPool::expandToLowerBound(const ModelPool::Set& modelPools, c
     }
 
     LOG_DEBUG_S << "Lower bound expanded on resources: " << std::endl
-        << "prev: " << std::endl << ModelPool::toString(modelPools,4) << std::endl
-        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
-        << "bounded: " << std::endl << ModelPool::toString(boundedModelPools,4);
+                << "prev: " << std::endl
+                << ModelPool::toString(modelPools, 4) << std::endl
+                << "bound: " << std::endl
+                << ModelPoolDelta(lowerBound).toString(4) << std::endl
+                << "bounded: " << std::endl
+                << ModelPool::toString(boundedModelPools, 4);
     return boundedModelPools;
 }
 
-ModelCombinationSet ModelPool::expandToLowerBound(const ModelCombinationSet& combinations, const ModelPool& lowerBound)
+ModelCombinationSet
+ModelPool::expandToLowerBound(const ModelCombinationSet& combinations,
+                              const ModelPool& lowerBound)
 {
     ModelCombinationSet boundedCombinations;
     if(combinations.empty())
     {
-        boundedCombinations.insert(OrganizationModel::modelPool2Combination(lowerBound));
+        boundedCombinations.insert(
+            OrganizationModel::modelPool2Combination(lowerBound));
     }
     ModelCombinationSet::const_iterator cit = combinations.begin();
     for(; cit != combinations.end(); ++cit)
@@ -156,18 +176,21 @@ ModelCombinationSet ModelPool::expandToLowerBound(const ModelCombinationSet& com
         ModelPool modelPool = OrganizationModel::combination2ModelPool(*cit);
         // enforce minimum requirement
         modelPool = Algebra::max(lowerBound, modelPool);
-        ModelCombination expandedCombination = OrganizationModel::modelPool2Combination(modelPool);
+        ModelCombination expandedCombination =
+            OrganizationModel::modelPool2Combination(modelPool);
 
         boundedCombinations.insert(expandedCombination);
     }
 
     LOG_DEBUG_S << "Lower bound expanded on resources: " << std::endl
-        << "prev: " << OrganizationModel::toString(combinations) << std::endl
-        << "bound: " << std::endl << ModelPoolDelta(lowerBound).toString(4) << std::endl
-        << "bounded: " << OrganizationModel::toString(boundedCombinations);
+                << "prev: " << OrganizationModel::toString(combinations)
+                << std::endl
+                << "bound: " << std::endl
+                << ModelPoolDelta(lowerBound).toString(4) << std::endl
+                << "bounded: "
+                << OrganizationModel::toString(boundedCombinations);
     return boundedCombinations;
 }
-
 
 bool ModelPool::isWithinUpperBound(const ModelPool& upperBound) const
 {
@@ -185,7 +208,8 @@ bool ModelPool::isWithinUpperBound(const ModelPool& upperBound) const
     return true;
 }
 
-ModelPool::Set ModelPool::applyUpperBound(const ModelPool::Set& modelPools, const ModelPool& upperBound)
+ModelPool::Set ModelPool::applyUpperBound(const ModelPool::Set& modelPools,
+                                          const ModelPool& upperBound)
 {
     ModelPool::Set boundedModelPools;
     ModelPool::Set::const_iterator cit = modelPools.begin();
@@ -199,9 +223,11 @@ ModelPool::Set ModelPool::applyUpperBound(const ModelPool::Set& modelPools, cons
     }
 
     LOG_DEBUG_S << "Upper bound set on resources: " << std::endl
-        << "    prev: " << ModelPool::toString(modelPools,4) << std::endl
-        << "    bound: " << ModelPoolDelta(upperBound).toString(4) << std::endl
-        << "    bounded: " << ModelPool::toString(boundedModelPools,4);
+                << "    prev: " << ModelPool::toString(modelPools, 4)
+                << std::endl
+                << "    bound: " << ModelPoolDelta(upperBound).toString(4)
+                << std::endl
+                << "    bounded: " << ModelPool::toString(boundedModelPools, 4);
     return boundedModelPools;
 }
 
@@ -226,19 +252,24 @@ ModelPool::Set ModelPool::allCombinations(size_t maxSize) const
     ModelCombination modelCombinationBound = toModelCombination();
 
     // Account for the maximum size of the combination
-    size_t sizeOfCombination = numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(*this);
+    size_t sizeOfCombination =
+        numeric::LimitedCombination<owlapi::model::IRI>::totalNumberOfAtoms(
+            *this);
     if(maxSize > 0)
     {
         sizeOfCombination = std::min(maxSize, sizeOfCombination);
     }
 
-    numeric::LimitedCombination<owlapi::model::IRI> combinations(*this,
-            sizeOfCombination,
-            numeric::MAX);
+    numeric::LimitedCombination<owlapi::model::IRI> combinations(
+        *this,
+        sizeOfCombination,
+        numeric::MAX);
 
-    do {
+    do
+    {
         owlapi::model::IRIList combination = combinations.current();
-        ModelPool modelPool = OrganizationModel::combination2ModelPool(combination);
+        ModelPool modelPool =
+            OrganizationModel::combination2ModelPool(combination);
         allCombinations.insert(modelPool);
     } while(combinations.next());
 
@@ -250,9 +281,11 @@ const owlapi::model::IRI& ModelPool::getAtomic() const
     if(isAtomic())
     {
         return begin()->first;
-    } else {
-        throw std::runtime_error("moreorg::ModelPool::getAtomic: this model pool does"
-                " not describe an atomic model");
+    } else
+    {
+        throw std::runtime_error(
+            "moreorg::ModelPool::getAtomic: this model pool does"
+            " not describe an atomic model");
     }
 }
 
@@ -281,7 +314,6 @@ bool ModelPool::isNull() const
     }
     return true;
 }
-
 
 ModelPoolDelta::ModelPoolDelta(const ModelPool& pool)
 {
@@ -326,7 +358,9 @@ ModelPool ModelPoolDelta::toModelPool() const
     {
         if(cit->second < 0)
         {
-            throw std::runtime_error("moreorg::ModelPoolDelta contains negative values -- cannot convert to ModelPool");
+            throw std::runtime_error(
+                "moreorg::ModelPoolDelta contains negative "
+                "values -- cannot convert to ModelPool");
         } else if(cit->second > 0)
         {
             modelPool[cit->first] = cit->second;
@@ -338,20 +372,22 @@ ModelPool ModelPoolDelta::toModelPool() const
 std::string ModelPoolDelta::toString(uint32_t indent) const
 {
     std::stringstream ss;
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     ModelPoolDelta::const_iterator cit = this->begin();
     ss << hspace << "ModelPoolDelta:" << std::endl;
     for(; cit != this->end(); ++cit)
     {
-        ss << "    " << hspace << cit->first << " : " << cit->second << std::endl;
+        ss << "    " << hspace << cit->first << " : " << cit->second
+           << std::endl;
     }
     return ss.str();
 }
 
-std::vector<owlapi::model::IRI> ModelPoolDelta::getModels(const ModelPool& modelPool)
+std::vector<owlapi::model::IRI>
+ModelPoolDelta::getModels(const ModelPool& modelPool)
 {
     std::vector<owlapi::model::IRI> models;
-    ModelPool::const_iterator cit  = modelPool.begin();
+    ModelPool::const_iterator cit = modelPool.begin();
     for(; cit != modelPool.end(); ++cit)
     {
         models.push_back(cit->first);
@@ -359,14 +395,15 @@ std::vector<owlapi::model::IRI> ModelPoolDelta::getModels(const ModelPool& model
     return models;
 }
 
-std::string ModelPool::toString(const ModelPool::Set& modelPoolSet, uint32_t indent)
+std::string ModelPool::toString(const ModelPool::Set& modelPoolSet,
+                                uint32_t indent)
 {
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     std::stringstream ss;
     ss << hspace;
 
     ModelPool::Set::const_iterator cit = modelPoolSet.begin();
-    for(; cit != modelPoolSet.end();++cit)
+    for(; cit != modelPoolSet.end(); ++cit)
     {
         ModelCombination combination = cit->toModelCombination();
         ss << owlapi::model::IRI::toString(combination, true);
@@ -378,14 +415,15 @@ std::string ModelPool::toString(const ModelPool::Set& modelPoolSet, uint32_t ind
     return ss.str();
 }
 
-std::string ModelPool::toString(const ModelPool::List& modelPoolList, uint32_t indent)
+std::string ModelPool::toString(const ModelPool::List& modelPoolList,
+                                uint32_t indent)
 {
-    std::string hspace(indent,' ');
+    std::string hspace(indent, ' ');
     std::stringstream ss;
     ss << hspace;
 
     ModelPool::List::const_iterator cit = modelPoolList.begin();
-    for(; cit != modelPoolList.end();++cit)
+    for(; cit != modelPoolList.end(); ++cit)
     {
         ModelCombination combination = cit->toModelCombination();
         ss << owlapi::model::IRI::toString(combination, true);
@@ -397,9 +435,11 @@ std::string ModelPool::toString(const ModelPool::List& modelPoolList, uint32_t i
     return ss.str();
 }
 
-size_t ModelPool::getValue(const owlapi::model::IRI& resource, size_t defaultVal) const
+size_t ModelPool::getValue(const owlapi::model::IRI& resource,
+                           size_t defaultVal) const
 {
-    std::map<owlapi::model::IRI, size_t>::const_iterator cit =  this->find(resource);
+    std::map<owlapi::model::IRI, size_t>::const_iterator cit =
+        this->find(resource);
     if(cit != this->end())
     {
         return cit->second;
@@ -410,7 +450,7 @@ size_t ModelPool::getValue(const owlapi::model::IRI& resource, size_t defaultVal
 std::pair<owlapi::model::IRI, size_t> ModelPool::getMaxResource() const
 {
     size_t maxValue = std::numeric_limits<size_t>::min();
-    //moreorg::ModelPool::value_type currentMax;
+    // moreorg::ModelPool::value_type currentMax;
     std::pair<owlapi::model::IRI, size_t> currentMax;
 
     moreorg::ModelPool::const_iterator cit = this->begin();
@@ -421,7 +461,7 @@ std::pair<owlapi::model::IRI, size_t> ModelPool::getMaxResource() const
             maxValue = cit->second;
             currentMax = *cit;
         }
-        maxValue = std::max( maxValue, cit->second);
+        maxValue = std::max(maxValue, cit->second);
     }
     return currentMax;
 }
@@ -434,7 +474,7 @@ std::pair<owlapi::model::IRI, size_t> ModelPool::getMinResource() const
     moreorg::ModelPool::const_iterator cit = this->begin();
     for(; cit != this->end(); ++cit)
     {
-        if(cit->second < minValue )
+        if(cit->second < minValue)
         {
             minValue = cit->second;
             currentMin = *cit;

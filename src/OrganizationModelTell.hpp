@@ -13,11 +13,13 @@ public:
     OrganizationModelTell(OrganizationModel::Ptr om);
 
 protected:
-
     /**
      * Return ontology that relates to this tell object
      */
-    owlapi::model::OWLOntology::Ptr ontology() const { return mpOrganizationModel->ontology(); }
+    owlapi::model::OWLOntology::Ptr ontology() const
+    {
+        return mpOrganizationModel->ontology();
+    }
 
 private:
     OrganizationModel::Ptr mpOrganizationModel;

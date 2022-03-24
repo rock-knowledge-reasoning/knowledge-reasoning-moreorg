@@ -5,12 +5,15 @@ namespace ccf {
 
 Interface::Interface() {}
 
-Interface::Interface(Actor actor, LocalInterfaceId interfaceId, CompatibilityType type)
+Interface::Interface(Actor actor,
+                     LocalInterfaceId interfaceId,
+                     CompatibilityType type)
     : mActor(actor)
     , mLocalId(interfaceId)
     , mCompatibilityType(type)
     , mType(actor.getType(), interfaceId)
-{}
+{
+}
 
 bool Interface::operator<(const Interface& other) const
 {
@@ -20,7 +23,8 @@ bool Interface::operator<(const Interface& other) const
     } else if(mActor == other.mActor)
     {
         return mLocalId < other.mLocalId;
-    } else {
+    } else
+    {
         return false;
     }
 }
@@ -32,7 +36,8 @@ bool Interface::operator==(const Interface& other) const
 
 std::ostream& operator<<(std::ostream& os, const Interface& i)
 {
-    os << i.getActor() << ":" << (char) (i.getLocalId() + 48) << "[" << (char) (i.getCompatibilityType()) << "]";
+    os << i.getActor() << ":" << (char)(i.getLocalId() + 48) << "["
+       << (char)(i.getCompatibilityType()) << "]";
     return os;
 }
 

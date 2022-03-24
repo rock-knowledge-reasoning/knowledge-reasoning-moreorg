@@ -1,12 +1,11 @@
-#include <set>
 #include <iostream>
 #include <numeric/LimitedCombination.hpp>
+#include <set>
 
-// Compute the 'simple' number of combination or a set of types with limited occurrence per type, vs.
-// the occurrence of up to a given number for all types (which is the standard formula using the
-// binomialcoefficent of
-// |n + k -1 |
-// | k       |
+// Compute the 'simple' number of combination or a set of types with limited
+// occurrence per type, vs. the occurrence of up to a given number for all types
+// (which is the standard formula using the binomialcoefficent of |n + k -1 | |
+// k       |
 int main()
 {
     size_t numberOfTypes;
@@ -18,7 +17,8 @@ int main()
 
     std::map<char, size_t> availabilityMap;
     char currentType = 'a';
-    std::cout << "Please provide the available number of items per type:" << std::endl;
+    std::cout << "Please provide the available number of items per type:"
+              << std::endl;
     for(size_t i = 0; i < numberOfTypes; ++i)
     {
         size_t numberPerType;
@@ -29,14 +29,18 @@ int main()
         ++currentType;
     }
 
-    size_t numberOfAtoms = numeric::LimitedCombination<char>::totalNumberOfAtoms(availabilityMap);
+    size_t numberOfAtoms =
+        numeric::LimitedCombination<char>::totalNumberOfAtoms(availabilityMap);
 
     std::vector<size_t> exactCombinations;
-    for(size_t i=1; i <= numberOfAtoms; ++i)
+    for(size_t i = 1; i <= numberOfAtoms; ++i)
     {
         int count = 0;
-        numeric::LimitedCombination<char> combinations(availabilityMap, i, numeric::EXACT);
-        do {
+        numeric::LimitedCombination<char> combinations(availabilityMap,
+                                                       i,
+                                                       numeric::EXACT);
+        do
+        {
             std::vector<char> charactorCombo = combinations.current();
             count++;
         } while(combinations.next());
@@ -44,24 +48,29 @@ int main()
     }
 
     std::vector<size_t> maxCombinations;
-    for(size_t i=1; i <= numberOfAtoms; ++i)
+    for(size_t i = 1; i <= numberOfAtoms; ++i)
     {
         int count = 0;
-        numeric::LimitedCombination<char> combinations(availabilityMap, i, numeric::MAX);
-        do {
+        numeric::LimitedCombination<char> combinations(availabilityMap,
+                                                       i,
+                                                       numeric::MAX);
+        do
+        {
             std::vector<char> charactorCombo = combinations.current();
             count++;
         } while(combinations.next());
         maxCombinations.push_back(count);
     }
 
-    std::cout << "# Computing the number of agent given and exact or maximum coalition size" << std::endl;
+    std::cout << "# Computing the number of agent given and exact or maximum "
+                 "coalition size"
+              << std::endl;
     std::cout << "#SizeOfDraw ExactCoalitionSize MaxCoalitionSize" << std::endl;
     for(size_t i = 1; i <= numberOfAtoms; ++i)
     {
-        std::cout << i << " " << exactCombinations[i-1] << " " << maxCombinations[i-1] << std::endl;
+        std::cout << i << " " << exactCombinations[i - 1] << " "
+                  << maxCombinations[i - 1] << std::endl;
     }
 
     return 0;
 }
-

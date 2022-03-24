@@ -13,7 +13,8 @@ LinkGroup::LinkGroup(Actor actor0, Actor actor1)
     {
         mFirstActor = actor0;
         mSecondActor = actor1;
-    } else {
+    } else
+    {
         mFirstActor = actor1;
         mSecondActor = actor0;
     }
@@ -27,13 +28,15 @@ bool LinkGroup::operator<(const LinkGroup& other) const
     } else if(mFirstActor == other.mFirstActor)
     {
         return mSecondActor < other.mSecondActor;
-    } else {
+    } else
+    {
         return false;
     }
 }
 bool LinkGroup::operator==(const LinkGroup& other) const
 {
-    return mFirstActor == other.mFirstActor && mSecondActor == other.mSecondActor;
+    return mFirstActor == other.mFirstActor &&
+           mSecondActor == other.mSecondActor;
 }
 
 std::ostream& operator<<(std::ostream& os, const LinkGroup& linkGroup)
@@ -42,5 +45,5 @@ std::ostream& operator<<(std::ostream& os, const LinkGroup& linkGroup)
     return os;
 }
 
-} // end namespace caf
+} // namespace ccf
 } // end namespace multiagent

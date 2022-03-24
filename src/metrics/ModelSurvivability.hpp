@@ -27,9 +27,8 @@ public:
     /**
      * Constructor for the ModelSurvivability of a single resource type
      * \param restriction Defines the requirement for a single resource type
-     * The cardinality of the restriction gives the number of components which have to be in serial
-     * for this model to work
-     * e.g. stereo camera: 2 cameras
+     * The cardinality of the restriction gives the number of components which
+     * have to be in serial for this model to work e.g. stereo camera: 2 cameras
      * \param resourceProbabilityOfSurvival the probability of survival of the
      * resource type that builds the model
      * \param redundancy redundancy of the model, where redundancy provides the
@@ -37,10 +36,9 @@ public:
      * available, we assume a redundancy of 2
      */
     ModelSurvivability(
-            const owlapi::model::OWLObjectCardinalityRestriction::Ptr& restriction,
-            double resourceProbabilityOfSurvival,
-            double redundancy
-    );
+        const owlapi::model::OWLObjectCardinalityRestriction::Ptr& restriction,
+        double resourceProbabilityOfSurvival,
+        double redundancy);
 
     /**
      * Get the probability of survival for this model
@@ -67,7 +65,7 @@ public:
      * type
      *
      */
-    void increment() { mRedundancy += 1.0/(1.0*getCardinality()); }
+    void increment() { mRedundancy += 1.0 / (1.0 * getCardinality()); }
 
     /**
      * Stringify object

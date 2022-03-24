@@ -3,8 +3,9 @@
 
 namespace moreorg {
 
-ModelPoolIterator::ModelPoolIterator(const ModelPool& start, const ModelPool& end,
-        const ModelPool& stepSize)
+ModelPoolIterator::ModelPoolIterator(const ModelPool& start,
+                                     const ModelPool& end,
+                                     const ModelPool& stepSize)
     : mStart(start)
     , mCurrent(start)
     , mEnd(end)
@@ -32,7 +33,8 @@ bool ModelPoolIterator::next()
         if(success)
         {
             return true;
-        } else {
+        } else
+        {
             reset(v.first);
         }
     }
@@ -52,7 +54,8 @@ bool ModelPoolIterator::increment(const owlapi::model::IRI& model)
         if(sit != mStepSize.end())
         {
             currentValue += sit->second;
-        } else {
+        } else
+        {
             ++currentValue;
         }
         currentValue = std::min(currentValue, maxValue);
@@ -67,9 +70,4 @@ void ModelPoolIterator::reset(const owlapi::model::IRI& model)
     mCurrent[model] = mStart[model];
 }
 
-
-
-
-
-
-}
+} // namespace moreorg

@@ -1,10 +1,10 @@
 #ifndef ORGANIZATION_MODEL_ORGANIZATION_MODEL_STATISTICS_HPP
 #define ORGANIZATION_MODEL_ORGANIZATION_MODEL_STATISTICS_HPP
 
-#include <stdint.h>
 #include <base/Time.hpp>
-#include <moreorg/organization_model/InterfaceConnection.hpp>
 #include <moreorg/organization_model/ActorModelLink.hpp>
+#include <moreorg/organization_model/InterfaceConnection.hpp>
+#include <stdint.h>
 
 namespace owl = owlapi::model;
 
@@ -37,18 +37,19 @@ struct Statistics
     owl::IRIList actorsInferred;
 
     owl::IRIList actorsCompositePrevious;
-    //owl::IRIList actorsCompositePost;
+    // owl::IRIList actorsCompositePost;
     uint32_t actorsCompositePost;
 
     owl::IRIList actorsCompositeModelPrevious;
-    std::vector< std::vector<ActorModelLink> > actorsCompositeModelPost;
-    //uint32_t actorsCompositeModelPost;
+    std::vector<std::vector<ActorModelLink>> actorsCompositeModelPost;
+    // uint32_t actorsCompositeModelPost;
 
     std::string toString() const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Statistics& statistics);
-std::ostream& operator<<(std::ostream& os, const std::vector<Statistics>& statisticsList);
+std::ostream& operator<<(std::ostream& os,
+                         const std::vector<Statistics>& statisticsList);
 
 } // end namespace moreorg
 } // end namespace moreorg

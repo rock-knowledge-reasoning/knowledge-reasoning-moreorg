@@ -4,7 +4,8 @@
 namespace moreorg {
 namespace algebra {
 
-double CompositionFunction::weightedSum(const ModelPool& modelPool, const IRIValueMap& valueMap)
+double CompositionFunction::weightedSum(const ModelPool& modelPool,
+                                        const IRIValueMap& valueMap)
 {
     double value = 0.0;
     for(const ModelPool::value_type& p : modelPool)
@@ -12,17 +13,20 @@ double CompositionFunction::weightedSum(const ModelPool& modelPool, const IRIVal
         IRIValueMap::const_iterator cit = valueMap.find(p.first);
         if(cit != valueMap.end())
         {
-            value += p.second*cit->second;
-        } else {
-            throw
-                std::invalid_argument("moreorg::algebra::CompositionFunction::weightedSum"
-                        " no value found for '" + p.first.toString() + "'");
+            value += p.second * cit->second;
+        } else
+        {
+            throw std::invalid_argument(
+                "moreorg::algebra::CompositionFunction::weightedSum"
+                " no value found for '" +
+                p.first.toString() + "'");
         }
     }
     return value;
 }
 
-double CompositionFunction::min(const ModelPool& modelPool, const IRIValueMap& valueMap)
+double CompositionFunction::min(const ModelPool& modelPool,
+                                const IRIValueMap& valueMap)
 {
     double value = std::numeric_limits<double>::max();
     for(const ModelPool::value_type& p : modelPool)
@@ -35,16 +39,19 @@ double CompositionFunction::min(const ModelPool& modelPool, const IRIValueMap& v
             {
                 value = propertyValue;
             }
-        } else {
-            throw
-                std::invalid_argument("moreorg::algebra::CompositionFunction::max"
-                        " no value found for '" + p.first.toString() + "'");
+        } else
+        {
+            throw std::invalid_argument(
+                "moreorg::algebra::CompositionFunction::max"
+                " no value found for '" +
+                p.first.toString() + "'");
         }
     }
     return value;
 }
 
-double CompositionFunction::max(const ModelPool& modelPool, const IRIValueMap& valueMap)
+double CompositionFunction::max(const ModelPool& modelPool,
+                                const IRIValueMap& valueMap)
 {
     double value = std::numeric_limits<double>::min();
     for(const ModelPool::value_type& p : modelPool)
@@ -57,10 +64,12 @@ double CompositionFunction::max(const ModelPool& modelPool, const IRIValueMap& v
             {
                 value = propertyValue;
             }
-        } else {
-            throw
-                std::invalid_argument("moreorg::algebra::CompositionFunction::max"
-                        " no value found for '" + p.first.toString() + "'");
+        } else
+        {
+            throw std::invalid_argument(
+                "moreorg::algebra::CompositionFunction::max"
+                " no value found for '" +
+                p.first.toString() + "'");
         }
     }
     return value;

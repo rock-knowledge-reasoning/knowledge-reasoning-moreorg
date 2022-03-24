@@ -1,9 +1,9 @@
 #ifndef ORGANIZATION_MODEL_ALGEBRA_RESOURCE_SUPPORT_VECTOR_HPP
 #define ORGANIZATION_MODEL_ALGEBRA_RESOURCE_SUPPORT_VECTOR_HPP
 
-#include <stdexcept>
 #include <base/Eigen.hpp>
 #include <owlapi/model/IRI.hpp>
+#include <stdexcept>
 
 namespace moreorg {
 
@@ -55,7 +55,9 @@ public:
      * \param sizes Vector of cardinalities
      * \param labels Vector of labels describing the row
      */
-    ResourceSupportVector(const base::VectorXd& supportValue, const owlapi::model::IRIList& labels = owlapi::model::IRIList());
+    ResourceSupportVector(
+        const base::VectorXd& supportValue,
+        const owlapi::model::IRIList& labels = owlapi::model::IRIList());
 
     /**
      * Retrieve the support value of a given dimension and allow manipulation
@@ -67,7 +69,10 @@ public:
      * Retrieve the support value of a given dimension
      * \return support value entry
      */
-    const double& operator()(uint32_t dimension) const { return mSizes(dimension); }
+    const double& operator()(uint32_t dimension) const
+    {
+        return mSizes(dimension);
+    }
 
     /**
      * Get the number of dimensions of this vector
@@ -81,7 +86,8 @@ public:
      * \return ResourceSupportVector as [ min(a0,b0), min(a1,b1), min(a2,b2),
      * ... ]
      */
-    static ResourceSupportVector intersection(const ResourceSupportVector& a, const ResourceSupportVector& b);
+    static ResourceSupportVector intersection(const ResourceSupportVector& a,
+                                              const ResourceSupportVector& b);
 
     /**
      * Check if this resource support vector contains the other, i.e. if the
@@ -96,7 +102,8 @@ public:
      * Check the support of a given requirement from another vector
      * \return one of FULL_SUPPORT, PARTIAL_SUPPORT or NO_SUPPORT
      */
-    SupportType getSupportFrom(const ResourceSupportVector& other, const OrganizationModelAsk& ask) const;
+    SupportType getSupportFrom(const ResourceSupportVector& other,
+                               const OrganizationModelAsk& ask) const;
 
     /**
      * Compute the ratios per dimension, i.e. new(0) = this(0) / other(0);
@@ -104,10 +111,11 @@ public:
     ResourceSupportVector getRatios(const ResourceSupportVector& other) const;
 
     /**
-     * Compute the missing support (delta between this and other) as ResourceSupportVector
-     * ignores dimension where sufficient support is given
+     * Compute the missing support (delta between this and other) as
+     * ResourceSupportVector ignores dimension where sufficient support is given
      */
-    ResourceSupportVector missingSupportFrom(const ResourceSupportVector& other) const;
+    ResourceSupportVector
+    missingSupportFrom(const ResourceSupportVector& other) const;
 
     /**
      * Test if this ResourceSupportVector refers to a null vector (norm of the
@@ -139,7 +147,8 @@ public:
      * if the original vector is
      * [1 2] for [BaseModel DerivedModel] the resulting vector will be [3 2]
      */
-    ResourceSupportVector embedClassRelationship(const OrganizationModelAsk& ask) const;
+    ResourceSupportVector
+    embedClassRelationship(const OrganizationModelAsk& ask) const;
 
     /**
      * Scale a ResourceSupportVector by a given factor
@@ -162,7 +171,8 @@ protected:
      * Check if two ResourceSupportVector have the same dimension
      * \return True if both vectors have the same dimension, false otherwise
      */
-    static void checkDimensions(const ResourceSupportVector& a, const ResourceSupportVector& b);
+    static void checkDimensions(const ResourceSupportVector& a,
+                                const ResourceSupportVector& b);
 
     /**
      * Check if ResourceSupportVector has only positive entries
@@ -183,14 +193,12 @@ protected:
      */
     bool partialSupportFrom(const ResourceSupportVector& other) const;
 
-
 private:
     /// Vector where each dimension refers to a distinct resource model
     /// the actual values refer to the availability
     base::VectorXd mSizes;
     /// Labels of the models that correspond to each dimension
     owlapi::model::IRIList mLabels;
-
 };
 
 } // end namespace algebra

@@ -2,7 +2,8 @@
 
 namespace moreorg {
 
-ModelPoolDelta Algebra::substract(const ModelPoolDelta& a, const ModelPoolDelta& b)
+ModelPoolDelta Algebra::substract(const ModelPoolDelta& a,
+                                  const ModelPoolDelta& b)
 {
     ModelPoolDelta delta;
 
@@ -16,7 +17,8 @@ ModelPoolDelta Algebra::substract(const ModelPoolDelta& a, const ModelPoolDelta&
         if(bit != b.end())
         {
             delta[model] = bit->second - modelCount;
-        } else {
+        } else
+        {
             delta[model] = 0 - modelCount;
         }
     }
@@ -31,7 +33,8 @@ ModelPoolDelta Algebra::substract(const ModelPoolDelta& a, const ModelPoolDelta&
         if(ait != a.end())
         {
             // already handled
-        } else {
+        } else
+        {
             delta[model] = modelCount;
         }
     }
@@ -59,7 +62,8 @@ ModelPool Algebra::merge(const ModelPool& a, const ModelPool& b)
     return merge(modelPoolSet);
 }
 
-ModelPool Algebra::merge(const std::set<ModelCombination>& a, const ModelCombination& b)
+ModelPool Algebra::merge(const std::set<ModelCombination>& a,
+                         const ModelCombination& b)
 {
     // Create a set
     std::set<ModelPool> modelPoolSet;
@@ -68,10 +72,9 @@ ModelPool Algebra::merge(const std::set<ModelCombination>& a, const ModelCombina
     std::set<ModelCombination>::const_iterator cit = a.begin();
     for(; cit != a.end(); ++cit)
     {
-        modelPoolSet.insert( OrganizationModel::combination2ModelPool(*cit) );
-
+        modelPoolSet.insert(OrganizationModel::combination2ModelPool(*cit));
     }
-    modelPoolSet.insert( OrganizationModel::combination2ModelPool(b) );
+    modelPoolSet.insert(OrganizationModel::combination2ModelPool(b));
 
     return merge(modelPoolSet);
 }
@@ -88,11 +91,11 @@ ModelPool Algebra::max(const ModelPool& a, const ModelPool& b)
         ModelPool::iterator rit = resultPool.find(model);
         if(rit != resultPool.end())
         {
-            rit->second = std::max( bit->second, rit->second );
-        } else {
+            rit->second = std::max(bit->second, rit->second);
+        } else
+        {
             resultPool.insert(ModelPool::value_type(model, cardinality));
         }
-
     }
     return resultPool;
 }
@@ -129,11 +132,11 @@ ModelPool Algebra::min(const ModelPool& a, const ModelPool& b)
         ModelPool::iterator rit = resultPool.find(model);
         if(rit != resultPool.end())
         {
-            rit->second = std::min( bit->second, rit->second );
-        } else {
+            rit->second = std::min(bit->second, rit->second);
+        } else
+        {
             resultPool.insert(ModelPool::value_type(model, cardinality));
         }
-
     }
     return resultPool;
 }
@@ -167,7 +170,8 @@ ModelPool Algebra::merge(const std::set<ModelPool>& modelPoolSet)
         {
             mergedPool = *cit;
             init = false;
-        } else {
+        } else
+        {
             mergedPool = sum(mergedPool, *cit);
         }
     }
@@ -180,7 +184,7 @@ ModelPool Algebra::multiply(const ModelPool& pool, uint32_t factor)
     ModelPool scaled;
     for(const ModelPool::value_type& entry : pool)
     {
-        scaled[entry.first] = entry.second*factor;
+        scaled[entry.first] = entry.second * factor;
     }
     return scaled;
 }
@@ -196,7 +200,8 @@ ModelPool::Set Algebra::maxCompositions(const ModelPool& a, const ModelPool& b)
     return maxCompositions(aPool, bPool);
 }
 
-ModelPool::Set Algebra::maxCompositions(const ModelPool::Set& a, const ModelPool::Set& b)
+ModelPool::Set Algebra::maxCompositions(const ModelPool::Set& a,
+                                        const ModelPool::Set& b)
 {
     ModelPool::Set maxCompositions;
     // Handle corner cases
@@ -234,7 +239,7 @@ bool Algebra::isSubset(const ModelPool& a, const ModelPool& b)
 
 bool Algebra::isSuperset(const ModelPool& a, const ModelPool& b)
 {
-    return isSubset(b,a);
+    return isSubset(b, a);
 }
 
 } // end namespace moreorg

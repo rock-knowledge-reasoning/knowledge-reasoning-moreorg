@@ -1,14 +1,14 @@
 #ifndef ORGANIZATION_MODEL_STATUS_SAMPLE_HPP
 #define ORGANIZATION_MODEL_STATUS_SAMPLE_HPP
 
-#include <vector>
-#include <map>
-#include <base/Pose.hpp>
 #include "Agent.hpp"
-#include "Resource.hpp"
-#include "Types.hpp"
 #include "OrganizationModelAsk.hpp"
+#include "Resource.hpp"
 #include "Sample.hpp"
+#include "Types.hpp"
+#include <base/Pose.hpp>
+#include <map>
+#include <vector>
 
 namespace moreorg {
 
@@ -39,18 +39,20 @@ public:
      * \param activity The type of activity if the agent is operative
      */
     StatusSample(const Agent& instance,
-            const base::Position& fromLocation,
-            const base::Position& toLocation,
-            size_t fromTime,
-            size_t toTime,
-            Agent::OperationalStatus operationalStatus,
-            activity::Type activity
-    );
+                 const base::Position& fromLocation,
+                 const base::Position& toLocation,
+                 size_t fromTime,
+                 size_t toTime,
+                 Agent::OperationalStatus operationalStatus,
+                 activity::Type activity);
 
     virtual ~StatusSample();
 
     const Agent& getAgent() const { return mAgent; }
-    Agent::OperationalStatus getOperationalStatus() const { return mOperationalStatus; }
+    Agent::OperationalStatus getOperationalStatus() const
+    {
+        return mOperationalStatus;
+    }
     activity::Type getActivityType() const { return mActivityType; }
 
 private:

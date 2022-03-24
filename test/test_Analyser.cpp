@@ -1,7 +1,7 @@
+#include "test_utils.hpp"
 #include <boost/test/unit_test.hpp>
 #include <moreorg/Analyser.hpp>
 #include <moreorg/vocabularies/OM.hpp>
-#include "test_utils.hpp"
 
 using namespace moreorg;
 using namespace moreorg::vocabulary;
@@ -11,7 +11,8 @@ struct AnalyserFixture
 {
     AnalyserFixture()
     {
-        OrganizationModel::Ptr om = make_shared<OrganizationModel>(getOMSchema());
+        OrganizationModel::Ptr om =
+            make_shared<OrganizationModel>(getOMSchema());
         IRI sherpa = OM::resolve("Sherpa");
         IRI payload = OM::resolve("Payload");
 
@@ -24,12 +25,12 @@ struct AnalyserFixture
         AtomicAgent::List sherpas;
         for(size_t i = 0; i < modelPool[sherpa]; ++i)
         {
-            sherpas.push_back( AtomicAgent(i, sherpa));
+            sherpas.push_back(AtomicAgent(i, sherpa));
         }
         AtomicAgent::List payloads;
         for(size_t i = 0; i < modelPool[payload]; ++i)
         {
-            payloads.push_back( AtomicAgent(i, payload));
+            payloads.push_back(AtomicAgent(i, payload));
         }
 
         Agent agent0;
@@ -49,74 +50,70 @@ struct AnalyserFixture
         atomicAgents.insert(payloads.begin(), payloads.end());
 
         StatusSample sample00(agent0,
-                base::Position(0,0,0),
-                base::Position(0,100,0),
-                0,
-                25,
-                Agent::OPERATIVE,
-                activity::BUSY);
+                              base::Position(0, 0, 0),
+                              base::Position(0, 100, 0),
+                              0,
+                              25,
+                              Agent::OPERATIVE,
+                              activity::BUSY);
 
         StatusSample sample01(agent0,
-                base::Position(0,100,0),
-                base::Position(0,100,0),
-                26,
-                75,
-                Agent::OPERATIVE,
-                activity::BUSY);
+                              base::Position(0, 100, 0),
+                              base::Position(0, 100, 0),
+                              26,
+                              75,
+                              Agent::OPERATIVE,
+                              activity::BUSY);
 
         StatusSample sample02(agent0,
-                base::Position(0,100,0),
-                base::Position(0,120,0),
-                76,
-                100,
-                Agent::OPERATIVE,
-                activity::BUSY);
+                              base::Position(0, 100, 0),
+                              base::Position(0, 120, 0),
+                              76,
+                              100,
+                              Agent::OPERATIVE,
+                              activity::BUSY);
 
         StatusSample sample10(agent1,
-                base::Position(0,0,0),
-                base::Position(100,0,0),
-                0,
-                100,
-                Agent::OPERATIVE,
-                activity::BUSY);
-
+                              base::Position(0, 0, 0),
+                              base::Position(100, 0, 0),
+                              0,
+                              100,
+                              Agent::OPERATIVE,
+                              activity::BUSY);
 
         Resource::Set resources;
-        resources.insert(Resource(OM::resolve("TransportProvider")) );
+        resources.insert(Resource(OM::resolve("TransportProvider")));
 
         RequirementSample r00(resources,
-                ModelPool(),
-                base::Position(0,0,0),
-                base::Position(0,100,0),
-                0,
-                25
-        );
+                              ModelPool(),
+                              base::Position(0, 0, 0),
+                              base::Position(0, 100, 0),
+                              0,
+                              25);
 
         Resource::Set stereoImageProvider;
-        stereoImageProvider.insert(Resource(OM::resolve("StereoImageProvider")) );
+        stereoImageProvider.insert(
+            Resource(OM::resolve("StereoImageProvider")));
 
         RequirementSample r01(stereoImageProvider,
-                ModelPool(),
-                base::Position(0,100,0),
-                base::Position(0,100,0),
-                26,
-                75
-        );
+                              ModelPool(),
+                              base::Position(0, 100, 0),
+                              base::Position(0, 100, 0),
+                              26,
+                              75);
 
         RequirementSample r02(resources,
-                ModelPool(),
-                base::Position(0,100,0),
-                base::Position(0,120,0),
-                76,
-                100
-        );
+                              ModelPool(),
+                              base::Position(0, 100, 0),
+                              base::Position(0, 120, 0),
+                              76,
+                              100);
         RequirementSample r10(resources,
-                ModelPool(),
-                base::Position(0,0,0),
-                base::Position(100,0,0),
-                0,
-                100
-        );
+                              ModelPool(),
+                              base::Position(0, 0, 0),
+                              base::Position(100, 0, 0),
+                              0,
+                              100);
 
         analyser = new Analyser(ask);
         analyser->add(sample00);
@@ -127,7 +124,6 @@ struct AnalyserFixture
         analyser->add(r00);
         analyser->add(r01);
         analyser->add(r10);
-
 
         analyser->createIndex();
     }
@@ -153,9 +149,8 @@ BOOST_FIXTURE_TEST_CASE(get_current_position, AnalyserFixture)
     std::vector<base::Position> positions = analyser->getPositions(30);
     for(const base::Position& position : positions)
     {
-        BOOST_TEST_MESSAGE("Position: " << position.x() << "/"
-                << position.y() << "/"
-                << position.z() );
+        BOOST_TEST_MESSAGE("Position: " << position.x() << "/" << position.y()
+                                        << "/" << position.z());
     }
 }
 
@@ -166,22 +161,37 @@ BOOST_FIXTURE_TEST_CASE(get_energy, AnalyserFixture)
     {
         {
             double energyReduction = analyser->getEnergyReductionAbsolute(0, a);
-            BOOST_REQUIRE_MESSAGE(energyReduction == 0, "Energy reduction at start should be zero, was '" << energyReduction << "'");
+            BOOST_REQUIRE_MESSAGE(
+                energyReduction == 0,
+                "Energy reduction at start should be zero, was '"
+                    << energyReduction << "'");
         }
 
         {
-            double energyReduction = analyser->getEnergyReductionAbsolute(100, a);
-            if( a.getFacade(ask).getEnergyCapacity() != 0)
+            double energyReduction =
+                analyser->getEnergyReductionAbsolute(100, a);
+            if(a.getFacade(ask).getEnergyCapacity() != 0)
             {
-                BOOST_REQUIRE_MESSAGE(energyReduction > 0, "Energy reduction for '" <<
-                        a.getName() << "' should be > 0, but was '" << energyReduction << "'");
-            } else {
-                BOOST_REQUIRE_MESSAGE(energyReduction == 0, "Energy reduction should be == 0, but was '" << energyReduction << "'");
+                BOOST_REQUIRE_MESSAGE(energyReduction > 0,
+                                      "Energy reduction for '"
+                                          << a.getName()
+                                          << "' should be > 0, but was '"
+                                          << energyReduction << "'");
+            } else
+            {
+                BOOST_REQUIRE_MESSAGE(
+                    energyReduction == 0,
+                    "Energy reduction should be == 0, but was '"
+                        << energyReduction << "'");
             }
         }
         for(size_t i = 0; i < 100; ++i)
         {
-            BOOST_TEST_MESSAGE("Energy reduction (" << a.getName() << ") absolute -- relative: " << analyser->getEnergyReductionAbsolute(i, a) << " -- " << analyser->getEnergyReductionRelative(i,a));
+            BOOST_TEST_MESSAGE("Energy reduction ("
+                               << a.getName() << ") absolute -- relative: "
+                               << analyser->getEnergyReductionAbsolute(i, a)
+                               << " -- "
+                               << analyser->getEnergyReductionRelative(i, a));
         }
     }
 
@@ -192,13 +202,15 @@ BOOST_FIXTURE_TEST_CASE(get_energy, AnalyserFixture)
 
     for(size_t i = 0; i < 100; ++i)
     {
-        BOOST_TEST_MESSAGE("getEnergyAvailableMinRelative: " << analyser->getEnergyAvailableMinRelative(i));
+        BOOST_TEST_MESSAGE("getEnergyAvailableMinRelative: "
+                           << analyser->getEnergyAvailableMinRelative(i));
     }
 }
 
 BOOST_FIXTURE_TEST_CASE(samples, AnalyserFixture)
 {
-    BOOST_TEST_MESSAGE("All samples at: 0 #" << analyser->getSampleColumnDescriptionO());
+    BOOST_TEST_MESSAGE("All samples at: 0 #"
+                       << analyser->getSampleColumnDescriptionO());
     for(int i = 0; i < 100; ++i)
     {
         std::vector<double> row = analyser->getSampleO(i);

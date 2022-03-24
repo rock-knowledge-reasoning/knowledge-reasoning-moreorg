@@ -7,7 +7,7 @@ namespace moreorg {
 namespace moreorg {
 
 /**
- * An ActorModelLink describes the combination of two actors via 
+ * An ActorModelLink describes the combination of two actors via
  * a unique tuple of (electro-mechanical) interfaces
  */
 class ActorModelLink
@@ -24,14 +24,17 @@ public:
     /**
      * Construct an ActorModelLink from two Endpoints
      */
-    ActorModelLink(const EndpointModel& endpoint0, const EndpointModel& endpoint1);
+    ActorModelLink(const EndpointModel& endpoint0,
+                   const EndpointModel& endpoint1);
 
     bool operator==(const ActorModelLink& other) const;
     bool operator<(const ActorModelLink& other) const;
     std::string toString() const;
 };
 
-std::ostream& operator<<(std::ostream& os, const std::vector< std::vector<ActorModelLink> > modelSet);
+std::ostream&
+operator<<(std::ostream& os,
+           const std::vector<std::vector<ActorModelLink>> modelSet);
 
 } // namespace moreorg
 } // namespace moreorg
