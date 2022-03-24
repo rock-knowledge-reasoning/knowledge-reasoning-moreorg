@@ -26,7 +26,7 @@ public:
     /**
      * Default constructor
      */
-    ModelPool();
+    ModelPool() = default;
 
     /**
      * Construct model pool from and existing list of resources

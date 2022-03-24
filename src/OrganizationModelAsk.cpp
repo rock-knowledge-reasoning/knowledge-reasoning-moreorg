@@ -1361,7 +1361,7 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(
     const owlapi::model::IRIList& filterLabels,
     bool useMaxCardinality) const
 {
-    if(modelBounds.size() == 0)
+    if(modelBounds.empty())
     {
         throw std::invalid_argument("moreorg::OrganizationModelAsk::"
                                     "getSupportVector: no model bounds given");
@@ -1411,7 +1411,7 @@ algebra::ResourceSupportVector OrganizationModelAsk::getSupportVector(
         {
             const IRI& modelDimensionLabel = mit->first;
             // Sum the requirement/availability of this model type
-            if(dimensionLabel == modelDimensionLabel ||
+            if((dimensionLabel == modelDimensionLabel) ||
                mOntologyAsk.isSubClassOf(modelDimensionLabel, dimensionLabel))
             {
                 if(useMaxCardinality)
@@ -1507,7 +1507,7 @@ double OrganizationModelAsk::getScalingFactor(const ModelPool& modelPool,
     size_t maxResourceCount = modelPool.getMaxResourceCount();
     double maxScalingFactor = maxResourceCount;
 
-    for(const PropertyConstraint::Clusters::value_type property2Constraints :
+    for(const PropertyConstraint::Clusters::value_type& property2Constraints :
         clusteredConstraints)
     {
         const owlapi::model::IRI& property = property2Constraints.first;
@@ -1655,7 +1655,7 @@ OrganizationModelAsk::allowSubclasses(const ModelPool& modelPool,
                                       const owlapi::model::IRI& parent) const
 {
     ModelPool filteredModelPool;
-    for(const ModelPool::value_type p : modelPool)
+    for(const ModelPool::value_type& p : modelPool)
     {
         if(mOntologyAsk.isSubClassOf(p.first, parent))
         {

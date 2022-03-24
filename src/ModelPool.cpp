@@ -6,8 +6,6 @@
 
 namespace moreorg {
 
-ModelPool::ModelPool() {}
-
 ModelPool::ModelPool(const ModelCombination& modelCombination)
 {
     ModelCombination::const_iterator cit = modelCombination.begin();
