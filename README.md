@@ -4,6 +4,7 @@
 This library implements MoreOrg which is described in the PhD Thesis
 "Autonomous Operation of a Reconfigurable Multi-Robot System for Planetary Space
 Missions" ([Roehr 2019](http://nbn-resolving.de/urn:nbn:de:gbv:46-00107698-18))
+and in ([Roehr 2021](https://doi.org/10.1109/TRO.2021.3118284).
 
 This implementation of an organization model allows to describe (reconfigurable)
 multirobot systems, so that one can reason on structure and function of so-called composite agents,
@@ -148,4 +149,5 @@ This software is distributed under the New/3-clause BSD license.
 
 # Copyright
 
+Copyright (c) 2022- Thomas M. Roehr, Simula Research Laboratory
 Copyright (c) 2013-2021 Thomas M. Roehr, DFKI GmbH Robotics Innovation Center
