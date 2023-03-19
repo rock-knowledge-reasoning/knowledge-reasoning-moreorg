@@ -170,7 +170,7 @@ double Redundancy::computeMetric(
 
     std::vector<ProbabilityOfFailure> models;
 
-    for(const auto required : modelBoundRequired)
+    for(const auto& required : modelBoundRequired)
     {
         // Mean probability of failure
         // Probability of component failure

@@ -3,6 +3,8 @@
 
 #include "ModelPool.hpp"
 #include "facades/Robot.hpp"
+
+#include <boost/serialization/library_version_type.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/set.hpp>

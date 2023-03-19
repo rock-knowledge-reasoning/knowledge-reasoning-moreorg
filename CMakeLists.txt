@@ -1,6 +1,6 @@
 # CMakeLists.txt has to be located in the project folder and cmake has to be
 # executed from 'project/build' with 'cmake ../'.
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10)
 find_package(Rock)
 project(moreorg
     VERSION 0.2

@@ -20,7 +20,7 @@ double CompositeAgentRule::apply(const facades::Robot& robot) const
 
     mu::Parser muParser;
     Agent agent(robot.getModelPool());
-    for(const std::pair<std::string, OPCall>& p : mOPCalls)
+    for(const std::pair<const std::string, OPCall>& p : mOPCalls)
     {
         const OPCall& opcall = p.second;
         double value = opcall.evalComposite(agent, mAsk);

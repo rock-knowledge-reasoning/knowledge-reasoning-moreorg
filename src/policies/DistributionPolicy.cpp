@@ -46,7 +46,7 @@ Distribution DistributionPolicy::apply(const ModelPool& modelPool,
     facades::Robot robot = facades::Robot::getInstance(modelPool, ask);
     double denom = mCompositeAgentRule->apply(robot);
 
-    for(const std::pair<IRI, size_t>& p : modelPool)
+    for(const std::pair<const IRI, size_t>& p : modelPool)
     {
         ModelPool atomicAgent;
         atomicAgent[p.first] = 1;

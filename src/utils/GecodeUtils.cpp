@@ -53,7 +53,7 @@ std::map<Gecode::IntVarBranch::Select, std::string>
 Gecode::IntValBranch::Select
 GecodeUtils::getIntValSelect(const std::string& txt)
 {
-    for(const std::pair<Gecode::IntValBranch::Select, std::string>& p :
+    for(const std::pair<const Gecode::IntValBranch::Select, std::string>& p :
         IntValSelect2Txt)
     {
         if(p.second == txt)
@@ -69,7 +69,7 @@ GecodeUtils::getIntValSelect(const std::string& txt)
 Gecode::IntVarBranch::Select
 GecodeUtils::getIntVarSelect(const std::string& txt)
 {
-    for(const std::pair<Gecode::IntVarBranch::Select, std::string>& p :
+    for(const std::pair<const Gecode::IntVarBranch::Select, std::string>& p :
         IntVarSelect2Txt)
     {
         if(p.second == txt)

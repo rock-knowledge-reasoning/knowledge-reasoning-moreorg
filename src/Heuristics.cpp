@@ -185,7 +185,7 @@ double Heuristics::getReconfigurationCost(
 {
     double cost = 0.0;
     std::vector<size_t> deltas;
-    for(const std::pair<Agent, AtomicAgent::List>& p : origins)
+    for(const std::pair<const Agent, AtomicAgent::List>& p : origins)
     {
         const AtomicAgent::List& involvedAgents = p.second;
 

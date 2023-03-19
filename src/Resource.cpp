@@ -67,7 +67,7 @@ Resource::Set Resource::toResourceSet(const owlapi::model::IRIList& models)
 owlapi::model::IRISet Resource::getModels(const Resource::Set& a)
 {
     owlapi::model::IRISet models;
-    for(const Resource r : a)
+    for(const Resource& r : a)
     {
         models.insert(r.getModel());
     }

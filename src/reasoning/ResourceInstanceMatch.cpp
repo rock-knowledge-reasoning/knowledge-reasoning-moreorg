@@ -125,7 +125,7 @@ ResourceInstanceMatch::ResourceInstanceMatch(
     }
 
     // Each resource can be only assigned once
-    for(const std::pair<ResourceInstance, Gecode::IntVarArgs>& assignments :
+    for(const std::pair<const ResourceInstance, Gecode::IntVarArgs>& assignments :
         resourceAssignments)
     {
         rel(*this, sum(assignments.second) <= 1);
@@ -285,7 +285,7 @@ ResourceInstanceMatch::Solution::removeAssignmentsFromList(
     ResourceInstance::List& availableList)
 {
     ResourceInstance::List available(availableList);
-    for(const auto pair : mAssignments)
+    for(const auto& pair : mAssignments)
     {
         for(auto ri : pair.second)
         {

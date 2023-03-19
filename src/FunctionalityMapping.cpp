@@ -210,7 +210,7 @@ void FunctionalityMapping::save(const std::string& filename) const
 
         mappingFile << "# END HEADER" << std::endl;
         mappingFile << "# BEGIN MAPPING" << std::endl;
-        for(const std::pair<IRI, ModelPool::Set>& m : mFunction2Pool)
+        for(const std::pair<const IRI, ModelPool::Set>& m : mFunction2Pool)
         {
             if(m.second.empty())
             {

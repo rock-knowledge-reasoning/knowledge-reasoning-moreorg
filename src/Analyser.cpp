@@ -216,7 +216,7 @@ void Analyser::setSampleColumnsAA(
 {
     mAtomicAgentSampleTypes.clear();
     mAtomicAgentSampleFunctions.clear();
-    for(const std::pair<AtomicAgentSampleType, AtomicAgentSampleFunc>& p :
+    for(const std::pair<const AtomicAgentSampleType, AtomicAgentSampleFunc>& p :
         mAtomicAgentSampleFunctionMap)
     {
         if(columnTypes.empty() ||
@@ -261,7 +261,7 @@ void Analyser::setSampleColumnsA(
 {
     mAgentSampleTypes.clear();
     mAgentSampleFunctions.clear();
-    for(const std::pair<AgentSampleType, AgentSampleFunc>& p :
+    for(const std::pair<const AgentSampleType, AgentSampleFunc>& p :
         mAgentSampleFunctionMap)
     {
         if(columnTypes.empty() ||
@@ -305,7 +305,7 @@ void Analyser::setSampleColumnsO(
 {
     mOrganizationSampleTypes.clear();
     mOrganizationSampleFunctions.clear();
-    for(const std::pair<OrganizationSampleType, OrganizationSampleFunc>& p :
+    for(const std::pair<const OrganizationSampleType, OrganizationSampleFunc>& p :
         mOrganizationSampleFunctionMap)
     {
         if(columnTypes.empty() ||

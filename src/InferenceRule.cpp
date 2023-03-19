@@ -397,7 +397,7 @@ std::string InferenceRule::toString() const
 {
     std::string txt;
     txt += mRule;
-    for(const std::pair<IRI, IRI>& binding : mBindings)
+    for(const std::pair<const IRI, IRI>& binding : mBindings)
     {
         txt += ", " + binding.first.getFragment() + ": " +
                binding.second.getFragment();
@@ -416,7 +416,7 @@ InferenceRule::resolvePlaceholder(const std::string& _placeholder) const
         inverse = true;
     }
 
-    for(const std::pair<IRI, IRI>& pair : mBindings)
+    for(const std::pair<const IRI, IRI>& pair : mBindings)
     {
         if(pair.first.getFragment() == placeholder ||
            pair.first == IRI(placeholder))

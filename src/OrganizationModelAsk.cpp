@@ -337,7 +337,7 @@ FunctionalityMapping OrganizationModelAsk::computeBoundedFunctionalityMapping(
                 if(!combinationModelPool.isNull() &&
                    !isFeasible(combinationModelPool))
                 {
-                    for(const ModelPool::value_type v : mModelPool)
+                    for(const ModelPool::value_type& v : mModelPool)
                     {
                         size_t currentModelCardinality =
                             boundedModelPool[v.first];
@@ -779,7 +779,7 @@ OrganizationModelAsk::getRelated(const Agent& agent,
                        qualification,
                        objectProperty,
                        includeFunctionalities);
-        for(const ResourceInstance::Ptr resourceInstance :
+        for(const ResourceInstance::Ptr& resourceInstance :
             agentRelatedResources)
         {
             // if (resourceInstance->getModel().toString().find("Provider") !=
