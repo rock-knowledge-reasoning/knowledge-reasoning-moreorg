@@ -5,15 +5,14 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
         id: current_branch
 
       - name: Build
-        run: docker build -t rock/moreorg .  --build-arg PKG_NAME="knowledge_reasoning/moreorg" --build-arg PKG_BRANCH=${{ steps.current_branch.outputs.branch }}
+        run: docker build -t rock/moreorg -f Dockerfile-22.04 .  --build-arg PKG_NAME="knowledge_reasoning/moreorg" --build-arg PKG_BRANCH=${{ steps.current_branch.outputs.branch }}
 
       - name: Test
         run: docker run rock/moreorg /bin/bash -c "source /home/docker/rock_test/env.sh; BOOST_TEST_CATCH_SYSTEM_ERRORS=\"no\" knowledge_reasoning/moreorg/build/test/moreorg-test --log_level=all"
