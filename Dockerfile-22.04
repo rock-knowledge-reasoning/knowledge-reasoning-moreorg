@@ -23,7 +23,7 @@ RUN apt update
 RUN apt upgrade -y
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt install -y ruby ruby-dev wget tzdata locales g++ autotools-dev make cmake sudo git python3-dev
+RUN apt install -y gnupg2 ruby ruby-dev wget tzdata locales g++ autotools-dev make cmake sudo git python3-dev
 
 ENV LANG=de_DE.UTF-8
 ENV LANGUAGE=de_DE:en_GB:en
