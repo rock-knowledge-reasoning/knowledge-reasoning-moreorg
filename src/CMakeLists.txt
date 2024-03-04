@@ -1,5 +1,5 @@
 find_package(gecode REQUIRED)
-find_package(Boost REQUIRED thread serialization program_options)
+find_package(Boost REQUIRED thread regex system filesystem serialization program_options)
 rock_library(moreorg
     SOURCES
         AtomicAgent.cpp
@@ -143,7 +143,7 @@ rock_library(moreorg
         qxcfg
         muparser
 
-    LIBS ${Boost_THREAD_LIBRARY}
+    LIBS ${Boost_LIBRARIES}
         gecode::kernel
         gecode::driver
         gecode::set
@@ -159,7 +159,7 @@ rock_library(moreorg
 )
 
 rock_executable(moreorg-limited_combinations utils/LimitedCombination.cpp
-    DEPS moreorg
+    DEPS moreorg    
 )
 
 #rock_executable(moreorg_bin Main.cpp
@@ -171,13 +171,12 @@ rock_executable(moreorg-multiagent_caf ccf/CAF.cpp
 
 rock_executable(moreorg-multiagent_scenario_analysis utils/ScenarioAnalysis.cpp
     DEPS moreorg
-    LIBS ${Boost_LIBRARIES}
 )
 
 rock_executable(moreorg-bm Benchmark.cpp
-    DEPS moreorg)
+    DEPS moreorg
+)
 
 rock_executable(moreorg-reader utils/OrganizationModelReader.cpp
     DEPS moreorg
-    LIBS ${Boost_LIBRARIES}
 )
