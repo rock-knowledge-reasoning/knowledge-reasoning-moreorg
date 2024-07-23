@@ -768,7 +768,7 @@ Connectivity::identifySymmetries(Gecode::IntVarArray& connections)
 
     Gecode::Symmetries symmetries;
     // define interchangeable columns for roles of the same model type
-    for(const std::pair<const IRI, uint32_t>& entry : mModelPool)
+    for(const std::pair<const IRI, size_t>& entry : mModelPool)
     {
         const IRI& currentModel = entry.first;
         Gecode::IntVarArgs sameModel;

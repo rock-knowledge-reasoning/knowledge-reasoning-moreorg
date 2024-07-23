@@ -222,7 +222,7 @@ void FunctionalityMapping::save(const std::string& filename) const
             mappingFile << "# AGENTS (MODEL POOLS)" << std::endl;
             for(const ModelPool& pool : m.second)
             {
-                for(const std::pair<IRI, size_t>& resource : pool)
+                for(const std::pair<const IRI, size_t>& resource : pool)
                 {
                     mappingFile << resource.first.toString() << " "
                                 << resource.second << std::endl;
