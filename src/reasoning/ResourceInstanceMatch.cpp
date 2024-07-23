@@ -1,7 +1,6 @@
 #include "ResourceInstanceMatch.hpp"
 
 #include <algorithm>
-#include <gecode/gist.hh>
 #include <gecode/minimodel.hh>
 #include <numeric/Combinatorics.hpp>
 
@@ -140,11 +139,6 @@ ResourceInstanceMatch::ResourceInstanceMatch(
            Gecode::INT_VAL_SPLIT_MIN());
     // branch(*this, mModelAssignment, Gecode::INT_VAR_NONE(),
     // Gecode::INT_VAL_SPLIT_MIN());
-
-    // Gecode::Gist::Print<ResourceInstanceMatch> p("Print solution");
-    // Gecode::Gist::Options o;
-    // o.inspect.click(&p);
-    // Gecode::Gist::bab(this, o);
 }
 
 ResourceInstanceMatch::ResourceInstanceMatch(ResourceInstanceMatch& other)

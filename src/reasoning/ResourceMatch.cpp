@@ -1,6 +1,5 @@
 
 #include <algorithm>
-#include <gecode/gist.hh>
 #include <gecode/minimodel.hh>
 #include <moreorg/vocabularies/OM.hpp>
 #include <numeric/Combinatorics.hpp>
@@ -184,11 +183,6 @@ ResourceMatch::ResourceMatch(const ModelBound::List& required,
            Gecode::INT_VAL_SPLIT_MIN());
     // branch(*this, mModelAssignment, Gecode::INT_VAR_NONE(),
     // Gecode::INT_VAL_SPLIT_MIN());
-
-    // Gecode::Gist::Print<ResourceMatch> p("Print solution");
-    // Gecode::Gist::Options o;
-    // o.inspect.click(&p);
-    // Gecode::Gist::bab(this, o);
 }
 
 ResourceMatch::ResourceMatch(ResourceMatch& other)
