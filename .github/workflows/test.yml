@@ -2,20 +2,36 @@ name: test
 on: [push]
 jobs:
   unittests:
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        os: ["ubuntu:20.04", "ubuntu:22.04"]
+        package: ["knowledge_reasoning/moreorg"]
+        seed_config: [".ci/autoproj-config.yml"]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Branch name
-        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
-        id: current_branch
+      - name: Checkout CI Helper
+        uses: actions/checkout@v4
+        with:
+          repository: 2maz/rock-github-workflow
+          path: rock-github-workflow
 
-      - name: Build
-        run: docker build -t rock/moreorg -f Dockerfile-22.04 .  --build-arg PKG_NAME="knowledge_reasoning/moreorg" --build-arg PKG_BRANCH=${{ steps.current_branch.outputs.branch }}
+      - name: Build 
+        run: docker build -t rock/${{ matrix.os }} -f rock-github-workflow/docker/Dockerfile .
+                --build-arg PKG_NAME=${{ matrix.package }}
+                --build-arg PKG_BRANCH=${{ github.ref_name }}
+                --build-arg BASE_IMAGE=${{ matrix.os }}
+                --build-arg SEED_CONFIG=${{ matrix.seed_config }}
 
       - name: Test
-        run: docker run rock/moreorg /bin/bash -c "source /home/docker/rock_test/env.sh; BOOST_TEST_CATCH_SYSTEM_ERRORS=\"no\" knowledge_reasoning/moreorg/build/test/moreorg-test --log_level=all"
+        run: docker run rock/${{ matrix.os }}
+                /bin/bash -c
+                  "source /home/docker/rock_test/env.sh; BOOST_TEST_CATCH_SYSTEM_ERRORS=\"no\" make -C /home/docker/rock_test/${{ matrix.package }}/build test"
+
+
+
 
 
 
