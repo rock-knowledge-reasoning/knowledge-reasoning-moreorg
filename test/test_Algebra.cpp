@@ -11,6 +11,20 @@
 using namespace moreorg;
 using namespace moreorg::algebra;
 
+
+struct ConnectivityFixture {
+
+    ConnectivityFixture()
+    {
+        OrganizationModel::Ptr om = make_shared<OrganizationModel>(getOMSchema());
+        ask = OrganizationModelAsk(om);
+    }
+
+    ~ConnectivityFixture() = default;
+
+    OrganizationModelAsk ask;
+};
+
 BOOST_AUTO_TEST_SUITE(algebra)
 
 BOOST_AUTO_TEST_CASE(max)
@@ -301,25 +315,29 @@ BOOST_AUTO_TEST_CASE(composition)
     }
 }
 
-BOOST_AUTO_TEST_CASE(connectivity)
-{
-    OrganizationModel::Ptr om = make_shared<OrganizationModel>(getOMSchema());
-    OrganizationModelAsk ask(om);
+BOOST_FIXTURE_TEST_SUITE(connectivity, ConnectivityFixture)
+    BOOST_AUTO_TEST_CASE(interfaces)
+    {
 
-    owlapi::model::IRI ifModel0 = vocabulary::OM::resolve("EmiActive");
-    owlapi::model::IRI ifModel1 = vocabulary::OM::resolve("EmiPassive");
+            owlapi::model::IRI ifModel0 = vocabulary::OM::resolve("EmiActive");
+            owlapi::model::IRI ifModel1 = vocabulary::OM::resolve("EmiPassive");
 
-    BOOST_REQUIRE_MESSAGE(
-        ask.ontology().isRelatedTo(ifModel0,
-                                   vocabulary::OM::compatibleWith(),
-                                   ifModel1),
-        "Interfaces are compatible");
+            BOOST_REQUIRE_MESSAGE(
+                ask.ontology().isRelatedTo(ifModel0,
+                                           vocabulary::OM::compatibleWith(),
+                                           ifModel1),
+                "Interfaces are compatible");
+    }
+
+    BOOST_AUTO_TEST_CASE(payload_2)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Payload")] = 2;
         BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(payload_10)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Payload")] = 10;
@@ -327,6 +345,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
         BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(payload_20)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Payload")] = 20;
@@ -334,6 +354,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
         BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(payload_40)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Payload")] = 40;
@@ -346,6 +368,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
             "/tmp/organization-model-connectivity-test-payload-10.dot",
             baseGraph);
     }
+
+    BOOST_AUTO_TEST_CASE(crex_1)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("CREX")] = 1;
@@ -353,6 +377,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
         BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(crex_2)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("CREX")] = 2;
@@ -360,6 +386,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
         BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(crex_10)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("CREX")] = 10;
@@ -367,24 +395,32 @@ BOOST_AUTO_TEST_CASE(connectivity)
         BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask, 30000),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_1)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 1;
         BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_2)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 2;
         BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_20)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 20;
         BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_20_crex_1)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 1;
@@ -393,6 +429,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
         BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_1_crex_10)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 1;
@@ -401,6 +439,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
         BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask, 30000),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_4_crex_3)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 4;
@@ -409,6 +449,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
         BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_10_crex_10)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 10;
@@ -422,6 +464,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
             "/tmp/organization-model-connectivity-test-sherpa10-cex10.dot",
             baseGraph);
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_4_crex_10)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 4;
@@ -430,6 +474,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
         BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask, 30000),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_6_crex_10)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 6;
@@ -446,6 +492,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
                 baseGraph);
         }
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_8_crex_10)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 8;
@@ -454,6 +502,8 @@ BOOST_AUTO_TEST_CASE(connectivity)
         BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask, 30000),
                               "ModelPool: " << modelPool.toString());
     }
+
+    BOOST_AUTO_TEST_CASE(sherpa_9_crex_10)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 9;
@@ -463,6 +513,7 @@ BOOST_AUTO_TEST_CASE(connectivity)
                               "ModelPool: " << modelPool.toString());
     }
 
+    BOOST_AUTO_TEST_CASE(sherpa_5_crex_3_basecamp_3_payload_10)
     {
         ModelPool modelPool;
         modelPool[vocabulary::OM::resolve("Sherpa")] = 5;
@@ -487,71 +538,72 @@ BOOST_AUTO_TEST_CASE(connectivity)
             "Evaluation done: " << Connectivity::getStatistics().toString());
         BOOST_REQUIRE_MESSAGE(feasible, "ModelPool: " << modelPool.toString());
     }
-}
 
-BOOST_AUTO_TEST_CASE(connectivity_multiple_interfaces)
-{
-    OrganizationModel::Ptr om(new OrganizationModel(
-        getRootDir() + "/test/data/om-multiple-interfaces.owl"));
-    OrganizationModelAsk ask(om);
-
+    BOOST_AUTO_TEST_CASE(multiple_interfaces)
     {
-        ModelPool modelPool;
-        modelPool[vocabulary::OM::resolve("RobotA")] = 2;
+        OrganizationModel::Ptr om(new OrganizationModel(
+            getRootDir() + "/test/data/om-multiple-interfaces.owl"));
+        OrganizationModelAsk ask(om);
 
-        BOOST_REQUIRE_MESSAGE(
-            !Connectivity::isFeasible(modelPool, ask),
-            "RobotA 2 should not be a valid combination: ModelPool: "
-                << modelPool.toString());
-    }
-    {
-        ModelPool modelPool;
-        modelPool[vocabulary::OM::resolve("RobotB")] = 2;
+        {
+            ModelPool modelPool;
+            modelPool[vocabulary::OM::resolve("RobotA")] = 2;
 
-        BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask),
-                              "ModelPool: " << modelPool.toString());
-    }
-    {
-        ModelPool modelPool;
-        modelPool[vocabulary::OM::resolve("RobotC")] = 2;
+            BOOST_REQUIRE_MESSAGE(
+                !Connectivity::isFeasible(modelPool, ask),
+                "RobotA 2 should not be a valid combination: ModelPool: "
+                    << modelPool.toString());
+        }
+        {
+            ModelPool modelPool;
+            modelPool[vocabulary::OM::resolve("RobotB")] = 2;
 
-        BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask),
-                              "ModelPool: " << modelPool.toString());
-    }
-    {
-        ModelPool modelPool;
-        modelPool[vocabulary::OM::resolve("RobotA")] = 1;
-        modelPool[vocabulary::OM::resolve("RobotB")] = 1;
+            BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask),
+                                  "ModelPool: " << modelPool.toString());
+        }
+        {
+            ModelPool modelPool;
+            modelPool[vocabulary::OM::resolve("RobotC")] = 2;
 
-        BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
-                              "ModelPool: " << modelPool.toString());
-    }
-    {
-        ModelPool modelPool;
-        modelPool[vocabulary::OM::resolve("RobotA")] = 1;
-        modelPool[vocabulary::OM::resolve("RobotC")] = 1;
+            BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask),
+                                  "ModelPool: " << modelPool.toString());
+        }
+        {
+            ModelPool modelPool;
+            modelPool[vocabulary::OM::resolve("RobotA")] = 1;
+            modelPool[vocabulary::OM::resolve("RobotB")] = 1;
 
-        BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
-                              "ModelPool: " << modelPool.toString());
-    }
-    {
-        ModelPool modelPool;
-        modelPool[vocabulary::OM::resolve("RobotB")] = 1;
-        modelPool[vocabulary::OM::resolve("RobotC")] = 1;
+            BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
+                                  "ModelPool: " << modelPool.toString());
+        }
+        {
+            ModelPool modelPool;
+            modelPool[vocabulary::OM::resolve("RobotA")] = 1;
+            modelPool[vocabulary::OM::resolve("RobotC")] = 1;
 
-        BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask),
-                              "ModelPool: " << modelPool.toString());
-    }
-    {
-        ModelPool modelPool;
-        modelPool[vocabulary::OM::resolve("RobotA")] = 1;
-        modelPool[vocabulary::OM::resolve("RobotB")] = 1;
-        modelPool[vocabulary::OM::resolve("RobotC")] = 1;
+            BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
+                                  "ModelPool: " << modelPool.toString());
+        }
+        {
+            ModelPool modelPool;
+            modelPool[vocabulary::OM::resolve("RobotB")] = 1;
+            modelPool[vocabulary::OM::resolve("RobotC")] = 1;
 
-        BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
-                              "ModelPool: " << modelPool.toString());
+            BOOST_REQUIRE_MESSAGE(!Connectivity::isFeasible(modelPool, ask),
+                                  "ModelPool: " << modelPool.toString());
+        }
+        {
+            ModelPool modelPool;
+            modelPool[vocabulary::OM::resolve("RobotA")] = 1;
+            modelPool[vocabulary::OM::resolve("RobotB")] = 1;
+            modelPool[vocabulary::OM::resolve("RobotC")] = 1;
+
+            BOOST_REQUIRE_MESSAGE(Connectivity::isFeasible(modelPool, ask),
+                                  "ModelPool: " << modelPool.toString());
+        }
     }
-}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_CASE(subset_superset)
 {
