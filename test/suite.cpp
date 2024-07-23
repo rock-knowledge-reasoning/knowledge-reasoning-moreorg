@@ -10,8 +10,13 @@ std::string rdfTestFiles[] = {"test/data/om-schema-v0.1.owl",
                               "test/data/om-schema-v0.2.owl",
                               "test/data/om-schema-v0.5.owl"};
 
+static std::string rootDir = "";
+
 std::string getRootDir()
 {
+    if (!rootDir.empty())
+        return rootDir;
+
     char buffer[1024];
     BOOST_REQUIRE_MESSAGE(readlink("/proc/self/exe", buffer, 1024) != -1,
                           "Retrieving current execution path");
@@ -32,7 +37,8 @@ std::string getRootDir()
 
     std::string executionDir = str.substr(0, textPos);
     std::string configurationPath = executionDir + mainfolder + "/";
-    return configurationPath;
+    rootDir = configurationPath;
+    return rootDir;
 }
 
 std::string getOMSchema()
