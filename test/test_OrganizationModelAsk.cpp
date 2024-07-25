@@ -945,7 +945,7 @@ BOOST_AUTO_TEST_CASE(related_resources)
     size_t numberOfRelatedResources = related.size();
     BOOST_REQUIRE_MESSAGE(numberOfRelatedResources > 0,
                           "Sherpa has associated resources");
-    for(const ResourceInstance::Ptr ri : related)
+    for(const ResourceInstance::Ptr& ri : related)
     {
         BOOST_TEST_MESSAGE("Related resource: " << ri->toString());
     }
