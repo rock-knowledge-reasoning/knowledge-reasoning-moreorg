@@ -1,51 +1,5 @@
-pkg_check_modules(GECODE gecode)
-if(NOT GECODE_FOUND)
-    set(GECODE_COMPONENTS
-            search
-            minimodel
-            set
-            float
-            int
-            kernel
-            support
-    )
-
-    foreach(GECODE_COMPONENT ${GECODE_COMPONENTS})
-        find_library(GECODE_${GECODE_COMPONENT}_LIBRARY_PATH
-            NAMES gecode${GECODE_COMPONENT}
-            HINTS ${CMAKE_INSTALL_TARGET}/lib
-                /opt/rock/$ENV{ROCK_DEB_RELEASE_NAME}/lib
-                /opt/rock/$ENV{ROCK_DEB_RELEASE_NAME}/rock-$ENV{ROCK_DEB_RELEASE_NAME}-tools-gecode/lib
-            REQUIRED
-        )
-        get_filename_component(GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY
-            ${GECODE_${GECODE_COMPONENT}_LIBRARY_PATH} DIRECTORY)
-        if(NOT GECODE_LIBDIR)
-            set(GECODE_LIBDIR ${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY})
-            set(GECODE_PC_LIBS "-L${GECODE_LIBDIR}")
-            string(REPLACE "/lib" "/include" GECODE_INCLUDE_DIR "${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY}")
-            set(GECODE_PC_CFLAGS "-I${GECODE_INCLUDE_DIR}")
-            include_directories(${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY}/../include)
-        endif()
-        get_filename_component(GECODE_${GECODE_COMPONENT}_LIBRARY
-            ${GECODE_${GECODE_COMPONENT}_LIBRARY_PATH} NAME)
-        get_filename_component(GECODE_${GECODE_COMPONENT}_LIBRARY_NOEXT
-            ${GECODE_${GECODE_COMPONENT}_LIBRARY_PATH} NAME_WE)
-        list(APPEND GECODE_LINK_LIBRARIES ${GECODE_${GECODE_COMPONENT}_LIBRARY})
-
-        string(REPLACE "lib" "" OUT_VAR ${GECODE_${GECODE_COMPONENT}_LIBRARY_NOEXT})
-        set(GECODE_PC_LIBS "${GECODE_PC_LIBS} -l${OUT_VAR}")
-
-        link_directories(${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY})
-        message(STATUS "Found gecode library: ${GECODE_${GECODE_COMPONENT}_LIBRARY} \
-             in ${GECODE_${GECODE_COMPONENT}_LINK_DIRECTORY}")
-    endforeach()
-else()
-    message(STATUS "Found gecode libraries via pkg-config in ${GECODE_LIBRARY_DIRS}")
-    set(GECODE_PKGCONFIG gecode)
-endif()
-
-find_package(Boost REQUIRED thread serialization program_options)
+find_package(gecode REQUIRED)
+find_package(Boost REQUIRED thread regex system filesystem serialization program_options)
 rock_library(moreorg
     SOURCES
         AtomicAgent.cpp
@@ -197,17 +151,23 @@ rock_library(moreorg
     DEPS_PKGCONFIG
         owlapi
         numeric
-        ${GECODE_PKGCONFIG}
         pddl_planner
         graph_analysis
         qxcfg
         muparser
-    LIBS ${Boost_THREAD_LIBRARY}
-        ${GECODE_LINK_LIBRARIES}
+
+    LIBS ${Boost_LIBRARIES}
+        gecode::kernel
+        gecode::set
+        gecode::support
+        gecode::search 
+        gecode::int 
+        gecode::float
+        gecode::minimodel
 )
 
 rock_executable(moreorg-limited_combinations utils/LimitedCombination.cpp
-    DEPS moreorg
+    DEPS moreorg    
 )
 
 #rock_executable(moreorg_bin Main.cpp
@@ -219,13 +179,12 @@ rock_executable(moreorg-multiagent_caf ccf/CAF.cpp
 
 rock_executable(moreorg-multiagent_scenario_analysis utils/ScenarioAnalysis.cpp
     DEPS moreorg
-    LIBS ${Boost_LIBRARIES}
 )
 
 rock_executable(moreorg-bm Benchmark.cpp
-    DEPS moreorg)
+    DEPS moreorg
+)
 
 rock_executable(moreorg-reader utils/OrganizationModelReader.cpp
     DEPS moreorg
-    LIBS ${Boost_LIBRARIES}
 )
