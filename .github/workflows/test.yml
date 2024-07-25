@@ -28,7 +28,7 @@ jobs:
       - name: Test
         run: docker run rock/${{ matrix.os }}
                 /bin/bash -c
-                  "source /home/docker/rock_test/env.sh; BOOST_TEST_CATCH_SYSTEM_ERRORS=\"no\" make -C /home/docker/rock_test/${{ matrix.package }}/build/moreorg-test --log_level=all"
+                  "source /home/docker/rock_test/env.sh; CTEST_OUTPUT_ON_FAILURE=1 BOOST_TEST_CATCH_SYSTEM_ERRORS=\"no\" make -C /home/docker/rock_test/${{ matrix.package }}/build/ test"
 
 
 
