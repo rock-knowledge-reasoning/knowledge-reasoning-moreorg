@@ -150,4 +150,5 @@ This software is distributed under the New/3-clause BSD license.
 # Copyright
 
 Copyright (c) 2022- Thomas M. Roehr, Simula Research Laboratory
+
 Copyright (c) 2013-2021 Thomas M. Roehr, DFKI GmbH Robotics Innovation Center
